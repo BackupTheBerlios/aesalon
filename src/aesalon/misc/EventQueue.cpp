@@ -1,9 +1,9 @@
 #include "EventQueue.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Misc {
 
-template<>EventQueue *Misc::Singleton<EventQueue>::instance = 0;
+template<>EventQueue *Singleton<EventQueue>::instance = 0;
 
 void EventQueue::push_event(Event *event) {
     if(event == NULL) return;
@@ -22,5 +22,5 @@ Event *EventQueue::peek_event() {
     return event_queue.front();
 }
 
-} // namespace Interface
+} // namespace Misc
 } // namespace Aesalon

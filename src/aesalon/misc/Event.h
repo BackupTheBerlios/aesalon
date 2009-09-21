@@ -1,12 +1,13 @@
-#ifndef AESALON_INTERFACE_EVENT_H
-#define AESALON_INTERFACE_EVENT_H
+#ifndef AESALON_MISC_EVENT_H
+#define AESALON_MISC_EVENT_H
 
 namespace Aesalon {
-namespace Interface {
+namespace Misc {
 
 class Event {
 public:
     enum event_type_e {
+        MEMORY_EVENT,
         EVENT_TYPES
     };
 private:
@@ -17,7 +18,7 @@ public:
     event_type_e get_type() const { return type; }
 };
 
-} // namespace Interface
+} // namespace Misc
 } // namespace Aesalon
 
 #endif
