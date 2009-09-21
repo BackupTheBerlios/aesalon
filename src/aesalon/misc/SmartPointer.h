@@ -13,10 +13,10 @@ class SmartPointer {
 private:
     Type *data;
     void set_data(Type *new_data) { data = new_data; }
-    Type *get_data() { return data; }
-    Type *get_nonnull_data() {
+    Type *get_data() const { return data; }
+    Type *get_nonnull_data() const {
         if(data) return data;
-        throw NullPointerException("Dereferencing Smart Pointer");
+        throw NullPointerException("dereferencing NULL smart pointer");
     }
 public:
     SmartPointer() { set_data(NULL); }
@@ -31,6 +31,33 @@ public:
     }
     
     Type &operator*() {
+        return *get_nonnull_data();
+    }
+    
+    SmartPointer<Type> operator=(const SmartPointer<Type> &other) {
+        /* NOTE: this const_cast is ugly as well. */
+        set_data(const_cast<Type *>(other.get_data()));
+        return *this;
+    }
+    SmartPointer<Type> operator=(Type *data) {
+        set_data(data);
+        return *this;
+    }
+    
+    bool operator==(const SmartPointer<Type> &other) const {
+        if(get_data() == NULL && other.get_data() == NULL) return true;
+        return *get_nonnull_data() == *other.get_nonnull_data();
+    }
+    
+    bool operator<(const SmartPointer<Type> &other) const {
+        if(get_data() == NULL && other.get_data() == NULL) return false;
+        return *get_nonnull_data() < *other.get_nonnull_data();
+    }
+    
+    operator Type*() {
+        return get_data();
+    }
+    operator Type() {
         return *get_nonnull_data();
     }
 };
