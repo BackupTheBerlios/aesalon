@@ -26,8 +26,8 @@ public:
         set_data(const_cast<Type *>(other.get_data()));
     }
     
-    Type &operator->() {
-        return *get_nonnull_data();
+    Type *operator->() {
+        return get_nonnull_data();
     }
     
     Type &operator*() {

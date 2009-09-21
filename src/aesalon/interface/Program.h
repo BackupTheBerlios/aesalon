@@ -24,6 +24,8 @@ public:
     std::string get_library_location() const { return library_location; }
     
     void execute();
+private:
+    void create_listening_thread();
 };
 
 } // namespace Interface

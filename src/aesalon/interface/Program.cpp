@@ -6,9 +6,17 @@
 #include "Program.h"
 #include "misc/Exception.h"
 #include "misc/OutOfMemoryException.h"
+#include "misc/StreamAsString.h"
 
 namespace Aesalon {
 namespace Interface {
+
+void create_listening_thread() {
+    pid_t child_pid = fork();
+    if(child_pid == 0) {
+        
+    }
+}
 
 void Program::execute() {
     pid_t child_pid;
@@ -16,12 +24,24 @@ void Program::execute() {
     if(child_pid == -1) {
         throw Misc::Exception("Couldn't fork to create another process.");
     }
+    program_pipe = new Pipe();
     if(child_pid != 0) {
-        program_pipe = new Pipe();
+        create_listening_thread();
         return;
     }
     
-    /* add LD_PRELOAD with get_library_path() */
+    char *ld_preload = getenv("LD_PRELOAD");
+    std::string preload_string;
+    if(ld_preload) {
+        /* NOTE: add the aesalon_malloc shared library to the existing LD_PRELOAD. */
+        throw Misc::Exception("Temporary: pre-existing LD_PRELOAD environment variable . . . ");
+    }
+    else preload_string = get_library_location();
+    setenv("LD_PRELOAD", preload_string.c_str(), 1);
+    
+    std::string pipe_fd = Misc::StreamAsString() << program_pipe->get_write_pipe_fd();
+    setenv("AESALON_PIPE", pipe_fd.c_str(), 1);
+    
     char **arguments;
     std::size_t arguments_size = 0;
     
