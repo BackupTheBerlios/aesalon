@@ -23,9 +23,26 @@ void Program::execute() {
     
     /* add LD_PRELOAD with get_library_path() */
     char **arguments;
+    std::size_t arguments_size = 0;
     
-    get_arguments();
+    std::string arguments_string = get_filename() + " " + get_arguments();
     
+    while(arguments_string.size() > 1) {
+        /* First, remove whitespace */
+        while(arguments_string[0] == ' ' || arguments_string[0] == '\t'
+            || arguments_string[0] == '\n') arguments_string.erase(0, 1);
+        /* NOTE: handle quotes in here later */
+        std::size_t length = 0;
+        while(length < arguments_string.size() && arguments_string[length] != ' ' && arguments_string[length] != '\t') length ++;
+        arguments = (char **)realloc(arguments, (arguments_size+2) * sizeof(char *));
+        arguments[arguments_size] = (char *)malloc((length+1) * sizeof(char));
+        for(std::size_t x = 0; x < length; x ++) {
+            arguments[arguments_size][x] = arguments_string[x];
+            arguments[arguments_size][x+1] = 0;
+        }
+        arguments_size ++;
+        *arguments[arguments_size] = 0;
+    }
     
     // strcpy(arguments[0], strrchr(get_filename().c_str(), '/'));
     if(execv(get_filename().c_str(), arguments) == -1) {
