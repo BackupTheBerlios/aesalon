@@ -21,7 +21,7 @@ void *malloc(size_t size) {
     real_free(scope);
     
     init_communication();
-    send_string(buffer, strlen(buffer));
+    send_string(buffer);
     
     return memory;
 }
