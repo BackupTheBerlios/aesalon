@@ -1,0 +1,18 @@
+# Generic ignores
+*.o
+*~
+*.a
+*.so
+
+# Buildsystem (CMake) ignores
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# IDE (KDevelop 4) ignores
+*kdev*
+
+# Executable ignores
+src/aesalon/aesalon
+
