@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "misc/SmartPointer.h"
+#include "../misc/SmartPointer.h"
 #include "Pipe.h"
 
 namespace Aesalon {
@@ -24,6 +24,8 @@ public:
     std::string get_library_location() const { return library_location; }
     
     void execute();
+    
+    std::string resolve_address(std::size_t address);
 private:
     void create_listening_thread();
 };

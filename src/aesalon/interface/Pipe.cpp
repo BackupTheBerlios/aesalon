@@ -11,7 +11,6 @@ Pipe::Pipe() {
     pipe(p_fd);
     pipe_fd = p_fd[0];
     write_fd = p_fd[1];
-    
 }
 
 Pipe::~Pipe() {

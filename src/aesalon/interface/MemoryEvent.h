@@ -12,6 +12,7 @@ class MemoryEvent : public Misc::Event {
 public:
     enum memory_event_type_e {
         MALLOC_EVENT,
+        FREE_EVENT,
         MEMORY_EVENT_TYPES
     };
 private:
@@ -39,6 +40,12 @@ public:
         MemoryEvent(MemoryEvent::MALLOC_EVENT, scope, address), size(size) {}
     
     std::size_t get_size() const { return size; }
+};
+
+class FreeEvent : public MemoryEvent {
+public:
+    FreeEvent(std::string scope, std::size_t address) :
+        MemoryEvent(MemoryEvent::FREE_EVENT, scope, address) {}
 };
 
 } // namespace Interface

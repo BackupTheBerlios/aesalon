@@ -1,4 +1,5 @@
-#include <stdlib.h>
+#include <iostream>
+#include <cstdlib>
 #include <unistd.h>
 #include <sstream>
 
@@ -9,34 +10,53 @@
 namespace Aesalon {
 namespace Interface {
 
+std::size_t PipeListener::get_size_t() {
+    std::string st_str = get_string();
+    std::stringstream ss;
+    ss << st_str;
+    std::size_t st;
+    ss >> st;
+    return st;
+}
+
+std::size_t PipeListener::get_address() {
+    std::string add_str = "0x" + get_string();
+    std::stringstream ss;
+    ss << add_str;
+    std::size_t st;
+    ss >> st;
+    return st;
+}
+
+std::string PipeListener::get_string() {
+    std::string str = get_buffer().substr(0, get_buffer().find(':')-1);
+    get_buffer().erase(0, get_buffer().find(':'));
+    return str;
+}
+
 void PipeListener::handle_buffer() {
     std::string buffer = get_buffer();
-    /* NOTE: ADD ERROR CHECKING */
-    std::string type = buffer.substr(0, buffer.find(':')-1);
-    buffer.erase(0, buffer.find(':'));
-    std::string scope = buffer.substr(0, buffer.find(':')-1);
-    buffer.erase(0, buffer.find(':'));
-    if(type == "malloc") {
-        std::string address_str = buffer.substr(0, buffer.find(':')-1);
-        buffer.erase(0, buffer.find(':'));
-        std::string size_str = buffer;
+    std::cout << "Attempting to handle string '" << buffer << "'" << std::endl;
+    /* buffer should be one of:
+        malloc:call_address:allocated_memory_address:allocated_memory_size
+        realloc:call_address:allocated_memory_address:allocated_memory_size:original_memory_address
+        free:call_address:freed_memory_address
+        Note that all addresses are in hexidecimal form with no leading 0x.
         
-        std::size_t address, size;
+        Also, be permissive of errors . . . if an error is encountered, simply return.
+    */
+    std::string call_type = get_string();
+    std::size_t call_address = get_address();
+    if(call_type == "malloc") {
+        std::size_t mem_address = get_address();
+        std::size_t mem_size = get_size_t();
         
-        std::stringstream ss;
-        
-        ss << address_str;
-        ss >> address;
-        ss.clear();
-        
-        ss << size_str;
-        ss >> size;
-        ss.clear();
-        
-        MemoryEvent *me;
-        me = new MallocEvent(scope, address, size);
+        MemoryEvent *me = new MallocEvent(get_program()->resolve_address(call_address), mem_address, mem_size);
         
         Misc::EventQueue::get_instance()->push_event(me);
+    }
+    else if(call_type == "free") {
+        
     }
 }
 
