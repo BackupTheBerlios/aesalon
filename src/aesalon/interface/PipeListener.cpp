@@ -19,7 +19,7 @@ void PipeListener::handle_buffer() {
     if(type == "malloc") {
         std::string address_str = buffer.substr(0, buffer.find(':')-1);
         buffer.erase(0, buffer.find(':'));
-        std::string size_str = buffer.substr(0);
+        std::string size_str = buffer;
         
         std::size_t address, size;
         

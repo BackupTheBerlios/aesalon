@@ -3,11 +3,16 @@
 #include <string.h>
 #include <stddef.h>
 
-#include "comm.h"
+#include "common.h"
 #include "stack_magic.h"
 #include "passthrough.h"
 
+void __attribute__((constructor)) initialize_library() {
+    printf("Loading library . . .\n");
+}
+
 void *malloc(size_t size) {
+    if(!initialized) return real_malloc(size);
     void *memory; 
     memory = real_malloc(size);
     
