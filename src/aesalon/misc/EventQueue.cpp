@@ -1,4 +1,5 @@
 #include "EventQueue.h"
+#include <iostream>
 
 namespace Aesalon {
 namespace Misc {
@@ -7,7 +8,10 @@ template<>EventQueue *Singleton<EventQueue>::instance = 0;
 
 void EventQueue::push_event(Event *event) {
     if(event == NULL) return;
+    std::cout << "Adding event to queue:" << event << std::endl;
+    std::cout << "\tCurrently, empty is: " << event_queue.empty() << std::endl;
     event_queue.push(event);
+    std::cout << "\tFront element: " << peek_event() << std::endl;
 }
 
 void EventQueue::pop_event() {
@@ -18,6 +22,7 @@ void EventQueue::pop_event() {
 }
 
 Event *EventQueue::peek_event() {
+    std::cout << event_queue.front() << std::endl;
     if(event_queue.empty()) return NULL;
     return event_queue.front();
 }

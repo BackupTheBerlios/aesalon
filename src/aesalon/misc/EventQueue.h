@@ -1,6 +1,7 @@
 #ifndef AESALON_MISC_EVENT_QUEUE_H
 #define AESALON_MISC_EVENT_QUEUE_H
 
+#include <iostream>
 #include <queue>
 
 #include "Event.h"
@@ -15,7 +16,13 @@ public:
 private:
     event_queue_t event_queue;
 public:
-    EventQueue() : Singleton<EventQueue>() {}
+    EventQueue() : Singleton<EventQueue>() {
+        std::cout << "Constructing EventQueue" << std::endl;
+    }
+    virtual ~EventQueue() {
+        std::cout << "Destructing EventQueue" << std::endl;
+        std::cout << event_queue.empty() << std::endl;
+    }
     
     void push_event(Event *event);
     void pop_event();

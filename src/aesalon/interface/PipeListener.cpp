@@ -29,14 +29,13 @@ std::size_t PipeListener::get_address() {
 }
 
 std::string PipeListener::get_string() {
-    std::string str = get_buffer().substr(0, get_buffer().find(':')-1);
-    get_buffer().erase(0, get_buffer().find(':'));
+    std::string str = get_buffer().substr(0, get_buffer().find(':'));
+    get_buffer().erase(0, get_buffer().find(':')+1);
     return str;
 }
 
 void PipeListener::handle_buffer() {
     std::string buffer = get_buffer();
-    std::cout << "Attempting to handle string '" << buffer << "'" << std::endl;
     /* buffer should be one of:
         malloc:call_address:allocated_memory_address:allocated_memory_size
         realloc:call_address:allocated_memory_address:allocated_memory_size:original_memory_address
@@ -56,15 +55,23 @@ void PipeListener::handle_buffer() {
         Misc::EventQueue::get_instance()->push_event(me);
     }
     else if(call_type == "free") {
+        std::size_t mem_address = get_address();
         
+        FreeEvent *fe = new FreeEvent(get_program()->resolve_address(call_address), mem_address);
+        
+        Misc::EventQueue::get_instance()->push_event(fe);
     }
 }
 
 void PipeListener::listen() {
     char c;
+    std::cout << "Listening on pipe . . ." << std::endl;
     while(read(get_pipe()->get_pipe_fd(), &c, sizeof(char))) {
         if(c != 0) buffer += c;
-        else handle_buffer();
+        else {
+            handle_buffer();
+            buffer.clear();
+        }
     }
 }
 

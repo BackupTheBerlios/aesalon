@@ -19,7 +19,7 @@ void __attribute__((constructor)) construct() {
     *(void **) (&aesalon_overload_realloc_ptr) = dlsym(RTLD_NEXT, "realloc");
     *(void **) (&aesalon_overload_free_ptr) = dlsym(RTLD_NEXT, "free");
     
-    pipe_fd = getenv("AESALON_BOOTSTRAP_PIPE");
+    pipe_fd = getenv("AESALON_OVERLOAD_PIPE");
     if(pipe_fd) {
         sscanf(pipe_fd, "%i", &aesalon_overload_communication_pipefd);
         aesalon_overload_communication_enabled = 1;

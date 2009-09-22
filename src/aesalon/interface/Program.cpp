@@ -18,18 +18,20 @@ void Program::create_listening_thread() {
     pid_t child_pid = fork();
     if(child_pid == 0) {
         PipeListener pl(program_pipe, this);
+        std::cout << "Calling PipeListener::listen() . . ." << std::endl;
         pl.listen();
+        exit(0);
     }
 }
 
 void Program::execute() {
     pid_t child_pid;
+    program_pipe = new Pipe();
     child_pid = fork();
     if(child_pid == -1) {
         throw Misc::Exception("Couldn't fork to create another process.");
     }
-    std::cout << "Creating pipe . . ." << std::endl;
-    program_pipe = new Pipe();
+    
     if(child_pid != 0) {
         create_listening_thread();
         return;

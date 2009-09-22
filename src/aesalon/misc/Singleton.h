@@ -21,8 +21,13 @@ class Singleton {
 private:
     static Type *instance;
 public:
-    Singleton();
-    virtual ~Singleton();
+    Singleton() {
+        if(instance) throw MultipleSingletonException();
+        instance = static_cast<Type *>(this);
+    }
+    virtual ~Singleton() {
+        if(instance) instance = 0;
+    }
     
     static Type *get_instance() {
         if(!instance) throw UnitializedSingletonException();

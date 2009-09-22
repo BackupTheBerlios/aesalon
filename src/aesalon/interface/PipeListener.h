@@ -1,6 +1,8 @@
 #ifndef AESALON_INTERFACE_PIPE_LISTENER_H
 #define AESALON_INTERFACE_PIPE_LISTENER_H
 
+#include <iostream>
+
 #include "Pipe.h"
 #include "Program.h"
 #include "misc/SmartPointer.h"
@@ -23,7 +25,9 @@ private:
     std::string get_string();
 public:
     PipeListener(Misc::SmartPointer<Pipe> pipe, Misc::SmartPointer<Program> program) :
-        pipe(pipe), program(program) {}
+        pipe(pipe), program(program) {
+        std::cout << "Creating PipeListener . . ." << std::endl;
+    }
     
     void listen();
     
