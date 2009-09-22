@@ -9,5 +9,6 @@ int aesalon_overload_communication_pipefd;
 int aesalon_overload_communication_enabled;
 
 void aesalon_overload_send_string(char *string) {
-    write(aesalon_overload_communication_pipefd, string, strlen(string)+1);
+    if(aesalon_overload_communication_enabled)
+        write(aesalon_overload_communication_pipefd, string, strlen(string)+1);
 }

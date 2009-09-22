@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include <unistd.h>
 
 void *(*aesalon_overload_malloc_ptr)(size_t);
 void *(*aesalon_overload_realloc_ptr)(void *, size_t);
@@ -16,9 +17,15 @@ void __attribute__((constructor)) construct() {
     
     char *pipe_fd;
     pipe_fd = getenv("AESALON_BOOTSTRAP_PIPE");
-    if(pipe_fd) sscanf(pipe_fd, "%i", &aesalon_overload_communication_pipefd);
-    
-    aesalon_overload_communication_enabled = 1;
+    if(pipe_fd) {
+        sscanf(pipe_fd, "%i", &aesalon_overload_communication_pipefd);
+        aesalon_overload_communication_enabled = 1;
+    }
+}
+
+void __attribute__((destructor)) destruct() {
+    if(aesalon_overload_communication_enabled)
+        close(aesalon_overload_communication_pipefd);
 }
 
 void *malloc(size_t size) {
@@ -29,7 +36,17 @@ void *malloc(size_t size) {
     return memory;
 }
 
+void *realloc(void *ptr, size_t size) {
+    char buffer[1024];
+    void *memory = aesalon_overload_realloc_ptr(ptr, size);
+    snprintf(buffer, 1024, "malloc:%s:%x:%i:%x\0", "<unknown scope>", ptr, size, memory);
+    aesalon_overload_send_string(buffer);
+    return memory;
+}
+
 void free(void *ptr) {
-    
+    char buffer[1024];
+    snprintf(buffer, 1024, "free:%s:%x\0", "<unknown scope>", ptr);
+    aesalon_overload_send_string(buffer);
     aesalon_overload_free_ptr(ptr);
 }
