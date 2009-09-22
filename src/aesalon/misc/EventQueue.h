@@ -21,7 +21,6 @@ public:
     }
     virtual ~EventQueue() {
         std::cout << "Destructing EventQueue" << std::endl;
-        std::cout << event_queue.empty() << std::endl;
     }
     
     void push_event(Event *event);

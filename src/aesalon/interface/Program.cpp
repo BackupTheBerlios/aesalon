@@ -15,13 +15,7 @@ namespace Aesalon {
 namespace Interface {
 
 void Program::create_listening_thread() {
-    pid_t child_pid = fork();
-    if(child_pid == 0) {
-        PipeListener pl(program_pipe, this);
-        std::cout << "Calling PipeListener::listen() . . ." << std::endl;
-        pl.listen();
-        exit(0);
-    }
+    PipeListener pl(program_pipe, this);
 }
 
 void Program::execute() {

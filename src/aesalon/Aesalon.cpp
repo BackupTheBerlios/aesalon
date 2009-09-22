@@ -18,13 +18,11 @@ int main(int argc, char *argv[]) {
     
     sleep(5);
     
+    std::cout << "main(): EventQueue address is: " << Aesalon::Misc::EventQueue::get_instance() << std::endl;
+    
     Aesalon::Misc::Event *e;
     
-    std::cout << Aesalon::Misc::EventQueue::get_instance()->peek_event() << std::endl;
-    
     while((e = Aesalon::Misc::EventQueue::get_instance()->peek_event())) {
-        std::cout << (size_t)e << std::endl;
-        
         Aesalon::Misc::EventQueue::get_instance()->pop_event();
     }
     
@@ -32,4 +30,3 @@ int main(int argc, char *argv[]) {
     
     return 0;
 }
-

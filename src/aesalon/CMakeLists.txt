@@ -8,6 +8,6 @@ aux_source_directory(. SOURCES)
 
 add_executable(aesalon ${SOURCES})
 
-target_link_libraries(aesalon aesalon_misc aesalon_interface aesalon_display dl)
+target_link_libraries(aesalon aesalon_misc aesalon_interface aesalon_display dl pthread)
 
 
