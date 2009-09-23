@@ -33,6 +33,9 @@ public:
     Type &operator*() {
         return *get_nonnull_data();
     }
+    Type *operator&() {
+        return get_nonnull_data();
+    }
     
     SmartPointer<Type> operator=(const SmartPointer<Type> &other) {
         /* NOTE: this const_cast is ugly as well. */
@@ -59,6 +62,10 @@ public:
     }
     operator Type() {
         return *get_nonnull_data();
+    }
+    
+    bool is_null() {
+        return get_data() == NULL;
     }
 };
 

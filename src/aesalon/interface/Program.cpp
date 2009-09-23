@@ -27,6 +27,8 @@ void Program::execute() {
     }
     
     if(child_pid != 0) {
+        program_parser = new ProgramSymbolParser(get_filename());
+        program_parser->parse();
         create_listening_thread();
         return;
     }
@@ -85,9 +87,7 @@ void Program::execute() {
 }
 
 std::string Program::resolve_address(std::size_t address) {
-    /* TODO: implement address resolution using nm, etc. */
-    std::cout << "Asking to resolve address " << address << std::endl;
-    return " ";
+    return program_parser->find_name_by_address(address);
 }
 
 } // namespace Interface

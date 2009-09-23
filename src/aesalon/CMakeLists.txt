@@ -4,6 +4,8 @@ add_subdirectory(misc)
 add_subdirectory(interface)
 add_subdirectory(display)
 
+include_directories(. ..)
+
 aux_source_directory(. SOURCES)
 
 add_executable(aesalon ${SOURCES})

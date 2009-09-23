@@ -3,8 +3,9 @@
 
 #include <string>
 
-#include "../misc/SmartPointer.h"
 #include "Pipe.h"
+#include "misc/SmartPointer.h"
+#include "ProgramSymbolParser.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -15,6 +16,7 @@ private:
     std::string arguments;
     std::string library_location;
     Misc::SmartPointer<Pipe> program_pipe;
+    Misc::SmartPointer<ProgramSymbolParser> program_parser;
 public:
     void set_filename(std::string new_filename) { filename = new_filename; }
     std::string get_filename() const { return filename; }
