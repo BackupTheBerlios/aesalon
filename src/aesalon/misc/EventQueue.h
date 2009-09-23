@@ -16,12 +16,8 @@ public:
 private:
     event_queue_t event_queue;
 public:
-    EventQueue() : Singleton<EventQueue>() {
-        std::cout << "Constructing EventQueue" << std::endl;
-    }
-    virtual ~EventQueue() {
-        std::cout << "Destructing EventQueue" << std::endl;
-    }
+    EventQueue() : Singleton<EventQueue>() {}
+    virtual ~EventQueue() {}
     
     void push_event(Event *event);
     void pop_event();

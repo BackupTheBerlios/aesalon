@@ -1,4 +1,6 @@
 #include <iostream>
+#include <unistd.h>
+#include <sys/wait.h>
 #include "interface/Program.h"
 #include "misc/Exception.h"
 #include "misc/EventQueue.h"
@@ -16,13 +18,12 @@ int main(int argc, char *argv[]) {
         std::cout << "Exception caught: " << e.get_message() << std::endl;
     }
     
-    sleep(5);
-    
-    std::cout << "main(): EventQueue address is: " << Aesalon::Misc::EventQueue::get_instance() << std::endl;
+    wait(NULL);
     
     Aesalon::Misc::Event *e;
     
     while((e = Aesalon::Misc::EventQueue::get_instance()->peek_event())) {
+        std::cout << "Event found: " << Aesalon::Misc::EventQueue::get_instance()->peek_event() << std::endl;
         Aesalon::Misc::EventQueue::get_instance()->pop_event();
     }
     

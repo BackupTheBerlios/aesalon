@@ -34,7 +34,6 @@ private:
 public:
     PipeListener(Misc::SmartPointer<Pipe> pipe, Misc::SmartPointer<Program> program) :
         pipe(pipe), program(program) {
-        std::cout << "Creating PipeListener . . ." << std::endl;
         pthread_create(&listen_thread, NULL, start_thread, this);
     }
     

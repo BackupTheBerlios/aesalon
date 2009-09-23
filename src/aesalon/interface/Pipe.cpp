@@ -8,7 +8,6 @@ namespace Aesalon {
 namespace Interface {
 
 Pipe::Pipe() {
-    std::cout << "Creating new pipe . . ." << std::endl;
     int p_fd[2];
     pipe(p_fd);
     pipe_fd = p_fd[0];

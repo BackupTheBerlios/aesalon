@@ -65,7 +65,6 @@ void PipeListener::handle_buffer() {
 
 void PipeListener::listen() {
     char c;
-    std::cout << "Listening on pipe . . ." << std::endl;
     while(read(get_pipe()->get_pipe_fd(), &c, sizeof(char))) {
         if(c != 0) buffer += c;
         else {

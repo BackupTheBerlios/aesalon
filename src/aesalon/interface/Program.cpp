@@ -31,7 +31,6 @@ void Program::execute() {
         return;
     }
     
-    std::cout << "Setting LD_PRELOAD . . ." << std::endl;
     char *ld_preload = getenv("LD_PRELOAD");
     std::string preload_string;
     if(ld_preload) {
@@ -41,11 +40,9 @@ void Program::execute() {
     else preload_string = get_library_location();
     setenv("LD_PRELOAD", preload_string.c_str(), 1);
     
-    std::cout << "Setting AESALON_OVERLOAD_PIPE . . ." << std::endl;
     std::string pipe_fd = Misc::StreamAsString() << program_pipe->get_write_pipe_fd();
     setenv("AESALON_OVERLOAD_PIPE", pipe_fd.c_str(), 1);
     
-    std::cout << "Creating arguments array . . ." << std::endl;
     char **arguments;
     std::size_t arguments_size = 0;
     
