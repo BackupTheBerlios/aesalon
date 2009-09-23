@@ -86,6 +86,7 @@ void Program::execute() {
 
 std::string Program::resolve_address(std::size_t address) {
     /* TODO: implement address resolution using nm, etc. */
+    std::cout << "Asking to resolve address " << address << std::endl;
     return " ";
 }
 

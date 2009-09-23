@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 #include <unistd.h>
 #include <sstream>
@@ -20,22 +21,21 @@ std::size_t PipeListener::get_size_t() {
 }
 
 std::size_t PipeListener::get_address() {
-    std::string add_str = "0x" + get_string();
+    std::string add_str = get_string();
     std::stringstream ss;
     ss << add_str;
     std::size_t st;
-    ss >> st;
+    ss >> std::hex >> st;
     return st;
 }
 
 std::string PipeListener::get_string() {
-    std::string str = get_buffer().substr(0, get_buffer().find(':'));
-    get_buffer().erase(0, get_buffer().find(':')+1);
+    std::string str = get_buffer()->substr(0, get_buffer()->find(':'));
+    get_buffer()->erase(0, get_buffer()->find(':')+1);
     return str;
 }
 
 void PipeListener::handle_buffer() {
-    std::string buffer = get_buffer();
     /* buffer should be one of:
         malloc:call_address:allocated_memory_address:allocated_memory_size
         realloc:call_address:allocated_memory_address:allocated_memory_size:original_memory_address

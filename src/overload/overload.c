@@ -1,3 +1,6 @@
+#ifndef _GNU_SOURCE
+    #define _GNU_SOURCE
+#endif /* #ifndef _GNU_SOURCE */
 #include "overload.h"
 #include "communication.h"
 #include <stdio.h>
@@ -36,7 +39,7 @@ void *malloc(size_t size) {
     void *memory = aesalon_overload_malloc_ptr(size);
     void *scope_address;
     
-    __asm__("push [rbp]");
+    __asm__("push [rbp+8]");
     scope_address = get_rp();
     __asm__("add rsp, 8");
     
@@ -50,7 +53,7 @@ void *realloc(void *ptr, size_t size) {
     void *memory;
     void *scope_address;
     
-    __asm__("push [rbp]");
+    __asm__("push [rbp+8]");
     scope_address = get_rp();
     __asm__("add rsp, 8");
     
@@ -64,7 +67,7 @@ void free(void *ptr) {
     char buffer[1024];
     void *scope_address;
     
-    __asm__("push [rbp]");
+    __asm__("push [rbp+8]");
     scope_address = get_rp();
     __asm__("add rsp, 8");
     

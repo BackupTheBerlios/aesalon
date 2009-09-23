@@ -18,7 +18,7 @@ private:
     std::string buffer;
     pthread_t listen_thread;
     
-    std::string get_buffer() const { return buffer; }
+    std::string *get_buffer() const { return const_cast<std::string *>(&buffer); }
     
     void handle_buffer();
     
