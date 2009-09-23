@@ -63,6 +63,9 @@ public:
     operator Type() {
         return *get_nonnull_data();
     }
+    operator Type&() {
+        return *get_nonnull_data();
+    }
     
     bool is_null() {
         return get_data() == NULL;

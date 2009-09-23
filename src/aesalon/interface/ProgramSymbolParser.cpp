@@ -20,8 +20,11 @@ void ProgramSymbolParser::parse_line(std::string line) {
     /* to get rid of the middle column */
     ss >> symbol_name;
     ss >> symbol_name;
+    
     ProgramSymbol *ps;
     ps = new ProgramSymbol(symbol_name, symbol_address);
+    std::cout << "Constructed new ProgramSymbol . . ." << std::endl;
+    std::vector< Misc::SmartPointer<ProgramSymbol> > sv_test;
     symbol_vector.push_back(ps);
 }
 
@@ -56,7 +59,7 @@ void ProgramSymbolParser::parse() {
 
 std::string ProgramSymbolParser::find_name_by_address(std::size_t address) {
     std::size_t x = 0;
-    while(get_address_by_number(x) < address) x ++;
+    while(get_address_by_number(x) && get_address_by_number(x) < address) x ++;
     return symbol_vector[x]->get_symbol_name();
 }
 

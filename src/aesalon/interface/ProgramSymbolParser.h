@@ -13,7 +13,7 @@ namespace Interface {
 
 class ProgramSymbolParser {
 public:
-    typedef std::vector< Misc::SmartPointer<ProgramSymbol> > symbol_vector_t;
+    typedef std::vector<Misc::SmartPointer<ProgramSymbol> > symbol_vector_t;
 private:
     std::string filename;
     symbol_vector_t symbol_vector;
