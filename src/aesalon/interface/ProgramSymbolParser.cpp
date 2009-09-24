@@ -24,8 +24,9 @@ void ProgramSymbolParser::parse_line(std::string line) {
     ProgramSymbol *ps;
     ps = new ProgramSymbol(symbol_name, symbol_address);
     std::cout << "Constructed new ProgramSymbol . . ." << std::endl;
-    std::vector< Misc::SmartPointer<ProgramSymbol> > sv_test;
-    symbol_vector.push_back(ps);
+    /*symbol_vector.push_back(Misc::SmartPointer<ProgramSymbol>(ps));*/
+    Misc::SmartPointer<ProgramSymbol> ps_ptr(ps);
+    symbol_vector.push_back(Misc::SmartPointer<ProgramSymbol>());
 }
 
 void ProgramSymbolParser::parse() {

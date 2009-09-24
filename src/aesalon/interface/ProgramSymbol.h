@@ -13,6 +13,11 @@ private:
 public:
     ProgramSymbol(std::string name, std::size_t address) :
         symbol_name(name), symbol_address(address) {}
+    ProgramSymbol() : symbol_name(""), symbol_address(0) {}
+    ProgramSymbol(const ProgramSymbol &other) {
+        set_symbol_name(other.get_symbol_name());
+        set_symbol_address(other.get_symbol_address());
+    }
     
     void set_symbol_name(std::string new_name) { symbol_name = new_name; }
     std::string get_symbol_name() const { return symbol_name; }

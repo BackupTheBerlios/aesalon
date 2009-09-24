@@ -19,8 +19,7 @@ private:
     symbol_vector_t symbol_vector;
     void parse_line(std::string line);
 public:
-    ProgramSymbolParser(std::string filename) : filename(filename) {
-        std::cout << "In ProgramSymbolParser::ProgramSymbolParser() . . ." << std::endl;
+    ProgramSymbolParser(std::string filename) : filename(filename), symbol_vector(10) {
     }
     virtual ~ProgramSymbolParser() {}
     
