@@ -4,6 +4,7 @@
 #include "interface/Program.h"
 #include "misc/Exception.h"
 #include "misc/EventQueue.h"
+#include "interface/MemoryEvent.h"
 
 int main(int argc, char *argv[]) {
     Aesalon::Interface::Program program;

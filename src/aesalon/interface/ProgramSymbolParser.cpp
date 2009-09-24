@@ -38,10 +38,12 @@ void ProgramSymbolParser::parse() {
     if(fork() == 0) {
         /* Don't need to read from the pipe, output only */
         close(pipe_fd[0]);
-        fcntl(pipe_fd[1], F_SETFL, fcntl(pipe_fd[1], F_GETFL) & ~O_NONBLOCK);
+        /*fcntl(pipe_fd[1], F_SETFL, fcntl(pipe_fd[1], F_GETFL) & ~O_NONBLOCK);*/
         dup2(pipe_fd[1], STDOUT_FILENO); /* Reassign stdout . . .*/
         execl("/usr/bin/nm", "/usr/bin/nm", get_filename().c_str(), 0);
     }
+    
+    close(pipe_fd[1]);
     
     wait(NULL);
     
@@ -49,7 +51,7 @@ void ProgramSymbolParser::parse() {
     
     std::string line;
     char buffer;
-    while(read(pipe_fd[0], &buffer, sizeof(char)) > 0) {
+    while(read(pipe_fd[0], &buffer, sizeof(char)) != 0) {
         if(buffer != '\n') line += buffer;
         else {
             parse_line(line);
