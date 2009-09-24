@@ -17,6 +17,9 @@ int main(int argc, char *argv[]) {
     catch(Aesalon::Misc::Exception e) {
         std::cout << "Exception caught: " << e.get_message() << std::endl;
     }
+    catch(std::exception e) {
+        std::cout << "std::exception caught: " << e.what() << std::endl;
+    }
     
     wait(NULL);
     

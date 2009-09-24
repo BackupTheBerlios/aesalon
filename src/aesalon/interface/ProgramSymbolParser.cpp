@@ -59,6 +59,7 @@ void ProgramSymbolParser::parse() {
 
 std::string ProgramSymbolParser::find_name_by_address(std::size_t address) {
     std::size_t x = 0;
+    if(x > symbol_vector.size()) return "";
     while(get_address_by_number(x) && get_address_by_number(x) < address) x ++;
     return symbol_vector[x]->get_symbol_name();
 }

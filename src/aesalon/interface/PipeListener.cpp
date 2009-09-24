@@ -65,12 +65,19 @@ void PipeListener::handle_buffer() {
 
 void PipeListener::listen() {
     char c;
+    try {
+    std::cout << "In PipeListener::listen()" << std::endl;
     while(read(get_pipe()->get_pipe_fd(), &c, sizeof(char))) {
         if(c != 0) buffer += c;
         else {
             handle_buffer();
             buffer.clear();
         }
+    }
+    }
+    catch(std::bad_alloc e) {
+        std::cout << "std::exception caught: " << e.what() << std::endl;
+        exit(1);
     }
 }
 

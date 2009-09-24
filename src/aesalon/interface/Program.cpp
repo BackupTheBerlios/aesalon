@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <cerrno>
+#include <exception>
 
 #include "Program.h"
 #include "PipeListener.h"
@@ -21,18 +22,16 @@ void Program::create_listening_thread() {
 void Program::execute() {
     pid_t child_pid;
     program_pipe = new Pipe();
+    program_parser = new ProgramSymbolParser(get_filename());
+    program_parser->parse();
     child_pid = fork();
     if(child_pid == -1) {
         throw Misc::Exception("Couldn't fork to create another process.");
     }
-    
     if(child_pid != 0) {
-        program_parser = new ProgramSymbolParser(get_filename());
-        program_parser->parse();
         create_listening_thread();
         return;
     }
-    
     char *ld_preload = getenv("LD_PRELOAD");
     std::string preload_string;
     if(ld_preload) {
@@ -86,6 +85,7 @@ void Program::execute() {
 }
 
 std::string Program::resolve_address(std::size_t address) {
+    return "N/A";
     return program_parser->find_name_by_address(address);
 }
 
