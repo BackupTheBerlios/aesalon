@@ -47,37 +47,19 @@ void Program::execute() {
     std::size_t arguments_size = 0;
     
     std::string arguments_string = get_filename() + " " + get_arguments();
-#if 0
-    while(arguments_string.size() > 1) {
-        std::cout << "arguments_string.size(): " << arguments_string.size() << std::endl;
-        /* First, remove whitespace */
-        while(arguments_string[0] == ' ' || arguments_string[0] == '\t'
-            || arguments_string[0] == '\n') arguments_string.erase(0, 1);
-        /* NOTE: handle quotes in here later */
-        std::size_t length = 0;
-        while(length < arguments_string.size() && arguments_string[length] != ' ' && arguments_string[length] != '\t') length ++;
-        std::cout << "Allocating space for another argument . . ." << std::endl;
-        arguments = (char **)realloc(arguments, (arguments_size+2) * sizeof(char *));
-        std::cout << "Called realloc(), calling malloc() . . ." << std::endl;
-        arguments[arguments_size] = (char *)malloc((length+1) * sizeof(char));
-        std::cout << "Copying argument from string . . ." << std::endl;
-        for(std::size_t x = 0; x < length; x ++) {
-            arguments[arguments_size][x] = arguments_string[x];
-            arguments[arguments_size][x+1] = 0;
-        }
+    while(arguments_string.size()) {
+        arguments = (char **)realloc(arguments, sizeof(char *) * (arguments_size + 2));
+        std::string argument = arguments_string.substr(0, arguments_string.find(' '));
+        arguments[arguments_size] = new char[argument.size()+1];
+        strcpy(arguments[arguments_size], argument.c_str());
+        
         arguments_size ++;
-        *arguments[arguments_size] = 0;
-        std::cout << "Checking arguments_string.size() . . ." << std::endl;
+        arguments[arguments_size] = 0;
+        arguments_string.erase(0, arguments_string.find(' ')+1);
     }
-#endif
-    arguments = new char*[2];
-    *arguments[1] = 0;
-    arguments[0] = new char[get_filename().size()+1];
-    strcpy(arguments[0], get_filename().c_str());
-    std::cout << "Executing file '" << get_filename() << "'" << std::endl;
     
     // strcpy(arguments[0], strrchr(get_filename().c_str(), '/'));
-    if(execvp(get_filename().c_str(), NULL) == -1) {
+    if(execvp(get_filename().c_str(), arguments) == -1) {
         /* then couldn't find executable file, or file not executable . . . */
         throw Misc::Exception(Misc::StreamAsString() << "Couldn't execute file: " << strerror(errno));
     }

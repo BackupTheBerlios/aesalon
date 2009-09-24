@@ -23,17 +23,13 @@ void ProgramSymbolParser::parse_line(std::string line) {
     
     ProgramSymbol *ps;
     ps = new ProgramSymbol(symbol_name, symbol_address);
-    std::cout << "Constructed new ProgramSymbol . . ." << std::endl;
-    /*symbol_vector.push_back(Misc::SmartPointer<ProgramSymbol>(ps));*/
+    symbol_vector.push_back(Misc::SmartPointer<ProgramSymbol>(ps));
     Misc::SmartPointer<ProgramSymbol> ps_ptr(ps);
-    symbol_vector.push_back(Misc::SmartPointer<ProgramSymbol>());
 }
 
 void ProgramSymbolParser::parse() {
     int pipe_fd[2];
     pipe(pipe_fd);
-    
-    std::cout << "Beginning parse of nm . . ." << std::endl;
     
     if(fork() == 0) {
         /* Don't need to read from the pipe, output only */
@@ -46,8 +42,6 @@ void ProgramSymbolParser::parse() {
     close(pipe_fd[1]);
     
     wait(NULL);
-    
-    std::cout << "Parsing output of nm . . ." << std::endl;
     
     std::string line;
     char buffer;
@@ -62,7 +56,7 @@ void ProgramSymbolParser::parse() {
 
 std::string ProgramSymbolParser::find_name_by_address(std::size_t address) {
     std::size_t x = 0;
-    if(x > symbol_vector.size()) return "";
+    if(x > symbol_vector.size()) return "<unknown scope>";
     while(get_address_by_number(x) && get_address_by_number(x) < address) x ++;
     return symbol_vector[x]->get_symbol_name();
 }
