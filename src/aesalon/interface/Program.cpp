@@ -36,8 +36,7 @@ void Program::execute() {
     char *ld_preload = getenv("LD_PRELOAD");
     std::string preload_string;
     if(ld_preload) {
-        /* NOTE: add the aesalon_malloc shared library to the existing LD_PRELOAD. */
-        throw Misc::Exception("Temporary: pre-existing LD_PRELOAD environment variable . . . ");
+        preload_string = Misc::StreamAsString() << ld_preload << " " << get_library_location();
     }
     else preload_string = get_library_location();
     setenv("LD_PRELOAD", preload_string.c_str(), 1);
