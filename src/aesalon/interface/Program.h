@@ -18,6 +18,9 @@ private:
     Misc::SmartPointer<Pipe> program_pipe;
     Misc::SmartPointer<ProgramSymbolParser> program_parser;
 public:
+    Program() {}
+    virtual ~Program() {}
+    
     void set_filename(std::string new_filename) { filename = new_filename; }
     std::string get_filename() const { return filename; }
     void set_arguments(std::string new_arguments) { arguments = new_arguments; }

@@ -9,6 +9,8 @@
 namespace Aesalon {
 namespace Misc {
 
+/** Exception class, thrown when a NULL SmartPointer is dereferenced.
+*/
 class NullPointerException : public Exception {
 public:
     NullPointerException(std::string message) :

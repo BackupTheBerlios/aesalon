@@ -67,7 +67,6 @@ void Program::execute() {
 }
 
 std::string Program::resolve_address(std::size_t address) {
-    return "N/A";
     return program_parser->find_name_by_address(address);
 }
 

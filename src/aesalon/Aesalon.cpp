@@ -28,6 +28,8 @@ int main(int argc, char *argv[]) {
     
     while((e = Aesalon::Misc::EventQueue::get_instance()->peek_event())) {
         std::cout << "Event found: " << Aesalon::Misc::EventQueue::get_instance()->peek_event() << std::endl;
+        Aesalon::Interface::MemoryEvent *me = reinterpret_cast<Aesalon::Interface::MemoryEvent *>(Aesalon::Misc::EventQueue::get_instance()->peek_event());
+        std::cout << "\tevent scope: " << me->get_scope() << std::endl;
         Aesalon::Misc::EventQueue::get_instance()->pop_event();
     }
     

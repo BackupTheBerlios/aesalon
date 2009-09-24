@@ -16,3 +16,6 @@ Makefile
 # Executable ignores
 src/aesalon/aesalon
 
+# Generated documentation (doxygen) ignores
+doc/html
+

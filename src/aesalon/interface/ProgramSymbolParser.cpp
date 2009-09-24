@@ -23,8 +23,7 @@ void ProgramSymbolParser::parse_line(std::string line) {
     
     ProgramSymbol *ps;
     ps = new ProgramSymbol(symbol_name, symbol_address);
-    symbol_vector.push_back(Misc::SmartPointer<ProgramSymbol>(ps));
-    Misc::SmartPointer<ProgramSymbol> ps_ptr(ps);
+    symbol_vector.push_back(ps);
 }
 
 void ProgramSymbolParser::parse() {
@@ -36,9 +35,9 @@ void ProgramSymbolParser::parse() {
         close(pipe_fd[0]);
         /*fcntl(pipe_fd[1], F_SETFL, fcntl(pipe_fd[1], F_GETFL) & ~O_NONBLOCK);*/
         dup2(pipe_fd[1], STDOUT_FILENO); /* Reassign stdout . . .*/
-        execl("/usr/bin/nm", "/usr/bin/nm", get_filename().c_str(), 0);
+        execl("/usr/bin/nm", "/usr/bin/nm", "--defined-only", "--numeric-sort", get_filename().c_str(), 0);
     }
-    
+    /* Close the write end of the pipe, so that when nm exits, an EOF is registered. */
     close(pipe_fd[1]);
     
     wait(NULL);
@@ -56,9 +55,16 @@ void ProgramSymbolParser::parse() {
 
 std::string ProgramSymbolParser::find_name_by_address(std::size_t address) {
     std::size_t x = 0;
-    if(x > symbol_vector.size()) return "<unknown scope>";
-    while(get_address_by_number(x) && get_address_by_number(x) < address) x ++;
-    return symbol_vector[x]->get_symbol_name();
+    std::cout << "Searching for event scope . . ." << std::endl;
+    std::cout << "\tAddress of event: " << address << std::endl;
+    if(!symbol_vector.size()) return "<unknown scope>";
+    while(get_address_by_number(x) && get_address_by_number(x) < address) {
+        std::cout << "\tAddress of symbol: " << get_address_by_number(x) << ", name: " << symbol_vector[x]->get_symbol_name() << std::endl;
+        x ++;
+    }
+    x --;
+    if(symbol_vector[x]) return symbol_vector[x]->get_symbol_name();
+    return "<unknown scope>";
 }
 
 } // namespace Interface

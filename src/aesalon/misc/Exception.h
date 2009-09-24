@@ -6,6 +6,8 @@
 namespace Aesalon {
 namespace Misc {
 
+/** Basic exception class, stores a message. Constuctor can be overloaded in
+    derived classes for more specific messages. */
 class Exception {
 private:
     std::string message;

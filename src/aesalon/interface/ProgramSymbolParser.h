@@ -19,7 +19,7 @@ private:
     symbol_vector_t symbol_vector;
     void parse_line(std::string line);
 public:
-    ProgramSymbolParser(std::string filename) : filename(filename), symbol_vector(10) {
+    ProgramSymbolParser(std::string filename) : filename(filename) {
     }
     virtual ~ProgramSymbolParser() {}
     
@@ -28,7 +28,10 @@ public:
     void parse();
     
     std::size_t get_address_by_number(std::size_t number) {
-        return symbol_vector.at(number)->get_symbol_address();
+        if(symbol_vector.at(number).is_valid()) return symbol_vector.at(number)->get_symbol_address();
+        std::cout << "Address out of range: " << number << std::endl;
+        std::cout << "\tVector size: " << symbol_vector.size() << std::endl;
+        return 0;
     }
     std::string find_name_by_address(std::size_t address);
 };
