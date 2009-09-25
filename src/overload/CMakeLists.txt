@@ -1,4 +1,4 @@
-add_definitions(-W -Wall -ansi -pedantic -g -D_GNU_SOURCE -masm=intel -fPIC)
+add_definitions(-W -Wall -ansi -pedantic -g -D_GNU_SOURCE -DAESALON_PLATFORM=1 -masm=intel -fPIC)
 
 aux_source_directory(. SOURCES)
 

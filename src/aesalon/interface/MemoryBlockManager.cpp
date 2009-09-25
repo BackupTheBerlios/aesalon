@@ -18,8 +18,10 @@ void MemoryBlockManager::handle_memory_event(Aesalon::Interface::MemoryEvent* me
             break;
         case MemoryEvent::REALLOC_EVENT:
             handle_realloc_event(dynamic_cast<ReallocEvent *>(me));
+            break;
         case MemoryEvent::FREE_EVENT:
             handle_free_event(dynamic_cast<FreeEvent *>(me));
+            break;
         default: break;
     }
 }
