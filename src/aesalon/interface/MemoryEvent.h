@@ -12,6 +12,7 @@ class MemoryEvent : public Misc::Event {
 public:
     enum memory_event_type_e {
         MALLOC_EVENT,
+        REALLOC_EVENT,
         FREE_EVENT,
         MEMORY_EVENT_TYPES
     };
@@ -40,6 +41,19 @@ public:
         MemoryEvent(MemoryEvent::MALLOC_EVENT, scope, address), size(size) {}
     
     std::size_t get_size() const { return size; }
+};
+
+class ReallocEvent : public MemoryEvent {
+private:
+    std::size_t size;
+    std::size_t new_address;
+public:
+    ReallocEvent(std::string scope, std::size_t address, std::size_t size,
+        std::size_t new_address) : MemoryEvent(MemoryEvent::REALLOC_EVENT, scope, address),
+            size(size), new_address(new_address) {}
+    
+    std::size_t get_size() const { return size; }
+    std::size_t get_new_address() const { return new_address; }
 };
 
 class FreeEvent : public MemoryEvent {

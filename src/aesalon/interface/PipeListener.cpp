@@ -49,17 +49,23 @@ void PipeListener::handle_buffer() {
     
     std::string call_type = get_string();
     std::size_t call_address = get_address();
+    std::size_t mem_address = get_address();
     if(call_type == "malloc") {
-        std::size_t mem_address = get_address();
         std::size_t mem_size = get_size_t();
         
         MemoryEvent *me = new MallocEvent(get_program()->resolve_address(call_address), mem_address, mem_size);
         
         Misc::EventQueue::get_instance()->push_event(me);
     }
-    else if(call_type == "free") {
-        std::size_t mem_address = get_address();
+    else if(call_type == "realloc") {
+        std::size_t mem_size = get_size_t();
+        std::size_t mem_new_address = get_address();
         
+        MemoryEvent *me = new ReallocEvent(get_program()->resolve_address(call_address), mem_address, mem_size, mem_new_address);
+        
+        Misc::EventQueue::get_instance()->push_event(me);
+    }
+    else if(call_type == "free") {
         FreeEvent *fe = new FreeEvent(get_program()->resolve_address(call_address), mem_address);
         
         Misc::EventQueue::get_instance()->push_event(fe);

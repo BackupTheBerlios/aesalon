@@ -58,7 +58,7 @@ void *realloc(void *ptr, size_t size) {
     __asm__("add rsp, 8");
     
     memory = aesalon_overload_realloc_ptr(ptr, size);
-    snprintf(buffer, 1024, "malloc:%lx:%lx:%li:%lx", (size_t)scope_address, (size_t)ptr, size, (size_t)memory);
+    snprintf(buffer, 1024, "realloc:%lx:%lx:%li:%lx", (size_t)scope_address, (size_t)ptr, size, (size_t)memory);
     aesalon_overload_send_string(buffer);
     return memory;
 }

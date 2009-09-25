@@ -18,6 +18,7 @@ private:
     block_map_t block_map;
     
     void handle_malloc_event(MallocEvent *me);
+    void handle_realloc_event(ReallocEvent *me);
     void handle_free_event(FreeEvent *me);
 public:
     MemoryBlockManager();
