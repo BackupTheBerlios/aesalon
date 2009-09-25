@@ -44,6 +44,9 @@ void PipeListener::handle_buffer() {
         
         Also, be permissive of errors . . . if an error is encountered, simply return.
     */
+    
+    Misc::EventQueue::lock_mutex();
+    
     std::string call_type = get_string();
     std::size_t call_address = get_address();
     if(call_type == "malloc") {
@@ -61,6 +64,8 @@ void PipeListener::handle_buffer() {
         
         Misc::EventQueue::get_instance()->push_event(fe);
     }
+    
+    Misc::EventQueue::unlock_mutex();
 }
 
 void PipeListener::listen() {
@@ -79,7 +84,6 @@ void PipeListener::listen() {
 }
 
 PipeListener::~PipeListener() {
-    std::cout << "Terminating listening thread . . ." << std::endl;
     pthread_cancel(listen_thread);
 }
 

@@ -29,12 +29,16 @@ int main(int argc, char *argv[]) {
     
     Aesalon::Interface::MemoryBlockManager mbm;
     
+    Aesalon::Misc::EventQueue::lock_mutex();
+    
     while((e = Aesalon::Misc::EventQueue::get_instance()->peek_event())) {
         Aesalon::Interface::MemoryEvent *me = dynamic_cast<Aesalon::Interface::MemoryEvent *>(Aesalon::Misc::EventQueue::get_instance()->peek_event());
         
         mbm.handle_memory_event(me);
         Aesalon::Misc::EventQueue::get_instance()->pop_event();
     }
+    
+    Aesalon::Misc::EventQueue::unlock_mutex();
     
     mbm.dump_memory();
     

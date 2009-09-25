@@ -1,6 +1,8 @@
 #ifndef AESALON_MISC_SINGLETON_H
 #define AESALON_MISC_SINGLETON_H
 
+#include <pthread.h>
+
 #include "Exception.h"
 
 namespace Aesalon {
@@ -28,6 +30,15 @@ class Singleton {
 private:
     /** Singleton instance, declared in each singleton derived class. */
     static Type *instance;
+    /** Singleton multithreading mutex. Makes the singleton class
+        thread-safe. */
+    pthread_mutex_t singleton_mutex;
+    
+    /** Returns the lockable mutex for the current singleton.
+        @return A lockable mutex, which helps make the singleton library
+            thread-safe.
+    */
+    pthread_mutex_t *get_mutex() { return &singleton_mutex; }
 public:
     /** Basic constructor, checks if the singleton has been initialized yet.
         @throw MultipleSingletonException If the singleton has already been
@@ -36,6 +47,7 @@ public:
     Singleton() {
         if(instance) throw MultipleSingletonException();
         instance = static_cast<Type *>(this);
+        pthread_mutex_init(&singleton_mutex, NULL);
     }
     
     /** Virtual destructor. If the instance is initialized, set the pointer to
@@ -43,6 +55,7 @@ public:
     */
     virtual ~Singleton() {
         if(instance) instance = 0;
+        pthread_mutex_destroy(&singleton_mutex);
     }
     
     /** Static member to return the singleton instance.
@@ -52,6 +65,14 @@ public:
     static Type *get_instance() {
         if(!instance) throw UnitializedSingletonException();
         return instance;
+    }
+    
+    static void lock_mutex() {
+        pthread_mutex_lock(get_instance()->get_mutex());
+    }
+    
+    static void unlock_mutex() {
+        pthread_mutex_unlock(get_instance()->get_mutex());
     }
 };
 
