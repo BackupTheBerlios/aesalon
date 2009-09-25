@@ -65,18 +65,22 @@ void PipeListener::handle_buffer() {
 
 void PipeListener::listen() {
     char c;
+    std::size_t character_received = 0;
+    std::string temporary_buffer;
     while(read(get_pipe()->get_pipe_fd(), &c, sizeof(char))) {
-        if(c != 0) buffer += c;
+        if(c != 0) temporary_buffer += c;
         else {
+            buffer = temporary_buffer;
             handle_buffer();
-            buffer.clear();
+            temporary_buffer.clear();
         }
     }
     pthread_exit(NULL);
 }
 
 PipeListener::~PipeListener() {
-    
+    std::cout << "Terminating listening thread . . ." << std::endl;
+    pthread_cancel(listen_thread);
 }
 
 

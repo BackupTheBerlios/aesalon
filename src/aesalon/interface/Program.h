@@ -9,6 +9,8 @@
 
 namespace Aesalon {
 namespace Interface {
+/* NOTE: forward declaration. */
+class PipeListener;
 
 class Program {
 private:
@@ -16,6 +18,7 @@ private:
     std::string arguments;
     std::string library_location;
     Misc::SmartPointer<Pipe> program_pipe;
+    Misc::SmartPointer<PipeListener> pipe_listener;
     Misc::SmartPointer<ProgramSymbolParser> program_parser;
 public:
     Program() {}

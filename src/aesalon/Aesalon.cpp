@@ -10,7 +10,7 @@
 int main(int argc, char *argv[]) {
     Aesalon::Interface::Program program;
     program.set_arguments("");
-    program.set_filename("/home/strange/c/malloc_test");
+    program.set_filename("/bin/bash");
     program.set_library_location("/home/strange/c/aesalon/src/overload/libaesalon_overload.so");
     new Aesalon::Misc::EventQueue();
     try {

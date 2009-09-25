@@ -16,7 +16,7 @@ namespace Aesalon {
 namespace Interface {
 
 void Program::create_listening_thread() {
-    PipeListener pl(program_pipe, this);
+    pipe_listener = new PipeListener(program_pipe, this);
 }
 
 void Program::execute() {
@@ -29,9 +29,11 @@ void Program::execute() {
         throw Misc::Exception("Couldn't fork to create another process.");
     }
     if(child_pid != 0) {
+        close(program_pipe->get_write_pipe_fd());
         create_listening_thread();
         return;
     }
+    close(program_pipe->get_pipe_fd());
     char *ld_preload = getenv("LD_PRELOAD");
     std::string preload_string;
     if(ld_preload) {
@@ -72,6 +74,7 @@ std::string Program::resolve_address(std::size_t address) {
 
 Program::~Program() {
     if(program_pipe) delete program_pipe;
+    if(pipe_listener) delete pipe_listener;
     if(program_parser) delete program_parser;
 }
 
