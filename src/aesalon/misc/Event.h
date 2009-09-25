@@ -20,6 +20,7 @@ public:
     /** Constructor, takes a type. All other stored data is in the derived
         types. */
     Event(event_type_e type) : type(type) {}
+    virtual ~Event() {}
     
     /** Returns the type of the current event.
         @return The type of the current event.

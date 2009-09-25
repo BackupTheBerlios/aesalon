@@ -29,8 +29,6 @@ public:
     
     std::size_t get_address_by_number(std::size_t number) {
         if(symbol_vector.at(number).is_valid()) return symbol_vector.at(number)->get_symbol_address();
-        std::cout << "Address out of range: " << number << std::endl;
-        std::cout << "\tVector size: " << symbol_vector.size() << std::endl;
         return 0;
     }
     std::string find_name_by_address(std::size_t address);

@@ -5,6 +5,7 @@
 #include "misc/Exception.h"
 #include "misc/EventQueue.h"
 #include "interface/MemoryEvent.h"
+#include "interface/MemoryBlockManager.h"
 
 int main(int argc, char *argv[]) {
     Aesalon::Interface::Program program;
@@ -26,12 +27,16 @@ int main(int argc, char *argv[]) {
     
     Aesalon::Misc::Event *e;
     
+    Aesalon::Interface::MemoryBlockManager mbm;
+    
     while((e = Aesalon::Misc::EventQueue::get_instance()->peek_event())) {
-        std::cout << "Event found: " << Aesalon::Misc::EventQueue::get_instance()->peek_event() << std::endl;
-        Aesalon::Interface::MemoryEvent *me = reinterpret_cast<Aesalon::Interface::MemoryEvent *>(Aesalon::Misc::EventQueue::get_instance()->peek_event());
-        std::cout << "\tevent scope: " << me->get_scope() << std::endl;
+        Aesalon::Interface::MemoryEvent *me = dynamic_cast<Aesalon::Interface::MemoryEvent *>(Aesalon::Misc::EventQueue::get_instance()->peek_event());
+        
+        mbm.handle_memory_event(me);
         Aesalon::Misc::EventQueue::get_instance()->pop_event();
     }
+    
+    mbm.dump_memory();
     
     delete Aesalon::Misc::EventQueue::get_instance();
     
