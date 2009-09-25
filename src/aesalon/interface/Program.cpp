@@ -43,14 +43,14 @@ void Program::execute() {
     std::string pipe_fd = Misc::StreamAsString() << program_pipe->get_write_pipe_fd();
     setenv("AESALON_OVERLOAD_PIPE", pipe_fd.c_str(), 1);
     
-    char **arguments;
+    char **arguments = NULL;
     std::size_t arguments_size = 0;
     
     std::string arguments_string = get_filename() + " " + get_arguments();
     while(arguments_string.size()) {
         arguments = (char **)realloc(arguments, sizeof(char *) * (arguments_size + 2));
         std::string argument = arguments_string.substr(0, arguments_string.find(' '));
-        arguments[arguments_size] = new char[argument.size()+1];
+        arguments[arguments_size] = (char *)malloc(sizeof(char) * argument.size()+1);
         strcpy(arguments[arguments_size], argument.c_str());
         
         arguments_size ++;
@@ -68,6 +68,11 @@ void Program::execute() {
 
 std::string Program::resolve_address(std::size_t address) {
     return program_parser->find_name_by_address(address);
+}
+
+Program::~Program() {
+    if(program_pipe) delete program_pipe;
+    if(program_parser) delete program_parser;
 }
 
 } // namespace Interface

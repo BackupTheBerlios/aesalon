@@ -72,7 +72,13 @@ void PipeListener::listen() {
             buffer.clear();
         }
     }
+    pthread_exit(NULL);
 }
+
+PipeListener::~PipeListener() {
+    
+}
+
 
 } // namespace Interface
 } // namespace Aesalon

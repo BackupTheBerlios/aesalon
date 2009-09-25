@@ -62,5 +62,14 @@ std::string ProgramSymbolParser::find_name_by_address(std::size_t address) {
     return "<unknown scope>";
 }
 
+ProgramSymbolParser::~ProgramSymbolParser() {
+    symbol_vector_t::iterator i = symbol_vector.begin();
+    for(; i != symbol_vector.end(); i ++) {
+        if((*i).is_valid()) {
+            delete (*i);
+        }
+    }
+}
+
 } // namespace Interface
 } // namespace Aesalon

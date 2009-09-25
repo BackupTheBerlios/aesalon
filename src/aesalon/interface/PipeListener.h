@@ -36,6 +36,7 @@ public:
         pipe(pipe), program(program) {
         pthread_create(&listen_thread, NULL, start_thread, this);
     }
+    virtual ~PipeListener();
     
     void listen();
     

@@ -19,9 +19,8 @@ private:
     symbol_vector_t symbol_vector;
     void parse_line(std::string line);
 public:
-    ProgramSymbolParser(std::string filename) : filename(filename) {
-    }
-    virtual ~ProgramSymbolParser() {}
+    ProgramSymbolParser(std::string filename) : filename(filename) {}
+    virtual ~ProgramSymbolParser();
     
     std::string get_filename() const { return filename; }
     

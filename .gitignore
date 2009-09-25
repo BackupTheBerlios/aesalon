@@ -19,3 +19,6 @@ src/aesalon/aesalon
 # Generated documentation (doxygen) ignores
 doc/html
 
+# Valgrind file ignores
+valgrind.*
+
