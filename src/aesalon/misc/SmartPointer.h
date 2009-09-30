@@ -4,6 +4,7 @@
 #include <cstddef>
 
 #include "NullPointerException.h"
+#include "ReferenceCounter.h"
 
 namespace Aesalon {
 namespace Misc {
@@ -18,7 +19,11 @@ private:
     /** Set the data to reference.
         @param new_data The new data for the smart pointer to reference.
     */
-    void set_data(Type *new_data) { data = new_data; }
+    void set_data(Type *new_data) {
+        ReferenceCounter::get_instance()->decrement_block<Type>(data);
+        data = new_data;
+        ReferenceCounter::get_instance()->increment_block<Type>(data);
+    }
     /** Get the data that the pointer references.
         @return The data that the pointer references.
     */
