@@ -34,14 +34,14 @@ void ArgumentParser::parse_argv(char *argv[]) {
                     }
                 }
                 if(i == argument_map.end()) {
-                    throw new UnknownArgumentException(argv[x]);
+                    throw UnknownArgumentException(argv[x]);
                 }
             }
             else {
                 std::queue<char> arguments;
                 std::string argvstr = argv[x];
                 std::string::iterator si = argvstr.begin();
-                for(; si != argvstr.end(); si ++) arguments.push(*si);
+                for(si++; si != argvstr.end(); si ++) arguments.push(*si);
                 /* It's a bunch of short-form arguments, then. */
                 argument_map_t::iterator i = argument_map.begin();
                 while(!arguments.empty()) {
@@ -58,7 +58,7 @@ void ArgumentParser::parse_argv(char *argv[]) {
                         }
                     }
                     if(i == argument_map.end()) {
-                        throw new UnknownArgumentException(arguments.front());
+                        throw UnknownArgumentException(arguments.front());
                     }
                     arguments.pop();
                 }

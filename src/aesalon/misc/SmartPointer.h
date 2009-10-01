@@ -145,7 +145,7 @@ public:
     template<typename ConvertedType>
     SmartPointer<ConvertedType>to() {
         ConvertedType *ct = dynamic_cast<ConvertedType *>(get_nonnull_data());
-        if(ct == NULL) throw new InvalidCastException();
+        if(ct == NULL) throw InvalidCastException();
         return ct;
     }
 };

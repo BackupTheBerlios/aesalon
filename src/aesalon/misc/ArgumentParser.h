@@ -9,6 +9,7 @@
 #include "SmartPointer.h"
 #include "Exception.h"
 #include "StreamAsString.h"
+#include "InvalidCastException.h"
 
 namespace Aesalon {
 namespace Misc {
@@ -28,6 +29,7 @@ public:
     The second, and second-most-obvious, is a string argument, something along
         the lines of '--library-path ./libaesalon_overload.so'/
         '-L ./libaesalon_overload.so' -- these may also have a default value.
+        These may also be used in short-form like '-Ll ./library.so logfile.log'.
 */
 
 class BooleanArgument;
@@ -46,6 +48,15 @@ public:
     virtual ~Argument() {}
     
     argument_type_e get_type() const { return type; }
+    
+    /*BooleanArgument *to_bool() const {
+        if(get_type() == BOOLEAN_ARGUMENT) return dynamic_cast<BooleanArgument *>(const_cast<Argument *>(this));
+        throw InvalidCastException();
+    }
+    StringArgument *to_string() const {
+        if(get_type() == STRING_ARGUMENT) return dynamic_cast<StringArgument *>(const_cast<Argument *>(this));
+        throw InvalidCastException();
+    }*/
 };
 
 class BooleanArgument : public Argument {
@@ -69,6 +80,7 @@ public:
     char get_enable_short_form() const { return enable_short_form; }
     std::string get_disable_long_form() const { return disable_long_form; }
     char get_disable_short_form() const { return disable_short_form; }
+    
     void set_status(bool new_status) { status = new_status; }
     void toggle_status() { status = !status; }
     bool get_status() const { return status; }
@@ -88,7 +100,7 @@ public:
     char get_short_form() const { return short_form; }
     
     void set_value(std::string new_value) { value = new_value; }
-    std::string get_value() const { return value;}
+    std::string get_value() const { return value; }
 };
 
 class FileArgument {
@@ -125,6 +137,7 @@ public:
     SmartPointer<FileArgument> get_file(std::size_t which) {
         return file_argument_vector[which];
     }
+    std::size_t get_files() const { return file_argument_vector.size(); }
     
     void parse_argv(char *argv[]);
 };
