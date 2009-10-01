@@ -140,7 +140,7 @@ public:
     /** Converts the current data to another type.
         @throw InvalidCastException If the types are not polymorphic
             (uses dynamic_cast) or are otherwise incompatible.
-        @return A SmartPointer referencing the converted data->
+        @return A SmartPointer referencing the converted data.
     */
     template<typename ConvertedType>
     SmartPointer<ConvertedType>to() {

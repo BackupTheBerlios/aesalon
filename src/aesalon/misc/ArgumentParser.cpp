@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 #include <queue>
 
 #include "ArgumentParser.h"
@@ -21,18 +22,26 @@ void ArgumentParser::parse_argv(char *argv[]) {
                 /* Try all the long-forms . . . */
                 argument_map_t::iterator i = argument_map.begin();
                 for(; i != argument_map.end(); i ++) {
-                    if((*i).first == argv[x]) {
-                        switch((*i).second->get_type()) {
-                            case Argument::BOOLEAN_ARGUMENT:
-                                (*i).second.to<BooleanArgument>()->toggle_status();
-                                break;
-                            case Argument::STRING_ARGUMENT:
-                                (*i).second.to<StringArgument>()->set_value(argv[++x]);
-                                break;
-                        }
+                    bool handled = false;
+                    switch((*i).second->get_type()) {
+                    case Argument::BOOLEAN_ARGUMENT: {
+                        BooleanArgument *ba = (*i).second.to<BooleanArgument>();
+                        if(ba->get_enable_long_form() == argv[x]) ba->set_status(true), handled = true;
+                        else if(ba->get_disable_long_form() == argv[x]) ba->set_status(false), handled = true;
+                        if(!handled) std::cout << "Skipping over long-form argument \"" << ba->get_enable_long_form() << "\"/\""
+                            << ba->get_disable_long_form() << "\", compared against \"" << argv[x] << "\"\n";
                         break;
                     }
+                    case Argument::STRING_ARGUMENT: {
+                        StringArgument *sa = (*i).second.to<StringArgument>();
+                        if(sa->get_long_form() == argv[x]) sa->set_value(argv[++x]), handled = true;
+                        break;
+                    }
+                    }
+                    
+                    if(handled) break;
                 }
+                
                 if(i == argument_map.end()) {
                     throw UnknownArgumentException(argv[x]);
                 }

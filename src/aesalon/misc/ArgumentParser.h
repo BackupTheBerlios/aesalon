@@ -29,11 +29,11 @@ public:
     The second, and second-most-obvious, is a string argument, something along
         the lines of '--library-path ./libaesalon_overload.so'/
         '-L ./libaesalon_overload.so' -- these may also have a default value.
-        These may also be used in short-form like '-Ll ./library.so logfile.log'.
+        These may also be used in short-form as '-Ll ./library.so logfile.log'.
 */
 
-class BooleanArgument;
-class StringArgument;
+/*class BooleanArgument;
+class StringArgument;*/
 
 class Argument {
 public:
@@ -75,6 +75,7 @@ public:
         disable_long_form(disable_long_form),
         disable_short_form(disable_short_form),
         status(default_value) {}
+    virtual ~BooleanArgument() {}
     
     std::string get_enable_long_form() const { return enable_long_form; }
     char get_enable_short_form() const { return enable_short_form; }
@@ -95,6 +96,7 @@ public:
     StringArgument(std::string long_form, char short_form,
         std::string default_value = "") : Argument(Argument::STRING_ARGUMENT),
         long_form(long_form), short_form(short_form), value(default_value) {}
+    virtual ~StringArgument() {}
     
     std::string get_long_form() const { return long_form; }
     char get_short_form() const { return short_form; }
