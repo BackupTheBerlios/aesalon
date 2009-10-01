@@ -13,7 +13,7 @@ void ArgumentParser::parse_argv(char *argv[]) {
     bool end_found = false;
     while(argv[x] && argv[++x]) {
         /* Is it an argument? */
-        if(argv[x][0] == '-') {
+        if(argv[x][0] == '-' && !end_found) {
             if(argv[x][1] == '-') {
                 if(argv[x][2] == 0) {
                     end_found = true; continue;
@@ -64,7 +64,8 @@ void ArgumentParser::parse_argv(char *argv[]) {
                 }
             }
         }
-        /* No, it's a filename . . . ignore it for now. */
+        /* Nope, it's a filename . . . */
+        else add_file(new FileArgument(argv[x]));
     }
 }
 

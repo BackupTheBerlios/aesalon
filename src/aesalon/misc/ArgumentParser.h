@@ -91,12 +91,23 @@ public:
     std::string get_value() const { return value;}
 };
 
+class FileArgument {
+private:
+    std::string filename;
+public:
+    FileArgument(std::string filename) : filename(filename) {}
+    virtual ~FileArgument() {}
+    
+    std::string get_filename() const { return filename; }
+};
+
 class ArgumentParser : public Misc::Singleton<ArgumentParser> {
 public:
     typedef std::map<std::string, SmartPointer<Argument> > argument_map_t;
-    typedef std::vector<std::string> filename_map_t;
+    typedef std::vector<SmartPointer<FileArgument> > file_argument_vector_t;
 private:
     argument_map_t argument_map;
+    file_argument_vector_t file_argument_vector;
 public:
     ArgumentParser() : Singleton<ArgumentParser>() {}
     virtual ~ArgumentParser() {}
@@ -106,6 +117,13 @@ public:
     }
     SmartPointer<Argument> get_argument(std::string reference_name) {
         return argument_map[reference_name];
+    }
+    
+    void add_file(SmartPointer<FileArgument> file) {
+        file_argument_vector.push_back(file);
+    }
+    SmartPointer<FileArgument> get_file(std::size_t which) {
+        return file_argument_vector[which];
     }
     
     void parse_argv(char *argv[]);
