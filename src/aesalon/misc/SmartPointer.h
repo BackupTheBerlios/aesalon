@@ -4,6 +4,7 @@
 #include <cstddef>
 
 #include "NullPointerException.h"
+#include "InvalidCastException.h"
 #include "ReferenceCounter.h"
 
 namespace Aesalon {
@@ -134,6 +135,18 @@ public:
     */
     bool is_valid() {
         return get_data() != NULL;
+    }
+    
+    /** Converts the current data to another type.
+        @throw InvalidCastException If the types are not polymorphic
+            (uses dynamic_cast) or are otherwise incompatible.
+        @return A SmartPointer referencing the converted data->
+    */
+    template<typename ConvertedType>
+    SmartPointer<ConvertedType>to() {
+        ConvertedType *ct = dynamic_cast<ConvertedType *>(get_nonnull_data());
+        if(ct == NULL) throw new InvalidCastException();
+        return ct;
     }
 };
 
