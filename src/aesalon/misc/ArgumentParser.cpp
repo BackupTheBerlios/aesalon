@@ -28,13 +28,16 @@ void ArgumentParser::parse_argv(char *argv[]) {
                         BooleanArgument *ba = (*i).second.to<BooleanArgument>();
                         if(ba->get_enable_long_form() == argv[x]) ba->set_status(true), handled = true;
                         else if(ba->get_disable_long_form() == argv[x]) ba->set_status(false), handled = true;
-                        if(!handled) std::cout << "Skipping over long-form argument \"" << ba->get_enable_long_form() << "\"/\""
-                            << ba->get_disable_long_form() << "\", compared against \"" << argv[x] << "\"\n";
                         break;
                     }
                     case Argument::STRING_ARGUMENT: {
                         StringArgument *sa = (*i).second.to<StringArgument>();
-                        if(sa->get_long_form() == argv[x]) sa->set_value(argv[++x]), handled = true;
+                        if(sa->get_long_form() == argv[x]) {
+                            if(!argv[x+1]) {
+                                throw NoArgumentToArgumentException(argv[x]);
+                            }
+                            sa->set_value(argv[++x]), handled = true;
+                        }
                         break;
                     }
                     }
@@ -54,19 +57,31 @@ void ArgumentParser::parse_argv(char *argv[]) {
                 /* It's a bunch of short-form arguments, then. */
                 argument_map_t::iterator i = argument_map.begin();
                 while(!arguments.empty()) {
+                    bool handled = false;
                     for(; i != argument_map.end(); i ++) {
                         if((*i).second->get_type() == Argument::BOOLEAN_ARGUMENT) {
                             if(arguments.front() == (*i).second.to<BooleanArgument>()->get_enable_short_form()) {
                                 (*i).second.to<BooleanArgument>()->set_status(true);
+                                handled = true;
                                 break;
                             }
                             else if(arguments.front() == (*i).second.to<BooleanArgument>()->get_disable_short_form()) {
                                 (*i).second.to<BooleanArgument>()->set_status(false);
+                                handled = true;
                                 break;
                             }
                         }
+                        else if((*i).second->get_type() == Argument::STRING_ARGUMENT) {
+                            if(arguments.front() == (*i).second.to<StringArgument>()->get_short_form()) {
+                                if(!argv[x+1]) {
+                                    throw NoArgumentToArgumentException(arguments.front());
+                                }
+                                (*i).second.to<StringArgument>()->set_value(argv[++x]);
+                                handled = true;
+                            }
+                        }
                     }
-                    if(i == argument_map.end()) {
+                    if(!handled) {
                         throw UnknownArgumentException(arguments.front());
                     }
                     arguments.pop();

@@ -14,11 +14,24 @@
 namespace Aesalon {
 namespace Misc {
 
-class UnknownArgumentException : public Exception {
+class ArgumentException : public Exception {
 public:
-    UnknownArgumentException(std::string what) : Exception(StreamAsString()
+    ArgumentException(std::string message) : Exception(message) {}
+};
+
+class NoArgumentToArgumentException : public ArgumentException {
+public:
+    NoArgumentToArgumentException(std::string which) : ArgumentException(StreamAsString()
+        << "Argument expects argument: " << which) {}
+    NoArgumentToArgumentException(char which) : ArgumentException(StreamAsString()
+        << "Argument expects argument: -" << which) {}
+};
+
+class UnknownArgumentException : public ArgumentException {
+public:
+    UnknownArgumentException(std::string what) : ArgumentException(StreamAsString()
         << "Unknown argument encountered: \"" << what << "\"") {}
-    UnknownArgumentException(char what) : Exception(StreamAsString()
+    UnknownArgumentException(char what) : ArgumentException(StreamAsString()
         << "Unknown short-form argument: \'" << what << "\'") {}
 };
 
@@ -32,8 +45,8 @@ public:
         These may also be used in short-form as '-Ll ./library.so logfile.log'.
 */
 
-/*class BooleanArgument;
-class StringArgument;*/
+class BooleanArgument;
+class StringArgument;
 
 class Argument {
 public:
@@ -49,14 +62,15 @@ public:
     
     argument_type_e get_type() const { return type; }
     
-    /*BooleanArgument *to_bool() const {
+    /*SmartPointer<BooleanArgument> to_bool() const {
         if(get_type() == BOOLEAN_ARGUMENT) return dynamic_cast<BooleanArgument *>(const_cast<Argument *>(this));
         throw InvalidCastException();
     }
-    StringArgument *to_string() const {
+    SmartPointer<StringArgument> to_string() const {
         if(get_type() == STRING_ARGUMENT) return dynamic_cast<StringArgument *>(const_cast<Argument *>(this));
         throw InvalidCastException();
     }*/
+    virtual Argument *convert() = 0;
 };
 
 class BooleanArgument : public Argument {
@@ -85,6 +99,8 @@ public:
     void set_status(bool new_status) { status = new_status; }
     void toggle_status() { status = !status; }
     bool get_status() const { return status; }
+    
+    virtual BooleanArgument *convert() { return this; }
 };
 
 class StringArgument : public Argument {
@@ -103,6 +119,8 @@ public:
     
     void set_value(std::string new_value) { value = new_value; }
     std::string get_value() const { return value; }
+    
+    virtual StringArgument *convert() { return this; }
 };
 
 class FileArgument {

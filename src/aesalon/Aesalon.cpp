@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) {
     }
     
     std::cout << "Filenames detected: " << Aesalon::Misc::ArgumentParser::get_instance()->get_files() << std::endl;
+    std::cout << "Display interface: " << ap->get_argument("display interface").to<Aesalon::Misc::StringArgument>()->get_value() << std::endl;
     std::cout << "Usage: " << ap->get_argument("usage").to<Aesalon::Misc::BooleanArgument>()->get_status() << std::endl;
     
     delete Aesalon::Misc::ArgumentParser::get_instance();
