@@ -1,6 +1,7 @@
 #include <iostream>
 #include "misc/ArgumentParser.h"
 #include "misc/ReferenceCounter.h"
+#include "display/DisplayInitializer.h"
 
 int main(int argc, char *argv[]) {
     new Aesalon::Misc::ReferenceCounter();
@@ -15,11 +16,11 @@ int main(int argc, char *argv[]) {
     catch(Aesalon::Misc::UnknownArgumentException e) {
         std::cout << e.get_message() << std::endl;
     }
+    new Aesalon::Display::DisplayInitializer();
     
-    std::cout << "Filenames detected: " << Aesalon::Misc::ArgumentParser::get_instance()->get_files() << std::endl;
-    std::cout << "Display interface: " << ap->get_argument("display interface").to<Aesalon::Misc::StringArgument>()->get_value() << std::endl;
-    std::cout << "Usage: " << ap->get_argument("usage").to<Aesalon::Misc::BooleanArgument>()->get_status() << std::endl;
+    /* The above call will begin the whole process, so clean up afterwards. */
     
+    delete Aesalon::Display::DisplayInitializer::get_instance();
     delete Aesalon::Misc::ArgumentParser::get_instance();
     delete Aesalon::Misc::ReferenceCounter::get_instance();
     return 0;

@@ -9,5 +9,7 @@ enable_language(C)
 
 project(aesalon)
 
+include(build.config)
+
 add_subdirectory(src)
 
