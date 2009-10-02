@@ -2,6 +2,8 @@
 #include "interface/Program.h"
 #include "misc/ArgumentParser.h"
 #include "misc/Exception.h"
+#include "misc/EventQueue.h"
+#include "interface/MemoryEvent.h"
 
 namespace Aesalon {
 namespace Display {
@@ -36,6 +38,27 @@ void StdoutDisplay::start() {
     program.execute();
     
     sleep(1);
+    
+    Misc::EventQueue *eq = Misc::EventQueue::get_instance();
+    
+    do {
+        Misc::EventQueue::lock_mutex();
+        while(eq->peek_event()) {
+            if(eq->peek_event()->get_type() == Misc::Event::MEMORY_EVENT) {
+                Interface::MemoryEvent *me = dynamic_cast<Interface::MemoryEvent *>(eq->peek_event());
+                switch(me->get_memory_type()) {
+                    case Interface::MemoryEvent::MALLOC_EVENT: {
+                        Interface::MallocEvent *ma = dynamic_cast<Interface::MallocEvent *>(me);
+                        if(!me) *((int *)NULL) = 2;
+                        std::cerr << "malloc in scope \"" << me->get_scope() << "\", size " << ma->get_size() << std::endl;
+                    }
+                    default: break;
+                }
+            }
+            eq->pop_event();
+        }
+        Misc::EventQueue::unlock_mutex();
+    } while(program.is_running());
 }
 
 } // namespace Stdout

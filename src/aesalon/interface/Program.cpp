@@ -36,7 +36,7 @@ void Program::execute() {
     }
     close(program_pipe->get_pipe_fd());
     
-    char pid_buffer[128];
+    char pid_buffer[128] = {0};
     sprintf(pid_buffer, "%ld", (long)getpid());
     write(program_pipe->get_write_pipe_fd(), pid_buffer, strlen(pid_buffer)+1);
     

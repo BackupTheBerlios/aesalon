@@ -45,7 +45,10 @@ void *malloc(size_t size) {
     void *memory = aesalon_overload_malloc_ptr(size);
     void *scope_address;
     
-    get_return_pointer();
+    /*get_return_pointer();*/
+    __asm__("push [rbp+8]");
+    scope_address = get_rp();
+    __asm__("add rsp, 8");
     
     snprintf(buffer, 1024, "malloc:%lx:%lx:%li", (size_t)scope_address, (size_t)memory, size);
     aesalon_overload_send_string(buffer);

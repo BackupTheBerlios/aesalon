@@ -56,7 +56,12 @@ void ProgramSymbolParser::parse() {
 std::string ProgramSymbolParser::find_name_by_address(std::size_t address) {
     std::size_t x = 0;
     if(!symbol_vector.size()) return "<unknown scope>";
-    while(get_address_by_number(x) && get_address_by_number(x) < address) x ++;
+    while(x < symbol_vector.size() && get_address_by_number(x) < address) {
+        std::cout << "Passing over symbol " << symbol_vector[x]->get_symbol_name()
+            << ", of address " << symbol_vector[x]->get_symbol_address()
+            << ", since the address of the scope is " << address << std::endl;
+        x ++;
+    }
     x --;
     if(symbol_vector[x]) return symbol_vector[x]->get_symbol_name();
     return "<unknown scope>";
