@@ -41,17 +41,18 @@ private:
     }
 public:
     /** Default constructor. Sets the reference data to NULL. */
-    SmartPointer() { set_data(NULL); }
+    SmartPointer() { data = NULL; }
     
     /** Constructor that takes a pointer data.
         @param data The pointer that the smart pointer should reference.
     */
-    SmartPointer(Type *data) { set_data(data); }
+    SmartPointer(Type *data) { this->data = NULL; set_data(data); }
     
     /** Copy constructor, simply copies the data content over.
         @param other The other SmartPointer to copy.
     */
     SmartPointer(const SmartPointer &other) {
+        data = NULL;
         /* NOTE: this const_cast is ugly. */
         set_data(const_cast<Type *>(other.get_data()));
     }

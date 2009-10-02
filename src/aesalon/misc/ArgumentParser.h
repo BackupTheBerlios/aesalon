@@ -124,7 +124,7 @@ private:
     file_argument_vector_t file_argument_vector;
 public:
     ArgumentParser() : Singleton<ArgumentParser>() {}
-    virtual ~ArgumentParser() {}
+    virtual ~ArgumentParser();
     
     void add_argument(std::string reference_name, SmartPointer<Argument> argument) {
         argument_map[reference_name] = argument;

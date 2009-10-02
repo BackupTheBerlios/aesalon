@@ -78,5 +78,16 @@ void ArgumentParser::parse_argv(char *argv[]) {
     }
 }
 
+ArgumentParser::~ArgumentParser() {
+    argument_map_t::iterator ai = argument_map.begin();
+    for(; ai != argument_map.end(); ai ++) {
+        delete (*ai).second;
+    }
+    file_argument_vector_t::iterator fi = file_argument_vector.begin();
+    for(; fi != file_argument_vector.end(); fi ++) {
+        delete (*fi);
+    }
+}
+
 } // namespace Misc
 } // namespace Aesalon
