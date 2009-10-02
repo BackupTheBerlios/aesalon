@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <pthread.h>
+#include <sys/types.h>
 
 #include "Pipe.h"
 #include "Program.h"
@@ -17,6 +18,7 @@ private:
     Misc::SmartPointer<Program> program;
     std::string buffer;
     pthread_t listen_thread;
+    pid_t listen_thread_pid;
     
     std::string *get_buffer() const { return const_cast<std::string *>(&buffer); }
     
@@ -42,6 +44,8 @@ public:
     
     Misc::SmartPointer<Program> get_program() const { return program; }
     Misc::SmartPointer<Pipe> get_pipe() const { return pipe; }
+    
+    bool is_running();
 };
 
 } // namespace Interface

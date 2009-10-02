@@ -34,6 +34,8 @@ public:
     void execute();
     
     std::string resolve_address(std::size_t address);
+    
+    bool is_running();
 private:
     void create_listening_thread();
 };

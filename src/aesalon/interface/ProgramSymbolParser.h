@@ -27,8 +27,9 @@ public:
     void parse();
     
     std::size_t get_address_by_number(std::size_t number) {
-        if(symbol_vector.at(number).is_valid()) return symbol_vector.at(number)->get_symbol_address();
-        return 0;
+        if(number < symbol_vector.size() && symbol_vector.at(number).is_valid())
+            return symbol_vector.at(number)->get_symbol_address();
+        else return 0;
     }
     std::string find_name_by_address(std::size_t address);
 };

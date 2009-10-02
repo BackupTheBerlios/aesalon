@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <sstream>
+#include <cstring>
+#include <cstdio>
+#include <sys/wait.h>
 
 #include "PipeListener.h"
 #include "misc/EventQueue.h"
@@ -76,13 +79,22 @@ void PipeListener::handle_buffer() {
 
 void PipeListener::listen() {
     char c;
-    std::size_t character_received = 0;
+    bool first = true;
     std::string temporary_buffer;
     while(read(get_pipe()->get_pipe_fd(), &c, sizeof(char))) {
         if(c != 0) temporary_buffer += c;
         else {
-            buffer = temporary_buffer;
-            handle_buffer();
+            if(first) {
+                long thread_pid;
+                sscanf(temporary_buffer.c_str(), "%ld", &thread_pid);
+                listen_thread_pid = (pid_t)thread_pid;
+                std::cout << "Child PID: " << listen_thread_pid << std::endl;
+                first = false;
+            }
+            else {
+                buffer = temporary_buffer;
+                handle_buffer();
+            }
             temporary_buffer.clear();
         }
     }
@@ -93,6 +105,13 @@ PipeListener::~PipeListener() {
     pthread_cancel(listen_thread);
 }
 
+bool PipeListener::is_running() {
+    int status;
+    /* NOTE: Linux-specific (requires 2.6.10 or later) */
+    waitpid(listen_thread_pid, &status, WNOHANG | WCONTINUED);
+    return !WIFEXITED(status);
+    
+}
 
 } // namespace Interface
 } // namespace Aesalon

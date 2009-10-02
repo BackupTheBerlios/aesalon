@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cerrno>
 #include <exception>
+#include <cstdio>
 
 #include "Program.h"
 #include "PipeListener.h"
@@ -28,12 +29,17 @@ void Program::execute() {
     if(child_pid == -1) {
         throw Misc::Exception("Couldn't fork to create another process.");
     }
-    if(child_pid != 0) {
+    else if(child_pid != 0) {
         close(program_pipe->get_write_pipe_fd());
         create_listening_thread();
         return;
     }
     close(program_pipe->get_pipe_fd());
+    
+    char pid_buffer[128];
+    sprintf(pid_buffer, "%ld", (long)getpid());
+    write(program_pipe->get_write_pipe_fd(), pid_buffer, strlen(pid_buffer)+1);
+    
     char *ld_preload = getenv("LD_PRELOAD");
     std::string preload_string;
     if(ld_preload) {
@@ -76,6 +82,11 @@ Program::~Program() {
     if(program_pipe) delete program_pipe;
     if(pipe_listener) delete pipe_listener;
     if(program_parser) delete program_parser;
+}
+
+bool Program::is_running() {
+    if(pipe_listener) return pipe_listener->is_running();
+    else return false;
 }
 
 } // namespace Interface
