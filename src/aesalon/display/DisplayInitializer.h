@@ -8,6 +8,8 @@
 namespace Aesalon {
 namespace Display {
 
+/** Chooses and initializes a display interface based on the content of the
+    "display interface" argument. */
 class DisplayInitializer : public Misc::Singleton<DisplayInitializer> {
 public:
     DisplayInitializer();

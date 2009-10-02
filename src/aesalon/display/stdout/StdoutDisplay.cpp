@@ -37,28 +37,42 @@ void StdoutDisplay::start() {
     
     program.execute();
     
-    sleep(1);
+    while(program.is_running()) sleep(1);
     
     Misc::EventQueue *eq = Misc::EventQueue::get_instance();
+    Misc::EventQueue::lock_mutex();
     
-    do {
-        Misc::EventQueue::lock_mutex();
-        while(eq->peek_event()) {
-            if(eq->peek_event()->get_type() == Misc::Event::MEMORY_EVENT) {
-                Interface::MemoryEvent *me = dynamic_cast<Interface::MemoryEvent *>(eq->peek_event());
-                switch(me->get_memory_type()) {
-                    case Interface::MemoryEvent::MALLOC_EVENT: {
-                        Interface::MallocEvent *ma = dynamic_cast<Interface::MallocEvent *>(me);
-                        if(!me) *((int *)NULL) = 2;
-                        std::cerr << "malloc in scope \"" << me->get_scope() << "\", size " << ma->get_size() << std::endl;
+    typedef std::map<std::string, Misc::SmartPointer<ScopeAllocationInformation> > allocation_scope_status_t;
+    allocation_scope_status_t allocations;
+    
+    while(eq->peek_event()) {
+        if(eq->peek_event()->get_type() == Misc::Event::MEMORY_EVENT) {
+            Interface::MemoryEvent *me = dynamic_cast<Interface::MemoryEvent *>(eq->peek_event());
+            switch(me->get_memory_type()) {
+                case Interface::MemoryEvent::MALLOC_EVENT: {
+                    Interface::MallocEvent *ma = dynamic_cast<Interface::MallocEvent *>(me);
+                    ScopeAllocationInformation *scope = allocations[ma->get_scope()];
+                    if(scope != NULL) {
+                        scope->inc_number();
+                        scope->add_size(ma->get_size());
                     }
-                    default: break;
+                    else {
+                        allocations[ma->get_scope()] = new ScopeAllocationInformation(1, ma->get_size());
+                    }
                 }
+                default: break;
             }
-            eq->pop_event();
         }
-        Misc::EventQueue::unlock_mutex();
-    } while(program.is_running());
+        eq->pop_event();
+    }
+    Misc::EventQueue::unlock_mutex();
+    
+    std::cout << "---------------- aesalon information ----------------" << std::endl;
+    allocation_scope_status_t::iterator i = allocations.begin();
+    for(; i != allocations.end(); i ++) {
+        std::cout << "\tIn the \"" << (*i).first << "\" scope, \n\t\t" << (*i).second->get_number() << " allocations were made"
+            << " for a total of " << (*i).second->get_size() << " byte(s)." << std::endl;
+    }
 }
 
 } // namespace Stdout

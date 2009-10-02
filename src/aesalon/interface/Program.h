@@ -12,6 +12,8 @@ namespace Interface {
 /* NOTE: forward declaration. */
 class PipeListener;
 
+/** Program class, manages an executable. Handles communication, arguments,
+    and scope resolution, through helper classes. */
 class Program {
 private:
     std::string filename;

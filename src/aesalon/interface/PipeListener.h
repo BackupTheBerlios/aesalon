@@ -12,6 +12,8 @@
 namespace Aesalon {
 namespace Interface {
 
+/** UNIX pipe listener class; interprets data coming down the pipe from the
+    overload library. */
 class PipeListener {
 private:
     Misc::SmartPointer<Pipe> pipe;

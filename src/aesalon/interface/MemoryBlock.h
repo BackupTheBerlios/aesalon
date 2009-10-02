@@ -8,6 +8,7 @@
 namespace Aesalon {
 namespace Interface {
 
+/** Class denoting a block of program memory. */
 class MemoryBlock {
 private:
     std::size_t address;

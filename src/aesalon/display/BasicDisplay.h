@@ -6,6 +6,7 @@
 namespace Aesalon {
 namespace Display {
 
+/** Basic display class; simply for overloading purposes. */
 class BasicDisplay : public Misc::Singleton<BasicDisplay> {
 public:
     BasicDisplay() : Misc::Singleton<BasicDisplay>() {}

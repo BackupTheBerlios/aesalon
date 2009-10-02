@@ -50,8 +50,6 @@ void PipeListener::handle_buffer() {
     
     Misc::EventQueue::lock_mutex();
     
-    std::cout << "Handling buffer: " << buffer << std::endl;
-    
     std::string call_type = get_string();
     std::size_t call_address = get_address();
     std::size_t mem_address = get_address();

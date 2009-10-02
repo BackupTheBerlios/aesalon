@@ -11,6 +11,6 @@ int aesalon_overload_communication_enabled;
 void aesalon_overload_send_string(char *string) {
     if(aesalon_overload_communication_enabled) {
         write(aesalon_overload_communication_pipefd, string, strlen(string)+1);
-        printf("Sending string: \"%s\"\n", string);
+        /*printf("Sending string: \"%s\"\n", string);*/
     }
 }
