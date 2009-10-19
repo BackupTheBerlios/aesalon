@@ -17,15 +17,15 @@ namespace Aesalon {
 namespace Interface {
 
 Program::Program() {
-
 }
 
 Program::~Program() {
 
 }
 
-void Program::execute() {
-    
+void Program::execute(std::string executable) {
+    gdb_pipe = new BidirectionalPipe(executable, argument_list);
+    pipe_listener = new PipeListener(gdb_pipe);
 }
 
 } // namespace Interface

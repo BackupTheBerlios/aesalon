@@ -4,6 +4,7 @@
 #include <string>
 
 #include "BidirectionalPipe.h"
+#include "PipeListener.h"
 #include "ArgumentList.h"
 #include "misc/SmartPointer.h"
 
@@ -15,12 +16,13 @@ class PipeListener;
 class Program {
 private:
     Misc::SmartPointer<BidirectionalPipe> gdb_pipe;
+    Misc::SmartPointer<PipeListener> pipe_listener;
     ArgumentList argument_list;
 public:
     Program();
     virtual ~Program();
     
-    void execute();
+    void execute(std::string executable);
 };
 
 } // namespace Interface

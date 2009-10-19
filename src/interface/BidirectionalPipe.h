@@ -26,8 +26,9 @@ public:
     virtual ~BidirectionalPipe();
     
     void send_string(std::string data);
-    
     std::string get_string();
+    
+    bool is_connected() const { return is_open; }
 };
 
 } // namespace Interface

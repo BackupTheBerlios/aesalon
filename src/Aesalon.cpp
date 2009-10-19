@@ -2,7 +2,6 @@
 #include "misc/ArgumentParser.h"
 #include "misc/ReferenceCounter.h"
 #include "misc/EventQueue.h"
-#include "display/DisplayInitializer.h"
 
 int main(int argc, char *argv[]) {
     new Aesalon::Misc::ReferenceCounter();
@@ -20,8 +19,6 @@ int main(int argc, char *argv[]) {
         std::cout << e.get_message() << std::endl;
     }
     try {
-        new Aesalon::Display::DisplayInitializer();
-        Aesalon::Display::DisplayInitializer::get_instance();
     }
     catch(Aesalon::Misc::Exception e) {
         std::cout << "Exception caught: " << e.get_message() << std::endl;
@@ -29,7 +26,6 @@ int main(int argc, char *argv[]) {
     
     /* The above call will begin the whole process, so clean up afterwards. */
     
-    delete Aesalon::Display::DisplayInitializer::get_instance();
     delete Aesalon::Misc::ArgumentParser::get_instance();
     delete Aesalon::Misc::ReferenceCounter::get_instance();
     return 0;

@@ -6,7 +6,6 @@
 
 #include "MemoryBlock.h"
 #include "misc/SmartPointer.h"
-#include "MemoryEvent.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -16,15 +15,12 @@ public:
     typedef std::map<std::size_t, Misc::SmartPointer<MemoryBlock> > block_map_t;
 private:
     block_map_t block_map;
-    
-    void handle_malloc_event(MallocEvent *me);
-    void handle_realloc_event(ReallocEvent *me);
-    void handle_free_event(FreeEvent *me);
 public:
     MemoryBlockManager();
     virtual ~MemoryBlockManager();
     
-    void handle_memory_event(MemoryEvent *me);
+    void add_block(Misc::SmartPointer<MemoryBlock> block) { block_map[block->get_address()] = block; }
+    Misc::SmartPointer<MemoryBlock> get_block(MemoryBlock::memory_address_t address) { return block_map[address]; }
     
     /* NOTE: debugging purposes only. */
     void dump_memory();

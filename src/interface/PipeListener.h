@@ -12,10 +12,15 @@
 namespace Aesalon {
 namespace Interface {
 
-/** UNIX pipe listener class; interprets data coming down the pipe from the
-    overload library. */
+/** UNIX pipe listener class; interprets data coming down the pipe from gdb. */
 class PipeListener {
-
+private:
+    Misc::SmartPointer<BidirectionalPipe> pipe;
+public:
+    PipeListener(Misc::SmartPointer<BidirectionalPipe> pipe);
+    virtual ~PipeListener();
+    
+    void run();
 };
 
 } // namespace Interface
