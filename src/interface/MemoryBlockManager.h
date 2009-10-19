@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 
+#include "MemoryAddress.h"
 #include "MemoryBlock.h"
 #include "misc/SmartPointer.h"
 
@@ -20,7 +21,7 @@ public:
     virtual ~MemoryBlockManager();
     
     void add_block(Misc::SmartPointer<MemoryBlock> block) { block_map[block->get_address()] = block; }
-    Misc::SmartPointer<MemoryBlock> get_block(MemoryBlock::memory_address_t address) { return block_map[address]; }
+    Misc::SmartPointer<MemoryBlock> get_block(MemoryAddress address) { return block_map[address]; }
     
     /* NOTE: debugging purposes only. */
     void dump_memory();
