@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
         std::cout << e.get_message() << std::endl;
     }
     try {
+        /* Begin display execution */
     }
     catch(Aesalon::Misc::Exception e) {
         std::cout << "Exception caught: " << e.get_message() << std::endl;

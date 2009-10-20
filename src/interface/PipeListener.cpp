@@ -25,9 +25,18 @@ void PipeListener::run() {
     while(pipe->is_connected()) {
         std::string data = pipe->get_string();
         
-        std::cout << "Got data: " << data << std::endl;
+        bool from_gdb = false;
+        /* TODO: Check if the string received is from gdb or not . . . */
+        if(!from_gdb) continue;
+        
+        handle_gdb_string(data);
     }
 }
+
+void PipeListener::handle_gdb_string(std::string string) {
+    
+}
+
 
 } // namespace Interface
 } // namespace Aesalon

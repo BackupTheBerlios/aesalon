@@ -16,6 +16,7 @@ namespace Interface {
 class PipeListener {
 private:
     Misc::SmartPointer<BidirectionalPipe> pipe;
+    void handle_gdb_string(std::string string);
 public:
     PipeListener(Misc::SmartPointer<BidirectionalPipe> pipe);
     virtual ~PipeListener();
