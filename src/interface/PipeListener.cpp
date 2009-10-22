@@ -30,25 +30,30 @@ PipeListener::~PipeListener() {
 }
 
 void PipeListener::run() {
-    while(pipe->is_connected()) {
+    while(pipe->is_open()) {
         std::string data = pipe->get_string();
         
         bool from_gdb = false;
         /* TODO: Check if the string received is from gdb or not . . . */
-        if(!from_gdb) continue;
+        if(!from_gdb) {
+            output_string(data);
+            continue;
+        }
         
+        Misc::EventQueue::lock_mutex();
         handle_gdb_string(data);
+        Misc::EventQueue::unlock_mutex();
     }
 }
 
 void PipeListener::handle_gdb_string(std::string string) {
-    Misc::EventQueue::lock_mutex();
-    
-    /* TODO: Process event and add it onto the queue */
-    
-    Misc::EventQueue::unlock_mutex();
+    /* TODO: Process event and add it onto the queue. Event queue mutex is already
+        locked. */
 }
 
+void PipeListener::output_string(std::string string) {
+    /* TODO: passthrough string, as it is not from GDB */
+}
 
 } // namespace Interface
 } // namespace Aesalon

@@ -26,6 +26,11 @@ public:
     void set_size(std::size_t new_size) { size = new_size; }
     std::size_t get_size() const { return size; }
     
+    bool operator==(const MemoryBlock &other) const {
+        if(other.address == address && other.size == size) return true;
+        return false;
+    }
+    
     /* NOTE: for debugging purposes . . . */
     void dump();
 };

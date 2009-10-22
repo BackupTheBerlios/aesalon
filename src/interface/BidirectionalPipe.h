@@ -20,7 +20,7 @@ private:
     int pc_pipe_fd[2];
     int cp_pipe_fd[2];
     std::string executable;
-    bool is_open;
+    bool is_connected;
 public:
     BidirectionalPipe(std::string executable, ArgumentList argument_list);
     virtual ~BidirectionalPipe();
@@ -28,7 +28,7 @@ public:
     void send_string(std::string data);
     std::string get_string();
     
-    bool is_connected() const { return is_open; }
+    bool is_open() const { return is_connected; }
 };
 
 } // namespace Interface

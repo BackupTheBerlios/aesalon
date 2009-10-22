@@ -60,14 +60,14 @@ public:
     /** Arrow operator.
         @return The data that the smart pointer references, in pointer form.
     */
-    Type *operator->() {
+    Type *operator->() const {
         return get_nonnull_data();
     }
     
     /** Dereference operator.
         @return The data that the smart pointer references, as a reference.
     */
-    Type &operator*() {
+    Type &operator*() const {
         return *get_nonnull_data();
     }
     

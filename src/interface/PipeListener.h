@@ -23,6 +23,8 @@ private:
     static void *create_thread(void *listener_instance);
     
     void run();
+    
+    void output_string(std::string string);
 public:
     PipeListener(Misc::SmartPointer<BidirectionalPipe> pipe);
     virtual ~PipeListener();

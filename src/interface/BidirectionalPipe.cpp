@@ -22,8 +22,8 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
     
     pid_t pid = fork();
     
-    if(pid == -1) throw Misc::Exception("Could not fork to execute child process");
-    if(pid == 0) {
+    if(pid == -1) throw BidirectionalPipeException("Could not fork to execute child process: ", true);
+    else if(pid == 0) {
         close(pc_pipe_fd[1]); /* Close the write end of the pc pipe */
         close(cp_pipe_fd[0]); /* Close the read end of the cp pipe */
         
@@ -44,12 +44,12 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
     fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) & ~O_NONBLOCK);
     
     /* Pipe opened and ready to go. */
-    is_open = true;
+    is_connected = true;
 }
 
 BidirectionalPipe::~BidirectionalPipe() {
-    if(is_open) close(pc_pipe_fd[1]), close(cp_pipe_fd[0]);
-    is_open = false;
+    if(is_connected) close(pc_pipe_fd[1]), close(cp_pipe_fd[0]);
+    is_connected = false;
 }
 
 std::string BidirectionalPipe::get_string() {
@@ -60,12 +60,12 @@ std::string BidirectionalPipe::get_string() {
         data += recv;
         if(recv == '\n') return data;
     }
-    is_open = false;
+    is_connected = false;
     return data;
 }
 
 void BidirectionalPipe::send_string(std::string data) {
-    if(is_open) write(pc_pipe_fd[1], data.c_str(), data.length());
+    if(is_open()) write(pc_pipe_fd[1], data.c_str(), data.length());
 }
 
 
