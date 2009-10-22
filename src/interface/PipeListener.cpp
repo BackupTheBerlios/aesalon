@@ -13,12 +13,20 @@
 namespace Aesalon {
 namespace Interface {
 
+void *PipeListener::create_thread(void *listener_instance) {
+    PipeListener *pl = reinterpret_cast<PipeListener *>(listener_instance);
+    
+    pl->run();
+    
+    return NULL;
+}
+
 PipeListener::PipeListener(Misc::SmartPointer<BidirectionalPipe> pipe) : pipe(pipe) {
-    /* TODO: Create another thread out of the run() method */
+    pthread_create(&thread_id, NULL, create_thread, this);
 }
 
 PipeListener::~PipeListener() {
-    
+    pthread_cancel(thread_id);
 }
 
 void PipeListener::run() {
@@ -34,7 +42,11 @@ void PipeListener::run() {
 }
 
 void PipeListener::handle_gdb_string(std::string string) {
+    Misc::EventQueue::lock_mutex();
     
+    /* TODO: Process event and add it onto the queue */
+    
+    Misc::EventQueue::unlock_mutex();
 }
 
 

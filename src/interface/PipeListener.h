@@ -16,12 +16,16 @@ namespace Interface {
 class PipeListener {
 private:
     Misc::SmartPointer<BidirectionalPipe> pipe;
+    pthread_t thread_id;
+    pid_t thread_pid;
+    
     void handle_gdb_string(std::string string);
+    static void *create_thread(void *listener_instance);
+    
+    void run();
 public:
     PipeListener(Misc::SmartPointer<BidirectionalPipe> pipe);
     virtual ~PipeListener();
-    
-    void run();
 };
 
 } // namespace Interface
