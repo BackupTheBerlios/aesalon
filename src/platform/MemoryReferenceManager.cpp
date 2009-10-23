@@ -38,5 +38,14 @@ MemoryReferenceManager::memory_reference_vector_t
     return references;
 }
 
+Misc::SmartPointer<MemoryReference> MemoryReferenceManager::get_reference_by_id(const MemoryReferenceID id) const {
+    memory_reference_vector_t::const_iterator mfi = memory_references.begin();
+    for(; mfi != memory_references.end(); mfi ++) {
+        if((*mfi)->get_id() == id) return *mfi;
+    }
+    return NULL;
+}
+
+
 } // namespace Platform
 } // namespace Aesalon

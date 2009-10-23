@@ -24,6 +24,7 @@ public:
     }
     memory_reference_vector_t *get_references_by_block(const Misc::SmartPointer<MemoryBlock> block) const;
     std::size_t get_block_references(const Misc::SmartPointer<MemoryBlock> block) const;
+    Misc::SmartPointer<MemoryReference> get_reference_by_id(const MemoryReferenceID id) const;
 };
 
 } // namespace Platform
