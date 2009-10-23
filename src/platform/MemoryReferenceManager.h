@@ -22,8 +22,10 @@ public:
     void add_reference(Misc::SmartPointer<MemoryReference> new_reference) {
         memory_references.push_back(new_reference);
     }
-    memory_reference_vector_t *get_references_by_block(const Misc::SmartPointer<MemoryBlock> block) const;
+    
     std::size_t get_block_references(const Misc::SmartPointer<MemoryBlock> block) const;
+    memory_reference_vector_t *get_references_by_block(const Misc::SmartPointer<MemoryBlock> block) const;
+    Misc::SmartPointer<MemoryReference> get_reference_by_scope(const Misc::SmartPointer<MemoryReferenceScope> scope);
     Misc::SmartPointer<MemoryReference> get_reference_by_id(const MemoryReferenceID id) const;
 };
 

@@ -3,6 +3,9 @@
 
 #include <string>
 
+#include "MemoryAddress.h"
+#include "MemoryBlock.h"
+#include "MemoryReference.h"
 #include "misc/Event.h"
 
 namespace Aesalon {
@@ -55,14 +58,50 @@ public:
     };
 private:
     memory_reference_event_type_e memory_reference_event_type;
+    Misc::SmartPointer<MemoryReferenceScope> scope;
+    Misc::SmartPointer<MemoryBlock> block;
 public:
-    MemoryReferenceEvent(memory_reference_event_type_e memory_reference_event_type) :
-        MemoryEvent(MemoryEvent::REFERENCE_EVENT), memory_reference_event_type(memory_reference_event_type) {}
+    MemoryReferenceEvent(memory_reference_event_type_e memory_reference_event_type,
+        Misc::SmartPointer<MemoryReferenceScope> scope, Misc::SmartPointer<MemoryBlock> block) :
+        MemoryEvent(MemoryEvent::REFERENCE_EVENT), memory_reference_event_type(memory_reference_event_type),
+        scope(scope), block(block) {}
+    virtual ~MemoryReferenceEvent() {}
     
     memory_reference_event_type_e get_memory_reference_event_type() const { return memory_reference_event_type; }
+    Misc::SmartPointer<MemoryReferenceScope> get_scope() const { return scope; }
+    Misc::SmartPointer<MemoryBlock> get_block() const { return block; }
 };
 
+class MemoryReferenceNewEvent : public MemoryReferenceEvent {
+private:
+    MemoryAddress address;
+public:
+    MemoryReferenceNewEvent(MemoryAddress address, Misc::SmartPointer<MemoryReferenceScope> scope) :
+        MemoryReferenceEvent(MemoryReferenceEvent::NEW_REFERENCE, scope, NULL), address(address) {}
+    virtual ~MemoryReferenceNewEvent();
+    
+    MemoryAddress get_address() const { return address; }
+};
 
+class MemoryReferenceChangedEvent : public MemoryReferenceEvent {
+private:
+    Misc::SmartPointer<MemoryBlock> new_block;
+public:
+    MemoryReferenceChangedEvent(Misc::SmartPointer<MemoryReferenceScope> scope,
+        Misc::SmartPointer<MemoryBlock> old_block, Misc::SmartPointer<MemoryBlock> new_block) :
+        MemoryReferenceEvent(MemoryReferenceEvent::CHANGED_REFERENCE, scope, old_block) {}
+    virtual ~MemoryReferenceChangedEvent() {}
+    
+    Misc::SmartPointer<MemoryBlock> get_new_block() const { return new_block; }
+};
+
+class MemoryReferenceRemovedEvent : public MemoryReferenceEvent {
+public:
+    MemoryReferenceRemovedEvent(Misc::SmartPointer<MemoryReferenceScope> scope,
+        Misc::SmartPointer<MemoryBlock> block) :
+        MemoryReferenceEvent(MemoryReferenceEvent::REMOVED_REFERENCE, scope, block) {}
+    virtual ~MemoryReferenceRemovedEvent() {}
+};
 
 } // namespace Platform
 } // namespace Aesalon

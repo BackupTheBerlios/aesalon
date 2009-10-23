@@ -23,6 +23,12 @@ public:
     void set_storage_block(Misc::SmartPointer<MemoryBlock> new_block) { storage_block = new_block; }
     std::string get_variable_name() const { return variable_name; }
     void set_variable_name(std::string new_variable_name) { variable_name = new_variable_name; }
+    
+    bool compare_scope(const MemoryReferenceScope &other) const {
+        if(storage_block == other.storage_block
+            && variable_name == other.variable_name) return true;
+        return false;
+    }
 };
 
 class MemoryReference : public MemoryReferenceScope {
