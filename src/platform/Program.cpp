@@ -19,9 +19,12 @@ namespace Platform {
 
 Program::Program() {
     program_memory = new Memory();
+    event_queue = new Misc::EventQueue();
 }
 
 Program::~Program() {
+    if(program_memory.is_valid()) delete program_memory;
+    if(event_queue.is_valid()) delete event_queue;
     if(gdb_pipe.is_valid()) delete gdb_pipe;
     if(pipe_listener.is_valid()) delete pipe_listener;
 }

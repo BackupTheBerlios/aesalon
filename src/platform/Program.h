@@ -8,6 +8,7 @@
 #include "ArgumentList.h"
 #include "Memory.h"
 #include "misc/SmartPointer.h"
+#include "misc/EventQueue.h"
 
 namespace Aesalon {
 namespace Platform {
@@ -20,6 +21,7 @@ private:
     Misc::SmartPointer<PipeListener> pipe_listener;
     Misc::SmartPointer<Memory> program_memory;
     ArgumentList argument_list;
+    Misc::SmartPointer<Misc::EventQueue> event_queue;
 public:
     Program();
     virtual ~Program();
@@ -27,6 +29,8 @@ public:
     Misc::SmartPointer<Memory> get_program_memory() const { return program_memory; }
     
     void execute(std::string executable);
+    
+    Misc::SmartPointer<Misc::EventQueue> get_event_queue() const { return event_queue; }
 };
 
 } // namespace Platform

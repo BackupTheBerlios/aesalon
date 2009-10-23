@@ -4,8 +4,6 @@
 namespace Aesalon {
 namespace Misc {
 
-template<>EventQueue *Singleton<EventQueue>::instance = 0;
-
 void EventQueue::push_event(Event *event) {
     if(event == NULL) return;
     event_queue.push(event);

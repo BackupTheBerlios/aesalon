@@ -40,9 +40,7 @@ void PipeListener::run() {
             continue;
         }
         
-        Misc::EventQueue::lock_mutex();
         handle_gdb_string(data);
-        Misc::EventQueue::unlock_mutex();
     }
 }
 

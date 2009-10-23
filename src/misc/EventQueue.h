@@ -5,20 +5,19 @@
 #include <queue>
 
 #include "Event.h"
-#include "Singleton.h"
 
 namespace Aesalon {
 namespace Misc {
 
 /** Event queue singleton class. Wrapper around std::queue. */
-class EventQueue : public Singleton<EventQueue> {
+class EventQueue {
 public:
     typedef std::queue<Event *> event_queue_t;
 private:
     event_queue_t event_queue;
 public:
     /** Basic constructor, calls Singleton constructor. */
-    EventQueue() : Singleton<EventQueue>() {}
+    EventQueue() {}
     /** Destructor, does nothing. */
     virtual ~EventQueue() {}
     
