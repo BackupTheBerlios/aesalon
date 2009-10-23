@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_MEMORY_BLOCK_H
-#define AESALON_INTERFACE_MEMORY_BLOCK_H
+#ifndef AESALON_PLATFORM_MEMORY_BLOCK_H
+#define AESALON_PLATFORM_MEMORY_BLOCK_H
 
 #include <cstddef>
 #include <string>
@@ -8,7 +8,7 @@
 #include "MemoryAddress.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 /** Class denoting a block of program memory. */
 class MemoryBlock {
@@ -35,7 +35,7 @@ public:
     void dump();
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

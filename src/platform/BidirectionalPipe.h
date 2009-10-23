@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_BIDIRECTIONAL_PIPE_H
-#define AESALON_INTERFACE_BIDIRECTIONAL_PIPE_H
+#ifndef AESALON_PLATFORM_BIDIRECTIONAL_PIPE_H
+#define AESALON_PLATFORM_BIDIRECTIONAL_PIPE_H
 
 #include <string>
 
@@ -8,7 +8,7 @@
 #include "misc/StreamAsString.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 class BidirectionalPipeException : public Misc::Exception {
 public:
@@ -31,7 +31,7 @@ public:
     bool is_open() const { return is_connected; }
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

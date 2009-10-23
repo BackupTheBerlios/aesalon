@@ -1,11 +1,11 @@
-#ifndef AESALON_INTERFACE_MEMORY_REFERENCE_H
-#define AESALON_INTERFACE_MEMORY_REFERENCE_H
+#ifndef AESALON_PLATFORM_MEMORY_REFERENCE_H
+#define AESALON_PLATFORM_MEMORY_REFERENCE_H
 
 #include "MemoryBlock.h"
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 class MemoryReference {
 private:
@@ -18,7 +18,7 @@ public:
     void set_block(Misc::SmartPointer<MemoryBlock> new_block) { block = new_block; }
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

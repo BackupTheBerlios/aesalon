@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_MEMORY_H
-#define AESALON_INTERFACE_MEMORY_H
+#ifndef AESALON_PLATFORM_MEMORY_H
+#define AESALON_PLATFORM_MEMORY_H
 
 #include <cstddef>
 
@@ -8,7 +8,7 @@
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 class Memory {
 private:
@@ -20,7 +20,7 @@ public:
     Misc::SmartPointer<MemoryBlockManager> get_block_manager() const { return block_manager; }
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

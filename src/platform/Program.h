@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_PROGRAM_H
-#define AESALON_INTERFACE_PROGRAM_H
+#ifndef AESALON_PLATFORM_PROGRAM_H
+#define AESALON_PLATFORM_PROGRAM_H
 
 #include <string>
 
@@ -10,7 +10,7 @@
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 /* NOTE: forward declaration. */
 class PipeListener;
 
@@ -29,7 +29,7 @@ public:
     void execute(std::string executable);
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

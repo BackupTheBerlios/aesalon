@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_PIPE_LISTENER_H
-#define AESALON_INTERFACE_PIPE_LISTENER_H
+#ifndef AESALON_PLATFORM_PIPE_LISTENER_H
+#define AESALON_PLATFORM_PIPE_LISTENER_H
 
 #include <iostream>
 #include <pthread.h>
@@ -10,7 +10,7 @@
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 /** UNIX pipe listener class; interprets data coming down the pipe from gdb. */
 class PipeListener {
@@ -30,7 +30,7 @@ public:
     virtual ~PipeListener();
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

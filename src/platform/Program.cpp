@@ -15,7 +15,7 @@
 #include "misc/StreamAsString.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 Program::Program() {
     program_memory = new Memory();
@@ -31,5 +31,5 @@ void Program::execute(std::string executable) {
     pipe_listener = new PipeListener(gdb_pipe);
 }
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon

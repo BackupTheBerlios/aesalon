@@ -1,7 +1,7 @@
 #include "MemoryReferenceManager.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 MemoryReferenceManager::MemoryReferenceManager() {
 
@@ -38,5 +38,5 @@ MemoryReferenceManager::memory_reference_vector_t
     return references;
 }
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon

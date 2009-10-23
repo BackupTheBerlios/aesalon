@@ -7,7 +7,7 @@
 #include "misc/Exception.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 BidirectionalPipeException::BidirectionalPipeException(std::string message,
     bool strerr) : Misc::Exception(Misc::StreamAsString() << message << (strerr?strerror(errno):"")) {
@@ -69,5 +69,5 @@ void BidirectionalPipe::send_string(std::string data) {
 }
 
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon

@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_MEMORY_BLOCK_MANAGER_H
-#define AESALON_INTERFACE_MEMORY_BLOCK_MANAGER_H
+#ifndef AESALON_PLATFORM_MEMORY_BLOCK_MANAGER_H
+#define AESALON_PLATFORM_MEMORY_BLOCK_MANAGER_H
 
 #include <vector>
 #include <map>
@@ -9,7 +9,7 @@
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 class MemoryBlockManager {
 public:
@@ -27,7 +27,7 @@ public:
     void dump_memory();
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 

@@ -1,7 +1,7 @@
 #include "MemoryBlockManager.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 MemoryBlockManager::MemoryBlockManager() {
 
@@ -11,5 +11,5 @@ MemoryBlockManager::~MemoryBlockManager() {
 
 }
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon

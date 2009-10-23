@@ -11,7 +11,7 @@
 #include "misc/EventQueue.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 void *PipeListener::create_thread(void *listener_instance) {
     PipeListener *pl = reinterpret_cast<PipeListener *>(listener_instance);
@@ -55,5 +55,5 @@ void PipeListener::output_string(std::string string) {
     /* TODO: passthrough string, as it is not from GDB */
 }
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon

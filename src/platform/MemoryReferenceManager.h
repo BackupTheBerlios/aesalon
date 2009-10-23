@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_MEMORY_REFERENCE_MANAGER_H
-#define AESALON_INTERFACE_MEMORY_REFERENCE_MANAGER_H
+#ifndef AESALON_PLATFORM_MEMORY_REFERENCE_MANAGER_H
+#define AESALON_PLATFORM_MEMORY_REFERENCE_MANAGER_H
 
 #include <vector>
 
@@ -8,7 +8,7 @@
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 class MemoryReferenceManager {
 public:
@@ -26,7 +26,7 @@ public:
     std::size_t get_block_references(const Misc::SmartPointer<MemoryBlock> block) const;
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 

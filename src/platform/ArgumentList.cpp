@@ -2,7 +2,7 @@
 #include "ArgumentList.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 char **ArgumentList::get_as_argv() {
     char **arguments;
@@ -18,5 +18,5 @@ char **ArgumentList::get_as_argv() {
     return arguments;
 }
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon

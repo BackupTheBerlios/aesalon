@@ -1,7 +1,7 @@
 #include "MemoryReference.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon

@@ -1,11 +1,11 @@
-#ifndef AESALON_INTERFACE_ARGUMENT_LIST_H
-#define AESALON_INTERFACE_ARGUMENT_LIST_H
+#ifndef AESALON_PLATFORM_ARGUMENT_LIST_H
+#define AESALON_PLATFORM_ARGUMENT_LIST_H
 
 #include <string>
 #include <vector>
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 class ArgumentList {
 public:
@@ -20,7 +20,7 @@ public:
     char **get_as_argv();
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif
