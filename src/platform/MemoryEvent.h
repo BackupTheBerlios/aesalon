@@ -40,12 +40,27 @@ public:
     };
 private:
     memory_block_event_type_e memory_block_event_type;
+    Misc::SmartPointer<MemoryBlock> block;
 public:
-    MemoryBlockEvent(memory_block_event_type_e memory_block_event_type) :
-        MemoryEvent(MemoryEvent::BLOCK_EVENT), memory_block_event_type(memory_block_event_type) {}
+    MemoryBlockEvent(memory_block_event_type_e memory_block_event_type, Misc::SmartPointer<MemoryBlock> block) :
+        MemoryEvent(MemoryEvent::BLOCK_EVENT), memory_block_event_type(memory_block_event_type), block(block) {}
     virtual ~MemoryBlockEvent() {}
     
     memory_block_event_type_e get_memory_block_event_type() const { return memory_block_event_type; }
+    Misc::SmartPointer<MemoryBlock> get_block() const { return block; }
+};
+
+class MemoryBlockAllocEvent : public MemoryBlockEvent {
+private:
+    MemoryAddress address;
+    std::size_t size;
+public:
+    MemoryBlockAllocEvent(MemoryAddress address, std::size_t size) :
+        MemoryBlockEvent(MemoryBlockEvent::ALLOC_BLOCK, NULL), address(address), size(size) {}
+    virtual ~MemoryBlockAllocEvent() {}
+    
+    MemoryAddress get_address() const { return address; }
+    std::size_t get_size() const { return size; }
 };
 
 class MemoryReferenceEvent : public MemoryEvent {
@@ -73,14 +88,10 @@ public:
 };
 
 class MemoryReferenceNewEvent : public MemoryReferenceEvent {
-private:
-    MemoryAddress address;
 public:
-    MemoryReferenceNewEvent(MemoryAddress address, Misc::SmartPointer<MemoryReferenceScope> scope) :
-        MemoryReferenceEvent(MemoryReferenceEvent::NEW_REFERENCE, scope, NULL), address(address) {}
+    MemoryReferenceNewEvent(Misc::SmartPointer<MemoryReferenceScope> scope, Misc::SmartPointer<MemoryBlock> block) :
+        MemoryReferenceEvent(MemoryReferenceEvent::NEW_REFERENCE, scope, block) {}
     virtual ~MemoryReferenceNewEvent();
-    
-    MemoryAddress get_address() const { return address; }
 };
 
 class MemoryReferenceChangedEvent : public MemoryReferenceEvent {
