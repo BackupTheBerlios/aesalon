@@ -14,7 +14,7 @@ Makefile
 *kdev*
 
 # Executable ignores
-src/aesalon
+src/interface/aesalon
 
 # Generated documentation (doxygen) ignores
 doc/html

@@ -3,7 +3,7 @@ aux_source_directory(. SOURCES)
 include_directories(.. ../..)
 link_directories(..)
 
-add_library(aesalon_interface ${SOURCES})
+add_executable(aesalon ${SOURCES})
 
-target_link_libraries(aesalon_interface aesalon_platform)
+target_link_libraries(aesalon aesalon_platform aesalon_misc pthread)
 
