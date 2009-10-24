@@ -32,5 +32,4 @@ public:
 } // namespace Platform
 } // namespace Aesalon
 
-
 #endif
