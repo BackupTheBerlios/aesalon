@@ -10,7 +10,7 @@
 namespace Aesalon {
 namespace Misc {
 
-/** Smart pointer class. Used in conjunction with a reference counter for
+/** Smart pointer class. Used in conjunction with Misc::ReferenceCounter for
 memory-leak detection. */
 template<typename Type>
 class SmartPointer {
@@ -21,9 +21,11 @@ private:
         @param new_data The new data for the smart pointer to reference.
     */
     void set_data(Type *new_data) {
+        ReferenceCounter::lock_mutex();
         ReferenceCounter::get_instance()->decrement_block<Type>(data);
         data = new_data;
         ReferenceCounter::get_instance()->increment_block<Type>(data);
+        ReferenceCounter::unlock_mutex();
     }
     /** Get the data that the pointer references.
         @return The data that the pointer references.

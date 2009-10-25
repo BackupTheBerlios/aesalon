@@ -1,6 +1,6 @@
 aux_source_directory(. SOURCES)
 
-include_directories(.. ../..)
+include_directories(..)
 link_directories(..)
 
 add_executable(aesalon ${SOURCES})
