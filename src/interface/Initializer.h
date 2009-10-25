@@ -8,10 +8,14 @@ namespace Interface {
 
 class Initializer : public Misc::Singleton<Initializer> {
 private:
-    void initialize(char *argv[]);
+    char **argv;
+    
+    void initialize();
     void deinitialize();
+    
+    void usage();
 public:
-    Initializer(char *argv[]);
+    Initializer(char **argv);
     virtual ~Initializer();
 };
 
