@@ -18,28 +18,30 @@ Initializer::~Initializer() {
 }
 
 void Initializer::initialize() {
-    new Aesalon::Misc::ReferenceCounter();
-    Aesalon::Misc::ArgumentParser *ap = new Aesalon::Misc::ArgumentParser();
+    new Misc::ReferenceCounter();
+    Misc::ArgumentParser *ap = new Misc::ArgumentParser();
     
-    ap->add_argument("usage", new Aesalon::Misc::BooleanArgument("--usage", 'h', "", 0, false));
-    ap->add_argument("gui pid", new Aesalon::Misc::StringArgument("--gui-pid", 'p', ""));
+    ap->add_argument("usage", new Misc::BooleanArgument("--usage", 'h', "", 0, false));
+    ap->add_argument("logfile", new Misc::StringArgument("--log-file", 'l', ""));
     
     ap->parse_argv(argv);
     
     if(ap->get_argument("usage").to<Misc::BooleanArgument>()->get_status()) usage();
-    std::cout << "GUI pid: " << ap->get_argument("gui pid").to<Aesalon::Misc::StringArgument>()->get_value() << std::endl;
 }
 
 void Initializer::deinitialize() {
-    Aesalon::Misc::ArgumentParser::lock_mutex();
-    delete Aesalon::Misc::ArgumentParser::get_instance();
-    Aesalon::Misc::ReferenceCounter::lock_mutex();
-    delete Aesalon::Misc::ReferenceCounter::get_instance();
+    Misc::ArgumentParser::lock_mutex();
+    delete Misc::ArgumentParser::get_instance();
+    Misc::ReferenceCounter::lock_mutex();
+    delete Misc::ReferenceCounter::get_instance();
 }
 
 void Initializer::usage() {
-    std::cout << argv[0] << ": aesalon gdb interface, version v" << MAJOR_VERSION << "." << MINOR_VERSION << "." << PATCHLEVEL;
+    std::cout << "aesalon gdb interface, version v" << MAJOR_VERSION << "." << MINOR_VERSION << "." << PATCHLEVEL;
     std::cout << ", copyright (C) 2009" << std::endl;
+    std::cout << "usage: " << argv[0] << " [arguments] executable [executable arguments]" << std::endl;
+    std::cout << "\t--usage, -h\t\tPrint this usage message." << std::endl;
+    std::cout << "\t--log-file, -l\t\tSets the file to log memory events to, for future reconstruction." << std::endl;
 }
 
 } // namespace Interface
