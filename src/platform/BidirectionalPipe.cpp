@@ -15,8 +15,7 @@ BidirectionalPipeException::BidirectionalPipeException(std::string message,
 
 BidirectionalPipe::BidirectionalPipe(std::string executable,
     ArgumentList argument_list) {
-    
-    
+        
     pipe(pc_pipe_fd);
     pipe(cp_pipe_fd);
     
