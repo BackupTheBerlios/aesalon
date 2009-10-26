@@ -32,7 +32,7 @@ void Initializer::initialize() {
 }
 
 void Initializer::deinitialize() {
-    delete named_pipe;
+    if(named_pipe) delete named_pipe;
     
     Misc::ArgumentParser::lock_mutex();
     delete Misc::ArgumentParser::get_instance();

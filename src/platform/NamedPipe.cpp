@@ -22,8 +22,15 @@ NamedPipe::~NamedPipe() {
 
 void NamedPipe::send_data(std::string data) {
     if(get_type() != NamedPipe::WRITE_PIPE) throw PipeException("Attempting to write to a non-writable pipe");
-    else if(!is_open()) /*throw PipeException("Attempting to write to a named pipe that is not open");*/
-        return; /* NOTE: for now, don't bother with data over a non-open pipe, just ignore it. */
+    else if(!is_open()) {
+        /*throw PipeException("Attempting to write to a named pipe that is not open");*/
+        /* Try to open the pipe for writing, but just ignore if it fails */
+        create_pipe();
+        if(!is_open()) {
+            pipe_queue.add_string(data);
+            return;
+        }
+    }
     int bytes_written = write(pipe_fd, data.data(), data.size());
     if(bytes_written == -1) {
         pipe_open = false;
@@ -45,7 +52,11 @@ std::string NamedPipe::get_data() {
 }
 
 void NamedPipe::create_pipe() {
-    if(mkfifo(pipe_name.c_str(), FIFO_PIPE_MODE) != 0) throw PlatformException("Could not create named pipe: ");
+    static bool pipe_created = false;
+    if(!pipe_created) {
+        if(mkfifo(pipe_name.c_str(), FIFO_PIPE_MODE) != 0) throw PlatformException("Could not create named pipe: ");
+        pipe_created = true;
+    }
     pipe_fd = open(pipe_name.c_str(), O_WRONLY | O_NONBLOCK);
     if(pipe_fd == -1) {
         if(errno != ENXIO) throw PlatformException("Could not open named pipe for writing: ");
