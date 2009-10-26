@@ -27,9 +27,13 @@ void Initializer::initialize() {
     ap->parse_argv(argv);
     
     if(ap->get_argument("usage").to<Misc::BooleanArgument>()->get_status()) usage();
+    
+    named_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon-" << getpid());
 }
 
 void Initializer::deinitialize() {
+    delete named_pipe;
+    
     Misc::ArgumentParser::lock_mutex();
     delete Misc::ArgumentParser::get_instance();
     Misc::ReferenceCounter::lock_mutex();

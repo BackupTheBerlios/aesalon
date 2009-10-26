@@ -1,10 +1,10 @@
+#include <stdio.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
 #include "NamedPipe.h"
 #include "PipeException.h"
 #include "PlatformException.h"
-
 
 namespace Aesalon {
 namespace Platform {
@@ -15,7 +15,7 @@ NamedPipe::NamedPipe(named_pipe_mode_e type, std::string name) : type(type), pip
 }
 
 NamedPipe::~NamedPipe() {
-    
+    if(type == NamedPipe::WRITE_PIPE) remove(pipe_name.c_str());
 }
 
 void NamedPipe::send_data(std::string data) {
