@@ -19,6 +19,7 @@ private:
     const named_pipe_mode_e type;
     std::string pipe_name;
     int pipe_fd;
+    bool pipe_open;
     
     void create_pipe();
     void open_pipe();
@@ -28,8 +29,11 @@ public:
     named_pipe_mode_e get_type() const { return type; }
     
     void send_data(std::string data);
+    
     /* NOTE: blocking function if there is no data waiting. */
     std::string get_data();
+    
+    bool is_open() const { return pipe_open; }
 };
 
 }  // namespace Platform

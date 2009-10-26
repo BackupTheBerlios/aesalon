@@ -20,6 +20,8 @@ private:
 public:
     Initializer(char **argv);
     virtual ~Initializer();
+    
+    Misc::SmartPointer<Platform::NamedPipe> get_named_pipe() const { return named_pipe; }
 };
 
 } // namespace Interface
