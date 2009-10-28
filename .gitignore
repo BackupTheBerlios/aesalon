@@ -17,7 +17,7 @@ Makefile
 src/interface/aesalon
 
 # Generated documentation (doxygen) ignores
-doc/html
+doc/html*
 
 # Valgrind file ignores
 valgrind.*

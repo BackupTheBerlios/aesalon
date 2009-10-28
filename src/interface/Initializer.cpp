@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include "misc/ArgumentParser.h"
+#include "misc/ReferenceCounter.h"
 
 #include "Initializer.h"
 
