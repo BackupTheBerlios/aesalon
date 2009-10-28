@@ -5,8 +5,6 @@
 
 #include <string>
 
-#include "PipeQueue.h"
-
 namespace Aesalon {
 namespace Platform {
 
@@ -22,7 +20,6 @@ private:
     std::string pipe_name;
     int pipe_fd;
     bool pipe_open;
-    PipeQueue pipe_queue;
     
     void create_pipe();
     void open_pipe();

@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "MemoryAddress.h"
+#include "misc/StreamAsString.h"
 
 namespace Aesalon {
 namespace Platform {
@@ -33,6 +34,10 @@ public:
     
     /* NOTE: for debugging purposes . . . */
     void dump();
+    
+    operator std::string() const {
+        return Misc::StreamAsString() << get_address() << ":" << get_size();
+    }
 };
 
 } // namespace Platform

@@ -27,7 +27,6 @@ void NamedPipe::send_data(std::string data) {
         /* Try to open the pipe for writing, but just ignore if it fails */
         create_pipe();
         if(!is_open()) {
-            pipe_queue.add_string(data);
             return;
         }
     }
@@ -60,6 +59,7 @@ void NamedPipe::create_pipe() {
     pipe_fd = open(pipe_name.c_str(), O_WRONLY | O_NONBLOCK);
     if(pipe_fd == -1) {
         if(errno != ENXIO) throw PlatformException("Could not open named pipe for writing: ");
+        pipe_open = false;
     }
     else pipe_open = true;
 }

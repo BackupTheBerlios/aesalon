@@ -5,6 +5,7 @@
 
 #include "MemoryBlock.h"
 #include "misc/SmartPointer.h"
+#include "misc/StreamAsString.h"
 
 namespace Aesalon {
 namespace Platform {
@@ -28,6 +29,12 @@ public:
         if(storage_block == other.storage_block
             && variable_name == other.variable_name) return true;
         return false;
+    }
+    
+    operator std::string() const {
+        if(get_storage_block())
+            return Misc::StreamAsString() << variable_name << ":" << std::string(*get_storage_block());
+        return Misc::StreamAsString() << variable_name << ":";
     }
 };
 

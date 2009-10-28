@@ -29,7 +29,8 @@ public:
     memory_event_type_e get_memory_event_type() const { return memory_event_type; }
     Misc::SmartPointer<MemoryBlock> get_block() const { return block; }
     
-    virtual std::string serialize() = 0;
+    virtual std::string serialize() const = 0;
+    static MemoryEvent *deserialize(std::string data);
 };
 
 class MemoryBlockEvent : public MemoryEvent {
@@ -62,11 +63,28 @@ public:
     MemoryBlockAllocEvent(MemoryAddress address, std::size_t size) :
         MemoryBlockEvent(MemoryBlockEvent::ALLOC_BLOCK, NULL, address, size)  {}
     virtual ~MemoryBlockAllocEvent() {}
+    
+    virtual std::string serialize() const;
 };
 
 class MemoryBlockResizedEvent : public MemoryBlockEvent {
 public:
-    MemoryBlockResizedEvent(Misc::SmartPointer<MemoryBlock> block);
+    MemoryBlockResizedEvent(Misc::SmartPointer<MemoryBlock> block,
+        MemoryAddress new_address, std::size_t new_size) :
+        MemoryBlockEvent(MemoryBlockEvent::RESIZED_BLOCK, block, new_address,
+        new_size) {}
+    virtual ~MemoryBlockResizedEvent() {}
+    
+    virtual std::string serialize() const;
+};
+
+class MemoryBlockFreeEvent : public MemoryBlockEvent {
+public:
+    MemoryBlockFreeEvent(Misc::SmartPointer<MemoryBlock> block) : 
+        MemoryBlockEvent(MemoryBlockEvent::FREE_BLOCK, block, 0, 0) {}
+    virtual ~MemoryBlockFreeEvent() {}
+    
+    virtual std::string serialize() const;
 };
 
 class MemoryReferenceEvent : public MemoryEvent {
@@ -96,6 +114,8 @@ public:
     MemoryReferenceNewEvent(Misc::SmartPointer<MemoryReferenceScope> scope, Misc::SmartPointer<MemoryBlock> block) :
         MemoryReferenceEvent(MemoryReferenceEvent::NEW_REFERENCE, scope, block) {}
     virtual ~MemoryReferenceNewEvent();
+    
+    virtual std::string serialize() const;
 };
 
 class MemoryReferenceChangedEvent : public MemoryReferenceEvent {
@@ -108,6 +128,8 @@ public:
     virtual ~MemoryReferenceChangedEvent() {}
     
     Misc::SmartPointer<MemoryBlock> get_new_block() const { return new_block; }
+    
+    virtual std::string serialize() const;
 };
 
 class MemoryReferenceRemovedEvent : public MemoryReferenceEvent {
@@ -116,6 +138,8 @@ public:
         Misc::SmartPointer<MemoryBlock> block) :
         MemoryReferenceEvent(MemoryReferenceEvent::REMOVED_REFERENCE, scope, block) {}
     virtual ~MemoryReferenceRemovedEvent() {}
+    
+    virtual std::string serialize() const;
 };
 
 } // namespace Platform
