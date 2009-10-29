@@ -58,7 +58,6 @@ std::string BidirectionalPipe::get_string() {
     
     while((read(cp_pipe_fd[0], &recv, sizeof(recv))) > 0) {
         if(recv == '\n') {
-            std::cout << "BidirectionalPipe: received data \"" << data << "\"\n";
             return data;
         }
         data += recv;

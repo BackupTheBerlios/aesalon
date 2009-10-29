@@ -61,7 +61,7 @@ void Initializer::initialize() {
         return;
     }
     
-    gdb_parser = new GDBParser();
+    gdb_parser = new GDBParser(bi_pipe);
     
     run();
 }
@@ -86,22 +86,10 @@ void Initializer::usage() {
 }
 
 void Initializer::run() {
-    /*
-    std::string command_string = "run ";
-    for(std::size_t x = 1; x < Misc::ArgumentParser::get_instance()->get_files(); x ++)
-        command_string += Misc::StreamAsString() << Misc::ArgumentParser::get_instance()->get_file(x)->get_filename() << " ";
-    command_string += '\n';
-    
-    if(!bi_pipe->is_open()) return;
-    
-    bi_pipe->send_string(command_string);
-    */
-    
     std::string data;
     
     while(bi_pipe->is_open()) {
-        data = bi_pipe->get_string();
-        if(!gdb_parser->parse_line(bi_pipe->get_string())) std::cout << data << std::endl;
+        gdb_parser->parse(std::cout);
     }
 }
 
