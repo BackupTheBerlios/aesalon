@@ -13,8 +13,8 @@ public:
 private:
     argument_vector_t argument_vector;
 public:
-    ArgumentList();
-    virtual ~ArgumentList();
+    ArgumentList() {}
+    virtual ~ArgumentList() {}
     
     void add_argument(std::string argument) { argument_vector.push_back(argument); }
     char **get_as_argv();

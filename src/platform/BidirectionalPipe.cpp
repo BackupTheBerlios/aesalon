@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <iostream>
 #include "BidirectionalPipe.h"
 #include "misc/Exception.h"
 
@@ -26,7 +27,7 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
         close(pc_pipe_fd[1]); /* Close the write end of the pc pipe */
         close(cp_pipe_fd[0]); /* Close the read end of the cp pipe */
         
-        fcntl(pc_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) & ~O_NONBLOCK);
+        fcntl(pc_pipe_fd[0], F_SETFL, fcntl(pc_pipe_fd[0], F_GETFL) & ~O_NONBLOCK);
         fcntl(cp_pipe_fd[1], F_SETFL, fcntl(cp_pipe_fd[1], F_GETFL) & ~O_NONBLOCK);
         
         dup2(pc_pipe_fd[0], STDIN_FILENO);
@@ -56,14 +57,18 @@ std::string BidirectionalPipe::get_string() {
     char recv;
     
     while((read(cp_pipe_fd[0], &recv, sizeof(recv))) > 0) {
+        if(recv == '\n') {
+            std::cout << "BidirectionalPipe: received data \"" << data << "\"\n";
+            return data;
+        }
         data += recv;
-        if(recv == '\n') return data;
     }
     is_connected = false;
     return data;
 }
 
 void BidirectionalPipe::send_string(std::string data) {
+    std::cout << "BidirectionalPipe: sending command \"" << data << "\"\n";
     if(is_open()) write(pc_pipe_fd[1], data.c_str(), data.length());
 }
 

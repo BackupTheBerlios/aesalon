@@ -1,6 +1,6 @@
 include(version_info)
 
-add_definitions(-std=c++0x -W -Wall -ansi -pedantic -Wno-unused-parameter -g -pthread -DMAJOR_VERSION=${MAJOR_VERSION} -DMINOR_VERSION=${MINOR_VERSION} -DPATCHLEVEL=${PATCHLEVEL})
+add_definitions(-std=c++0x -W -Wall -ansi -pedantic -Wno-unused-parameter -g -pthread -DAESALON_MAJOR_VERSION=${MAJOR_VERSION} -DAESALON_MINOR_VERSION=${MINOR_VERSION} -DAESALON_PATCHLEVEL=${PATCHLEVEL})
 
 add_subdirectory(misc)
 add_subdirectory(platform)

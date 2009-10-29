@@ -27,6 +27,6 @@ int main(int argc, char *argv[]) {
         std::cout << e.get_message() << std::endl;
         return 1;
     }
-    delete Aesalon::Interface::Initializer::get_instance();
+    if(Aesalon::Interface::Initializer::get_instance()) delete Aesalon::Interface::Initializer::get_instance();
     return 0;
 }
