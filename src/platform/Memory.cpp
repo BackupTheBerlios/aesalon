@@ -13,5 +13,10 @@ Memory::~Memory() {
     if(reference_manager.is_valid()) delete reference_manager;
 }
 
+void Memory::generate_events(Misc::EventQueue &queue) const {
+    block_manager->generate_events(queue);
+    /*reference_manager->generate_events(queue);*/
+}
+
 } // namespace Platform
 } // namespace Aesalon

@@ -6,6 +6,7 @@
 #include "MemoryReference.h"
 #include "MemoryBlock.h"
 #include "misc/SmartPointer.h"
+#include "misc/EventQueue.h"
 
 namespace Aesalon {
 namespace Platform {
@@ -27,6 +28,8 @@ public:
     memory_reference_vector_t *get_references_by_block(const Misc::SmartPointer<MemoryBlock> block) const;
     Misc::SmartPointer<MemoryReference> get_reference_by_scope(const Misc::SmartPointer<MemoryReferenceScope> scope);
     Misc::SmartPointer<MemoryReference> get_reference_by_id(const MemoryReferenceID id) const;
+    
+    void generate_events(Misc::EventQueue &queue) const;
 };
 
 } // namespace Platform

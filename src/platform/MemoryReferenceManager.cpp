@@ -1,4 +1,5 @@
 #include "MemoryReferenceManager.h"
+#include "MemoryEvent.h"
 
 namespace Aesalon {
 namespace Platform {
@@ -54,6 +55,14 @@ Misc::SmartPointer<MemoryReference> MemoryReferenceManager::get_reference_by_sco
         if((*mfi)->compare_scope(scope)) return *mfi;
     }
     return NULL;
+}
+
+void MemoryReferenceManager::generate_events(Misc::EventQueue &queue) const {
+    memory_reference_vector_t::const_iterator mfi = memory_references.begin();
+    
+    for(; mfi != memory_references.end(); mfi ++) {
+        queue.push_event(new MemoryReferenceNewEvent((*mfi)->get_scope(), (*mfi)->get_block()));
+    }
 }
 
 } // namespace Platform

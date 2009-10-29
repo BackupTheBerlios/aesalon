@@ -38,16 +38,21 @@ public:
     }
 };
 
-class MemoryReference : public MemoryReferenceScope {
+class MemoryReference {
 private:
     Misc::SmartPointer<MemoryBlock> block;
     MemoryReferenceID reference_id;
+    Misc::SmartPointer<MemoryReferenceScope> scope;
 public:
     MemoryReference();
     virtual ~MemoryReference();
     
     Misc::SmartPointer<MemoryBlock> get_block() const { return block; }
     void set_block(Misc::SmartPointer<MemoryBlock> new_block) { block = new_block; }
+    
+    Misc::SmartPointer<MemoryReferenceScope> get_scope() const { return scope; }
+    void set_scope(Misc::SmartPointer<MemoryReferenceScope> new_scope) { scope = new_scope; }
+    bool compare_scope(const MemoryReferenceScope &other) { return scope->compare_scope(other); }
     
     MemoryReferenceID get_id() const { return reference_id; }
 };
