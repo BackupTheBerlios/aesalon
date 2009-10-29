@@ -89,7 +89,7 @@ sub open_namespaces {
 sub close_namespaces {
     my $return = '';
     for my $namespace (reverse @_) {
-        $return .= "}  // namespace $namespace\n";
+        $return .= "} // namespace $namespace\n";
     }
     
     return $return;

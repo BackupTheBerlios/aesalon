@@ -61,7 +61,7 @@ void Initializer::initialize() {
         return;
     }
     
-    gdb_parser = new GDBParser(bi_pipe);
+    gdb_parser = new GDB::Parser(bi_pipe);
     
     run();
 }

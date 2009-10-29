@@ -5,7 +5,7 @@
 #include "misc/Singleton.h"
 #include "platform/NamedPipe.h"
 #include "platform/BidirectionalPipe.h"
-#include "interface/GDBParser.h"
+#include "gdb/Parser.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -15,7 +15,7 @@ private:
     char **argv;
     Misc::SmartPointer<Platform::NamedPipe> named_pipe;
     Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
-    Misc::SmartPointer<Interface::GDBParser> gdb_parser;
+    Misc::SmartPointer<Interface::GDB::Parser> gdb_parser;
     
     void initialize();
     void deinitialize();

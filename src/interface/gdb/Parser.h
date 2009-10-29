@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_GDBPARSER_H
-#define AESALON_INTERFACE_GDBPARSER_H
+#ifndef AESALON_INTERFACE_GDB_PARSER_H
+#define AESALON_INTERFACE_GDB_PARSER_H
 
 #include <ostream>
 
@@ -8,8 +8,9 @@
 
 namespace Aesalon {
 namespace Interface {
+namespace GDB {
 
-class GDBParser {
+class Parser {
 public:
     enum gdb_status_e {
         GDB_STOPPED,
@@ -26,8 +27,8 @@ private:
     
     bool is_gdb(std::string line);
 public:
-    GDBParser(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe);
-    virtual ~GDBParser();
+    Parser(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe);
+    virtual ~Parser();
     
     void parse(std::ostream &non_gdb);
     
@@ -35,7 +36,8 @@ public:
     void set_status(gdb_status_e new_status) { gdb_status = new_status; }
 };
 
-}  // namespace Interface
-}  // namespace Aesalon
+} // namespace GDB
+} // namespace Interface
+} // namespace Aesalon
 
 #endif

@@ -1,11 +1,12 @@
 #include <string>
-#include "GDBParser.h"
+#include "Parser.h"
 #include "misc/ArgumentParser.h"
 
 namespace Aesalon {
 namespace Interface {
+namespace GDB {
 
-GDBParser::GDBParser(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe)
+Parser::Parser(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe)
     : gdb_status(GDB_STOPPED), bi_pipe(bi_pipe) {
     
     send_command("set can-use-hw-watchpoints 0");
@@ -17,11 +18,11 @@ GDBParser::GDBParser(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe)
     
     
 }
-GDBParser::~GDBParser() {
+Parser::~Parser() {
     
 }
 
-void GDBParser::parse(std::ostream &non_gdb) {
+void Parser::parse(std::ostream &non_gdb) {
     std::string input = bi_pipe->get_string();
     
     if(!is_gdb(input)) non_gdb << input << std::endl;
@@ -37,13 +38,14 @@ void GDBParser::parse(std::ostream &non_gdb) {
     }
 }
 
-bool GDBParser::is_gdb(std::string line) {
+bool Parser::is_gdb(std::string line) {
     return false;
 }
 
-void GDBParser::send_command(std::string command) {
+void Parser::send_command(std::string command) {
     bi_pipe->send_string(command + "\n");
 }
 
-}  // namespace Interface
-}  // namespace Aesalon
+} // namespace GDB
+} // namespace Interface
+} // namespace Aesalon
