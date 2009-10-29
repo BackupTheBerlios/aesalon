@@ -10,7 +10,7 @@ GDBParser::GDBParser(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe)
     
     send_command("set can-use-hw-watchpoints 0");
     
-    std::string command_string = "run ";
+    std::string command_string = "-exec-run ";
     for(std::size_t x = 1; x < Misc::ArgumentParser::get_instance()->get_files(); x ++)
         command_string += Misc::StreamAsString() << Misc::ArgumentParser::get_instance()->get_file(x)->get_filename() << " ";
     send_command(command_string);
