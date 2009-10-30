@@ -6,7 +6,6 @@ add_subdirectory(misc)
 add_subdirectory(platform)
 add_subdirectory(interface)
 
-include_directories(. ..)
-
-aux_source_directory(. SOURCES)
+# Now, piggyback onto qmake for the gui system; as qmake removes all the hassles of automoc.
+add_custom_target(gui /usr/bin/make -f qmake.makefile WORKING_DIRECTORY src/gui)
 
