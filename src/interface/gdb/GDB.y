@@ -6,6 +6,7 @@
 %token  STRING
 %token  C_STRING
 %token  TOKEN
+%token  GDB_PROMPT
 
 %%
 const: C_STRING;
@@ -32,8 +33,10 @@ tuple:      '{' '}'
     |       '{' tuple_entry '}'
 ;
 
+gdb_line:   oob_record_list GDB_PROMPT
+    |       oob_record_list result_record GDB_PROMPT
+;
 
-
-line:
-    '\n'
+line:       gdb_line
+    |       '\n'
 ;
