@@ -1,6 +1,6 @@
 #include <iostream>
 #include <QtGui/QApplication>
-#include "Framework.h"
+#include "MainWindow.h"
 
 #include "misc/ReferenceCounter.h"
 
@@ -9,8 +9,8 @@ int main(int argc, char *argv[]) {
     
     new Aesalon::Misc::ReferenceCounter();
     
-    Aesalon::GUI::Framework *framework = new Aesalon::GUI::Framework;
-    framework->show();
+    Aesalon::GUI::MainWindow *main_window = new Aesalon::GUI::MainWindow();
+    main_window->show();
     
     int ret_value = application.exec();
     
