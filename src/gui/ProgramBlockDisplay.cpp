@@ -1,4 +1,5 @@
 #include "ProgramBlockDisplay.h"
+#include "ProgramBlockDisplay.moc"
 
 namespace Aesalon {
 namespace GUI {

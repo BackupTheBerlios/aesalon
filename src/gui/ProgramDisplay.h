@@ -6,9 +6,15 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QTabWidget>
 
 #include "ProgramBlockDisplay.h"
 #include "ProgramReferenceDisplay.h"
+
+#include "misc/SmartPointer.h"
+#include "platform/Program.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -18,12 +24,28 @@ private:
     ProgramBlockDisplay *program_block_display;
     ProgramReferenceDisplay *program_reference_display;
     
-    QGridLayout *launch_layout;
-    QHBoxLayout *launch_program_layout;
+    QWidget *launch_widget;
+    QVBoxLayout *launch_layout;
+    QGridLayout *launch_program_layout;
     QLineEdit *launch_program_name;
     QLabel *launch_program_label;
+    QLineEdit *launch_program_arguments;
+    QLabel *launch_program_arguments_label;
+    QPushButton *launch_program_button;
     
-    void create_launch_widgets();
+    QWidget *running_widget;
+    QVBoxLayout *running_layout;
+    QTabWidget *running_tab_bar;
+    QWidget *running_general;
+    QVBoxLayout *running_general_layout;
+    QHBoxLayout *running_general_program_layout;
+    QLabel *running_general_program_label;
+    QLabel *running_general_program_name_label;
+    
+    Platform::Program *program;
+    
+    void create_launch_widget();
+    void create_running_widget();
 private slots:
     void begin_program();
 public:

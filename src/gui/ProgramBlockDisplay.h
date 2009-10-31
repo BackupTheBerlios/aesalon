@@ -6,7 +6,7 @@
 namespace Aesalon {
 namespace GUI {
 
-class ProgramBlockDisplay : public QMdiSubWindow {
+class ProgramBlockDisplay : public QWidget { Q_OBJECT
 public:
     ProgramBlockDisplay(QWidget *parent = 0);
     virtual ~ProgramBlockDisplay();
