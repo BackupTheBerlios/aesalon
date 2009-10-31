@@ -38,7 +38,7 @@ void MainWindow::create_menus() {
 }
 
 void MainWindow::quit_requested() {
-    std::cout << "Quit requested." << std::endl;
+    if(!mdi_area->subWindowList().size()) this->close();
 }
 
 void MainWindow::new_program() {

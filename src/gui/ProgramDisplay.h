@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QTabWidget>
+#include <QCheckBox>
 
 #include "ProgramBlockDisplay.h"
 #include "ProgramReferenceDisplay.h"
@@ -31,6 +32,7 @@ private:
     QLabel *launch_program_label;
     QLineEdit *launch_program_arguments;
     QLabel *launch_program_arguments_label;
+    QCheckBox *launch_program_xterm;
     QPushButton *launch_program_button;
     
     QWidget *running_widget;
@@ -42,7 +44,7 @@ private:
     QLabel *running_general_program_label;
     QLabel *running_general_program_name_label;
     
-    Platform::Program *program;
+    Misc::SmartPointer<Platform::Program> program;
     
     void create_launch_widget();
     void create_running_widget();

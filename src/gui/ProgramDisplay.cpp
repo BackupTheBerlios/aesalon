@@ -34,11 +34,14 @@ void ProgramDisplay::create_launch_widget() {
     launch_program_arguments = new QLineEdit("");
     launch_program_layout->addWidget(launch_program_arguments, 1, 1);
     
+    launch_program_xterm = new QCheckBox("&Launch executable in terminal");
+    launch_program_layout->addWidget(launch_program_xterm, 2, 0);
+    
     launch_layout->addStretch();
-    launch_program_button = new QPushButton(tr("&Launch program"));
+    launch_program_button = new QPushButton(tr("&Begin execution"));
     launch_program_button->show();
     connect(launch_program_button, SIGNAL(clicked()), this, SLOT(begin_program()));
-    launch_program_layout->addWidget(launch_program_button, 2, 0, 1, 2, Qt::AlignBottom);
+    launch_program_layout->addWidget(launch_program_button, 3, 0, 1, 2, Qt::AlignBottom);
     
     launch_widget->setLayout(launch_layout);
     setWidget(launch_widget);
@@ -83,6 +86,7 @@ void ProgramDisplay::create_running_widget() {
 }
 
 void ProgramDisplay::begin_program() {
+    program = new Platform::Program();
     create_running_widget();
 }
 

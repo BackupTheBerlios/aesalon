@@ -113,7 +113,7 @@ class MemoryReferenceNewEvent : public MemoryReferenceEvent {
 public:
     MemoryReferenceNewEvent(Misc::SmartPointer<MemoryReferenceScope> scope, Misc::SmartPointer<MemoryBlock> block) :
         MemoryReferenceEvent(MemoryReferenceEvent::NEW_REFERENCE, scope, block) {}
-    virtual ~MemoryReferenceNewEvent();
+    virtual ~MemoryReferenceNewEvent() {}
     
     virtual std::string serialize() const;
 };
