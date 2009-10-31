@@ -20,11 +20,13 @@ private:
     std::string pipe_name;
     int pipe_fd;
     bool pipe_open;
+    bool create_pipe;
     
-    void create_pipe();
-    void open_pipe();
+    void create_named_pipe();
+    void open_pipe_read();
+    void open_pipe_write();
 public:
-    NamedPipe(named_pipe_mode_e type, std::string name);
+    NamedPipe(named_pipe_mode_e type, std::string name, bool create_pipe = false);
     virtual ~NamedPipe();
     named_pipe_mode_e get_type() const { return type; }
     

@@ -6,6 +6,9 @@
 #include <QAction>
 #include <QMdiArea>
 
+#include "platform/NamedPipe.h"
+#include "misc/SmartPointer.h"
+
 namespace Aesalon {
 namespace GUI {
 
@@ -16,10 +19,12 @@ private:
     QAction *aesalon_menu_quit;
     QMdiArea *mdi_area;
     
+    Misc::SmartPointer<Platform::NamedPipe> named_pipe;
+    
     void create_menus();
 public:
     MainWindow(QWidget *parent = 0);
-    virtual ~MainWindow() {}
+    virtual ~MainWindow();
 private slots:
     void quit_requested();
     void new_program();

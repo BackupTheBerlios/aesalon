@@ -104,13 +104,9 @@ void Initializer::send_pid_to_gui() {
     std::string pid_string = Misc::ArgumentParser::get_instance()->get_argument("gui pid").to<Misc::StringArgument>()->get_value();
     if(pid_string == "") return;
     
-    std::ofstream named_pipe(std::string(Misc::StreamAsString() << "/tmp/aesalon_gui-" << pid_string).c_str(), std::ios_base::out | std::ios_base::app);
-    if(!named_pipe.is_open()) return;
+    Platform::NamedPipe named_pipe(Aesalon::Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << pid_string);
     
-    named_pipe << getpid();
-    std::cout << "Sent to aesalon gui: " << getpid() << std::endl;
-    
-    named_pipe.close();
+    if(named_pipe.is_open()) named_pipe.send_data(Misc::StreamAsString() << getpid());
 }
 
 } // namespace Interface
