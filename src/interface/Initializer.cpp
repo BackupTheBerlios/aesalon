@@ -1,7 +1,9 @@
 #include <string>
 #include <iostream>
+#include <fstream>
 #include "misc/ArgumentParser.h"
 #include "misc/ReferenceCounter.h"
+#include "misc/StreamAsString.h"
 
 #include "Initializer.h"
 
@@ -38,6 +40,7 @@ void Initializer::initialize() {
     ap->add_argument("usage", new Misc::BooleanArgument("--usage", 'h', "", 0, false));
     ap->add_argument("logfile", new Misc::StringArgument("--log-file", 'l', ""));
     ap->add_argument("gdb executable", new Misc::StringArgument("--gdb-path", 0, "/usr/bin/gdb"));
+    ap->add_argument("gui pid", new Misc::StringArgument("--gui-pid", 0, ""));
     
     ap->parse_argv(argv);
     
@@ -45,6 +48,8 @@ void Initializer::initialize() {
         usage();
         return;
     }
+    
+    send_pid_to_gui();
     
     named_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon-" << getpid());
     
@@ -83,6 +88,8 @@ void Initializer::usage() {
     std::cout << "\t--usage, -h\t\tPrint this usage message." << std::endl;
     std::cout << "\t--log-file, -l\t\tSets the file to log memory events to, for future reconstruction." << std::endl;
     std::cout << "\t--gdb-path\t\tSets the path to the gdb executable to use." << std::endl;
+    std::cout << "Internal arguments (do not use, provided for reference):" << std::endl;
+    std::cout << "\t--gui-pid\t\tSets the aesalon gui interface PID." << std::endl;
 }
 
 void Initializer::run() {
@@ -91,6 +98,19 @@ void Initializer::run() {
     while(bi_pipe->is_open()) {
         gdb_parser->parse(std::cout);
     }
+}
+
+void Initializer::send_pid_to_gui() {
+    std::string pid_string = Misc::ArgumentParser::get_instance()->get_argument("gui pid").to<Misc::StringArgument>()->get_value();
+    if(pid_string == "") return;
+    
+    std::ofstream named_pipe(std::string(Misc::StreamAsString() << "/tmp/aesalon_gui-" << pid_string).c_str(), std::ios_base::out | std::ios_base::app);
+    if(!named_pipe.is_open()) return;
+    
+    named_pipe << getpid();
+    std::cout << "Sent to aesalon gui: " << getpid() << std::endl;
+    
+    named_pipe.close();
 }
 
 } // namespace Interface

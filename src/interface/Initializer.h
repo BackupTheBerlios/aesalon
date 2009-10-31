@@ -19,6 +19,7 @@ private:
     
     void initialize();
     void deinitialize();
+    void send_pid_to_gui();
     
     void usage();
     
