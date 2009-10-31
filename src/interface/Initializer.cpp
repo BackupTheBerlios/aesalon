@@ -5,6 +5,8 @@
 #include "misc/ReferenceCounter.h"
 #include "misc/StreamAsString.h"
 
+#include "platform/PlatformException.h"
+
 #include "Initializer.h"
 
 #ifndef AESALON_MAJOR_VERSION
@@ -51,7 +53,7 @@ void Initializer::initialize() {
     
     send_pid_to_gui();
     
-    named_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon-" << getpid());
+    named_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon-" << getpid(), true);
     
     if(ap->get_files()) {
         Platform::ArgumentList al;
@@ -104,9 +106,15 @@ void Initializer::send_pid_to_gui() {
     std::string pid_string = Misc::ArgumentParser::get_instance()->get_argument("gui pid").to<Misc::StringArgument>()->get_value();
     if(pid_string == "") return;
     
-    Platform::NamedPipe named_pipe(Aesalon::Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << pid_string);
+    try {
+        Platform::NamedPipe named_pipe(Aesalon::Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << pid_string);
     
-    if(named_pipe.is_open()) named_pipe.send_data(Misc::StreamAsString() << getpid());
+        if(named_pipe.is_open()) named_pipe.send_data(Misc::StreamAsString() << getpid());
+    }
+    catch(Misc::Exception pe) {
+        std::cout << pe.get_message() << std::endl;
+    }
+    /* named_pipe will auto-destruct, since it is a local variable */
 }
 
 } // namespace Interface

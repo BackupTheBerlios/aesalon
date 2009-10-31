@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <iostream>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -17,7 +18,9 @@ NamedPipe::NamedPipe(named_pipe_mode_e type, std::string name, bool create_pipe)
 }
 
 NamedPipe::~NamedPipe() {
-    if(type == NamedPipe::WRITE_PIPE) remove(pipe_name.c_str());
+    if(create_pipe) {
+        remove(pipe_name.c_str());
+    }
 }
 
 void NamedPipe::send_data(std::string data) {

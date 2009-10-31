@@ -16,7 +16,10 @@ class MainWindow : public QMainWindow { Q_OBJECT
 private:
     QMenu *aesalon_menu;
     QAction *aesalon_menu_new;
+    QAction *aesalon_menu_connect;
     QAction *aesalon_menu_quit;
+    QMenu *help_menu;
+    QAction *help_menu_about;
     QMdiArea *mdi_area;
     
     Misc::SmartPointer<Platform::NamedPipe> named_pipe;
@@ -28,6 +31,7 @@ public:
 private slots:
     void quit_requested();
     void new_program();
+    void about_aesalon();
 };
 
 } // namespace GUI
