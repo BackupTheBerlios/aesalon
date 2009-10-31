@@ -6,6 +6,8 @@ include(${QT_USE_FILE})
 
 QT4_AUTOMOC(${SOURCES})
 
+include_directories(..)
+
 add_executable(aesalon_gui ${SOURCES})
 
 target_link_libraries(aesalon_gui aesalon_platform aesalon_misc QtCore QtGui pthread)
