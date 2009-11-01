@@ -11,15 +11,16 @@
 %token  GDB_PROMPT
 
 %%
-const: C_STRING
+const: C_STRING { $$ = $1; }
 ;
-variable: STRING
+variable: STRING { $$ = $1; }
 ;
 value:      const
     |       tuple
     |       list
 ;
-result: variable '=' value;
+result: variable '=' value { $$ = new Aesalon::Interface::GDB::ResultElement($1, $3); }
+;
 
 list_entry: value
     |       value ',' list_entry
@@ -30,17 +31,17 @@ list:       '[' ']'
     |       '[' list_entry ']'
 ;
 
-tuple_entry: result
-    |       result ',' tuple_entry
+tuple_entry: result { $$ = $1; }
+    |       result ',' tuple_entry { $$ = $1; $$->get_parent().to<Aesalon::Interface::GDB::TupleElement>()->add_tuple_item($3); }
 ;
-tuple:      '{' '}'
-    |       '{' tuple_entry '}'
+tuple:      '{' '}' { $$ = new Aesalon::Interface::GDB::TupleElement(); }
+    |       '{' tuple_entry '}' { $$ = new Aesalon::Interface::GDB::TupleElement(); $$.to<Aesalon::Interface::GDB::TupleElement>()->add_tuple_item($2); }
 ;
 
-gdb_line:   oob_record_list GDB_PROMPT
+gdb_output:   oob_record_list GDB_PROMPT
     |       oob_record_list result_record GDB_PROMPT
 ;
 
-line:       gdb_line
+line:       gdb_output
     |       '\n'
 ;

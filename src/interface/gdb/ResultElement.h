@@ -13,8 +13,8 @@ private:
     ParseElementWrapper variable_name;
     ParseElementWrapper value;
 public:
-    ResultElement();
-    virtual ~ResultElement();
+    ResultElement(ParseElementWrapper variable_name, ParseElementWrapper value) : variable_name(variable_name), value(value) {}
+    virtual ~ResultElement() {}
     
     ParseElementWrapper get_variable_name() const { return variable_name; }
     void set_variable_name(ParseElementWrapper new_variable_name) { variable_name = new_variable_name; }

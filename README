@@ -1,0 +1,46 @@
+This is the README for aesalon, version 0.0.1 (pre-release)
+
+---- OVERVIEW
+    In a nutshell, Aesalon is a program to graphically display the dynamically-
+allocated memory that another program has allocated. This can be utilized in a
+number of different ways.
+
+---- BUILDING
+To build the aesalon executable, you will need the following:
+- g++ (only tested with 4.3 and 4.4; but any recent g++ should work. Aesalon is
+    99% ISO-c++0x compatible; there may be a few things that are not.)
+- libpthread, or some other pthread implementation (NOTE: LinuxThreads will
+    *not* work)
+- CMake (at least version 2.6)
+- bisonc++ (tested with 2.4.8, but older versions should also work)
+
+For the aesalon GUI, you will additionally need:
+- qt devel libraries (tested with Qt 4.5.2, but Qt 4.3 or greater should work)
+- qt devel programs (moc4, etc. Note that qmake is *not* required)
+
+Building aesalon is simplicity itself. (Well, maybe.) Depending on your
+version of g++, there may be some hand modifications required. Assuming you've
+accquired the source from somewhere, simply run these commands:
+
+For both aesalon and aesalon_gui:
+user@host[aesalon]$ cmake .
+user@host[aesalon]$ make
+
+For only aesalon:
+user@host[aesalon]$ cmake .
+user@host[aesalon]$ make aesalon
+
+For only aesalon_gui:
+user@host[aesalon]$ cmake .
+user@host[aesalon]$ make aesalon_gui
+
+If there are any configuration errors, correct them. (You may need to install
+additional development libraries.)
+
+The two symlinks in the root of the source directory (aesalon and aesalon_gui)
+should now be valid, and pointing to executables. Simply run the symlinks to
+run each program. If you so desire, you may copy the executables to a path;
+neither requires any data files beyond standard Qt files.
+
+And that is it, ladies and gentlemen -- aesalon is compiled.
+
