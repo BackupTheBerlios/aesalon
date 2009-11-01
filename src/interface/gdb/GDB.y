@@ -3,14 +3,18 @@
 %class-name GDBParser
 %namespace GDB_Parser
 
+%stype Aesalon::Interface::GDB::ParseElementWrapper
+
 %token  STRING
 %token  C_STRING
 %token  TOKEN
 %token  GDB_PROMPT
 
 %%
-const: C_STRING;
-variable: STRING;
+const: C_STRING
+;
+variable: STRING
+;
 value:      const
     |       tuple
     |       list
