@@ -10,22 +10,7 @@ namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
-class ParseElementWrapper;
-
-class ParseElement {
-public:
-    typedef std::vector<ParseElementWrapper> parse_element_vector_t;
-private:
-    parse_element_vector_t parse_element_vector;
-public:
-    ParseElement();
-    virtual ~ParseElement();
-    
-    /*ParseElementWrapper get_parse_element(std::size_t which) const
-        { return parse_element_vector.at(which); }*/
-    std::size_t get_parse_elements() const
-        { return parse_element_vector.size(); }
-};
+class ParseElement;
 
 class ParseElementWrapper : public Misc::SmartPointer<ParseElement> {
 public:
@@ -33,12 +18,20 @@ public:
     virtual ~ParseElementWrapper() {}
 };
 
-class StringParseElement : public ParseElement {
+class ParseElement {
 private:
-    std::string data;
+    ParseElementWrapper next, prev;
+    ParseElementWrapper parent;
 public:
-    StringParseElement(std::string data) : data(data) {}
-    virtual ~StringParseElement() {}
+    ParseElement() {}
+    virtual ~ParseElement() {}
+    
+    ParseElementWrapper get_next() const { return next; }
+    void set_next(ParseElementWrapper new_next) { next = new_next; }
+    ParseElementWrapper get_prev() const { return prev; }
+    void set_prev(ParseElementWrapper new_prev) { prev = new_prev; }
+    ParseElementWrapper get_parent() const { return parent; }
+    void set_parent(ParseElementWrapper new_parent) { parent = new_parent; }
 };
 
 } // namespace GDB

@@ -2,5 +2,7 @@
 #define AESALON_INTERFACE_GDB_PREINCLUDE_H
 
 #include "ParseElement.h"
+#include "ListElement.h"
+#include "TupleElement.h"
 
 #endif
