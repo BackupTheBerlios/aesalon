@@ -15,16 +15,17 @@ const: C_STRING { $$ = $1; }
 ;
 variable: STRING { $$ = $1; }
 ;
-value:      const
-    |       tuple
-    |       list
+value:      const { $$ = $1; }
+    |       tuple { $$ = $1; }
+    |       list { $$ = $1; }
 ;
+
 result: variable '=' value { $$ = new Aesalon::Interface::GDB::ResultElement($1, $3); }
 ;
 
-list_entry: value
+list_entry: value { $$ = $1; }
     |       value ',' list_entry
-    |       result
+    |       result { $$ = $1; }
     |       result ',' list_entry
 ;
 list:       '[' ']'
