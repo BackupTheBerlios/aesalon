@@ -47,7 +47,7 @@ public:
     StreamOutput(std::string data) : String(String::STREAM_OUTPUT), data(data) {}
     virtual ~StreamOutput() {}
     
-    std::string get_data() const { return data; }
+    std::string get_stream_data() const { return data; }
     
     virtual Misc::SmartPointer<ParseSequence> get_data() { return NULL; }
 };

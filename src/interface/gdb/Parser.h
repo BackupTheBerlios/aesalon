@@ -32,8 +32,8 @@ private:
     std::string next_word();
     bool is_word_char(char to_test);
 public:
-    Parser();
-    virtual ~Parser();
+    Parser() {}
+    virtual ~Parser() {}
     
     Misc::SmartPointer<String> parse_gdb_string(std::string string);
 };

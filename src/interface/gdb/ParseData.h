@@ -45,7 +45,7 @@ public:
 private:
     tuple_map_t tuple_map;
 public:
-    virtual ~ParseTuple();
+    virtual ~ParseTuple() {}
     
     void add_element(Misc::SmartPointer<ParseResult> new_element)
         { tuple_map[new_element->get_name()] = new_element; }
