@@ -68,14 +68,14 @@ void Initializer::initialize() {
         return;
     }
     
-    gdb_parser = new GDB::Parser(bi_pipe);
+    /*gdb_parser = new GDB::Parser(bi_pipe);*/
     
     run();
 }
 
 void Initializer::deinitialize() {
     if(named_pipe) delete named_pipe;
-    if(gdb_parser) delete gdb_parser;
+    /*if(gdb_parser) delete gdb_parser;*/
     
     Misc::ArgumentParser::lock_mutex();
     delete Misc::ArgumentParser::get_instance();
@@ -98,7 +98,7 @@ void Initializer::run() {
     std::string data;
     
     while(bi_pipe->is_open()) {
-        gdb_parser->parse(std::cout);
+        /*gdb_parser->parse(std::cout);*/
     }
 }
 
