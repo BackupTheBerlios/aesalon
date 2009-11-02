@@ -5,6 +5,7 @@ namespace Aesalon {
 namespace GUI {
 
 ProgramDisplay::ProgramDisplay(QWidget *parent) {
+    this->hide();
     this->setGeometry(0, 0, 400, 300);
     this->setWindowTitle("Unlaunched program");
     

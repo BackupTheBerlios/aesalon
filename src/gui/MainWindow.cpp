@@ -12,7 +12,7 @@
 namespace Aesalon {
 namespace GUI {
 
-MainWindow::MainWindow(QWidget *parent) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     this->setGeometry(0, 0, 800, 600);
     this->setWindowTitle("Aesalon GUI interface");
     
