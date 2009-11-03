@@ -76,10 +76,9 @@ void Initializer::initialize() {
 }
 
 void Initializer::deinitialize() {
-    if(named_pipe) {
-        named_pipe = NULL;
-    }
-    if(gdb_controller) gdb_controller = NULL;
+    if(named_pipe) delete named_pipe;
+    if(gdb_controller) delete gdb_controller;
+    if(event_queue) delete event_queue;
     
     Misc::ArgumentParser::lock_mutex();
     delete Misc::ArgumentParser::get_instance();
