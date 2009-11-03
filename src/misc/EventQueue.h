@@ -9,7 +9,7 @@
 namespace Aesalon {
 namespace Misc {
 
-/** Event queue singleton class. Wrapper around std::queue. */
+/** Event queue class. Wrapper around std::queue. */
 class EventQueue {
 public:
     typedef std::queue<Event *> event_queue_t;

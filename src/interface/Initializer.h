@@ -5,7 +5,7 @@
 #include "misc/Singleton.h"
 #include "platform/NamedPipe.h"
 #include "platform/BidirectionalPipe.h"
-#include "gdb/Processor.h"
+#include "gdb/Controller.h"
 #include "misc/EventQueue.h"
 
 namespace Aesalon {
@@ -16,9 +16,8 @@ private:
     char **argv;
     Misc::SmartPointer<Platform::NamedPipe> named_pipe;
     Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
-    Misc::SmartPointer<Interface::GDB::Processor> gdb_processor;
-    
-    Misc::EventQueue event_queue;
+    Misc::SmartPointer<Interface::GDB::Controller> gdb_controller;
+    Misc::SmartPointer<Misc::EventQueue> event_queue;
     
     void initialize();
     void deinitialize();

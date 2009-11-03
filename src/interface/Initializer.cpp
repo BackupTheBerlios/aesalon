@@ -68,14 +68,16 @@ void Initializer::initialize() {
         return;
     }
     
-    gdb_processor = new GDB::Processor(bi_pipe);
+    event_queue = new Misc::EventQueue();
+    
+    gdb_controller = new GDB::Controller(bi_pipe, event_queue);
     
     run();
 }
 
 void Initializer::deinitialize() {
-    if(named_pipe) delete named_pipe;
-    if(gdb_processor) delete gdb_processor;
+    /*if(named_pipe) named_pipe = NULL;
+    if(gdb_controller) gdb_controller = NULL;*/
     
     Misc::ArgumentParser::lock_mutex();
     delete Misc::ArgumentParser::get_instance();
@@ -96,7 +98,7 @@ void Initializer::usage() {
 
 void Initializer::run() {
     while(bi_pipe->is_open()) {
-        gdb_processor->process(event_queue);
+        gdb_controller->listen();
     }
 }
 

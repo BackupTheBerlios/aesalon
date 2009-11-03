@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iostream>
 
 #include "Parser.h"
 #include "String.h"
@@ -59,7 +60,7 @@ Misc::SmartPointer<ParseSequence> Parser::parse_sequence() {
         seq->add_element(parse_result());
     }
     
-    return NULL;
+    return seq;
 }
 
 Misc::SmartPointer<ParseResult> Parser::parse_result() {

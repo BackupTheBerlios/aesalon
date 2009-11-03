@@ -67,7 +67,6 @@ std::string BidirectionalPipe::get_string() {
 }
 
 void BidirectionalPipe::send_string(std::string data) {
-    std::cout << "BidirectionalPipe: sending command \"" << data << "\"\n";
     if(is_open()) write(pc_pipe_fd[1], data.c_str(), data.length());
 }
 
