@@ -19,6 +19,7 @@ void Processor::process(std::string line) {
     
     if(!this->line.length()) return;
     if(begins_with("(gdb)")) {
+        if(gdb_state != GDB_STOPPED) gdb_state = GDB_PAUSED;
         return;
     }
     
@@ -31,15 +32,26 @@ void Processor::process(std::string line) {
     else if(string->get_type() == String::ASYNC_OUTPUT) {
         handle_async(string.to<AsyncOutput>());
     }
-    else handle_result(string.to<ResultRecord>());
+    else if(string->get_type() == String::RESULT_RECORD) handle_result(string.to<ResultRecord>());
+    else throw Misc::Exception("Invalid String::string_type_e value");
 }
 
 void Processor::handle_async(Misc::SmartPointer<AsyncOutput> output) {
-    
+    if(output->get_data()->get_first() == "stopped") {
+        if(output->get_data()->get_element("reason").is_valid()) {
+            std::cout << "handle_async: \"reason\" type is: " << output->get_data()->get_element("reason")->get_type() << std::endl;
+            std::string reason = output->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data();
+            if(reason != "watchpoint-trigger") set_gdb_state(GDB_STOPPED);
+            else set_gdb_state(GDB_PAUSED);
+        }
+    }
 }
 
 void Processor::handle_result(Misc::SmartPointer<ResultRecord> record) {
-    if(record->get_data()->get_first() == "running") std::cout << "Program is running" << std::endl;
+    if(record->get_data()->get_first() == "running") {
+        set_gdb_state(GDB_RUNNING);
+    }
+    
 }
 
 } // namespace GDB

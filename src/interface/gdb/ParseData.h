@@ -14,7 +14,10 @@ namespace GDB {
 /* Base class */
 class ParseData {
 public:
+    ParseData() {}
     virtual ~ParseData() {}
+    
+    virtual std::string get_type() const { return "ParseData"; }
 };
 
 class ParseString : public ParseData {
@@ -25,6 +28,8 @@ public:
     virtual ~ParseString() {}
     
     std::string get_data() const { return data; }
+    
+    virtual std::string get_type() const { return "ParseString"; }
 };
 
 class ParseResult : public ParseData {
@@ -37,6 +42,8 @@ public:
     
     std::string get_name() const { return name; }
     Misc::SmartPointer<ParseData> get_value() const { return value; }
+    
+    virtual std::string get_type() const { return "ParseResult"; }
 };
 
 class ParseTuple : public ParseData {
@@ -51,6 +58,8 @@ public:
         { tuple_map[new_element->get_name()] = new_element; }
     Misc::SmartPointer<ParseData> get_element(std::string name) const
         { return tuple_map.at(name); }
+    
+    virtual std::string get_type() const { return "ParseTuple"; }
 };
 
 class ParseList : public ParseData {
@@ -65,6 +74,8 @@ public:
     void add_element(Misc::SmartPointer<ParseData> new_element) { list_vector.push_back(new_element); }
     Misc::SmartPointer<ParseData> get_element(std::size_t which) const { return list_vector[which]; }
     std::size_t num_elements() const { return list_vector.size(); }
+    
+    virtual std::string get_type() const { return "ParseList"; }
 };
 
 class ParseSequence : public ParseTuple {
@@ -75,6 +86,8 @@ public:
     virtual ~ParseSequence() {}
     
     std::string get_first() const { return first; }
+    
+    virtual std::string get_type() const { return "ParseSequence"; }
 };
 
 } // namespace GDB

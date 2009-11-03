@@ -35,6 +35,7 @@ public:
     void process(std::string line);
     
     gdb_state_e get_gdb_state() const { return gdb_state; }
+    void set_gdb_state(gdb_state_e new_state) { gdb_state = new_state; }
     
     bool begins_with(std::string beginning) {
         return line.substr(0, beginning.length()) == beginning;

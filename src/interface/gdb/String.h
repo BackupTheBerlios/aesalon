@@ -72,7 +72,6 @@ public:
     virtual Misc::SmartPointer<ParseSequence> get_data() { return data; }
 };
 
-
 } // namespace GDB
 } // namespace Interface
 } // namespace Aesalon
