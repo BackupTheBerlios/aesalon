@@ -26,7 +26,7 @@ Misc::SmartPointer<String> Parser::parse_gdb_string(std::string string) {
     begin = digits + 1;
     
     if(std::string("~@&").find(type) != std::string::npos) {
-        instance = new StreamOutput("");
+        instance = new StreamOutput(Misc::StringEscaper::remove_escapes(this->string.substr(begin)));
     }
     else if(std::string("*+=").find(type) != std::string::npos) {
         Misc::SmartPointer<ParseSequence> seq = parse_sequence();

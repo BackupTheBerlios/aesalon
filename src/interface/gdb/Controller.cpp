@@ -18,7 +18,9 @@ Controller::~Controller() {
 void Controller::listen() {
     std::cout << "GDB state: " << get_state() << std::endl;
     if(get_state() == Processor::GDB_STOPPED) {
-        send_command("-gdb-exit");
+        static bool exit_sent = false; /* To prevent multiple -gdb-exits from being sent */
+        if(!exit_sent) send_command("-gdb-exit");
+        exit_sent = true;
     }
     std::string line = bi_pipe->get_string();
     
