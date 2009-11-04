@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 #include "misc/ArgumentParser.h"
 #include "misc/ReferenceCounter.h"
 #include "misc/StreamAsString.h"
@@ -100,6 +101,7 @@ void Initializer::usage() {
 void Initializer::run() {
     while(bi_pipe->is_open()) {
         gdb_controller->listen();
+        sleep(1);
     }
 }
 

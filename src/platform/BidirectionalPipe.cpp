@@ -41,7 +41,8 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
     close(cp_pipe_fd[1]);  /* Close the write end of the cp pipe */
     
     fcntl(pc_pipe_fd[1], F_SETFL, fcntl(cp_pipe_fd[1], F_GETFL) & ~O_NONBLOCK);
-    fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) & ~O_NONBLOCK);
+    /* NOTE: cp_pipe on the parent end needs to be non-blocking! */
+    fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) | O_NONBLOCK);
     
     /* Pipe opened and ready to go. */
     is_connected = true;
@@ -55,12 +56,17 @@ BidirectionalPipe::~BidirectionalPipe() {
 std::string BidirectionalPipe::get_string() {
     std::string data;
     char recv;
+    int ret_value;
     
-    while((read(cp_pipe_fd[0], &recv, sizeof(recv))) > 0) {
+    while((ret_value = read(cp_pipe_fd[0], &recv, sizeof(recv))) > 0) {
         if(recv == '\n') {
             return data;
         }
         data += recv;
+    }
+    /* EAGAIN on a pipe read with O_NONBLOCK set means no data waiting. */
+    if(ret_value == -1 && errno == EAGAIN) {
+        return "";
     }
     is_connected = false;
     return data;

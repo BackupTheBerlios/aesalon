@@ -22,9 +22,12 @@ void Controller::listen() {
         if(!exit_sent) send_command("-gdb-exit");
         exit_sent = true;
     }
-    std::string line = bi_pipe->get_string();
+    std::string line;
+    do {
+        line = bi_pipe->get_string();
     
-    processor->process(line);
+        processor->process(line);
+    } while(line != "" && bi_pipe->is_open());
 }
 
 void Controller::send_command(std::string command) {
