@@ -82,10 +82,8 @@ void Initializer::deinitialize() {
     
     Misc::ArgumentParser::lock_mutex();
     delete Misc::ArgumentParser::get_instance();
-    Misc::ArgumentParser::unlock_mutex();
     Misc::ReferenceCounter::lock_mutex();
     delete Misc::ReferenceCounter::get_instance();
-    Misc::ReferenceCounter::unlock_mutex();
 }
 
 void Initializer::usage() {
