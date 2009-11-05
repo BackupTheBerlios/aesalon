@@ -7,6 +7,7 @@ namespace GDB {
 Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     Misc::SmartPointer<Misc::EventQueue> event_queue) : bi_pipe(bi_pipe), event_queue(event_queue) {
     processor = new Processor(bi_pipe, event_queue);
+    send_command("-gdb-set target-async 1");
     send_command("-exec-run");
     processor->set_gdb_state(Processor::GDB_RUNNING);
 }
