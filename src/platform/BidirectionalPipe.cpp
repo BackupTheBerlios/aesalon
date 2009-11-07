@@ -41,7 +41,7 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
     close(cp_pipe_fd[1]);  /* Close the write end of the cp pipe */
     
     fcntl(pc_pipe_fd[1], F_SETFL, fcntl(cp_pipe_fd[1], F_GETFL) & ~O_NONBLOCK);
-    if(block) fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) | O_NONBLOCK);
+    if(!block) fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) | O_NONBLOCK);
     else fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) | ~O_NONBLOCK);
     
     /* Pipe opened and ready to go. */

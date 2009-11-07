@@ -12,7 +12,17 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     
     processor = new Processor(bi_pipe, event_queue);
     this_sp = this;
+    
+    processor->set_gdb_state(Processor::GDB_PAUSED);
+    
+    /* NOTE: !!! For testing purposes only! */
+    for(int x = 0; x < 15; x ++) {
+        std::cout << "Skipping GDB intro message . . ." << std::endl;
+        this->listen(false);
+    }
+    
     set_breakpoints();
+    
     send_command("-gdb-set target-async 1");
     send_command("-exec-run");
     processor->set_gdb_state(Processor::GDB_RUNNING);
@@ -21,7 +31,7 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
 Controller::~Controller() {
 }
 
-void Controller::listen() {
+void Controller::listen(bool wait) {
     std::cout << "GDB state: " << get_state() << std::endl;
     if(get_state() == Processor::GDB_STOPPED) {
         static bool exit_sent = false; /* To prevent multiple -gdb-exits from being sent */
@@ -33,7 +43,7 @@ void Controller::listen() {
         line = bi_pipe->get_string();
     
         processor->process(line);
-    } while(line != "" && bi_pipe->is_open());
+    } while(wait && line != "" && bi_pipe->is_open());
 }
 
 void Controller::send_command(std::string command) {
@@ -42,7 +52,17 @@ void Controller::send_command(std::string command) {
 }
 
 void Controller::set_breakpoints() {
+    std::cout << "Setting breakpoints . . ." << std::endl;
+    
     symbol_parser = new SymbolParser(this_sp);
+    
+    SymbolManager::symbol_vector_t::size_type x;
+    for(x = 0; x < symbol_manager->get_symbols(); x ++) {
+        std::cout << "Calling symbol_parser->parse_symbol() . . ." << std::endl;
+        Misc::SmartPointer<Symbol> symbol = symbol_manager->get_symbol(x);
+        symbol_parser->parse_symbol(symbol);
+    }
+    
 }
 
 } // namespace GDB

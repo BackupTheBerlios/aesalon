@@ -43,8 +43,9 @@ public:
     */
     void send_command(std::string command);
     /** Listen on the BidirectionalPipe for GDB output, then pass it onto the @a Processor instance.
+        @param wait If true, waits for a string to parse. If false, only parses a line if there is one waiting.
     */
-    void listen();
+    void listen(bool wait = true);
     
     /** Returns the state of the GDB processor.
         @return The state of the GDB processor.

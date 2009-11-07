@@ -17,6 +17,12 @@ private:
     Misc::SmartPointer<AssemblyParser> assembly_parser;
     Misc::SmartPointer<Controller> gdb_controller;
     Misc::SmartPointer<StreamHandler> previous_stream_handler;
+    
+    Misc::SmartPointer<Symbol> current_symbol;
+    
+    bool in_scope;
+    std::string scope;
+    bool first;
 public:
     SymbolParser(Misc::SmartPointer<Controller> gdb_controller);
     virtual ~SymbolParser();

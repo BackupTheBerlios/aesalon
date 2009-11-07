@@ -15,11 +15,16 @@ Processor::Processor(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
 }
 
 void Processor::process(std::string line) {
+    std::cout << "Processor::process(): Processing string \"" << line << "\" . . .\n";
     this->line = line;
     
-    if(!this->line.length()) return;
+    if(!this->line.length()) {
+    std::cout << "Processor::process(): Skipping empty string . . ." << std::endl;
+        return;
+    }
     if(begins_with("(gdb)")) {
         if(gdb_state != GDB_STOPPED) gdb_state = GDB_PAUSED;
+        std::cout << "Processor::process(): Skipping string \"" << line << "\" . . .\n";
         return;
     }
     
@@ -28,7 +33,10 @@ void Processor::process(std::string line) {
     /* Now farm off the string as required . . . */
     
     if(string->get_type() == String::STREAM_OUTPUT) {
-        if(stream_handler) stream_handler->handle_stream(string.to<StreamOutput>());
+        std::cout << "StreamOutput received, stream_handler: " << stream_handler << std::endl;
+        if(stream_handler) {
+            stream_handler->handle_stream(string.to<StreamOutput>());
+        }
     }
     else if(string->get_type() == String::ASYNC_OUTPUT) {
         handle_async(string.to<AsyncOutput>());

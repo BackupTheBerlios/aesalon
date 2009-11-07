@@ -62,7 +62,7 @@ void Initializer::initialize() {
         al.add_argument("--interpreter=mi2");
         al.add_argument(ap->get_file(0)->get_filename());
         /*for(std::size_t x = 0; x < ap->get_files(); x ++) al.add_argument(ap->get_file(x)->get_filename());*/
-        bi_pipe = new Platform::BidirectionalPipe(ap->get_argument("gdb executable").to<Misc::StringArgument>()->get_value(), al);
+        bi_pipe = new Platform::BidirectionalPipe(ap->get_argument("gdb executable").to<Misc::StringArgument>()->get_value(), al, false);
     }
     else {
         usage();
