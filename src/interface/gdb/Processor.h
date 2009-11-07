@@ -2,6 +2,7 @@
 #define AESALON_INTERFACE_GDB_PROCESSOR_H
 
 #include "Parser.h"
+#include "StreamHandler.h"
 #include "platform/BidirectionalPipe.h"
 #include "misc/EventQueue.h"
 
@@ -30,6 +31,8 @@ private:
     Misc::SmartPointer<Parser> parser;
     /** An EventQueue to push events onto as they occur. */
     Misc::SmartPointer<Misc::EventQueue> event_queue;
+    
+    Misc::SmartPointer<StreamHandler> stream_handler;
     
     /** The current line to pass onto GDB; stored for reference purposes. */
     std::string line;
@@ -72,6 +75,9 @@ public:
         @param new_state The new state to set the current state to.
     */
     void set_gdb_state(gdb_state_e new_state) { gdb_state = new_state; }
+    
+    Misc::SmartPointer<StreamHandler> get_stream_handler() const { return stream_handler; }
+    void set_stream_handler(Misc::SmartPointer<StreamHandler> new_stream_handler) { stream_handler = new_stream_handler; }
 };
 
 } // namespace GDB

@@ -75,7 +75,7 @@ void Initializer::initialize() {
     
     symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());
     
-    gdb_controller = new GDB::Controller(bi_pipe, event_queue);
+    gdb_controller = new GDB::Controller(bi_pipe, event_queue, symbol_manager);
     
     run();
 }

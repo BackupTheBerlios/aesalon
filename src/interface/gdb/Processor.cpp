@@ -27,8 +27,9 @@ void Processor::process(std::string line) {
     
     /* Now farm off the string as required . . . */
     
-    /* Don't bother with StreamOutputs, they're simply messages, nothing too useful */
-    if(string->get_type() == String::STREAM_OUTPUT) return;
+    if(string->get_type() == String::STREAM_OUTPUT) {
+        if(stream_handler) stream_handler->handle_stream(string.to<StreamOutput>());
+    }
     else if(string->get_type() == String::ASYNC_OUTPUT) {
         handle_async(string.to<AsyncOutput>());
     }
@@ -51,7 +52,6 @@ void Processor::handle_result(Misc::SmartPointer<ResultRecord> record) {
     if(record->get_data()->get_first() == "running") {
         set_gdb_state(GDB_RUNNING);
     }
-    
 }
 
 } // namespace GDB

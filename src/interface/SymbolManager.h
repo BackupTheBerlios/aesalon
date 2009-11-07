@@ -40,6 +40,15 @@ public:
     virtual ~SymbolManager();
     
     void parse_from_executable(std::string executable_name);
+    
+    Misc::SmartPointer<Symbol> get_symbol(symbol_vector_t::size_type which) const {
+        return symbol_list.at(which);
+    }
+    symbol_vector_t::size_type get_symbols() const { return symbol_list.size(); }
+    Misc::SmartPointer<Symbol> get_global(symbol_vector_t::size_type which) const {
+        return global_list.at(which);
+    }
+    symbol_vector_t::size_type get_globals() const { return global_list.size(); }
 };
 
 } // namespace Interface

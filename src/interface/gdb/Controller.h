@@ -4,6 +4,8 @@
 #include <string>
 #include "misc/EventQueue.h"
 #include "Processor.h"
+#include "SymbolParser.h"
+#include "interface/SymbolManager.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -19,11 +21,18 @@ private:
     /** EventQueue to push MemoryEvents onto; saved for reference. */
     Misc::SmartPointer<Misc::EventQueue> event_queue;
     
+    Misc::SmartPointer<SymbolManager> symbol_manager;
+    Misc::SmartPointer<SymbolParser> symbol_parser;
+    
+    Misc::SmartPointer<Controller> this_sp;
+    
+    void set_breakpoints();
 public:
     /** Constructor for the GDB Controller.
         @param bi_pipe A BidirectionalPipe connected to a running instance of GDB.
         @param event_queue An EventQueue to push MemoryEvents onto. */
-    Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe, Misc::SmartPointer<Misc::EventQueue> event_queue);
+    Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe, Misc::SmartPointer<Misc::EventQueue> event_queue,
+        Misc::SmartPointer<SymbolManager> symbol_manager);
     /** Destructor for the GDB Controller. */
     virtual ~Controller();
     
@@ -42,6 +51,8 @@ public:
         @note This method is a passthrough to Processor::get_state().
     */
     Processor::gdb_state_e get_state() const { return processor->get_gdb_state(); }
+    
+    Misc::SmartPointer<Processor> get_processor() const { return processor; }
 };
 
 } // namespace GDB

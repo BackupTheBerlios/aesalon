@@ -17,14 +17,19 @@ private:
     Platform::MemoryAddress address;
     symbol_type_e type;
     std::string name;
+    bool parsed;
 public:
-    Symbol(Platform::MemoryAddress address, symbol_type_e type, std::string name) : address(address), type(type), name(name) {}
+    Symbol(Platform::MemoryAddress address, symbol_type_e type, std::string name) :
+        address(address), type(type), name(name), parsed(false) {}
     virtual ~Symbol() {}
     
     
     std::string get_name() const { return name; }
     symbol_type_e get_type() const { return type; }
     Platform::MemoryAddress get_address() const { return address; }
+    
+    bool is_parsed() const { return parsed; }
+    void set_parsed(bool value) { parsed = value; }
 };
 
 } // namespace Interface
