@@ -8,6 +8,8 @@
 #include "gdb/Controller.h"
 #include "misc/EventQueue.h"
 
+#include "SymbolManager.h"
+
 namespace Aesalon {
 namespace Interface {
 
@@ -24,6 +26,8 @@ private:
     Misc::SmartPointer<Interface::GDB::Controller> gdb_controller;
     /** The EventQueue instance; used to keep the local copy of the program's memory updated. */
     Misc::SmartPointer<Misc::EventQueue> event_queue;
+    
+    Misc::SmartPointer<SymbolManager> symbol_manager;
     
     /** Initialize the aeslaon gdb interface. */
     void initialize();

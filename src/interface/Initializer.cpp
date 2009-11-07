@@ -71,12 +71,17 @@ void Initializer::initialize() {
     
     event_queue = new Misc::EventQueue();
     
+    symbol_manager = new SymbolManager();
+    
+    symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());
+    
     gdb_controller = new GDB::Controller(bi_pipe, event_queue);
     
     run();
 }
 
 void Initializer::deinitialize() {
+    if(symbol_manager) delete symbol_manager;
     if(named_pipe) delete named_pipe;
     if(gdb_controller) delete gdb_controller;
     if(event_queue) delete event_queue;

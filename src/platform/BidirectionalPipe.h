@@ -21,14 +21,16 @@ private:
     int cp_pipe_fd[2];
     std::string executable;
     bool is_connected;
+    bool block;
 public:
-    BidirectionalPipe(std::string executable, ArgumentList argument_list);
+    BidirectionalPipe(std::string executable, ArgumentList argument_list, bool block = false);
     virtual ~BidirectionalPipe();
     
     void send_string(std::string data);
     std::string get_string();
     
     bool is_open() const { return is_connected; }
+    bool is_blocking() const { return block; }
 };
 
 } // namespace Platform
