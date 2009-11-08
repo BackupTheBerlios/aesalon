@@ -17,24 +17,22 @@ AssemblyParser::~AssemblyParser() {
 
 }
 
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86
-
-    #error "x86 support is currently NYI"
-
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86_64
 bool AssemblyParser::changes_memory(std::string asm_line) {
     std::cout << "AssemblyParser: asked if \"" << asm_line << "\" changes memory . . ." << std::endl;
     
     std::string instruction = asm_line.substr(0, asm_line.find(" "));
+    asm_line.erase(0, asm_line.length());
     std::cout << "\tAssembly instruction is " << instruction << std::endl;
     
-    if(instruction.substr(0, 3) == "mov") {
-        
-    }
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86
+    #error "x86 support is currently NYI"
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86_64
     
+    
+    
+#endif
     return false;
 }
-#endif
 
 } // namespace GDB
 } // namespace Interface

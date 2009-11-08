@@ -22,6 +22,7 @@ private:
     
     bool in_scope;
     std::string scope;
+    std::string address;
     bool first;
     bool was_stream;
     

@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iomanip>
 
 #include "SymbolParser.h"
 #include "Controller.h"
@@ -42,7 +43,6 @@ void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
         first = false;
         std::stringstream ss;
         ss << stream->get_stream_data();
-        std::string address;
         ss >> address;
         std::string symbol_name;
         ss >> symbol_name;
@@ -52,7 +52,6 @@ void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
     else {
         std::stringstream ss;
         ss << stream->get_stream_data();
-        std::string address;
         ss >> address;
         std::string symbol_name;
         ss >> symbol_name;
@@ -75,7 +74,7 @@ void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
 }
 
 void SymbolParser::add_breakpoint() {
-    
+    gdb_controller->send_command(Misc::StreamAsString() << "-break-insert *" << address);
 }
 
 } // namespace GDB
