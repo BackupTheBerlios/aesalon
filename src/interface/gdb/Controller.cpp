@@ -19,7 +19,6 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     this->listen(true);
     sleep(1);
     for(int x = 0; x < 25; x ++) {
-        std::cout << "Skipping GDB intro message . . ." << std::endl;
         this->listen(false);
     }
     
@@ -34,7 +33,6 @@ Controller::~Controller() {
 }
 
 void Controller::listen(bool wait) {
-    std::cout << "GDB state: " << get_state() << std::endl;
     if(get_state() == Processor::GDB_STOPPED) {
         static bool exit_sent = false; /* To prevent multiple -gdb-exits from being sent */
         if(!exit_sent) send_command("-gdb-exit");
@@ -59,7 +57,6 @@ void Controller::set_breakpoints() {
     
     SymbolManager::symbol_vector_t::size_type x;
     for(x = 0; x < symbol_manager->get_symbols(); x ++) {
-        std::cout << "Calling symbol_parser->parse_symbol() . . ." << std::endl;
         Misc::SmartPointer<Symbol> symbol = symbol_manager->get_symbol(x);
         symbol_parser->parse_symbol(symbol);
     }

@@ -23,6 +23,8 @@ private:
     bool in_scope;
     std::string scope;
     bool first;
+    
+    void add_breakpoint();
 public:
     SymbolParser(Misc::SmartPointer<Controller> gdb_controller);
     virtual ~SymbolParser();
