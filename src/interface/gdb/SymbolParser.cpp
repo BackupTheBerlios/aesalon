@@ -34,11 +34,10 @@ void SymbolParser::parse_symbol(Misc::SmartPointer<Symbol> symbol) {
 }
 
 void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
-    std::cout << "Received stream \"" << stream->get_stream_data() << "\"" << std::endl;
     if(first) {
         first = false;
         std::stringstream ss;
-        ss << stream;
+        ss << stream->get_stream_data();
         std::string address;
         ss >> address;
         std::string symbol_name;
@@ -46,6 +45,22 @@ void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
         scope = symbol_name.substr(1, symbol_name.length()-3);
         std::cout << "Scope is: \"" << scope << "\"\n";
     }
+    else {
+        std::stringstream ss;
+        ss << stream->get_stream_data();
+        std::string address;
+        ss >> address;
+        std::string symbol_name;
+        ss >> symbol_name;
+        std::string temporary_scope;
+        temporary_scope = symbol_name.substr(1, symbol_name.length()-3);
+        temporary_scope = temporary_scope.substr(0, scope.find("+"));
+        if(scope != temporary_scope) {
+            in_scope = false;
+            return;
+        }
+    }
+    
 }
 
 } // namespace GDB

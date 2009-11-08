@@ -16,7 +16,9 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     processor->set_gdb_state(Processor::GDB_PAUSED);
     
     /* NOTE: !!! For testing purposes only! */
-    for(int x = 0; x < 15; x ++) {
+    this->listen(true);
+    sleep(1);
+    for(int x = 0; x < 25; x ++) {
         std::cout << "Skipping GDB intro message . . ." << std::endl;
         this->listen(false);
     }
@@ -41,8 +43,7 @@ void Controller::listen(bool wait) {
     std::string line;
     do {
         line = bi_pipe->get_string();
-    
-        processor->process(line);
+        if(line != "") processor->process(line);
     } while(wait && line != "" && bi_pipe->is_open());
 }
 

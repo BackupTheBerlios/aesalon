@@ -42,7 +42,7 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
     
     fcntl(pc_pipe_fd[1], F_SETFL, fcntl(cp_pipe_fd[1], F_GETFL) & ~O_NONBLOCK);
     if(!block) fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) | O_NONBLOCK);
-    else fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) | ~O_NONBLOCK);
+    else fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) & ~O_NONBLOCK);
     
     /* Pipe opened and ready to go. */
     is_connected = true;
@@ -67,7 +67,7 @@ std::string BidirectionalPipe::get_string() {
         data += recv;
     }
     /* EAGAIN on a pipe read with O_NONBLOCK set means no data waiting. */
-    if(block && ret_value == -1 && errno == EAGAIN) {
+    if(!block && ret_value == -1 && errno == EAGAIN) {
         return "";
     }
     is_connected = false;
