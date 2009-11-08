@@ -1,4 +1,7 @@
-set(MAJOR_VERSION   0)
-set(MINOR_VERSION   0)
-set(PATCHLEVEL      1)
-
+set(AESALON_MAJOR_VERSION   0)
+set(AESALON_MINOR_VERSION   0)
+set(AESALON_PATCHLEVEL      1)
+# AESALON_PLATFORM can be:
+#   0: x86
+#   1: x86-64 (sometimes known as amd64)
+set(AESALON_PLATFORM        1)
