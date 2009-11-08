@@ -23,17 +23,20 @@ void SymbolParser::parse_symbol(Misc::SmartPointer<Symbol> symbol) {
     if(symbol->is_parsed()) return;
     current_symbol = symbol;
     first = true;
+    in_scope = true; /* it's assumed that the first instruction is within the scope. */
     gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i " << symbol->get_address() << "\"");
-    gdb_controller->listen();
-    while(in_scope) {
-        gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i\"");
+    while(true) {
         gdb_controller->listen();
+        if(in_scope) gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i\"");
+        else break;
+        usleep(5000);
     }
     
     symbol->set_parsed(true);
 }
 
 void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
+    if(!in_scope) return;
     if(first) {
         first = false;
         std::stringstream ss;

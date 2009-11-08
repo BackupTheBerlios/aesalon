@@ -25,6 +25,13 @@ AssemblyParser::~AssemblyParser() {
 bool AssemblyParser::changes_memory(std::string asm_line) {
     std::cout << "AssemblyParser: asked if \"" << asm_line << "\" changes memory . . ." << std::endl;
     
+    std::string instruction = asm_line.substr(0, asm_line.find(" "));
+    std::cout << "\tAssembly instruction is " << instruction << std::endl;
+    
+    if(instruction.substr(0, 3) == "mov") {
+        
+    }
+    
     return false;
 }
 #endif
