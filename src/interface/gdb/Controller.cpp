@@ -15,18 +15,16 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     
     processor->set_gdb_state(Processor::GDB_PAUSED);
     
-    /* NOTE: !!! For testing purposes only! */
-    this->listen(true);
-    sleep(1);
-    for(int x = 0; x < 25; x ++) {
-        this->listen(false);
+    /* NOTE: !!! For testing purposes only! 11 is *very* gdb-version-dependent . . . */
+    for(int x = 0; x < 11; x ++) {
+        this->listen(true);
     }
     
-    set_breakpoints();
-    
-    send_command("-gdb-set target-async 1");
+    /*send_command("-gdb-set target-async 1");*/
+    send_command("-break-insert main");
     send_command("-exec-run");
     processor->set_gdb_state(Processor::GDB_RUNNING);
+    set_breakpoints();
 }
 
 Controller::~Controller() {
@@ -43,8 +41,7 @@ void Controller::listen(bool wait) {
         line = bi_pipe->get_string();
         if(line != "") processor->process(line);
     } while(wait && line == "" && bi_pipe->is_open());
-    
-    std::cout << "Controller::listen: got string \"" << line << "\"" << std::endl;
+    std::cout << "Controller::listen(): Received string \"" << line << "\"\n";
 }
 
 void Controller::send_command(std::string command) {

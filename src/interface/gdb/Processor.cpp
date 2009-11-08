@@ -46,8 +46,7 @@ void Processor::handle_async(Misc::SmartPointer<AsyncOutput> output) {
         if(output->get_data()->get_element("reason").is_valid()) {
             std::string reason = output->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data();
             
-            if(reason != "watchpoint-trigger") set_gdb_state(GDB_STOPPED);
-            else set_gdb_state(GDB_PAUSED);
+            set_gdb_state(GDB_PAUSED);
         }
     }
 }
