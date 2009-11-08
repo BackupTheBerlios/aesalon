@@ -42,7 +42,9 @@ void Controller::listen(bool wait) {
     do {
         line = bi_pipe->get_string();
         if(line != "") processor->process(line);
-    } while(wait && line != "" && bi_pipe->is_open());
+    } while(wait && line == "" && bi_pipe->is_open());
+    
+    std::cout << "Controller::listen: got string \"" << line << "\"" << std::endl;
 }
 
 void Controller::send_command(std::string command) {

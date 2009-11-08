@@ -26,16 +26,17 @@ void SymbolParser::parse_symbol(Misc::SmartPointer<Symbol> symbol) {
     in_scope = true; /* it's assumed that the first instruction is within the scope. */
     gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i " << symbol->get_address() << "\"");
     while(true) {
-        gdb_controller->listen();
+        was_stream = false;
+        while(!was_stream) gdb_controller->listen();
         if(in_scope) gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i\"");
         else break;
-        usleep(5000);
     }
     
     symbol->set_parsed(true);
 }
 
 void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
+    was_stream = true;
     if(!in_scope) return;
     if(first) {
         first = false;

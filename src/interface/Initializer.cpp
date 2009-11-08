@@ -106,7 +106,6 @@ void Initializer::usage() {
 void Initializer::run() {
     while(bi_pipe->is_open()) {
         gdb_controller->listen();
-        sleep(1);
     }
 }
 

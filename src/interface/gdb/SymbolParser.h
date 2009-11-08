@@ -23,6 +23,7 @@ private:
     bool in_scope;
     std::string scope;
     bool first;
+    bool was_stream;
     
     void add_breakpoint();
 public:
