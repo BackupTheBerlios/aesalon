@@ -41,8 +41,7 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
     close(cp_pipe_fd[1]);  /* Close the write end of the cp pipe */
     
     fcntl(pc_pipe_fd[1], F_SETFL, fcntl(cp_pipe_fd[1], F_GETFL) & ~O_NONBLOCK);
-    if(!block) fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) | O_NONBLOCK);
-    else fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) & ~O_NONBLOCK);
+    set_blocking(block);
     
     /* Pipe opened and ready to go. */
     is_connected = true;
@@ -78,6 +77,11 @@ void BidirectionalPipe::send_string(std::string data) {
     if(is_open()) write(pc_pipe_fd[1], data.c_str(), data.length());
 }
 
+void BidirectionalPipe::set_blocking(bool new_blocking) {
+    block = new_blocking;
+    if(!block) fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) | O_NONBLOCK);
+    else fcntl(cp_pipe_fd[0], F_SETFL, fcntl(cp_pipe_fd[0], F_GETFL) & ~O_NONBLOCK);
+}
 
 } // namespace Platform
 } // namespace Aesalon

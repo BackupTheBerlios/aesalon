@@ -29,6 +29,8 @@ public:
     void send_string(std::string data);
     std::string get_string();
     
+    void set_blocking(bool new_blocking);
+    
     bool is_open() const { return is_connected; }
     bool is_blocking() const { return block; }
 };

@@ -50,12 +50,10 @@ void SymbolManager::parse_nm_output() {
             case 'W':
                 /* Skip the three ELF symbols, as they do not allocate memory we are interested in . . . */
                 if(symbol_name == "_init" || symbol_name == "_start" || symbol_name == "_fini") break;
-                std::cout << "Adding symbol \"" << symbol_name << "\" . . ." << std::endl;
                 symbol_list.push_back(new Symbol(symbol_address, Symbol::FUNCTION, symbol_name));
                 break;
             /*case 'b':*/
             case 'B':
-                std::cout << "Adding global variable \"" << symbol_name << "\" . . ." << std::endl;
                 global_list.push_back(new Symbol(symbol_address, Symbol::FUNCTION, symbol_name));
                 break;
             default: break;

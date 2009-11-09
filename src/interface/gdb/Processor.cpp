@@ -21,7 +21,10 @@ void Processor::process(std::string line) {
         return;
     }
     if(begins_with("(gdb)")) {
-        if(gdb_state != GDB_STOPPED) gdb_state = GDB_PAUSED;
+        if(get_gdb_state() == GDB_RUNNING) {
+            std::cout << "\t**** setting GDB state to GDB_PAUSED (current state is " << get_gdb_state() << ")" << std::endl;
+            set_gdb_state(GDB_PAUSED);
+        }
         return;
     }
     
@@ -44,9 +47,8 @@ void Processor::process(std::string line) {
 void Processor::handle_async(Misc::SmartPointer<AsyncOutput> output) {
     if(output->get_data()->get_first() == "stopped") {
         if(output->get_data()->get_element("reason").is_valid()) {
-            std::string reason = output->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data();
-            
-            set_gdb_state(GDB_PAUSED);
+            /*std::string reason = output->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data();*/
+            if(get_gdb_state() != GDB_SETUP) set_gdb_state(GDB_PAUSED);
         }
     }
 }

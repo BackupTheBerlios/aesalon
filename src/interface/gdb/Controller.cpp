@@ -13,35 +13,58 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     processor = new Processor(bi_pipe, event_queue);
     this_sp = this;
     
-    processor->set_gdb_state(Processor::GDB_PAUSED);
+    processor->set_gdb_state(Processor::GDB_SETUP);
     
-    /* NOTE: !!! For testing purposes only! 11 is *very* gdb-version-dependent . . . */
-    for(int x = 0; x < 11; x ++) {
-        this->listen(true);
-    }
+    sleep(1);
+    this->listen(true);
+    
+    processor->set_gdb_state(Processor::GDB_SETUP);
     
     /*send_command("-gdb-set target-async 1");*/
     send_command("-break-insert main");
     send_command("-exec-run");
-    processor->set_gdb_state(Processor::GDB_RUNNING);
+    /*send_command("-break-delete 1");*/
+    /*processor->set_gdb_state(Processor::GDB_SETUP);*/
     set_breakpoints();
+    
+    std::cout << "Breakpoints have been set, continuing execution . . ." << std::endl;
+    send_command("-exec-continue");
+    processor->set_gdb_state(Processor::GDB_RUNNING);
 }
 
 Controller::~Controller() {
 }
 
 void Controller::listen(bool wait) {
+    static bool exit_sent = false; /* To prevent multiple -gdb-exits from being sent */
+    static bool update_sent = false; /* To prevent multiple -var-updates from being sent */
+    
     if(get_state() == Processor::GDB_STOPPED) {
-        static bool exit_sent = false; /* To prevent multiple -gdb-exits from being sent */
         if(!exit_sent) send_command("-gdb-exit");
         exit_sent = true;
     }
+    
+    /* line = bi_pipe->get_string();
+            if(line != "") processor->process(line); */
+    
     std::string line;
+    
+    
+    bool recved = false;
     do {
         line = bi_pipe->get_string();
-        if(line != "") processor->process(line);
-    } while(wait && line == "" && bi_pipe->is_open());
-    std::cout << "Controller::listen(): Received string \"" << line << "\"\n";
+        if(line != "") {
+            processor->process(line);
+            recved = true;
+        }
+    } while(bi_pipe->is_open() && ((wait && !recved) || (!wait && line != "")));
+    
+    if(get_state() == Processor::GDB_PAUSED && !update_sent) {
+        /*send_command("-var-update --all-values \"*\"");*/
+        send_command("-exec-continue");
+        update_sent = true;
+    }
+    else if(get_state() == Processor::GDB_RUNNING) update_sent = false;
 }
 
 void Controller::send_command(std::string command) {

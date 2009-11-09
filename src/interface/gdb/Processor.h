@@ -16,6 +16,7 @@ class Processor {
 public:
     /** Enum to describe the current state of GDB. */
     enum gdb_state_e {
+        GDB_SETUP, /**< GDB is in the "setup" stage -- the program is loaded into memory, but not being executed. */
         GDB_STOPPED, /**< GDB is currently stopped, no program is loaded into memory. */
         GDB_PAUSED, /**< GDB is paused, but a program is loaded into memory. */
         GDB_RUNNING,  /**< GDB is currently running a program that is loaded into memory. */
