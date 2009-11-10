@@ -50,6 +50,7 @@ void Processor::handle_async(Misc::SmartPointer<AsyncOutput> output) {
             std::string reason = output->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data();
             if(reason == "exited-normally") set_gdb_state(GDB_STOPPED);
             else if(get_gdb_state() != GDB_SETUP) set_gdb_state(GDB_PAUSED);
+            if(output->get_number()) std::cout << "Stopped, number is " << output->get_number()->get_number() << std::endl;
         }
     }
 }

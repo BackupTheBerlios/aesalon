@@ -47,7 +47,9 @@ Misc::SmartPointer<String> Parser::parse_gdb_string(std::string string) {
         int digits_value;
         ss >> digits_value;
         instance->set_number(new NumberedString(digits_value));
+        std::cout << "instance->set_number: " << digits_value << std::endl;
     }
+    else instance->set_number(NULL);
     
     return instance;
 }
