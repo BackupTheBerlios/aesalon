@@ -37,6 +37,7 @@ void SymbolParser::parse_symbol(Misc::SmartPointer<Symbol> symbol) {
 }
 
 void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
+    std::cout << "SymbolParser::handle_stream: stream content is: " << stream->get_stream_data() << std::endl;
     was_stream = true;
     if(!in_scope) return;
     if(first) {

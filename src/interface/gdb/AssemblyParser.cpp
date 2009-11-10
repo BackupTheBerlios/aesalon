@@ -59,7 +59,7 @@ bool AssemblyParser::handle_mov_instruction() {
     /* If the second operand begins with a '%', then the content of memory is moving into a register (mov   $0x20, %rax) */
     if(operands[1][0] == '%') return false;
     /* If the first operand begins with a '%', but the second does not,
-        then the content of a register is moving into memory (mov   %rax, [%r9]).
+        then the content of a register is moving into memory ("mov   %rax, (%r9)").
         Excuse the mixing of intel and GNU assembly. */
     else if(operands[0][0] == '%') return true;
     else return true; /* This should never happen, but in case it does, assume it changes memory. */

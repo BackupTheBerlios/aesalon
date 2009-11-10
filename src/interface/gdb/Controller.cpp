@@ -23,13 +23,20 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     /*send_command("-gdb-set target-async 1");*/
     send_command("-break-insert main");
     send_command("-exec-run");
-    /*send_command("-break-delete 1");*/
+    
+    sleep(1);
+    this->listen(true);
+    
+    processor->set_gdb_state(Processor::GDB_SETUP);
+    
+    
     /*processor->set_gdb_state(Processor::GDB_SETUP);*/
     set_breakpoints();
     
     std::cout << "Breakpoints have been set, continuing execution . . ." << std::endl;
-    send_command("-exec-continue");
-    processor->set_gdb_state(Processor::GDB_RUNNING);
+    send_command("-break-delete 1"); /* Delete the breakpoint on main, as it is no longer required */
+    /*send_command("-exec-continue");*/
+    processor->set_gdb_state(Processor::GDB_PAUSED);
 }
 
 Controller::~Controller() {
@@ -55,6 +62,7 @@ void Controller::listen(bool wait) {
         line = bi_pipe->get_string();
         if(line != "") {
             processor->process(line);
+            std::cout << "GDB::Controller: received string \'" << line << "\'\n";
             recved = true;
         }
     } while(bi_pipe->is_open() && ((wait && !recved) || (!wait && line != "")));

@@ -47,15 +47,16 @@ void Processor::process(std::string line) {
 void Processor::handle_async(Misc::SmartPointer<AsyncOutput> output) {
     if(output->get_data()->get_first() == "stopped") {
         if(output->get_data()->get_element("reason").is_valid()) {
-            /*std::string reason = output->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data();*/
-            if(get_gdb_state() != GDB_SETUP) set_gdb_state(GDB_PAUSED);
+            std::string reason = output->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data();
+            if(reason == "exited-normally") set_gdb_state(GDB_STOPPED);
+            else if(get_gdb_state() != GDB_SETUP) set_gdb_state(GDB_PAUSED);
         }
     }
 }
 
 void Processor::handle_result(Misc::SmartPointer<ResultRecord> record) {
     if(record->get_data()->get_first() == "running") {
-        set_gdb_state(GDB_RUNNING);
+        /*set_gdb_state(GDB_RUNNING);*/
     }
 }
 
