@@ -20,6 +20,8 @@ private:
     char **argv;
     /** The named pipe used to communicate with the GUI. */
     Misc::SmartPointer<Platform::NamedPipe> named_pipe;
+    /** The named pipe used to receive information from the overload library. */
+    Misc::SmartPointer<Platform::NamedPipe> malloc_info_pipe;
     /** The BidirectionalPipe instance used to communicate with gdb. */
     Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
     /** The GDB Controller instance; handles all gdb input and output. */

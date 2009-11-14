@@ -54,11 +54,7 @@ std::string NamedPipe::get_data() {
 }
 
 void NamedPipe::create_named_pipe() {
-    static bool pipe_created = false;
-    if(!pipe_created) {
-        if(mkfifo(pipe_name.c_str(), FIFO_PIPE_MODE) != 0) throw PlatformException("Could not create named pipe: ");
-        pipe_created = true;
-    }
+    if(mkfifo(pipe_name.c_str(), FIFO_PIPE_MODE) != 0) throw PlatformException("Could not create named pipe: ");
 }
 
 void NamedPipe::open_pipe_write() {

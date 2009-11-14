@@ -1,6 +1,7 @@
 #include "Controller.h"
 #include "SymbolParser.h"
 #include "interface/SymbolManager.h"
+#include "misc/ArgumentParser.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -19,6 +20,9 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     this->listen(true);
     
     processor->set_gdb_state(Processor::GDB_SETUP);
+    
+    send_command(Misc::StreamAsString() << "-gdb-set env AESALON_PID=" << getpid());
+    send_command(Misc::StreamAsString() << "-gdb-set env LD_PRELOAD=" << Misc::ArgumentParser::get_instance()->get_argument("overload path").to<Misc::StringArgument>()->get_value());
     
     /*send_command("-gdb-set target-async 1");*/
     send_command("-break-insert main");

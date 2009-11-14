@@ -5,3 +5,5 @@ add_definitions(-std=c99)
 
 add_library(aesalon_overload SHARED ${SOURCES})
 
+target_link_libraries(aesalon_overload dl)
+

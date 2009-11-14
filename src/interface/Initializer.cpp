@@ -44,6 +44,7 @@ void Initializer::initialize() {
     ap->add_argument("logfile", new Misc::StringArgument("--log-file", 'l', ""));
     ap->add_argument("gdb executable", new Misc::StringArgument("--gdb-path", 0, "/usr/bin/gdb"));
     ap->add_argument("gui pid", new Misc::StringArgument("--gui-pid", 0, ""));
+    ap->add_argument("overload path", new Misc::StringArgument("--overload-path", 0, "./libaesalon_overload.so"));
     
     ap->parse_argv(argv);
     
@@ -55,6 +56,7 @@ void Initializer::initialize() {
     send_pid_to_gui();
     
     named_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon-" << getpid(), true);
+    malloc_info_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon_overload-" << getpid(), true);
     
     if(ap->get_files()) {
         Platform::ArgumentList al;
