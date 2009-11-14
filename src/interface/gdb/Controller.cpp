@@ -90,12 +90,6 @@ void Controller::set_breakpoints() {
         Misc::SmartPointer<Symbol> symbol = symbol_manager->get_symbol(x);
         symbol_parser->parse_symbol(symbol);
     }
-    
-    send_command("1-break-insert malloc");
-    send_command("1-break-insert free");
-    send_command("1-break-insert realloc");
-    send_command("1-break-insert calloc");
-    
 }
 
 } // namespace GDB
