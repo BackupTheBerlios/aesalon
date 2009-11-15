@@ -10,5 +10,3 @@ add_subdirectory(interface)
 
 add_subdirectory(gui)
 
-add_subdirectory(overload)
-

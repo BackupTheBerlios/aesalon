@@ -25,6 +25,8 @@ public:
 private:
     /** The current state of GDB. */
     gdb_state_e gdb_state;
+    
+    std::size_t current_breakpoint;
 
     /** BidirectionalPipe used to communicate with GDB. */
     Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
@@ -79,6 +81,8 @@ public:
     
     Misc::SmartPointer<StreamHandler> get_stream_handler() const { return stream_handler; }
     void set_stream_handler(Misc::SmartPointer<StreamHandler> new_stream_handler) { stream_handler = new_stream_handler; }
+    
+    std::size_t get_current_breakpoint() const { return current_breakpoint; }
 };
 
 } // namespace GDB

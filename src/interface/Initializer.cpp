@@ -56,7 +56,6 @@ void Initializer::initialize() {
     send_pid_to_gui();
     
     named_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon-" << getpid(), true);
-    malloc_info_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon_overload-" << getpid(), true);
     
     if(ap->get_files()) {
         Platform::ArgumentList al;

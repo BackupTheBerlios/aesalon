@@ -21,9 +21,6 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     
     processor->set_gdb_state(Processor::GDB_SETUP);
     
-    send_command(Misc::StreamAsString() << "-gdb-set env AESALON_PID=" << getpid());
-    send_command(Misc::StreamAsString() << "-gdb-set env LD_PRELOAD=" << Misc::ArgumentParser::get_instance()->get_argument("overload path").to<Misc::StringArgument>()->get_value());
-    
     /*send_command("-gdb-set target-async 1");*/
     send_command("-break-insert main");
     send_command("-exec-run");
@@ -32,7 +29,6 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe,
     this->listen(true);
     
     processor->set_gdb_state(Processor::GDB_SETUP);
-    
     
     /*processor->set_gdb_state(Processor::GDB_SETUP);*/
     set_breakpoints();
@@ -50,19 +46,34 @@ void Controller::listen(bool wait) {
     static bool exit_sent = false; /* To prevent multiple -gdb-exits from being sent */
     static bool update_sent = false; /* To prevent multiple -var-updates from being sent */
     
-    if(get_state() == Processor::GDB_STOPPED) {
-        if(!exit_sent) send_command("-gdb-exit");
-        exit_sent = true;
-    }
-    
     /* line = bi_pipe->get_string();
             if(line != "") processor->process(line); */
     
     std::string line;
     
-    
     bool recved = false;
     do {
+        if(get_state() == Processor::GDB_STOPPED) {
+            if(!exit_sent) send_command("-gdb-exit");
+            exit_sent = true;
+        }
+        if(get_state() == Processor::GDB_PAUSED && !update_sent) {
+            /*send_command("-var-update --all-values \"*\"");*/
+            std::cout << "Sending continue . . ." << std::endl;
+            if(processor->get_current_breakpoint() >= MALLOC_BREAKPOINT
+                && processor->get_current_breakpoint() <= CALLOC_BREAKPOINT) {
+                send_command(Misc::StreamAsString() << "-break-after " << processor->get_current_breakpoint() << " 1");
+                send_command("-exec-finish");
+            }
+            else send_command("-exec-continue");
+            update_sent = true;
+        }
+        if(get_state() != Processor::GDB_PAUSED) {
+            if(update_sent) std::cout << "Controller: Resetting update_sent\n";
+            update_sent = false;
+        }
+        /* NOTE: update_sent is never being reset to false . . . */
+    
         line = bi_pipe->get_string();
         if(line != "") {
             processor->process(line);
@@ -70,13 +81,6 @@ void Controller::listen(bool wait) {
             recved = true;
         }
     } while(bi_pipe->is_open() && ((wait && !recved) || (!wait && line != "")));
-    
-    if(get_state() == Processor::GDB_PAUSED && !update_sent) {
-        /*send_command("-var-update --all-values \"*\"");*/
-        send_command("-exec-continue");
-        update_sent = true;
-    }
-    else if(get_state() == Processor::GDB_RUNNING) update_sent = false;
 }
 
 void Controller::send_command(std::string command) {
@@ -86,6 +90,12 @@ void Controller::send_command(std::string command) {
 
 void Controller::set_breakpoints() {
     std::cout << "Setting breakpoints . . ." << std::endl;
+    
+    /* NOTE: this may be platform-dependent, not sure . . .*/
+    send_command("-break-insert -f __malloc"); /* <-- breakpoint #2, MALLOC_BREAKPOINT */
+    send_command("-break-insert -f __free"); /* <-- breakpoint #3, FREE_BREAKPOINT */
+    send_command("-break-insert -f __realloc"); /* <-- breakpoint #4, REALLOC_BREAKPOINT */
+    send_command("-break-insert -f __calloc"); /* <-- breakpoint #5, CALLOC_BREAKPOINT */
     
     symbol_parser = new SymbolParser(this_sp);
     

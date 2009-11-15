@@ -28,6 +28,12 @@ private:
     
     void set_breakpoints();
 public:
+    enum function_breakpoints_e {
+        MALLOC_BREAKPOINT = 2,
+        FREE_BREAKPOINT,
+        REALLOC_BREAKPOINT,
+        CALLOC_BREAKPOINT
+    };
     /** Constructor for the GDB Controller.
         @param bi_pipe A BidirectionalPipe connected to a running instance of GDB.
         @param event_queue An EventQueue to push MemoryEvents onto. */

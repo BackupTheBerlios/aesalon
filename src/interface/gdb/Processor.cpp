@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "Processor.h"
+#include "Controller.h"
 #include "platform/MemoryEvent.h"
 
 namespace Aesalon {
@@ -49,7 +50,25 @@ void Processor::handle_async(Misc::SmartPointer<AsyncOutput> output) {
         if(output->get_data()->get_element("reason").is_valid()) {
             std::string reason = output->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data();
             if(reason == "exited-normally") set_gdb_state(GDB_STOPPED);
-            else if(get_gdb_state() != GDB_SETUP) set_gdb_state(GDB_PAUSED);
+            else if(reason == "function-finished") {
+                std::string return_value = output->get_data()->get_element("return-value")
+                    .to<ParseResult>()->get_value().to<ParseString>()->get_data();
+                set_gdb_state(GDB_PAUSED);
+                current_breakpoint = 0;
+            }
+            else if(reason == "breakpoint-hit") {
+                std::string breakpoint = output->get_data()->get_element("bkptno")
+                    .to<ParseResult>()->get_value().to<ParseString>()->get_data();
+                std::cout << "Breakpoint was hit, ID #" << breakpoint << std::endl;
+                if(get_gdb_state() != GDB_SETUP) set_gdb_state(GDB_PAUSED);
+                std::stringstream ss;
+                ss << breakpoint;
+                ss >> current_breakpoint;
+            }
+            else if(get_gdb_state() != GDB_SETUP) {
+                set_gdb_state(GDB_PAUSED);
+                current_breakpoint = 0;
+            }
             if(output->get_number()) std::cout << "Stopped, number is " << output->get_number()->get_number() << std::endl;
         }
     }
