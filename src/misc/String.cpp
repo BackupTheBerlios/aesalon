@@ -1,10 +1,10 @@
-#include "StringEscaper.h"
+#include "String.h"
 #include "Exception.h"
 
 namespace Aesalon {
 namespace Misc {
 
-bool StringEscaper::is_escaped(std::string string, std::string::size_type position) {
+bool String::is_escaped(std::string string, std::string::size_type position) {
     int backslash_count = 0;
     
     while(--position != std::string::size_type(-1)) {
@@ -16,7 +16,7 @@ bool StringEscaper::is_escaped(std::string string, std::string::size_type positi
     return true;
 }
 
-std::string StringEscaper::remove_escapes(std::string string) {
+std::string String::remove_escapes(std::string string) {
     std::string result;
     
     for(std::string::iterator i = string.begin(); i != string.end(); i ++) {
@@ -42,6 +42,10 @@ std::string StringEscaper::remove_escapes(std::string string) {
     }
     
     return result;
+}
+
+bool String::begins_with(std::string string, std::string beginning) {
+    return string.substr(beginning.length()) == beginning;
 }
 
 } // namespace Misc

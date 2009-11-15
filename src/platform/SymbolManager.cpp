@@ -4,7 +4,7 @@
 #include <iomanip>
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 SymbolManager::SymbolManager() : nm_path("/usr/bin/nm"), demangle_style("") {
 
@@ -62,5 +62,5 @@ void SymbolManager::parse_nm_output() {
     } while(bi_pipe->is_open());
 }
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon

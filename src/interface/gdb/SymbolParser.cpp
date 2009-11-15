@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 #include "SymbolParser.h"
 #include "Controller.h"
@@ -10,17 +11,17 @@ namespace GDB {
 
 SymbolParser::SymbolParser(Misc::SmartPointer<Controller> gdb_controller) : gdb_controller(gdb_controller) {
     assembly_parser = new AssemblyParser();
-    previous_stream_handler = gdb_controller->get_processor()->get_stream_handler();
-    gdb_controller->get_processor()->set_stream_handler(this);
+    previous_stream_handler = gdb_controller->get_stream_handler();
+    gdb_controller->set_stream_handler(this);
     in_scope = true;
     first = true;
 }
 
 SymbolParser::~SymbolParser() {
-    gdb_controller->get_processor()->set_stream_handler(previous_stream_handler);
+    gdb_controller->set_stream_handler(previous_stream_handler);
 }
 
-void SymbolParser::parse_symbol(Misc::SmartPointer<Symbol> symbol) {
+void SymbolParser::parse_symbol(Misc::SmartPointer<Platform::Symbol> symbol) {
     if(symbol->is_parsed()) return;
     current_symbol = symbol;
     first = true;
@@ -28,7 +29,7 @@ void SymbolParser::parse_symbol(Misc::SmartPointer<Symbol> symbol) {
     gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i " << symbol->get_address() << "\"");
     while(true) {
         was_stream = false;
-        while(!was_stream) gdb_controller->listen(false);
+        while(!was_stream) gdb_controller->listen();
         if(in_scope) gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i\"");
         else break;
     }
@@ -36,10 +37,11 @@ void SymbolParser::parse_symbol(Misc::SmartPointer<Symbol> symbol) {
     symbol->set_parsed(true);
 }
 
-void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
+bool SymbolParser::handle(Misc::SmartPointer<String> string) {
+    Misc::SmartPointer<StreamOutput> stream = string.to<StreamOutput>();
     std::cout << "SymbolParser::handle_stream: stream content is: " << stream->get_stream_data() << std::endl;
     was_stream = true;
-    if(!in_scope) return;
+    if(!in_scope) return true;
     if(first) {
         first = false;
         std::stringstream ss;
@@ -62,7 +64,7 @@ void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
         if(scope != temporary_scope) {
             /*std::cout << "Scope \"" << temporary_scope << "\" does not match original of \"" << scope << "\"" << std::endl;*/
             in_scope = false;
-            return;
+            return true;
         }
     }
     
@@ -71,6 +73,7 @@ void SymbolParser::handle_stream(Misc::SmartPointer<StreamOutput> stream) {
     asm_instruction.erase(asm_instruction.length()-1, 1);
     
     if(assembly_parser->changes_memory(asm_instruction)) add_breakpoint();
+    return true;
 }
 
 void SymbolParser::add_breakpoint() {

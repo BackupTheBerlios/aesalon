@@ -1,22 +1,22 @@
-#ifndef AESALON_INTERFACE_SYMBOL_MANAGER_H
-#define AESALON_INTERFACE_SYMBOL_MANAGER_H
+#ifndef AESALON_PLATFORM_SYMBOL_MANAGER_H
+#define AESALON_PLATFORM_SYMBOL_MANAGER_H
 
 #include <vector>
 
 #include "Symbol.h"
 
 #include "misc/SmartPointer.h"
-#include "platform/BidirectionalPipe.h"
-#include "platform/MemoryAddress.h"
+#include "BidirectionalPipe.h"
+#include "MemoryAddress.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 class SymbolManager {
 public:
     typedef std::vector<Misc::SmartPointer<Symbol> > symbol_vector_t;
 private:
-    Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
+    Misc::SmartPointer<BidirectionalPipe> bi_pipe;
     symbol_vector_t symbol_list;
     symbol_vector_t global_list;
     
@@ -25,7 +25,7 @@ private:
     const std::string nm_path;
     std::string demangle_style;
     
-    Platform::MemoryAddress symbol_address;
+    MemoryAddress symbol_address;
     char symbol_type;
     std::string symbol_name;
     
@@ -51,7 +51,7 @@ public:
     symbol_vector_t::size_type get_globals() const { return global_list.size(); }
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

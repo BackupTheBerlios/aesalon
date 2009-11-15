@@ -1,18 +1,18 @@
-#ifndef AESALON_INTERFACE_GDB_STREAM_HANDLER_H
-#define AESALON_INTERFACE_GDB_STREAM_HANDLER_H
+#ifndef AESALON_INTERFACE_GDB_RESULT_HANDLER_H
+#define AESALON_INTERFACE_GDB_RESULT_HANDLER_H
 
-#include "StringHandler.h"
 #include "misc/SmartPointer.h"
 #include "String.h"
+#include "StringHandler.h"
 
 namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
-class StreamHandler : public StringHandler {
+class ResultHandler : public StringHandler {
 public:
-    StreamHandler() {}
-    virtual ~StreamHandler() {}
+    ResultHandler() {}
+    virtual ~ResultHandler() {}
     
     virtual bool handle(Misc::SmartPointer<String> string) = 0;
 };

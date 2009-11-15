@@ -2,64 +2,40 @@
 #define AESALON_INTERFACE_GDB_CONTROLLER_H
 
 #include <string>
+
+#include "StreamHandler.h"
+#include "Parser.h"
+#include "platform/BidirectionalPipe.h"
 #include "misc/EventQueue.h"
-#include "Processor.h"
+#include "platform/SymbolManager.h"
 #include "SymbolParser.h"
-#include "interface/SymbolManager.h"
 
 namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
-/** GDB Controller class; handles all input and output between GDB and aesalon. */
 class Controller {
 private:
-    /** SmartPointer to the GDB Processor, which handles GDB output. */
-    Misc::SmartPointer<Processor> processor;
-    /** BidirectionalPipe instance used to communicate with GDB, saved for reference. */
-    Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
-    /** EventQueue to push MemoryEvents onto; saved for reference. */
+    Misc::SmartPointer<StreamHandler> stream_handler;
+    
+    Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe;
+    Misc::SmartPointer<Parser> gdb_parser;
     Misc::SmartPointer<Misc::EventQueue> event_queue;
-    
-    Misc::SmartPointer<SymbolManager> symbol_manager;
+    Misc::SmartPointer<Platform::SymbolManager> symbol_manager;
     Misc::SmartPointer<SymbolParser> symbol_parser;
-    
-    Misc::SmartPointer<Controller> this_sp;
-    
-    void set_breakpoints();
 public:
-    enum function_breakpoints_e {
-        MALLOC_BREAKPOINT = 2,
-        FREE_BREAKPOINT,
-        REALLOC_BREAKPOINT,
-        CALLOC_BREAKPOINT
-    };
-    /** Constructor for the GDB Controller.
-        @param bi_pipe A BidirectionalPipe connected to a running instance of GDB.
-        @param event_queue An EventQueue to push MemoryEvents onto. */
-    Controller(Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe, Misc::SmartPointer<Misc::EventQueue> event_queue,
-        Misc::SmartPointer<SymbolManager> symbol_manager);
-    /** Destructor for the GDB Controller. */
+    Controller(Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe,
+        Misc::SmartPointer<Misc::EventQueue> event_queue, Misc::SmartPointer<Platform::SymbolManager> symbol_manager);
     virtual ~Controller();
     
-    /** Sends a command along to GDB. Adds a newline on the end of the given string.
-        @param command The command for GDB to execute.
-        @note This method should eventually be private,
-            but it will be used for debugging purposes as public until then.
-    */
     void send_command(std::string command);
-    /** Listen on the BidirectionalPipe for GDB output, then pass it onto the @a Processor instance.
-        @param wait If true, waits for a string to parse if there is not one already waiting. If false, parses as many as are available.
-    */
-    void listen(bool wait = true);
     
-    /** Returns the state of the GDB processor.
-        @return The state of the GDB processor.
-        @note This method is a passthrough to Processor::get_state().
-    */
-    Processor::gdb_state_e get_state() const { return processor->get_gdb_state(); }
+    Misc::SmartPointer<StreamHandler> get_stream_handler() const { return stream_handler; }
+    void set_stream_handler(Misc::SmartPointer<StreamHandler> new_handler)
+        { stream_handler = new_handler; }
     
-    Misc::SmartPointer<Processor> get_processor() const { return processor; }
+    void listen();
+    void process(std::string line);
 };
 
 } // namespace GDB

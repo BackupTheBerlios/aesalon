@@ -72,7 +72,7 @@ void Initializer::initialize() {
     
     event_queue = new Misc::EventQueue();
     
-    symbol_manager = new SymbolManager();
+    symbol_manager = new Platform::SymbolManager();
     
     symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());
     

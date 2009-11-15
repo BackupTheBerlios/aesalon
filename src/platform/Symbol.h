@@ -1,11 +1,11 @@
-#ifndef AESALON_INTERFACE_SYMBOL_H
-#define AESALON_INTERFACE_SYMBOL_H
+#ifndef AESALON_PLATFORM_SYMBOL_H
+#define AESALON_PLATFORM_SYMBOL_H
 
 #include <string>
-#include "platform/MemoryAddress.h"
+#include "MemoryAddress.h"
 
 namespace Aesalon {
-namespace Interface {
+namespace Platform {
 
 class Symbol {
 public:
@@ -32,7 +32,7 @@ public:
     void set_parsed(bool value) { parsed = value; }
 };
 
-} // namespace Interface
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

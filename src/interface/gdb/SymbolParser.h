@@ -3,7 +3,7 @@
 
 #include "AssemblyParser.h"
 #include "misc/SmartPointer.h"
-#include "interface/Symbol.h"
+#include "platform/Symbol.h"
 #include "StreamHandler.h"
 
 namespace Aesalon {
@@ -18,7 +18,7 @@ private:
     Misc::SmartPointer<Controller> gdb_controller;
     Misc::SmartPointer<StreamHandler> previous_stream_handler;
     
-    Misc::SmartPointer<Symbol> current_symbol;
+    Misc::SmartPointer<Platform::Symbol> current_symbol;
     
     bool in_scope;
     std::string scope;
@@ -31,9 +31,9 @@ public:
     SymbolParser(Misc::SmartPointer<Controller> gdb_controller);
     virtual ~SymbolParser();
     
-    void parse_symbol(Misc::SmartPointer<Symbol> symbol);
+    void parse_symbol(Misc::SmartPointer<Platform::Symbol> symbol);
     
-    void handle_stream(Misc::SmartPointer<StreamOutput> stream);
+    virtual bool handle(Misc::SmartPointer<String> string);
 };
 
 } // namespace GDB

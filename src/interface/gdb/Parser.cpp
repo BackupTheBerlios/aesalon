@@ -5,7 +5,7 @@
 #include "String.h"
 
 #include "misc/SmartPointer.h"
-#include "misc/StringEscaper.h"
+#include "misc/String.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -26,7 +26,7 @@ Misc::SmartPointer<String> Parser::parse_gdb_string(std::string string) {
     begin = digits + 1;
     
     if(std::string("~@&").find(type) != std::string::npos) {
-        std::string stream = Misc::StringEscaper::remove_escapes(this->string.substr(begin));
+        std::string stream = Misc::String::remove_escapes(this->string.substr(begin));
         if(stream.find("\n") != std::string::npos) stream[stream.find("\n")] = 0;
         instance = new StreamOutput(stream);
     }
@@ -103,11 +103,11 @@ Misc::SmartPointer<ParseData> Parser::parse_value() {
 Misc::SmartPointer<ParseData> Parser::parse_string() {
     std::string::size_type position = begin;
     while(position < string.length()) {
-        if(string[position] == '"' && !Misc::StringEscaper::is_escaped(string, position)) break;
+        if(string[position] == '"' && !Misc::String::is_escaped(string, position)) break;
         position ++;
     }
     
-    std::string data = Misc::StringEscaper::remove_escapes(string.substr(begin, position - begin));
+    std::string data = Misc::String::remove_escapes(string.substr(begin, position - begin));
     
     begin = position + 1;
     
