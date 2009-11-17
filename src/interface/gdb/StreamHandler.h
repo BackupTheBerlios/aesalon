@@ -14,7 +14,10 @@ public:
     StreamHandler() {}
     virtual ~StreamHandler() {}
     
-    virtual bool handle(Misc::SmartPointer<String> string) = 0;
+    virtual bool handle(Misc::SmartPointer<String> string) {
+        return handle(string.to<StreamOutput>());
+    }
+    virtual bool handle(Misc::SmartPointer<StreamOutput> stream) = 0;
 };
 
 } // namespace GDB

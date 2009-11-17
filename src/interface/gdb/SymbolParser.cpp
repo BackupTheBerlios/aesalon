@@ -11,14 +11,11 @@ namespace GDB {
 
 SymbolParser::SymbolParser(Misc::SmartPointer<Controller> gdb_controller) : gdb_controller(gdb_controller) {
     assembly_parser = new AssemblyParser();
-    previous_stream_handler = gdb_controller->get_stream_handler();
-    gdb_controller->set_stream_handler(this);
     in_scope = true;
     first = true;
 }
 
 SymbolParser::~SymbolParser() {
-    gdb_controller->set_stream_handler(previous_stream_handler);
 }
 
 void SymbolParser::parse_symbol(Misc::SmartPointer<Platform::Symbol> symbol) {
@@ -37,8 +34,7 @@ void SymbolParser::parse_symbol(Misc::SmartPointer<Platform::Symbol> symbol) {
     symbol->set_parsed(true);
 }
 
-bool SymbolParser::handle(Misc::SmartPointer<String> string) {
-    Misc::SmartPointer<StreamOutput> stream = string.to<StreamOutput>();
+bool SymbolParser::handle(Misc::SmartPointer<StreamOutput> stream) {
     std::cout << "SymbolParser::handle_stream: stream content is: " << stream->get_stream_data() << std::endl;
     was_stream = true;
     if(!in_scope) return true;

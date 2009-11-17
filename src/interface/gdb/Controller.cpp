@@ -31,10 +31,12 @@ void Controller::listen() {
 void Controller::process(std::string line) {
     if(line.length() == 0) return;
     if(Misc::String::begins_with(line, "(gdb)")) {
-        
+        return;
     }
     
     Misc::SmartPointer<String> string = gdb_parser->parse_gdb_string(line);
+    
+    
 }
 
 void Controller::send_command(std::string line) {

@@ -11,7 +11,6 @@ namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
-template<typename StringHandlerType>
 class StringHandlerManager {
 public:
     typedef std::vector<Misc::SmartPointer<StringHandler> > string_handler_list_t;
@@ -21,17 +20,18 @@ public:
     StringHandlerManager() {}
     virtual ~StringHandlerManager() {}
     
-    void add_string_handler(Misc::SmartPointer<StringHandlerType> handler) {
+    void add_string_handler(Misc::SmartPointer<StringHandler> handler) {
         string_handler_list.push_back(handler);
     }
     void handle(Misc::SmartPointer<String> string) const {
-        if(string.to<StringHandlerType>() == 0) return;
         string_handler_list_t::const_iterator i = string_handler_list.begin();
         for(; i != string_handler_list.end(); i ++) {
-            if((*i)->handle(string)) return;
+            try {
+                if((*i)->handle(string)) return;
+            }
+            catch(Misc::InvalidCastException ice) {}
         }
         /* Nothing was able to handle it . . . oh well. */
-        
     }
 };
 

@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "StreamHandler.h"
+#include "StringHandlerManager.h"
 #include "Parser.h"
 #include "platform/BidirectionalPipe.h"
 #include "misc/EventQueue.h"
@@ -16,7 +16,7 @@ namespace GDB {
 
 class Controller {
 private:
-    Misc::SmartPointer<StreamHandler> stream_handler;
+    Misc::SmartPointer<StringHandlerManager> string_manager;
     
     Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe;
     Misc::SmartPointer<Parser> gdb_parser;
@@ -30,9 +30,9 @@ public:
     
     void send_command(std::string command);
     
-    Misc::SmartPointer<StreamHandler> get_stream_handler() const { return stream_handler; }
-    void set_stream_handler(Misc::SmartPointer<StreamHandler> new_handler)
-        { stream_handler = new_handler; }
+    Misc::SmartPointer<StringHandlerManager> get_stream_manager() const { return string_manager; }
+    void set_string_manager(Misc::SmartPointer<StringHandlerManager> new_handler)
+        { string_manager = new_handler; }
     
     void listen();
     void process(std::string line);

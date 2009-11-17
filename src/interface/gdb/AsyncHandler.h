@@ -14,7 +14,10 @@ public:
     AsyncHandler() {}
     virtual ~AsyncHandler() {}
     
-    virtual bool handle(Misc::SmartPointer<String> string) = 0;
+    virtual bool handle(Misc::SmartPointer<String> string) {
+        return handle(string.to<AsyncOutput>());
+    }
+    virtual bool handle(Misc::SmartPointer<AsyncOutput> string) = 0;
 };
 
 } // namespace GDB

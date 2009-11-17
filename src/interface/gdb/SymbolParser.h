@@ -33,7 +33,7 @@ public:
     
     void parse_symbol(Misc::SmartPointer<Platform::Symbol> symbol);
     
-    virtual bool handle(Misc::SmartPointer<String> string);
+    virtual bool handle(Misc::SmartPointer<StreamOutput> stream);
 };
 
 } // namespace GDB

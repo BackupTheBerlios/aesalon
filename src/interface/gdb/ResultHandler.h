@@ -14,7 +14,10 @@ public:
     ResultHandler() {}
     virtual ~ResultHandler() {}
     
-    virtual bool handle(Misc::SmartPointer<String> string) = 0;
+    virtual bool handle(Misc::SmartPointer<String> string) {
+        return handle(string.to<ResultRecord>());
+    }
+    virtual bool handle(Misc::SmartPointer<ResultRecord> result) = 0;
 };
 
 } // namespace GDB
