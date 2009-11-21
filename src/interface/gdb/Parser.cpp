@@ -40,6 +40,10 @@ Misc::SmartPointer<String> Parser::parse_gdb_string(std::string string) {
         
         instance = new ResultRecord(seq);
     }
+    else {
+        std::cout << "Unknown gdb string: \"" << string << "\"\n";
+    }
+    
     
     if(digits) {
         std::stringstream ss;

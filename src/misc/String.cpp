@@ -45,7 +45,7 @@ std::string String::remove_escapes(std::string string) {
 }
 
 bool String::begins_with(std::string string, std::string beginning) {
-    return string.substr(beginning.length()) == beginning;
+    return string.substr(0, beginning.length()) == beginning;
 }
 
 } // namespace Misc

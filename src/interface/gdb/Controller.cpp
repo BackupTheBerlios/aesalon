@@ -10,14 +10,16 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe,
     Misc::SmartPointer<Misc::EventQueue> event_queue, Misc::SmartPointer<Platform::SymbolManager> symbol_manager)
     : gdb_pipe(gdb_pipe), event_queue(event_queue), symbol_manager(symbol_manager) {
     
+    gdb_parser = new Parser();
+    
     sleep(1);
     listen();
+    string_manager = new StringHandlerManager();
     
     symbol_parser = new SymbolParser(this);
 }
 
 Controller::~Controller() {
-
 }
 
 void Controller::listen() {
@@ -36,7 +38,7 @@ void Controller::process(std::string line) {
     
     Misc::SmartPointer<String> string = gdb_parser->parse_gdb_string(line);
     
-    
+    string_manager->handle(string);
 }
 
 void Controller::send_command(std::string line) {
