@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_GDB_STRING_HANDLER_MANAGER_H
-#define AESALON_INTERFACE_GDB_STRING_HANDLER_MANAGER_H
+#ifndef AESALON_INTERFACE_GDB_STRING_MANAGER_H
+#define AESALON_INTERFACE_GDB_STRING_MANAGER_H
 
 #include <vector>
 
@@ -11,14 +11,15 @@ namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
-class StringHandlerManager {
+class StringManager {
 public:
     typedef std::vector<Misc::SmartPointer<StringHandler> > string_handler_list_t;
 private:
     string_handler_list_t string_handler_list;
+    Misc::SmartPointer<Controller> controller;
 public:
-    StringHandlerManager() {}
-    virtual ~StringHandlerManager() {}
+    StringManager() {}
+    virtual ~StringManager() {}
     
     void add_string_handler(Misc::SmartPointer<StringHandler> handler) {
         string_handler_list.push_back(handler);
@@ -33,6 +34,8 @@ public:
         }
         /* Nothing was able to handle it . . . oh well. */
     }
+    
+    Misc::SmartPointer<Controller> get_controller() const { return controller; }
 };
 
 } // namespace GDB

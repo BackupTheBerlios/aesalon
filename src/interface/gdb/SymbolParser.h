@@ -15,7 +15,6 @@ class Controller;
 class SymbolParser : public StreamHandler {
 private:
     Misc::SmartPointer<AssemblyParser> assembly_parser;
-    Misc::SmartPointer<Controller> gdb_controller;
     Misc::SmartPointer<StreamHandler> previous_stream_handler;
     
     Misc::SmartPointer<Platform::Symbol> current_symbol;
@@ -28,7 +27,7 @@ private:
     
     void add_breakpoint();
 public:
-    SymbolParser(Misc::SmartPointer<Controller> gdb_controller);
+    SymbolParser(Misc::SmartPointer<Controller> controller);
     virtual ~SymbolParser();
     
     void parse_symbol(Misc::SmartPointer<Platform::Symbol> symbol);

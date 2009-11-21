@@ -1,4 +1,4 @@
-#include "StringHandlerManager.h"
+#include "StringManager.h"
 
 namespace Aesalon {
 namespace Interface {

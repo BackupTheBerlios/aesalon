@@ -11,7 +11,7 @@ namespace GDB {
 
 class ResultHandler : public StringHandler {
 public:
-    ResultHandler() {}
+    ResultHandler(Misc::SmartPointer<Controller> controller) : StringHandler(controller) {}
     virtual ~ResultHandler() {}
     
     virtual bool handle(Misc::SmartPointer<String> string) {

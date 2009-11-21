@@ -9,7 +9,7 @@ namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
-SymbolParser::SymbolParser(Misc::SmartPointer<Controller> gdb_controller) : gdb_controller(gdb_controller) {
+SymbolParser::SymbolParser(Misc::SmartPointer<Controller> controller) : StreamHandler(controller) {
     assembly_parser = new AssemblyParser();
     in_scope = true;
     first = true;
@@ -23,11 +23,11 @@ void SymbolParser::parse_symbol(Misc::SmartPointer<Platform::Symbol> symbol) {
     current_symbol = symbol;
     first = true;
     in_scope = true; /* it's assumed that the first instruction is within the scope. */
-    gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i " << symbol->get_address() << "\"");
+    get_controller()->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i " << symbol->get_address() << "\"");
     while(true) {
         was_stream = false;
-        while(!was_stream) gdb_controller->listen();
-        if(in_scope) gdb_controller->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i\"");
+        while(!was_stream) get_controller()->listen();
+        if(in_scope) get_controller()->send_command(Misc::StreamAsString() << "-interpreter-exec console \"x/i\"");
         else break;
     }
     
@@ -73,7 +73,7 @@ bool SymbolParser::handle(Misc::SmartPointer<StreamOutput> stream) {
 }
 
 void SymbolParser::add_breakpoint() {
-    gdb_controller->send_command(Misc::StreamAsString() << "-break-insert *" << address << "\"");
+    get_controller()->send_command(Misc::StreamAsString() << "-break-insert *" << address << "\"");
 }
 
 } // namespace GDB

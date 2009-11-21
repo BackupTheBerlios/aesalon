@@ -8,12 +8,18 @@ namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
+class Controller;
+
 class StringHandler {
+private:
+    Misc::SmartPointer<Controller> controller;
 public:
-    StringHandler() {}
+    StringHandler(Misc::SmartPointer<Controller> controller) : controller(controller) {}
     virtual ~StringHandler() {}
     
     virtual bool handle(Misc::SmartPointer<String> string) = 0;
+    
+    Misc::SmartPointer<Controller> get_controller() const { return controller; }
 };
 
 } // namespace GDB

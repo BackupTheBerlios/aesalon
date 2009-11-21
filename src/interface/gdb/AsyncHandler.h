@@ -11,7 +11,7 @@ namespace GDB {
 
 class AsyncHandler :public StringHandler {
 public:
-    AsyncHandler() {}
+    AsyncHandler(Misc::SmartPointer<Controller> controller) : StringHandler(controller) {}
     virtual ~AsyncHandler() {}
     
     virtual bool handle(Misc::SmartPointer<String> string) {

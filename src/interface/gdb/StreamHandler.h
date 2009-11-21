@@ -11,7 +11,7 @@ namespace GDB {
 
 class StreamHandler : public StringHandler {
 public:
-    StreamHandler() {}
+    StreamHandler(Misc::SmartPointer<Controller> controller) : StringHandler(controller) {}
     virtual ~StreamHandler() {}
     
     virtual bool handle(Misc::SmartPointer<String> string) {
