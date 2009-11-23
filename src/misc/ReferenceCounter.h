@@ -9,6 +9,13 @@
 #include "StreamAsString.h"
 
 namespace Aesalon {
+
+namespace Interface {
+namespace GDB {
+class Controller;
+}
+}
+
 namespace Misc {
 
 class UntrackedMemoryException : public Exception {
@@ -37,6 +44,7 @@ public:
     virtual ~ReferenceCounter() {}
     template<typename Type> void increment_block(const Type *data);
     template<typename Type> void decrement_block(const Type *data);
+    
     template<typename Type> refcount_t get_block_references(const Type *data);
 };
 

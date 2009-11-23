@@ -54,6 +54,7 @@ public:
         @return The named pipe created by this aesalon gdb instance.
     */
     Misc::SmartPointer<Platform::NamedPipe> get_named_pipe() const { return named_pipe; }
+    Misc::SmartPointer<GDB::Controller> get_controller() const { return gdb_controller; }
 };
 
 } // namespace Interface

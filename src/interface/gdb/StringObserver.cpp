@@ -1,4 +1,4 @@
-#include "StringManager.h"
+#include "StringObserver.h"
 
 namespace Aesalon {
 namespace Interface {
