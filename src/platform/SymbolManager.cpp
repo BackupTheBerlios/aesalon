@@ -72,7 +72,7 @@ void SymbolManager::parse_nm_output() {
     for(; i != symbol_list.end() && (i+1) != symbol_list.end(); i ++) {
         (*i)->set_size((*(i+1))->get_address() - (*i)->get_address());
     }
-    (*i+1)->set_size(fini_address - (*i)->get_address());
+    (*i)->set_size(fini_address - (*i)->get_address());
 }
 
 } // namespace Platform

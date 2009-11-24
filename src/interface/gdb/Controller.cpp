@@ -28,6 +28,10 @@ void Controller::create_observers() {
 }
 
 void Controller::listen() {
+    if(get_state() == GDB_SETUP) {
+        process_symbols();
+    }
+    
     std::string line;
     do {
         line = gdb_pipe->get_string();
@@ -55,6 +59,10 @@ void Controller::process_symbols() {
     for(std::size_t x = 0; x < symbol_manager->get_symbols(); x ++) {
         Misc::SmartPointer<Platform::Symbol> symbol = symbol_manager->get_symbol(x);
         if(symbol->is_parsed()) continue;
+        std::string gdb_command = Misc::StreamAsString() << "x/" << symbol->get_size() << "i " << symbol->get_address();
+        std::cout << "Sending symbol command: " << gdb_command << std::endl;
+        send_command(gdb_command);
+        symbol->set_parsed(true);
     }
 }
 
