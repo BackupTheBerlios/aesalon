@@ -13,11 +13,10 @@ SymbolObserver::SymbolObserver() : StringObserver(String::STREAM_OUTPUT), finish
 }
 
 SymbolObserver::~SymbolObserver() {
-
 }
 
-bool SymbolObserver::notify(Misc::SmartPointer<String> string) {
-    if(Initializer::get_instance()->get_controller()->get_state() != GDB_SETUP) return false;
+bool SymbolObserver::notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) {
+    if(state_manager->get_state() != StateManager::SETUP) return false;
     Misc::SmartPointer<StreamOutput> stream = string.to<StreamOutput>();
     
     std::string stream_data = stream->get_stream_data();

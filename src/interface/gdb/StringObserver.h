@@ -3,6 +3,7 @@
 
 #include "misc/SmartPointer.h"
 #include "String.h"
+#include "StateManager.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -16,7 +17,7 @@ public:
         : interested_type(interested_type) {}
     virtual ~StringObserver() {}
     
-    virtual bool notify(Misc::SmartPointer<String> string) = 0;
+    virtual bool notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) = 0;
     
     String::string_type_e get_interested_type() const { return interested_type; }
 };

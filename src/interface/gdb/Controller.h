@@ -7,7 +7,7 @@
 #include "platform/BidirectionalPipe.h"
 #include "misc/EventQueue.h"
 #include "platform/SymbolManager.h"
-#include "GDBState.h"
+#include "StateManager.h"
 #include "StringObserverManager.h"
 
 namespace Aesalon {
@@ -22,7 +22,7 @@ private:
     Misc::SmartPointer<StringObserverManager> observer_manager;
     Misc::SmartPointer<Platform::SymbolManager> symbol_manager;
     
-    GDBState gdb_state;
+    Misc::SmartPointer<StateManager> state_manager;
     
     void create_observers();
     void process_symbols();
@@ -39,8 +39,10 @@ public:
     Misc::SmartPointer<StringObserverManager> get_observer_manager() const
         { return observer_manager; }
     
-    GDBState get_state() const { return gdb_state; }
-    void set_state(GDBState new_state) { gdb_state = new_state; }
+    StateManager::gdb_state_e get_state() const { return state_manager->get_state(); }
+    void set_state(StateManager::gdb_state_e new_state) { state_manager->set_state(new_state); }
+    
+    Misc::SmartPointer<StateManager> get_state_manager() const { return state_manager; }
 };
 
 } // namespace GDB

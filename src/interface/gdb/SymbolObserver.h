@@ -18,7 +18,7 @@ public:
     SymbolObserver();
     virtual ~SymbolObserver();
     
-    virtual bool notify(Misc::SmartPointer<String> string);
+    virtual bool notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager);
 };
 
 } // namespace GDB

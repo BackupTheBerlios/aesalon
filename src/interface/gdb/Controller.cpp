@@ -17,7 +17,7 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe,
     
     create_observers();
     
-    set_state(GDB_SETUP);
+    set_state(StateManager::SETUP);
 }
 
 Controller::~Controller() {
@@ -28,7 +28,7 @@ void Controller::create_observers() {
 }
 
 void Controller::listen() {
-    if(get_state() == GDB_SETUP) {
+    if(get_state() == StateManager::SETUP) {
         process_symbols();
     }
     
@@ -47,11 +47,11 @@ void Controller::process(std::string line) {
     
     Misc::SmartPointer<String> string = gdb_parser->parse_gdb_string(line);
     
-    if(string.is_valid()) get_observer_manager()->notify(string);
+    if(string.is_valid()) get_observer_manager()->notify(string, get_state_manager());
 }
 
 void Controller::send_command(std::string line) {
-    if(get_state() == GDB_RUNNING) throw Misc::Exception("Attempt to send GDB command while program is running.");
+    if(get_state() == StateManager::RUNNING) throw Misc::Exception("Attempt to send GDB command while program is running.");
     gdb_pipe->send_string(line + "\n");
 }
 

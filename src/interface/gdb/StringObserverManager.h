@@ -23,7 +23,7 @@ public:
         observer_vector.push_back(observer);
     }
     
-    void notify(Misc::SmartPointer<String> string) const;
+    void notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) const;
 };
 
 } // namespace GDB
