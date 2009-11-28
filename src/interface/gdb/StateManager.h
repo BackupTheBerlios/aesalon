@@ -1,29 +1,34 @@
 #ifndef AESALON_INTERFACE_GDB_STATE_MANAGER_H
 #define AESALON_INTERFACE_GDB_STATE_MANAGER_H
 
+#include <vector>
+
+#include "State.h"
+#include "StateObserver.h"
+
 namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
 class StateManager {
 public:
-    enum gdb_state_e {
-        SETUP, /**< GDB is currently being set up, initialization is in progress. */
-        RUNNING, /**< GDB is currently running. No commands can be executed during this state. */
-        PAUSED, /**< GDB is paused, but has been running previously, and setup is complete. */
-        FINISHED, /**< GDB has finished executing the program. */
-        UNKNOWN /**< GDB is in an unknown state; this shouldn't happen. */
-    };
+    typedef std::vector<Misc::SmartPointer<StateObserver> > observer_list_t;
 private:
-    gdb_state_e state;
+    State state;
+    observer_list_t observer_list;
+    
+    void notify(State from, State to);
 public:
-    StateManager() : state(UNKNOWN) {}
+    StateManager() : state(State::UNKNOWN) {}
     virtual ~StateManager() {}
     
-    operator gdb_state_e() const { return get_state(); }
+    operator State() const { return get_state(); }
     
-    gdb_state_e get_state() const { return state; }
-    void set_state(gdb_state_e new_state) { state = new_state; }
+    State get_state() const { return state; }
+    void set_state(State new_state) { State old = state; state = new_state; notify(old, state); }
+    
+    void add_observer(Misc::SmartPointer<StateObserver> new_observer)
+        { observer_list.push_back(new_observer); }
 };
 
 } // namespace GDB

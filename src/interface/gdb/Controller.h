@@ -39,8 +39,8 @@ public:
     Misc::SmartPointer<StringObserverManager> get_observer_manager() const
         { return observer_manager; }
     
-    StateManager::gdb_state_e get_state() const { return state_manager->get_state(); }
-    void set_state(StateManager::gdb_state_e new_state) { state_manager->set_state(new_state); }
+    State get_state() const { return state_manager->get_state(); }
+    void set_state(State new_state) { state_manager->set_state(new_state); }
     
     Misc::SmartPointer<StateManager> get_state_manager() const { return state_manager; }
 };

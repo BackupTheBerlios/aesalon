@@ -16,7 +16,7 @@ SymbolObserver::~SymbolObserver() {
 }
 
 bool SymbolObserver::notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) {
-    if(state_manager->get_state() != StateManager::SETUP) return false;
+    if(state_manager->get_state() != State::SETUP) return false;
     Misc::SmartPointer<StreamOutput> stream = string.to<StreamOutput>();
     
     std::string stream_data = stream->get_stream_data();

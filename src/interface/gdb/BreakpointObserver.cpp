@@ -5,7 +5,7 @@ namespace Interface {
 namespace GDB {
 
 bool BreakpointObserver::notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) {
-    if(state_manager->get_state() != StateManager::RUNNING) return false;
+    if(state_manager->get_state() != State::RUNNING) return false;
     Misc::SmartPointer<AsyncOutput> async = string.to<AsyncOutput>();
     
     if(async->get_data()->get_first() != "stopped") return false;
