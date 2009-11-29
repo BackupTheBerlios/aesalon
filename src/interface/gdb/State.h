@@ -8,11 +8,11 @@ namespace GDB {
 class State {
 public:
     typedef enum {
+        START, /**< GDB has been started, but nothing else has happened. */
         SETUP, /**< GDB is currently being set up, initialization is in progress. */
         RUNNING, /**< GDB is currently running. No commands can be executed during this state. */
         PAUSED, /**< GDB is paused, but has been running previously, and setup is complete. */
-        FINISHED, /**< GDB has finished executing the program. */
-        UNKNOWN /**< GDB is in an unknown state; this shouldn't happen. */
+        FINISHED /**< GDB has finished executing the program. */
     } gdb_state;
 
 private:

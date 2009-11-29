@@ -9,7 +9,7 @@ namespace GDB {
 
 class ExitObserver : public StringObserver {
 public:
-    ExitObserver() : StringObserver(String::ASYNC_OUTPUT) {}
+    ExitObserver() : StringObserver(Aesalon::Interface::GDB::String::ASYNC_OUTPUT) {}
     virtual ~ExitObserver() {}
     
     virtual bool notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager);

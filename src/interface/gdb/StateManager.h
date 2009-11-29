@@ -19,7 +19,7 @@ private:
     
     void notify(State from, State to);
 public:
-    StateManager() : state(State::UNKNOWN) {}
+    StateManager() : state(State::START) {}
     virtual ~StateManager() {}
     
     operator State() const { return get_state(); }
