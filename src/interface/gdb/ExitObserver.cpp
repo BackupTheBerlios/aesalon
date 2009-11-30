@@ -5,7 +5,7 @@ namespace Interface {
 namespace GDB {
 
 bool ExitObserver::notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) {
-    if(state_manager != State::RUNNING) return false;
+    if(state_manager->get_state() != State::RUNNING) return false;
     
     Misc::SmartPointer<AsyncOutput> async = string.to<AsyncOutput>();
     

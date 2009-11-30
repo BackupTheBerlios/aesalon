@@ -24,6 +24,7 @@ public:
     operator gdb_state() const { return get_state(); }
     gdb_state operator=(const gdb_state &new_state) { state = new_state; return state; }
     bool operator==(const gdb_state &other) const { return state == other; }
+    bool operator!=(const gdb_state &other) const { return state != other; }
     
     gdb_state get_state() const { return state; }
     void set_state(gdb_state new_state) { state = new_state; }

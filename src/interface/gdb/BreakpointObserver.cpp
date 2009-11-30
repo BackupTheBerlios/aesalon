@@ -10,7 +10,10 @@ bool BreakpointObserver::notify(Misc::SmartPointer<String> string, Misc::SmartPo
     
     if(async->get_data()->get_first() != "stopped") return false;
     try {
-        if(async->get_data()->get_element("reason").to<ParseResult>()->get_value().to<ParseString>()->get_data() == "") {}
+        std::string reason = async->get_data()->get_element("reason")
+            .to<ParseResult>()->get_value().to<ParseString>()->get_data();
+        
+        std::cout << "Stopped, reason is " << reason << std::endl;
     }
     catch(Misc::InvalidCastException ice) { return false; }
     catch(Misc::NullPointerException npe) { return false; }
