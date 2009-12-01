@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "BreakpointObserver.h"
 
 namespace Aesalon {
