@@ -41,7 +41,7 @@ void Controller::process(std::string line) {
     
     Misc::SmartPointer<String> string = gdb_parser->parse_gdb_string(line);
     
-    if(string.is_valid()) get_observer_manager()->notify(string, get_state_manager());
+    if(string.is_valid()) get_observer_manager()->notify(string);
 }
 
 void Controller::send_command(std::string line) {

@@ -28,7 +28,9 @@ public:
     }
     void remove_observer(Misc::SmartPointer<StringObserver> observer);
     
-    void notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) const;
+    void notify(Misc::SmartPointer<String> string) const;
+    
+    void cleanup();
 };
 
 } // namespace GDB

@@ -11,21 +11,25 @@ namespace GDB {
 
 class StringObserver {
 private:
-    String::string_type_e interested_type;
+    Misc::SmartPointer<StateManager> state_manager;
     std::size_t id;
     static std::size_t last_id; /**< Used to generate unique observer IDs. */
+    bool alive;
 public:
-    StringObserver(String::string_type_e interested_type)
-        : interested_type(interested_type), id(last_id++) {}
+    StringObserver(Misc::SmartPointer<StateManager> state_manager) : state_manager(state_manager), id(last_id++), alive(true) {}
     virtual ~StringObserver() {}
     
     bool operator==(const StringObserver &other) const {
         if(id == other.id) return true;
         return false;
     }
-    virtual bool notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) = 0;
+    virtual bool notify(Misc::SmartPointer<String> string);
+    virtual bool notify(Misc::SmartPointer<AsyncOutput> async) { return false; }
+    virtual bool notify(Misc::SmartPointer<ResultRecord> result) { return false; }
+    virtual bool notify(Misc::SmartPointer<StreamOutput> stream) { return false; }
     
-    String::string_type_e get_interested_type() const { return interested_type; }
+    bool is_alive() const { return alive; }
+    void set_alive(bool new_alive) { alive = new_alive; }
 };
 
 } // namespace GDB

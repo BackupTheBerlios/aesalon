@@ -7,6 +7,9 @@ namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
+/* Forward decs */
+class StringObserver;
+
 class NumberedString {
 private:
     int number;
@@ -21,8 +24,7 @@ public:
     enum string_type_e {
         STREAM_OUTPUT, /* '~', '@', '&' */
         ASYNC_OUTPUT, /* '*' '+' '=' */
-        RESULT_RECORD, /* '^' */
-        TYPES
+        RESULT_RECORD /* '^' */
     };
 private:
     string_type_e type;

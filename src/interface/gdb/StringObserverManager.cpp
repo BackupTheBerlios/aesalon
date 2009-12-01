@@ -22,11 +22,39 @@ void StringObserverManager::remove_observer(Misc::SmartPointer<StringObserver> o
     }
 }
 
-void StringObserverManager::notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) const {
-    observer_vector_t::const_iterator i = observer_vector.begin();
+void StringObserverManager::notify(Misc::SmartPointer<String> string) const {
+    observer_vector_t::const_iterator i = temporary_observers.begin();
+    
+    for(; i != temporary_observers.end(); i ++) {
+        if((*i)->is_alive() && (*i)->notify(string)) break;
+    }
+
+    i = observer_vector.begin();
     
     for(; i != observer_vector.end(); i ++) {
-        if((*i)->get_interested_type() == string->get_type() && (*i)->notify(string, state_manager)) break;
+        if((*i)->is_alive() && (*i)->notify(string)) break;
+    }
+}
+
+void StringObserverManager::cleanup() {
+    observer_vector_t::iterator i = temporary_observers.begin();
+    
+    /* TODO: make these loops more efficient */
+    
+    for(; i != temporary_observers.end(); i ++) {
+        if((*i)->is_alive()) {
+            temporary_observers.erase(i);
+            i = temporary_observers.begin();
+        }
+    }
+
+    i = observer_vector.begin();
+    
+    for(; i != observer_vector.end(); i ++) {
+        if((*i)->is_alive()) {
+            observer_vector.erase(i);
+            i = observer_vector.begin();
+        }
     }
 }
 
