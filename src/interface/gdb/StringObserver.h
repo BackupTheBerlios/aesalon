@@ -12,11 +12,17 @@ namespace GDB {
 class StringObserver {
 private:
     String::string_type_e interested_type;
+    std::size_t id;
+    static std::size_t last_id; /**< Used to generate unique observer IDs. */
 public:
     StringObserver(String::string_type_e interested_type)
-        : interested_type(interested_type) {}
+        : interested_type(interested_type), id(last_id++) {}
     virtual ~StringObserver() {}
     
+    bool operator==(const StringObserver &other) const {
+        if(id == other.id) return true;
+        return false;
+    }
     virtual bool notify(Misc::SmartPointer<String> string, Misc::SmartPointer<StateManager> state_manager) = 0;
     
     String::string_type_e get_interested_type() const { return interested_type; }

@@ -1,9 +1,6 @@
 #include "Controller.h"
 #include "String.h"
 #include "misc/String.h"
-#include "SymbolObserver.h"
-#include "BreakpointObserver.h"
-#include "SetupStateObserver.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -26,9 +23,6 @@ Controller::~Controller() {
 }
 
 void Controller::create_observers() {
-    get_observer_manager()->add_observer(new SymbolObserver());
-    get_observer_manager()->add_observer(new BreakpointObserver());
-    get_state_manager()->add_observer(new SetupStateObserver());
 }
 
 void Controller::listen() {
