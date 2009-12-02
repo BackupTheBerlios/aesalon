@@ -4,6 +4,8 @@ namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
+std::size_t StringObserver::last_id = 0;
+
 bool StringObserver::notify(Misc::SmartPointer<String> string) {
     switch(string->get_type()) {
         case String::ASYNC_OUTPUT: {

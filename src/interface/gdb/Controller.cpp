@@ -2,6 +2,7 @@
 #include "String.h"
 #include "misc/String.h"
 #include "misc/ArgumentParser.h"
+#include "SymbolObserver.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -34,6 +35,10 @@ Controller::~Controller() {
 }
 
 void Controller::add_observers() {
+    /* Add setup observers first . . . */
+    get_observer_manager()->add_observer(new SymbolObserver(get_state_manager(), symbol_manager));
+    
+    /* Now for the regular observers . . . */
 }
 
 void Controller::listen() {
@@ -46,6 +51,7 @@ void Controller::listen() {
 
 void Controller::process(std::string line) {
     if(line.length() == 0) return;
+    std::cout << "Received line from gdb: " << line << std::endl;
     if(Misc::String::begins_with(line, "(gdb)")) {
         return;
     }

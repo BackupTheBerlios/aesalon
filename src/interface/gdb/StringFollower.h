@@ -28,6 +28,8 @@ private:
     Misc::SmartPointer<ParseData> data;
 public:
     StringFollower(Misc::SmartPointer<String> string) : data(string->get_data()) {}
+    StringFollower(Misc::SmartPointer<AsyncOutput> async) : data(async->get_data()) {}
+    StringFollower(Misc::SmartPointer<ResultRecord> result) : data(result->get_data()) {}
     virtual ~StringFollower() {}
     
     /** Syntax used:
