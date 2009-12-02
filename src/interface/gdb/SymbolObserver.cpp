@@ -36,6 +36,8 @@ bool SymbolObserver::notify(Misc::SmartPointer<ResultRecord> result) {
     if(result->get_data()->get_first() == "error") {
         if(Misc::String::begins_with(StringFollower(result).follow("'msg' rhs"), "Cannot access memory at address 0x")) {
             set_alive(false);
+            Initializer::get_instance()->get_controller()->send_command("-exec-continue");
+            get_state_manager()->set_state(State::RUNNING);
             return true;
         }
     }

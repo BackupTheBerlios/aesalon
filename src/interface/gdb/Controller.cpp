@@ -3,6 +3,7 @@
 #include "misc/String.h"
 #include "misc/ArgumentParser.h"
 #include "SymbolObserver.h"
+#include "ExitObserver.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -39,10 +40,14 @@ void Controller::add_observers() {
     get_observer_manager()->add_observer(new SymbolObserver(get_state_manager(), symbol_manager));
     
     /* Now for the regular observers . . . */
+    get_observer_manager()->add_observer(new ExitObserver(get_state_manager()));
 }
 
 void Controller::listen() {
     std::string line;
+    
+    get_observer_manager()->cleanup();
+    
     do {
         line = gdb_pipe->get_string();
         process(line);

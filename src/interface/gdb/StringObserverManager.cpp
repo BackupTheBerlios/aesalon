@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "StringObserverManager.h"
 
 namespace Aesalon {
@@ -5,6 +7,7 @@ namespace Interface {
 namespace GDB {
 
 void StringObserverManager::remove_observer(Misc::SmartPointer<StringObserver> observer) {
+    std::cout << "StringObserverManager::remove_observer() called . . .\n";
     observer_vector_t::iterator i = temporary_observers.begin();
     for(; i != temporary_observers.end(); i ++) {
         if(observer == *i) {
@@ -41,8 +44,9 @@ void StringObserverManager::cleanup() {
     
     /* TODO: make these loops more efficient */
     
-    for(; i != temporary_observers.end(); i ++) {
-        if((*i)->is_alive()) {
+    for(; i != temporary_observers.end() && temporary_observers.size(); i ++) {
+        if(!(*i)->is_alive()) {
+            std::cout << "StringObserverManager::cleanup(): Dead temporary observer found, removing . . ." << std::endl;
             temporary_observers.erase(i);
             i = temporary_observers.begin();
         }
@@ -50,8 +54,9 @@ void StringObserverManager::cleanup() {
 
     i = observer_vector.begin();
     
-    for(; i != observer_vector.end(); i ++) {
-        if((*i)->is_alive()) {
+    for(; i != observer_vector.end() && observer_vector.size(); i ++) {
+        if(!(*i)->is_alive()) {
+            std::cout << "StringObserverManager::cleanup(): Dead observer found, removing . . ." << std::endl;
             observer_vector.erase(i);
             i = observer_vector.begin();
         }
