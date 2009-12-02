@@ -82,6 +82,7 @@ void Initializer::initialize() {
 }
 
 void Initializer::deinitialize() {
+    if(bi_pipe) delete bi_pipe;
     if(symbol_manager) delete symbol_manager;
     if(named_pipe) delete named_pipe;
     if(gdb_controller) delete gdb_controller;

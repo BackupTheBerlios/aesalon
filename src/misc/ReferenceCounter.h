@@ -9,42 +9,57 @@
 #include "StreamAsString.h"
 
 namespace Aesalon {
-
-namespace Interface {
-namespace GDB {
-class Controller;
-}
-}
-
 namespace Misc {
 
+/** Exception thrown when asked to modify refcount on untracked memory. */
 class UntrackedMemoryException : public Exception {
 public:
     UntrackedMemoryException() : Exception(StreamAsString()
         << "Asked to decrement refcount on untracked block.") {}
 };
 
+/** Reference counter, used to reduce memory leaks from unfreed memory. */
 class ReferenceCounter : public Singleton<ReferenceCounter> {
 public:
+    /** A simple refcount_t definition, simply a std::size_t. */
     typedef std::size_t refcount_t;
 protected:
+    /** A block of memory being tracked by the reference counter. */
     class MemoryBlock {
     private:
+        /** The amount of references this block has. */
         refcount_t refcount;
     public:
+        /** Get the number of references this block has.
+            @return A refcount_t denoting the number of references.
+        */
         refcount_t get_refcount() const { return refcount; }
+        /** Set the number of references the current block has.
+            @param new_refcount The new amount of references the block has.
+        */
         void set_refcount(refcount_t new_refcount) { refcount = new_refcount; }
     };
+    /** A type denoting a map of memory blocks, from void pointers to MemoryBlock instances. */
     typedef std::map<const void *, MemoryBlock> block_map_t;
 private:
+    /** The map of memory blocks. */
     block_map_t block_map;
 
 public:
-    ReferenceCounter() {}
+    /** Generic constructor, chains onto the Singleton constructor. */
+    ReferenceCounter() : Singleton<ReferenceCounter>() {}
+    /** Virtual destructor, doesn't do anything. */
     virtual ~ReferenceCounter() {}
+    /** Increment the amount of references @a data has.
+        @param data A pointer to increment the refcount of.
+    */
     template<typename Type> void increment_block(const Type *data);
+    /** Decrement the amount of references @a data has. Frees the memory if the refcount is decreased to zero.
+        @param data A pointer to increment the refcount of.
+    */
     template<typename Type> void decrement_block(const Type *data);
     
+    /** Return the amount of references a given pointer has. */
     template<typename Type> refcount_t get_block_references(const Type *data);
 };
 

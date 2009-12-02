@@ -55,7 +55,7 @@ Misc::SmartPointer<String> Parser::parse_gdb_string(std::string string) {
     }
     else instance->set_number(NULL);
     
-    return instance;
+    return Misc::SmartPointer<String>(instance);
 }
 
 Misc::SmartPointer<ParseSequence> Parser::parse_sequence() {
