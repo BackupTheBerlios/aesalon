@@ -41,6 +41,8 @@ private:
     
     /** Main execution loop. */
     void run();
+    
+    int return_value;
 public:
     /** Constructor for the Initializer class. This is where the magic begins.
         @arg argv argv, as passed into main().
@@ -55,6 +57,9 @@ public:
     */
     Misc::SmartPointer<Platform::NamedPipe> get_named_pipe() const { return named_pipe; }
     Misc::SmartPointer<GDB::Controller> get_controller() const { return gdb_controller; }
+    
+    int get_return_value() const { return return_value; }
+    void set_return_value(int new_return_value) { return_value = new_return_value; }
 };
 
 } // namespace Interface

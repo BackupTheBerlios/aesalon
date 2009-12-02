@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
         std::cout << e.get_message() << std::endl;
         return 1;
     }
+    int return_value = Aesalon::Interface::Initializer::get_instance()->get_return_value();
     if(Aesalon::Interface::Initializer::get_instance()) delete Aesalon::Interface::Initializer::get_instance();
-    return 0;
+    return return_value;
 }
