@@ -4,6 +4,7 @@
 #include "misc/ArgumentParser.h"
 #include "SymbolObserver.h"
 #include "ExitObserver.h"
+#include "BreakpointObserver.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -11,13 +12,11 @@ namespace GDB {
 
 Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe,
     Misc::SmartPointer<Misc::EventQueue> event_queue, Misc::SmartPointer<Platform::SymbolManager> symbol_manager)
-    : gdb_pipe(gdb_pipe), event_queue(event_queue), symbol_manager(symbol_manager) {
+    : gdb_pipe(gdb_pipe), event_queue(event_queue), symbol_manager(symbol_manager), running(true) {
     
     observer_manager = new StringObserverManager();
     
     gdb_parser = new Parser();
-    
-    state_manager = new StateManager();
     
     add_observers();
     
@@ -37,10 +36,11 @@ Controller::~Controller() {
 
 void Controller::add_observers() {
     /* Add setup observers first . . . */
-    get_observer_manager()->add_observer(new SymbolObserver(get_state_manager(), symbol_manager));
+    get_observer_manager()->add_observer(new SymbolObserver(symbol_manager));
     
     /* Now for the regular observers . . . */
-    get_observer_manager()->add_observer(new ExitObserver(get_state_manager()));
+    get_observer_manager()->add_observer(new BreakpointObserver());
+    get_observer_manager()->add_observer(new ExitObserver());
 }
 
 void Controller::listen() {
@@ -67,7 +67,6 @@ void Controller::process(std::string line) {
 }
 
 void Controller::send_command(std::string line) {
-    if(get_state() == State::RUNNING) throw Misc::Exception("Attempt to send GDB command while program is running.");
     std::cout << "Sending command to gdb: \"" << line << "\"\n";
     gdb_pipe->send_string(line + "\n");
 }

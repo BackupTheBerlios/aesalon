@@ -36,8 +36,8 @@ bool SymbolObserver::notify(Misc::SmartPointer<ResultRecord> result) {
     if(result->get_data()->get_first() == "error") {
         if(Misc::String::begins_with(StringFollower(result).follow("'msg' rhs"), "Cannot access memory at address 0x")) {
             set_alive(false);
+            Initializer::get_instance()->get_controller()->send_command("-break-delete 1");
             Initializer::get_instance()->get_controller()->send_command("-exec-continue");
-            get_state_manager()->set_state(State::RUNNING);
             return true;
         }
     }
@@ -61,15 +61,22 @@ bool SymbolObserver::notify(Misc::SmartPointer<StreamOutput> stream) {
         std::istringstream parser(data.substr(0, data.find(" ")));
         parser >> std::hex >> address;
         last_address = address;
+        
+        std::string asm_line = data.substr(data.find(":")+2);
+        if(assembly_parser->changes_memory(asm_line)) add_breakpoint();
     }
     
     return false;
 }
 
 void SymbolObserver::request_next() {
-    if(!last_address) last_address = symbol_manager->get_global(0)->get_address();
+    if(!last_address) last_address = symbol_manager->get_symbol(0)->get_address();
     Initializer::get_instance()->get_controller()->send_command(
         Misc::StreamAsString() << "-interpreter-exec console \"x/" << INSTRUCTION_BLOCK_SIZE << "i " << last_address << "\"");
+}
+
+void SymbolObserver::add_breakpoint() {
+    Initializer::get_instance()->get_controller()->send_command(Misc::StreamAsString() << "-break-insert *" << last_address);
 }
 
 } // namespace GDB

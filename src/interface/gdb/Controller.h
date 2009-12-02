@@ -7,7 +7,6 @@
 #include "platform/BidirectionalPipe.h"
 #include "misc/EventQueue.h"
 #include "platform/SymbolManager.h"
-#include "StateManager.h"
 #include "StringObserverManager.h"
 
 namespace Aesalon {
@@ -21,8 +20,7 @@ private:
     Misc::SmartPointer<Misc::EventQueue> event_queue;
     Misc::SmartPointer<StringObserverManager> observer_manager;
     Misc::SmartPointer<Platform::SymbolManager> symbol_manager;
-    
-    Misc::SmartPointer<StateManager> state_manager;
+    bool running;
     
     void add_observers();
 public:
@@ -38,10 +36,8 @@ public:
     Misc::SmartPointer<StringObserverManager> get_observer_manager() const
         { return observer_manager; }
     
-    State get_state() const { return state_manager->get_state(); }
-    void set_state(State new_state) { state_manager->set_state(new_state); }
-    
-    Misc::SmartPointer<StateManager> get_state_manager() const { return state_manager; }
+    bool is_running() const { return running; }
+    void set_running(bool new_running) { running = new_running; }
 };
 
 } // namespace GDB

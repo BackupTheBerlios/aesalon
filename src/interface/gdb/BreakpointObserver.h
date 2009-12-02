@@ -1,5 +1,5 @@
-#ifndef AESALON_INTERFACE_GDB_EXIT_OBSERVER_H
-#define AESALON_INTERFACE_GDB_EXIT_OBSERVER_H
+#ifndef AESALON_INTERFACE_GDB_BREAKPOINT_OBSERVER_H
+#define AESALON_INTERFACE_GDB_BREAKPOINT_OBSERVER_H
 
 #include "StringObserver.h"
 
@@ -7,10 +7,10 @@ namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
-class ExitObserver : public StringObserver {
+class BreakpointObserver : public StringObserver {
 public:
-    ExitObserver() : StringObserver() {}
-    virtual ~ExitObserver() {}
+    BreakpointObserver() : StringObserver() {}
+    virtual ~BreakpointObserver() {}
     
     virtual bool notify(Misc::SmartPointer<AsyncOutput> async);
 };
