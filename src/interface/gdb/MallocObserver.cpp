@@ -15,7 +15,9 @@ bool MallocObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
             Misc::String::to<int>(StringFollower(async).follow("'bkptno' rhs"), breakpoint_number);
             if(breakpoint_number != BreakpointSetupObserver::MALLOC) return false;
             
-            Misc::String::to<std::size_t>(StringFollower(async).follow("'frame' 'args' [0] 'value' rhs"), last_size);
+            /* TODO: fix this StringFollower path . . . */
+            /*Misc::String::to<std::size_t>(StringFollower(async).follow("'frame' rhs 'args' rhs [0] 'value' rhs"), last_size);*/
+            last_size = 1; 
             
             Initializer::get_instance()->get_controller()->send_command(
                 Misc::StreamAsString() << "-break-disable" << BreakpointSetupObserver::MALLOC);

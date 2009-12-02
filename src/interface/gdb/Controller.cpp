@@ -7,6 +7,7 @@
 #include "BreakpointObserver.h"
 #include "BreakpointSetupObserver.h"
 #include "MallocObserver.h"
+#include "FreeObserver.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -45,6 +46,7 @@ void Controller::add_observers() {
     get_observer_manager()->add_observer(new BreakpointObserver());
     get_observer_manager()->add_observer(new ExitObserver());
     get_observer_manager()->add_observer(new MallocObserver(event_queue));
+    get_observer_manager()->add_observer(new FreeObserver(event_queue));
 }
 
 void Controller::listen() {

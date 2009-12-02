@@ -12,9 +12,9 @@ public:
     /* NOTE: these are hardcoded, perhaps not the best idea . . . */
     enum special_breakpoints_e {
         MALLOC = 2,
-        FREE,
-        REALLOC,
-        CALLOC,
+        FREE = 3,
+        REALLOC = 4,
+        CALLOC = 5,
         LAST
     };
 

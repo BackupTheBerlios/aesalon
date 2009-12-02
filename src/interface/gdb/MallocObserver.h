@@ -3,6 +3,7 @@
 
 #include "StringObserver.h"
 #include "platform/EventQueue.h"
+#include "platform/MemoryAddress.h"
 
 namespace Aesalon {
 namespace Interface {

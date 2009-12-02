@@ -7,7 +7,7 @@ namespace Interface {
 namespace GDB {
 
 bool BreakpointSetupObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
-    if(async->get_data()->get_first() == "stopped") return false;
+    if(async->get_data()->get_first() != "stopped") return false;
     if(StringFollower(async).follow("'reason' rhs") != "breakpoint-hit") return false;
     if(StringFollower(async).follow("'bkptno' rhs") != "1") return false;
     else { /* FIXME: all of these names are hardcoded; not a good idea . . . */
