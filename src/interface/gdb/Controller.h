@@ -24,8 +24,7 @@ private:
     
     Misc::SmartPointer<StateManager> state_manager;
     
-    void create_observers();
-    void process_symbols();
+    void add_observers();
 public:
     Controller(Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe,
         Misc::SmartPointer<Misc::EventQueue> event_queue, Misc::SmartPointer<Platform::SymbolManager> symbol_manager);

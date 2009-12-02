@@ -1,6 +1,7 @@
 #include "Controller.h"
 #include "String.h"
 #include "misc/String.h"
+#include "misc/ArgumentParser.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -16,13 +17,23 @@ Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe,
     
     state_manager = new StateManager();
     
-    create_observers();
+    add_observers();
+    
+    std::string program_arguments;
+    for(std::size_t x = 1; x < Misc::ArgumentParser::get_instance()->get_files(); x ++) {
+        program_arguments += Misc::ArgumentParser::get_instance()->get_file(x)->get_filename();
+        program_arguments += " ";
+    }
+    send_command("-exec-arguments " + program_arguments);
+    
+    send_command("-break-insert _start");
+    send_command("-exec-run");
 }
 
 Controller::~Controller() {
 }
 
-void Controller::create_observers() {
+void Controller::add_observers() {
 }
 
 void Controller::listen() {
@@ -46,18 +57,8 @@ void Controller::process(std::string line) {
 
 void Controller::send_command(std::string line) {
     if(get_state() == State::RUNNING) throw Misc::Exception("Attempt to send GDB command while program is running.");
+    std::cout << "Sending command to gdb: \"" << line << "\"\n";
     gdb_pipe->send_string(line + "\n");
-}
-
-void Controller::process_symbols() {
-    for(std::size_t x = 0; x < symbol_manager->get_symbols(); x ++) {
-        Misc::SmartPointer<Platform::Symbol> symbol = symbol_manager->get_symbol(x);
-        if(symbol->is_parsed()) continue;
-        std::string gdb_command = Misc::StreamAsString() << "x/" << symbol->get_size() << "i " << symbol->get_address();
-        std::cout << "Sending symbol command: " << gdb_command << std::endl;
-        send_command(gdb_command);
-        symbol->set_parsed(true);
-    }
 }
 
 } // namespace GDB
