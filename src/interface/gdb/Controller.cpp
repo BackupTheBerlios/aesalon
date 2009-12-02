@@ -5,13 +5,15 @@
 #include "SymbolObserver.h"
 #include "ExitObserver.h"
 #include "BreakpointObserver.h"
+#include "BreakpointSetupObserver.h"
+#include "MallocObserver.h"
 
 namespace Aesalon {
 namespace Interface {
 namespace GDB {
 
 Controller::Controller(Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe,
-    Misc::SmartPointer<Misc::EventQueue> event_queue, Misc::SmartPointer<Platform::SymbolManager> symbol_manager)
+    Misc::SmartPointer<Platform::EventQueue> event_queue, Misc::SmartPointer<Platform::SymbolManager> symbol_manager)
     : gdb_pipe(gdb_pipe), event_queue(event_queue), symbol_manager(symbol_manager), running(true) {
     
     observer_manager = new StringObserverManager();
@@ -37,10 +39,12 @@ Controller::~Controller() {
 void Controller::add_observers() {
     /* Add setup observers first . . . */
     get_observer_manager()->add_observer(new SymbolObserver(symbol_manager));
+    get_observer_manager()->add_temporary_observer(new BreakpointSetupObserver());
     
     /* Now for the regular observers . . . */
     get_observer_manager()->add_observer(new BreakpointObserver());
     get_observer_manager()->add_observer(new ExitObserver());
+    get_observer_manager()->add_observer(new MallocObserver(event_queue));
 }
 
 void Controller::listen() {

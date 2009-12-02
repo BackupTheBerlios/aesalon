@@ -70,7 +70,7 @@ void Initializer::initialize() {
         return;
     }
     
-    event_queue = new Misc::EventQueue();
+    event_queue = new Platform::EventQueue();
     
     symbol_manager = new Platform::SymbolManager();
     

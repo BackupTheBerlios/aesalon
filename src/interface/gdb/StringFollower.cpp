@@ -2,6 +2,8 @@
 
 #include "StringFollower.h"
 
+#include "misc/String.h"
+
 namespace Aesalon {
 namespace Interface {
 namespace GDB {
@@ -17,9 +19,8 @@ std::string StringFollower::follow(std::string path) {
             if(token[token.length()-1] != ']') {
                 throw StringFollowerInvalidPathException("Expected terminating ']' at end of token.");
             }
-            std::istringstream number_stream(token.substr(1, token.length()-2));
             int number;
-            number_stream >> number;
+            Misc::String::to<int>(token.substr(1, token.length()-2), number);
             
             data = data.to<ParseList>()->get_element(number);
         }

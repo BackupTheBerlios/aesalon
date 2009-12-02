@@ -58,8 +58,7 @@ bool SymbolObserver::notify(Misc::SmartPointer<StreamOutput> stream) {
             request_next();
         }
         Platform::MemoryAddress address;
-        std::istringstream parser(data.substr(0, data.find(" ")));
-        parser >> std::hex >> address;
+        Misc::String::to<Platform::MemoryAddress>(data.substr(0, data.find(" ")), address, true);
         last_address = address;
         
         std::string asm_line = data.substr(data.find(":")+2);

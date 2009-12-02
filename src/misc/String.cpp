@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "String.h"
 #include "Exception.h"
 

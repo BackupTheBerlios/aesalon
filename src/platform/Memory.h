@@ -7,7 +7,7 @@
 #include "MemoryBlockManager.h"
 #include "MemoryReferenceManager.h"
 #include "misc/SmartPointer.h"
-#include "misc/EventQueue.h"
+#include "EventQueue.h"
 
 namespace Aesalon {
 namespace Platform {
@@ -23,7 +23,7 @@ public:
     Misc::SmartPointer<MemoryBlockManager> get_block_manager() const { return block_manager; }
     Misc::SmartPointer<MemoryReferenceManager> get_reference_manager() const { return reference_manager; }
     
-    void generate_events(Misc::EventQueue &queue) const;
+    void generate_events(Misc::SmartPointer<EventQueue> queue) const;
 };
 
 } // namespace Platform

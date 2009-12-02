@@ -2,6 +2,7 @@
 #include "ExitObserver.h"
 #include "StringFollower.h"
 #include "interface/Initializer.h"
+#include "misc/String.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -14,10 +15,8 @@ bool ExitObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
             set_alive(false);
             Initializer::get_instance()->get_controller()->set_running(false);
             if(reason == "exited") {
-                std::string ret_value = StringFollower(async).follow("'exit-code' rhs");
-                std::istringstream parser(ret_value);
                 int return_value;
-                parser >> return_value;
+                Misc::String::to<int>(StringFollower(async).follow("'exit-code' rhs"), return_value);
                 Initializer::get_instance()->set_return_value(return_value);
             }
             else Initializer::get_instance()->set_return_value(0);

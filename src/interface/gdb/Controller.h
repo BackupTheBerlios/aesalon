@@ -5,7 +5,7 @@
 
 #include "Parser.h"
 #include "platform/BidirectionalPipe.h"
-#include "misc/EventQueue.h"
+#include "platform/EventQueue.h"
 #include "platform/SymbolManager.h"
 #include "StringObserverManager.h"
 
@@ -17,7 +17,7 @@ class Controller {
 private:
     Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe;
     Misc::SmartPointer<Parser> gdb_parser;
-    Misc::SmartPointer<Misc::EventQueue> event_queue;
+    Misc::SmartPointer<Platform::EventQueue> event_queue;
     Misc::SmartPointer<StringObserverManager> observer_manager;
     Misc::SmartPointer<Platform::SymbolManager> symbol_manager;
     bool running;
@@ -25,7 +25,7 @@ private:
     void add_observers();
 public:
     Controller(Misc::SmartPointer<Platform::BidirectionalPipe> gdb_pipe,
-        Misc::SmartPointer<Misc::EventQueue> event_queue, Misc::SmartPointer<Platform::SymbolManager> symbol_manager);
+        Misc::SmartPointer<Platform::EventQueue> event_queue, Misc::SmartPointer<Platform::SymbolManager> symbol_manager);
     virtual ~Controller();
     
     void send_command(std::string command);

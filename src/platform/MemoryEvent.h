@@ -6,12 +6,12 @@
 #include "MemoryAddress.h"
 #include "MemoryBlock.h"
 #include "MemoryReference.h"
-#include "misc/Event.h"
+#include "Event.h"
 
 namespace Aesalon {
 namespace Platform {
 
-class MemoryEvent : public Misc::Event {
+class MemoryEvent : public Event {
 public:
     enum memory_event_type_e {
         BLOCK_EVENT,
@@ -23,7 +23,7 @@ private:
     Misc::SmartPointer<MemoryBlock> block;
 public:
     MemoryEvent(memory_event_type_e memory_event_type, Misc::SmartPointer<MemoryBlock> block) :
-        Misc::Event(Misc::Event::MEMORY_EVENT), memory_event_type(memory_event_type), block(block) {}
+        Event(Event::MEMORY_EVENT), memory_event_type(memory_event_type), block(block) {}
     virtual ~MemoryEvent() {}
     
     memory_event_type_e get_memory_event_type() const { return memory_event_type; }

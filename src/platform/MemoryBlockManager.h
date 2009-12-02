@@ -7,7 +7,7 @@
 #include "MemoryAddress.h"
 #include "MemoryBlock.h"
 #include "misc/SmartPointer.h"
-#include "misc/EventQueue.h"
+#include "EventQueue.h"
 
 namespace Aesalon {
 namespace Platform {
@@ -27,7 +27,7 @@ public:
     /* NOTE: debugging purposes only. */
     void dump_memory();
     
-    void generate_events(Misc::EventQueue &queue) const;
+    void generate_events(Misc::SmartPointer<EventQueue> queue) const;
 };
 
 } // namespace Platform

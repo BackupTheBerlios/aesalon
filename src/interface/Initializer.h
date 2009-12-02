@@ -6,7 +6,7 @@
 #include "platform/NamedPipe.h"
 #include "platform/BidirectionalPipe.h"
 #include "gdb/Controller.h"
-#include "misc/EventQueue.h"
+#include "platform//EventQueue.h"
 
 #include "platform/SymbolManager.h"
 
@@ -25,7 +25,7 @@ private:
     /** The GDB Controller instance; handles all gdb input and output. */
     Misc::SmartPointer<Interface::GDB::Controller> gdb_controller;
     /** The EventQueue instance; used to keep the local copy of the program's memory updated. */
-    Misc::SmartPointer<Misc::EventQueue> event_queue;
+    Misc::SmartPointer<Platform::EventQueue> event_queue;
     
     Misc::SmartPointer<Platform::SymbolManager> symbol_manager;
     

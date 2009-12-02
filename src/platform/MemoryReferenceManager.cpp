@@ -57,11 +57,11 @@ Misc::SmartPointer<MemoryReference> MemoryReferenceManager::get_reference_by_sco
     return NULL;
 }
 
-void MemoryReferenceManager::generate_events(Misc::EventQueue &queue) const {
+void MemoryReferenceManager::generate_events(Misc::SmartPointer<EventQueue> queue) const {
     memory_reference_vector_t::const_iterator mfi = memory_references.begin();
     
     for(; mfi != memory_references.end(); mfi ++) {
-        queue.push_event(new MemoryReferenceNewEvent((*mfi)->get_scope(), (*mfi)->get_block()));
+        queue->push_event(new MemoryReferenceNewEvent((*mfi)->get_scope(), (*mfi)->get_block()));
     }
 }
 

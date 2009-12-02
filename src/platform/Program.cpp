@@ -19,7 +19,7 @@ namespace Platform {
 
 Program::Program() {
     program_memory = new Memory();
-    event_queue = new Misc::EventQueue();
+    event_queue = new EventQueue();
 }
 
 Program::~Program() {

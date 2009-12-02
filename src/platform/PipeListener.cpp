@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 
 #include "PipeListener.h"
-#include "misc/EventQueue.h"
+#include "EventQueue.h"
 
 namespace Aesalon {
 namespace Platform {

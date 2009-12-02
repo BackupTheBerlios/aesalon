@@ -1,8 +1,8 @@
-#ifndef AESALON_MISC_EVENT_H
-#define AESALON_MISC_EVENT_H
+#ifndef AESALON_PLATFORM_EVENT_H
+#define AESALON_PLATFORM_EVENT_H
 
 namespace Aesalon {
-namespace Misc {
+namespace Platform {
 
 /** Event class. Note that until overloaded, this base class is rather
     useless. */
@@ -28,7 +28,7 @@ public:
     event_type_e get_type() const { return type; }
 };
 
-} // namespace Misc
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

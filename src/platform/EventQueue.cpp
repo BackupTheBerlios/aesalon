@@ -2,7 +2,7 @@
 #include <iostream>
 
 namespace Aesalon {
-namespace Misc {
+namespace Platform {
 
 void EventQueue::push_event(Event *event) {
     if(event == NULL) return;
@@ -21,5 +21,6 @@ Event *EventQueue::peek_event() {
     return event_queue.front();
 }
 
-} // namespace Misc
+} // namespace Platform
 } // namespace Aesalon
+

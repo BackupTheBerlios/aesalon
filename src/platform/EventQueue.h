@@ -1,5 +1,5 @@
-#ifndef AESALON_MISC_EVENT_QUEUE_H
-#define AESALON_MISC_EVENT_QUEUE_H
+#ifndef AESALON_PLATFORM_EVENT_QUEUE_H
+#define AESALON_PLATFORM_EVENT_QUEUE_H
 
 #include <iostream>
 #include <queue>
@@ -7,7 +7,7 @@
 #include "Event.h"
 
 namespace Aesalon {
-namespace Misc {
+namespace Platform {
 
 /** Event queue class. Wrapper around std::queue. */
 class EventQueue {
@@ -33,7 +33,7 @@ public:
     Event *peek_event();
 };
 
-} // namespace Misc
+} // namespace Platform
 } // namespace Aesalon
 
 #endif

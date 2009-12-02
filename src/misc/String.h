@@ -2,6 +2,7 @@
 #define AESALON_MISC_STRING_H
 
 #include <string>
+#include <ios>
 
 namespace Aesalon {
 namespace Misc {
@@ -26,6 +27,13 @@ public:
         @return True if @a string starts with @a beginning.
     */
     static bool begins_with(std::string string, std::string beginning);
+    
+    template<typename Type> static void to(std::string string, Type &instance, bool hex = false) {
+        std::istringstream parser(string);
+        if(hex) parser >> std::hex >> instance;
+        else parser >> instance;
+    }
+
 };
 
 } // namespace Misc
