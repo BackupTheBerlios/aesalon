@@ -13,9 +13,11 @@ class FreeObserver : public StringObserver {
 private:
     Misc::SmartPointer<Platform::EventQueue> event_queue;
     Platform::MemoryAddress block_address;
+    
+    bool waiting;
 public:
     FreeObserver(Misc::SmartPointer<Platform::EventQueue> event_queue)
-        : StringObserver(), event_queue(event_queue) {}
+        : StringObserver(), event_queue(event_queue), waiting(false) {}
     virtual ~FreeObserver() {}
     
     virtual bool notify(Misc::SmartPointer<AsyncOutput> async);

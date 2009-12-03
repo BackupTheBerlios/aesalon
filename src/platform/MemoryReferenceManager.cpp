@@ -61,7 +61,8 @@ void MemoryReferenceManager::generate_events(Misc::SmartPointer<EventQueue> queu
     memory_reference_vector_t::const_iterator mfi = memory_references.begin();
     
     for(; mfi != memory_references.end(); mfi ++) {
-        queue->push_event(new MemoryReferenceNewEvent((*mfi)->get_scope(), (*mfi)->get_block()));
+        /* NOTE: put this back in later . . . */
+        /*queue->push_event(new MemoryReferenceNewEvent((*mfi)->get_scope(), (*mfi)->get_block()));*/
     }
 }
 

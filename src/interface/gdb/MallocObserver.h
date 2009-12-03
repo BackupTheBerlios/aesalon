@@ -13,8 +13,10 @@ class MallocObserver : public StringObserver {
 private:
     Misc::SmartPointer<Platform::EventQueue> event_queue;
     std::size_t last_size;
+    bool waiting;
 public:
-    MallocObserver(Misc::SmartPointer<Platform::EventQueue> event_queue) : StringObserver(), event_queue(event_queue) {}
+    MallocObserver(Misc::SmartPointer<Platform::EventQueue> event_queue)
+        : StringObserver(), event_queue(event_queue), waiting(false) {}
     virtual ~MallocObserver() {}
     
     virtual bool notify(Misc::SmartPointer<AsyncOutput> async);
