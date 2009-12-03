@@ -108,6 +108,7 @@ void Initializer::usage() {
 void Initializer::run() {
     while(bi_pipe->is_open() && gdb_controller->is_running()) {
         gdb_controller->listen();
+        if(event_queue->peek_event().is_valid()) get_named_pipe()->send_data(event_queue);
     }
 }
 

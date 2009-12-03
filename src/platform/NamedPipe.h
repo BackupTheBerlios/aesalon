@@ -5,6 +5,9 @@
 
 #include <string>
 
+#include "EventQueue.h"
+#include "misc/SmartPointer.h"
+
 namespace Aesalon {
 namespace Platform {
 
@@ -31,6 +34,7 @@ public:
     named_pipe_mode_e get_type() const { return type; }
     
     void send_data(std::string data);
+    void send_data(Misc::SmartPointer<EventQueue> queue);
     
     /* NOTE: blocking function if there is no data waiting. */
     std::string get_data();

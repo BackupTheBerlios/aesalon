@@ -4,9 +4,8 @@
 namespace Aesalon {
 namespace Platform {
 
-void EventQueue::push_event(Event *event) {
-    if(event == NULL) return;
-    event_queue.push(event);
+void EventQueue::push_event(Misc::SmartPointer<Event> event) {
+    if(event.is_valid()) event_queue.push(event);
 }
 
 void EventQueue::pop_event() {
@@ -16,7 +15,7 @@ void EventQueue::pop_event() {
     delete event;
 }
 
-Event *EventQueue::peek_event() {
+Misc::SmartPointer<Event> EventQueue::peek_event() {
     if(event_queue.empty()) return NULL;
     return event_queue.front();
 }

@@ -6,13 +6,15 @@
 
 #include "Event.h"
 
+#include "misc/SmartPointer.h"
+
 namespace Aesalon {
 namespace Platform {
 
 /** Event queue class. Wrapper around std::queue. */
 class EventQueue {
 public:
-    typedef std::queue<Event *> event_queue_t;
+    typedef std::queue<Misc::SmartPointer<Event> > event_queue_t;
 private:
     event_queue_t event_queue;
 public:
@@ -24,13 +26,13 @@ public:
     /** Add another event onto the FIFO queue.
         @param event The event to push on the queue.
     */
-    void push_event(Event *event);
+    void push_event(Misc::SmartPointer<Event> event);
     /** Remove an event from the queue, and delete its instance. */
     void pop_event();
     /** Get the first element on the queue.
         @return The first element, or NULL if there are no elements.
     */
-    Event *peek_event();
+    Misc::SmartPointer<Event> peek_event();
 };
 
 } // namespace Platform

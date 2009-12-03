@@ -7,6 +7,7 @@
 #include "NamedPipe.h"
 #include "PipeException.h"
 #include "PlatformException.h"
+#include "MemoryEvent.h"
 
 namespace Aesalon {
 namespace Platform {
@@ -74,6 +75,13 @@ void NamedPipe::open_pipe_read() {
         throw PlatformException("Could not open named pipe for reading: ");
     }
     else pipe_open = true;
+}
+
+void NamedPipe::send_data(Misc::SmartPointer<EventQueue> queue) {
+    while(queue->peek_event()) {
+        send_data(queue->peek_event().to<MemoryEvent>()->serialize());
+        queue->pop_event();
+    }
 }
 
 }  // namespace Platform
