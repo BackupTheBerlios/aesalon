@@ -63,7 +63,7 @@ void Initializer::initialize() {
         al.add_argument("--interpreter=mi2");
         al.add_argument(ap->get_file(0)->get_filename());
         /*for(std::size_t x = 0; x < ap->get_files(); x ++) al.add_argument(ap->get_file(x)->get_filename());*/
-        bi_pipe = new Platform::BidirectionalPipe(ap->get_argument("gdb executable").to<Misc::StringArgument>()->get_value(), al, false);
+        bi_pipe = new Platform::BidirectionalPipe(ap->get_argument("gdb executable").to<Misc::StringArgument>()->get_value(), al, true);
     }
     else {
         usage();
@@ -117,8 +117,8 @@ void Initializer::send_pid_to_gui() {
     if(pid_string == "") return;
     
     try {
-        Platform::NamedPipe named_pipe(Aesalon::Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << pid_string);
-    
+        Platform::NamedPipe named_pipe(Aesalon::Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << pid_string, true, true);
+        
         if(named_pipe.is_open()) named_pipe.send_data(Misc::StreamAsString() << getpid());
     }
     catch(Misc::Exception pe) {

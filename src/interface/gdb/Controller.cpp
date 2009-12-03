@@ -55,6 +55,7 @@ void Controller::listen() {
     get_observer_manager()->cleanup();
     
     do {
+        if(!is_running()) return;
         line = gdb_pipe->get_string();
         process(line);
     } while(line != "");

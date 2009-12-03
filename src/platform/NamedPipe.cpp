@@ -12,7 +12,8 @@
 namespace Aesalon {
 namespace Platform {
 
-NamedPipe::NamedPipe(named_pipe_mode_e type, std::string name, bool create_pipe) : type(type), pipe_name(name), create_pipe(create_pipe) {
+NamedPipe::NamedPipe(named_pipe_mode_e type, std::string name, bool create_pipe, bool blocking)
+    : type(type), pipe_name(name), create_pipe(create_pipe), blocking(blocking) {
     pipe_open = false;
     if(type == NamedPipe::WRITE_PIPE) open_pipe_write();
     else if(type == NamedPipe::READ_PIPE) open_pipe_read();
@@ -60,7 +61,7 @@ void NamedPipe::create_named_pipe() {
 
 void NamedPipe::open_pipe_write() {
     if(create_pipe) create_named_pipe();
-    pipe_fd = open(pipe_name.c_str(), O_WRONLY | O_NONBLOCK);
+    pipe_fd = open(pipe_name.c_str(), O_WRONLY | (blocking?0:O_NONBLOCK));
     if(pipe_fd == -1) {
         if(errno != ENXIO) throw PlatformException("Could not open named pipe for writing: ");
         pipe_open = false;
@@ -70,9 +71,10 @@ void NamedPipe::open_pipe_write() {
 
 void NamedPipe::open_pipe_read() {
     if(create_pipe) create_named_pipe();
-    pipe_fd = open(pipe_name.c_str(), O_RDONLY | O_NONBLOCK);
+    pipe_fd = open(pipe_name.c_str(), O_RDONLY | (blocking?0:O_NONBLOCK));
     if(pipe_fd == -1) {
-        throw PlatformException("Could not open named pipe for reading: ");
+        pipe_open = false;
+        /*throw PlatformException("Could not open named pipe for reading: ");*/
     }
     else pipe_open = true;
 }
@@ -81,6 +83,13 @@ void NamedPipe::send_data(Misc::SmartPointer<EventQueue> queue) {
     while(queue->peek_event()) {
         send_data(queue->peek_event().to<MemoryEvent>()->serialize());
         queue->pop_event();
+    }
+}
+
+void NamedPipe::try_open() {
+    if(!pipe_open) {
+        if(get_type() == READ_PIPE) open_pipe_read();
+        else open_pipe_write();
     }
 }
 

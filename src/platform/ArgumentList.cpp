@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 #include "ArgumentList.h"
 
 namespace Aesalon {
@@ -7,9 +8,11 @@ namespace Platform {
 void ArgumentList::from_string(std::string string) {
     /* TODO: support quoted arguments . . . */
     while(string.length()) {
+        std::cout << "ArgumentList::from_string(): string is \"" << string << "\"\n";
         std::string argument = string.substr(0, string.find(" "));
+        if(string.find(" ") != std::string::npos) string.erase(0, string.find(" ")+1);
+        else return;
         add_argument(argument);
-        return;
     }
 }
 

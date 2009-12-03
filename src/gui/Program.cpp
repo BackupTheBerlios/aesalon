@@ -1,6 +1,7 @@
 #include "Program.h"
 #include "MainWindow.h"
 #include "misc/String.h"
+#include "platform/PlatformException.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -13,19 +14,22 @@ Program::Program(std::string executable, std::string arguments, bool in_xterm)
         executable = "/usr/bin/x-terminal-emulator";
     }
     
-    arguments = Misc::StreamAsString() << "--gui-pid " << getpid() << " " << executable << " " << arguments;
+    arguments = Misc::StreamAsString() << "/home/strange/c/aesalon/aesalon" << " --gui-pid " << getpid() << " " << executable << " " << arguments;
     executable = "/home/strange/c/aesalon/aesalon"; /* NOTE: hardcoded . . . */
     
     Platform::ArgumentList argument_list;
     
-    Misc::SmartPointer<Platform::NamedPipe> gui_pipe
-        = new Aesalon::Platform::NamedPipe(Aesalon::Platform::NamedPipe::READ_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << getpid(), true);
-    
-    argument_list.from_string(arguments);
+    argument_list.from_string(arguments + " ");
     
     bi_pipe = new Platform::BidirectionalPipe(executable, argument_list, true);
     
+    Misc::SmartPointer<Platform::NamedPipe> gui_pipe
+        = new Aesalon::Platform::NamedPipe(Aesalon::Platform::NamedPipe::READ_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << getpid());
+    
     std::string data;
+    
+    gui_pipe->try_open();
+    
     while((data = gui_pipe->get_data()) == "") ;
     
     gui_pipe = 0;
