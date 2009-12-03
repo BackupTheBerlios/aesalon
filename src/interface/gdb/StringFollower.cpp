@@ -42,7 +42,8 @@ std::string StringFollower::follow(std::string path) {
             data = new ParseString(data.to<ParseResult>()->get_name());
         }
         else if(token == "rhs") { /* right side of a result */
-            data = data.to<ParseResult>()->get_value();
+            Misc::SmartPointer<ParseResult> result = data.to<ParseResult>();
+            data = result->get_value();
         }
     }
     

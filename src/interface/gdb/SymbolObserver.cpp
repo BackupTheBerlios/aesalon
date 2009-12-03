@@ -12,15 +12,8 @@ namespace GDB {
 
 bool SymbolObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
     if(async->get_data()->get_first() == "stopped") {
-        std::cout << "\tProgram execution has stopped for some reason . . ." << std::endl;
-        if(StringFollower(async).follow("'reason' rhs") != "breakpoint-hit") {
-            std::cout << "\t . . . wasn't a breakpoint-hit . . ." << std::endl;
-            return false;
-        }
-        if(StringFollower(async).follow("'bkptno' rhs") != "1") {
-            std::cout << "\t . . . the breakpoint number wasn't 1 . . ." << std::endl;
-            return false;
-        }
+        if(StringFollower(async).follow("'reason' rhs") != "breakpoint-hit") return false;
+        if(StringFollower(async).follow("'bkptno' rhs") != "1") return false;
         
         request_next();
         
@@ -30,9 +23,6 @@ bool SymbolObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
 }
 
 bool SymbolObserver::notify(Misc::SmartPointer<ResultRecord> result) {
-    std::cout << "SymbolObserver::notify(ResultRecord):" << std::endl;
-    std::cout << "\tresult->get_data()->get_first(): " << result->get_data()->get_first() << std::endl;
-    
     if(result->get_data()->get_first() == "error") {
         if(Misc::String::begins_with(StringFollower(result).follow("'msg' rhs"), "Cannot access memory at address 0x")) {
             set_alive(false);
@@ -49,7 +39,6 @@ bool SymbolObserver::notify(Misc::SmartPointer<StreamOutput> stream) {
     std::string data = stream->get_stream_data();
     data = Misc::String::remove_escapes(data);
     data = data.substr(1, data.length()-2);
-    std::cout << "SymbolObserver::notify(StreamOutput): data is \"" << data << "\"\n";
     
     if(Misc::String::begins_with(data, "0x")) {
         instructions_parsed ++;

@@ -15,8 +15,13 @@ bool MallocObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
             Misc::String::to<int>(StringFollower(async).follow("'bkptno' rhs"), breakpoint_number);
             if(breakpoint_number != BreakpointSetupObserver::MALLOC) return false;
             
-            /* TODO: fix this StringFollower path . . . */
-            /*Misc::String::to<std::size_t>(StringFollower(async).follow("'frame' rhs 'args' rhs [0] 'value' rhs"), last_size);*/
+            /* Example line:
+*stopped,reason="breakpoint-hit",disp="keep",bkptno="2",frame={addr="<address>",func="*__GI__libc_malloc",args=[{name="bytes,value="1"}],file="malloc.c"}
+                
+                Therefore, "'frame' rhs args rhs [0] value rhs" . . .
+            */
+            
+            Misc::String::to<std::size_t>(StringFollower(async).follow("'frame' rhs 'args' rhs [0] 'value' rhs"), last_size);
             last_size = 1; 
             
             Initializer::get_instance()->get_controller()->send_command(
