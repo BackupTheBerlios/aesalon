@@ -19,7 +19,7 @@ bool FreeObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
             /*Misc::String::to<std::size_t>(StringFollower(async).follow("'frame' rhs 'args' rhs [0] 'value' rhs"), block_address, true);*/
             
             Initializer::get_instance()->get_controller()->send_command(
-                Misc::StreamAsString() << "-break-disable" << BreakpointSetupObserver::FREE);
+                Misc::StreamAsString() << "-break-disable " << BreakpointSetupObserver::FREE);
             Initializer::get_instance()->get_controller()->send_command("-exec-finish");
         }
         else if(StringFollower(async).follow("'reason' rhs") == "function-finished") {

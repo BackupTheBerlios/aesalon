@@ -156,7 +156,7 @@ Misc::SmartPointer<ParseData> Parser::parse_list() {
         else list->add_element(parse_value());
     }
     
-    return NULL;
+    return list;
 }
 
 std::string Parser::next_word() {

@@ -25,7 +25,7 @@ bool MallocObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
             last_size = 1; 
             
             Initializer::get_instance()->get_controller()->send_command(
-                Misc::StreamAsString() << "-break-disable" << BreakpointSetupObserver::MALLOC);
+                Misc::StreamAsString() << "-break-disable " << BreakpointSetupObserver::MALLOC);
             Initializer::get_instance()->get_controller()->send_command("-exec-finish");
         }
         else if(StringFollower(async).follow("'reason' rhs") == "function-finished") {
