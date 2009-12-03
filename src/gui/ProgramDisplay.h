@@ -18,6 +18,7 @@
 
 #include "misc/SmartPointer.h"
 #include "platform/NamedPipe.h"
+#include "Program.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -47,6 +48,8 @@ private:
     QLabel *running_general_program_name_label;
     
     QTimer *update_timer;
+    
+    Misc::SmartPointer<Program> program;
     
     void create_launch_widget();
     void create_running_widget();

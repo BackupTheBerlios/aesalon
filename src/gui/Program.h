@@ -17,7 +17,6 @@ private:
     Misc::SmartPointer<Platform::Memory> memory;
     Misc::SmartPointer<Platform::NamedPipe> named_pipe;
     
-    
     std::string executable;
     std::string arguments;
     bool in_xterm;

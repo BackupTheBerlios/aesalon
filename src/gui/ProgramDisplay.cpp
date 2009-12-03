@@ -88,6 +88,7 @@ void ProgramDisplay::create_running_widget() {
 
 void ProgramDisplay::begin_program() {
     create_running_widget();
+    program = new Program(launch_program_name->text().toStdString(), launch_program_arguments->text().toStdString(), launch_program_xterm->isChecked());
 }
 
 } // namespace GUI
