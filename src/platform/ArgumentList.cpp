@@ -4,6 +4,15 @@
 namespace Aesalon {
 namespace Platform {
 
+void ArgumentList::from_string(std::string string) {
+    /* TODO: support quoted arguments . . . */
+    while(string.length()) {
+        std::string argument = string.substr(0, string.find(" "));
+        string.erase(0, string.find(" ")+1);
+        add_argument(argument);
+    }
+}
+
 char **ArgumentList::get_as_argv() {
     char **arguments;
     

@@ -87,7 +87,6 @@ void ProgramDisplay::create_running_widget() {
 }
 
 void ProgramDisplay::begin_program() {
-    program = new Platform::Program();
     create_running_widget();
 }
 

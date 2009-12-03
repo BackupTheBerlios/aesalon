@@ -1,6 +1,8 @@
 #ifndef AESALON_GUI_PROGRAM_DISPLAY_H
 #define AESALON_GUI_PROGRAM_DISPLAY_H
 
+#include <QTimer>
+
 #include <QMdiSubWindow>
 #include <QGridLayout>
 #include <QLineEdit>
@@ -15,7 +17,7 @@
 #include "ProgramReferenceDisplay.h"
 
 #include "misc/SmartPointer.h"
-#include "platform/Program.h"
+#include "platform/NamedPipe.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -44,7 +46,7 @@ private:
     QLabel *running_general_program_label;
     QLabel *running_general_program_name_label;
     
-    Misc::SmartPointer<Platform::Program> program;
+    QTimer *update_timer;
     
     void create_launch_widget();
     void create_running_widget();

@@ -16,6 +16,8 @@ public:
     ArgumentList() {}
     virtual ~ArgumentList() {}
     
+    void from_string(std::string string);
+    
     void add_argument(std::string argument) { argument_vector.push_back(argument); }
     char **get_as_argv();
 };
