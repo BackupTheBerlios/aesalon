@@ -11,6 +11,7 @@ namespace Platform {
 class PlatformException : public Misc::Exception {
 public:
     PlatformException(std::string message);
+    PlatformException(std::string message, bool no_errno);
 };
 
 }  // namespace Platform
