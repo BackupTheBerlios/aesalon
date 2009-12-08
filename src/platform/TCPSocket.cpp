@@ -34,6 +34,7 @@ TCPSocket::TCPSocket(std::string host, int port) {
     }
     
     /* Socket is now connected. */
+    valid = true;
 }
 TCPSocket::~TCPSocket() {
     close(socket_fd);
@@ -44,9 +45,11 @@ void TCPSocket::send_data(std::string data) {
     
     raw_data = Misc::StreamAsString() << htons(data.length()) << data;
     
-    write(socket_fd, raw_data.c_str(), raw_data.length());
+    int sent = write(socket_fd, raw_data.c_str(), raw_data.length());
+    if(sent == -1) valid = false;
 }
 std::string TCPSocket::get_data() {
+    if(!is_valid()) return "";
     uint16_t size;
     read(socket_fd, &size, 2);
     size = ntohs(size);
@@ -55,7 +58,14 @@ std::string TCPSocket::get_data() {
     
     while(size) {
         char c;
-        read(socket_fd, &c, 1);
+        int ret = read(socket_fd, &c, 1);
+        if(ret == -1) {
+            if(errno == EAGAIN) continue;
+            else {
+                valid = false;
+                break;
+            }
+        }
         data += c;
         size --;
     }
