@@ -6,7 +6,12 @@ add_definitions(-DAESALON_PLATFORM_x86=0 -DAESALON_PLATFORM_x86_64=1)
 
 add_subdirectory(misc)
 add_subdirectory(platform)
-add_subdirectory(interface)
 
-add_subdirectory(gui)
+if(BUILD_PLATFORM)
+    add_subdirectory(interface)
+endif(BUILD_PLATFORM)
+
+if(BUILD_GUI)
+    add_subdirectory(gui)
+endif(BUILD_GUI)
 
