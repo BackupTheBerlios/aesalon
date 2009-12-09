@@ -14,7 +14,7 @@ Program::Program(std::string executable, std::string arguments, int port, bool i
         executable = "/usr/bin/x-terminal-emulator";
     }
     
-    arguments = Misc::StreamAsString() << "/home/strange/c/aesalon/aesalon" << " --gui-pid " << getpid() << " " << executable << " " << arguments;
+    arguments = Misc::StreamAsString() << "/home/strange/c/aesalon/aesalon" << " --use-port" << port << " " << executable << " " << arguments;
     executable = "/home/strange/c/aesalon/aesalon"; /* NOTE: hardcoded . . . */
     
     Platform::ArgumentList argument_list;
@@ -25,7 +25,7 @@ Program::Program(std::string executable, std::string arguments, int port, bool i
     
     memory = new Platform::Memory();
     
-    socket = new Platform::TCPSocket("localhost", port);
+    socket = new Platform::TCPSocket("127.0.0.1", port);
 }
 
 } // namespace GUI

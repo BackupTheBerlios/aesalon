@@ -1,11 +1,12 @@
 #include <iostream>
 #include <QtGui/QApplication>
 #include "MainWindow.h"
+#include "Application.h"
 
 #include "misc/ReferenceCounter.h"
 
 int main(int argc, char *argv[]) {
-    QApplication application(argc, argv);
+    Aesalon::GUI::Application application(argc, argv);
     
     new Aesalon::Misc::ReferenceCounter();
     
