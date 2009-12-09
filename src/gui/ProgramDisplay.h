@@ -17,7 +17,6 @@
 #include "ProgramReferenceDisplay.h"
 
 #include "misc/SmartPointer.h"
-#include "platform/NamedPipe.h"
 #include "Program.h"
 
 namespace Aesalon {
@@ -35,6 +34,8 @@ private:
     QLabel *launch_program_label;
     QLineEdit *launch_program_arguments;
     QLabel *launch_program_arguments_label;
+    QLabel *launch_port_label;
+    QLineEdit *launch_port;
     QCheckBox *launch_program_xterm;
     QPushButton *launch_program_button;
     

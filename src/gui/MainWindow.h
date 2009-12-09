@@ -6,7 +6,6 @@
 #include <QAction>
 #include <QMdiArea>
 
-#include "platform/NamedPipe.h"
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
@@ -21,8 +20,6 @@ private:
     QMenu *help_menu;
     QAction *help_menu_about;
     QMdiArea *mdi_area;
-    
-    Misc::SmartPointer<Platform::NamedPipe> named_pipe;
     
     void create_menus();
 public:

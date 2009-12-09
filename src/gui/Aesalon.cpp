@@ -3,7 +3,6 @@
 #include "MainWindow.h"
 
 #include "misc/ReferenceCounter.h"
-#include "platform/NamedPipe.h"
 
 int main(int argc, char *argv[]) {
     QApplication application(argc, argv);

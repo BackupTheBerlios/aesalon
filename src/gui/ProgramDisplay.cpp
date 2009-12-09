@@ -1,6 +1,8 @@
 #include "ProgramDisplay.h"
 #include "ProgramDisplay.moc"
 
+#include "misc/String.h"
+
 namespace Aesalon {
 namespace GUI {
 
@@ -35,14 +37,19 @@ void ProgramDisplay::create_launch_widget() {
     launch_program_arguments = new QLineEdit("");
     launch_program_layout->addWidget(launch_program_arguments, 1, 1);
     
+    launch_port_label = new QLabel(tr("TCP port to use: "));
+    launch_program_layout->addWidget(launch_port_label, 2, 0);
+    launch_port = new QLineEdit("6321");
+    launch_program_layout->addWidget(launch_port, 2, 1);
+    
     launch_program_xterm = new QCheckBox("&Launch executable in terminal");
-    launch_program_layout->addWidget(launch_program_xterm, 2, 0);
+    launch_program_layout->addWidget(launch_program_xterm, 3, 0);
     
     launch_layout->addStretch();
     launch_program_button = new QPushButton(tr("&Begin execution"));
     launch_program_button->show();
     connect(launch_program_button, SIGNAL(clicked()), this, SLOT(begin_program()));
-    launch_program_layout->addWidget(launch_program_button, 3, 0, 1, 2, Qt::AlignBottom);
+    launch_program_layout->addWidget(launch_program_button, 4, 0, 1, 2, Qt::AlignBottom);
     
     launch_widget->setLayout(launch_layout);
     setWidget(launch_widget);
@@ -88,7 +95,12 @@ void ProgramDisplay::create_running_widget() {
 
 void ProgramDisplay::begin_program() {
     create_running_widget();
-    program = new Program(launch_program_name->text().toStdString(), launch_program_arguments->text().toStdString(), launch_program_xterm->isChecked());
+    int port;
+    Misc::String::to<int>(launch_port->text().toStdString(), port);
+    program =
+        new Program(launch_program_name->text().toStdString(),
+        launch_program_arguments->text().toStdString(),
+        port, launch_program_xterm->isChecked());
 }
 
 } // namespace GUI

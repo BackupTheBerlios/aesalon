@@ -2,7 +2,7 @@
 #define AESALON_GUI_PROGRAM_H
 
 #include "platform/EventQueue.h"
-#include "platform/NamedPipe.h"
+#include "platform/TCPSocket.h"
 #include "platform/Memory.h"
 #include "platform/BidirectionalPipe.h"
 
@@ -15,15 +15,16 @@ class Program {
 private:
     Misc::SmartPointer<Platform::EventQueue> event_queue;
     Misc::SmartPointer<Platform::Memory> memory;
-    Misc::SmartPointer<Platform::NamedPipe> named_pipe;
+    Misc::SmartPointer<Platform::TCPSocket> socket;
     
     std::string executable;
     std::string arguments;
+    int port;
     bool in_xterm;
     
     Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
 public:
-    Program(std::string executable, std::string arguments, bool in_xterm);
+    Program(std::string executable, std::string arguments, int port, bool in_xterm);
     virtual ~Program() {}
     
     std::string get_executable() const { return executable; }

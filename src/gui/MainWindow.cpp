@@ -21,13 +21,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     mdi_area = new QMdiArea(this);
     setCentralWidget(mdi_area);
     
-    /*try {
-        named_pipe = new Aesalon::Platform::NamedPipe(Aesalon::Platform::NamedPipe::READ_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << getpid(), true);
-    }
-    catch(Misc::Exception e) {
-        std::cout << "Exception: " << e.get_message() << std::endl;
-    }*/
-    
     statusBar()->showMessage("Ready.");
 }
 
