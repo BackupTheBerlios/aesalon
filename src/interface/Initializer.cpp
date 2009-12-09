@@ -5,6 +5,7 @@
 #include "misc/ArgumentParser.h"
 #include "misc/ReferenceCounter.h"
 #include "misc/StreamAsString.h"
+#include "misc/String.h"
 
 #include "platform/PlatformException.h"
 
@@ -22,6 +23,7 @@
     #define AESALON_PATCHLEVEL "unknown"
 #endif
 
+#define DEFAULT_PORT 6321
 
 namespace Aesalon {
 namespace Interface {
@@ -43,7 +45,7 @@ void Initializer::initialize() {
     ap->add_argument("usage", new Misc::BooleanArgument("--usage", 'h', "", 0, false));
     ap->add_argument("logfile", new Misc::StringArgument("--log-file", 'l', ""));
     ap->add_argument("gdb executable", new Misc::StringArgument("--gdb-path", 0, "/usr/bin/gdb"));
-    ap->add_argument("gui pid", new Misc::StringArgument("--gui-pid", 0, ""));
+    ap->add_argument("tcp port", new Misc::StringArgument("--use-port", 0, Misc::StreamAsString() << DEFAULT_PORT));
     ap->add_argument("overload path", new Misc::StringArgument("--overload-path", 0, "./libaesalon_overload.so"));
     
     ap->parse_argv(argv);
@@ -53,9 +55,9 @@ void Initializer::initialize() {
         return;
     }
     
-    send_pid_to_gui();
-    
-    named_pipe = new Platform::NamedPipe(Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon-" << getpid(), true);
+    int port;
+    Misc::String::to<int>(ap->get_argument("tcp port").to<Misc::StringArgument>()->get_value(), port);
+    server_socket = new Platform::TCPServerSocket(port);
     
     if(ap->get_files()) {
         Platform::ArgumentList al;
@@ -84,7 +86,7 @@ void Initializer::initialize() {
 void Initializer::deinitialize() {
     if(bi_pipe) delete bi_pipe;
     if(symbol_manager) delete symbol_manager;
-    if(named_pipe) delete named_pipe;
+    if(server_socket) delete server_socket;
     if(gdb_controller) delete gdb_controller;
     if(event_queue) delete event_queue;
     
@@ -101,30 +103,14 @@ void Initializer::usage() {
     std::cout << "\t--usage, -h\t\tPrint this usage message." << std::endl;
     std::cout << "\t--log-file, -l\t\tSets the file to log memory events to, for future reconstruction." << std::endl;
     std::cout << "\t--gdb-path\t\tSets the path to the gdb executable to use." << std::endl;
-    std::cout << "Internal arguments (do not use, provided for reference):" << std::endl;
-    std::cout << "\t--gui-pid\t\tSets the aesalon gui interface PID." << std::endl;
+    std::cout << "\t--use-port\t\tSets the port to listen on for connections." << std::endl;
 }
 
 void Initializer::run() {
     while(bi_pipe->is_open() && gdb_controller->is_running()) {
         gdb_controller->listen();
-        if(event_queue->peek_event().is_valid()) get_named_pipe()->send_data(event_queue);
+        if(event_queue->peek_event().is_valid()) get_socket()->send_data(event_queue);
     }
-}
-
-void Initializer::send_pid_to_gui() {
-    std::string pid_string = Misc::ArgumentParser::get_instance()->get_argument("gui pid").to<Misc::StringArgument>()->get_value();
-    if(pid_string == "") return;
-    
-    try {
-        Platform::NamedPipe named_pipe(Aesalon::Platform::NamedPipe::WRITE_PIPE, Misc::StreamAsString() << "/tmp/aesalon_gui-" << pid_string, true, true);
-        
-        if(named_pipe.is_open()) named_pipe.send_data(Misc::StreamAsString() << getpid());
-    }
-    catch(Misc::Exception pe) {
-        std::cout << pe.get_message() << std::endl;
-    }
-    /* named_pipe will auto-destruct, since it is a local variable */
 }
 
 } // namespace Interface

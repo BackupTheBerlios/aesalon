@@ -2,14 +2,17 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <cstring>
+#include <iostream>
 
 #include "TCPServerSocket.h"
 #include "PlatformException.h"
+#include "MemoryEvent.h"
 
 namespace Aesalon {
 namespace Platform {
 
 TCPServerSocket::TCPServerSocket(int port) : port(port) {
+    std::cout << "Constructing TCPServerSocket, port is: " << port << std::endl;
     socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if(socket_fd == -1) throw PlatformException("Unable to create socket: ");
     
@@ -25,7 +28,13 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
         throw PlatformException("Couldn't set socket option SO_REUSEADDR: ");
     }
     
-    bind(socket_fd, (struct sockaddr *)&address, sizeof(address));
+    if(bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) == -1) {
+        throw PlatformException("Couldn't bind to port: ");
+    }
+    if(listen(socket_fd, 20) == -1) {
+        throw PlatformException("Couldn't listen on port: ");
+    }
+    
 }
 
 TCPServerSocket::~TCPServerSocket() {
@@ -65,6 +74,13 @@ void TCPServerSocket::send_data(std::string data) {
     
     for(; i != socket_list.end(); i ++) {
         (*i)->send_data(data);
+    }
+}
+
+void TCPServerSocket::send_data(Misc::SmartPointer<EventQueue> data) {
+    while(data->peek_event()) {
+        send_data(data->peek_event().to<MemoryEvent>()->serialize());
+        data->pop_event();
     }
 }
 

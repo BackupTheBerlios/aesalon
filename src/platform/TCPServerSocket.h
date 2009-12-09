@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "TCPSocket.h"
+#include "EventQueue.h"
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
@@ -24,6 +25,7 @@ public:
     void remove_invalid_sockets();
     
     void send_data(std::string data);
+    void send_data(Misc::SmartPointer<EventQueue> data);
     
     int get_port() const;
 };

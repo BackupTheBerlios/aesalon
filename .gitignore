@@ -4,6 +4,7 @@
 *.a
 *.so
 .gdb_history
+core
 
 # Buildsystem (CMake) ignores
 CMakeFiles
