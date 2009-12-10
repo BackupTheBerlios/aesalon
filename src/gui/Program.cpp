@@ -14,7 +14,7 @@ Program::Program(std::string executable, std::string arguments, int port, bool i
         executable = "/usr/bin/x-terminal-emulator";
     }
     
-    arguments = Misc::StreamAsString() << "/home/strange/c/aesalon/aesalon" << " --use-port" << port << " " << executable << " " << arguments;
+    arguments = Misc::StreamAsString() << "/home/strange/c/aesalon/aesalon" << " --use-port " << port << " " << executable << " " << arguments;
     executable = "/home/strange/c/aesalon/aesalon"; /* NOTE: hardcoded . . . */
     
     Platform::ArgumentList argument_list;

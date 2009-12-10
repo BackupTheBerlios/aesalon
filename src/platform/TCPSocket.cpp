@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -25,9 +26,12 @@ TCPSocket::TCPSocket(std::string host, int port) {
 
     struct hostent *he;
     
-    he = gethostbyname(host.c_str());
+    /*he = gethostbyname(host.c_str());
     if(he == NULL) throw PlatformException(Misc::StreamAsString() << "Couldn't lookup host: " << strerror(h_errno));
-    address.sin_addr = *(struct in_addr *)he;
+    std::cout << inet_ntoa(*(struct in_addr *)he) << std::endl;
+    address.sin_addr = *(struct in_addr *)he;*/
+    
+    
     
     if(connect(socket_fd, (struct sockaddr *)&address, sizeof(address)) == -1) {
         throw PlatformException("Couldn't connect to host: ");

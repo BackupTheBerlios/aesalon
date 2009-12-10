@@ -34,7 +34,6 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
     if(listen(socket_fd, 20) == -1) {
         throw PlatformException("Couldn't listen on port: ");
     }
-    
 }
 
 TCPServerSocket::~TCPServerSocket() {
