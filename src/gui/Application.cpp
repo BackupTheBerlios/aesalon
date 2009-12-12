@@ -6,6 +6,12 @@
 namespace Aesalon {
 namespace GUI {
 
+Application::Application(int argc, char *argv[]) : QApplication(argc, argv) {
+    QCoreApplication::setApplicationName("Aesalon GUI");
+    QCoreApplication::setOrganizationName("Aesalon development team");
+    QCoreApplication::setOrganizationDomain("");
+}
+
 bool Application::notify(QObject *object, QEvent *event) {
     try {
         return QApplication::notify(object, event);

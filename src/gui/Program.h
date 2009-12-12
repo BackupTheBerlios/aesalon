@@ -24,7 +24,7 @@ private:
     
     Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
 public:
-    Program(std::string executable, std::string arguments, int port, bool in_xterm);
+    Program();
     virtual ~Program() {}
     
     std::string get_executable() const { return executable; }

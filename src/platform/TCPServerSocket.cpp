@@ -38,6 +38,7 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
         if(socket_fd == -1) continue;
         
         if(bind(socket_fd, rp->ai_addr, rp->ai_addrlen) == 0) break;
+        
         int e = errno;
         close(socket_fd);
         errno = e;

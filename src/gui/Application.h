@@ -8,7 +8,7 @@ namespace GUI {
 
 class Application : public QApplication {
 public:
-    Application(int argc, char **argv) : QApplication(argc, argv) {}
+    Application(int argc, char **argv);
     virtual ~Application() {}
     
     virtual bool notify(QObject *receiver, QEvent *event);

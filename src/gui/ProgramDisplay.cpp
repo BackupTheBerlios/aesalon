@@ -1,3 +1,4 @@
+#include <QSettings>
 #include "ProgramDisplay.h"
 #include "ProgramDisplay.moc"
 
@@ -97,10 +98,12 @@ void ProgramDisplay::begin_program() {
     create_running_widget();
     int port;
     Misc::String::to<int>(launch_port->text().toStdString(), port);
-    program =
-        new Program(launch_program_name->text().toStdString(),
-        launch_program_arguments->text().toStdString(),
-        port, launch_program_xterm->isChecked());
+    QSettings settings;
+    settings.setValue("Program/executable", launch_program_name->text());
+    settings.setValue("Program/arguments", launch_program_arguments->text());
+    settings.setValue("Program/port", launch_port->text());
+    settings.setValue("Program/in-xterm", launch_program_xterm->isChecked());
+    program = new Program();
 }
 
 } // namespace GUI
