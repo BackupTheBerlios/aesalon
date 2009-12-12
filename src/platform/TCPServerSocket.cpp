@@ -3,37 +3,49 @@
 #include <arpa/inet.h>
 #include <cstring>
 #include <iostream>
+#include <netdb.h>
+#include <errno.h>
 
 #include "TCPServerSocket.h"
 #include "PlatformException.h"
 #include "MemoryEvent.h"
+#include "misc/String.h"
 
 namespace Aesalon {
 namespace Platform {
 
 TCPServerSocket::TCPServerSocket(int port) : port(port) {
     std::cout << "Constructing TCPServerSocket, port is: " << port << std::endl;
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if(socket_fd == -1) throw PlatformException("Unable to create socket: ");
     
-    struct sockaddr_in address;
+    struct addrinfo hints, *result, *rp;
     
-    address.sin_port = htons(port);
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = htonl(INADDR_ANY);
-    memset(address.sin_zero, 0, sizeof(address.sin_zero));
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    hints.ai_protocol = 0;
+    hints.ai_canonname = NULL;
+    hints.ai_addr = NULL;
+    hints.ai_next = NULL;
     
-    int yes = 1;
-    if(setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
-        throw PlatformException("Couldn't set socket option SO_REUSEADDR: ");
+    int ret = getaddrinfo(NULL, Misc::String::from<int>(port).c_str(), &hints, &result);
+    if(ret != 0) {
+        throw PlatformException(Misc::StreamAsString() << "Couldn't resolve hostname: " << gai_strerror(ret), false);
     }
     
-    if(bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) == -1) {
-        throw PlatformException("Couldn't bind to port: ");
+    for(rp = result; rp != NULL; rp = rp->ai_next) {
+        socket_fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if(socket_fd == -1) continue;
+        
+        if(bind(socket_fd, rp->ai_addr, rp->ai_addrlen) == 0) break;
+        int e = errno;
+        close(socket_fd);
+        errno = e;
     }
-    if(listen(socket_fd, 20) == -1) {
-        throw PlatformException("Couldn't listen on port: ");
-    }
+    if(rp == NULL) throw PlatformException("Couldn't open port for listening: ");
+    freeaddrinfo(result);
+    
+    if(listen(socket_fd, 8) == -1) throw PlatformException("Couldn't listen on socket: ");
 }
 
 TCPServerSocket::~TCPServerSocket() {

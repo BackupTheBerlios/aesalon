@@ -4,6 +4,8 @@
 #include <string>
 #include <ios>
 
+#include "StreamAsString.h"
+
 namespace Aesalon {
 namespace Misc {
 
@@ -33,7 +35,9 @@ public:
         if(hex) parser >> std::hex >> instance;
         else parser >> instance;
     }
-
+    template<typename Type> static std::string from(Type &instance) {
+        return Misc::StreamAsString() << instance;
+    }
 };
 
 } // namespace Misc

@@ -9,33 +9,31 @@
 #include "TCPSocket.h"
 #include "PlatformException.h"
 #include "misc/StreamAsString.h"
+#include "misc/String.h"
 
 namespace Aesalon {
 namespace Platform {
 
 TCPSocket::TCPSocket(std::string host, int port) {
-    /* Open an internet socket, TCP. */
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    struct addrinfo hints, *result, *rp;
+    
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = hints.ai_protocol = 0;
+    int ret = getaddrinfo(host.c_str(), Misc::String::from<int>(port).c_str(), &hints, &result);
+    if(ret != 0) {
+        throw PlatformException(Misc::StreamAsString() << "Couldn't resolve hostname: " << gai_strerror(ret), false);
+    }
+    
+    if(rp->ai_next != NULL) {
+        std::cout << "Warning: Hostname \"" << host << "\" resolves to multiple IPs. Using the first." << std::endl;
+    }
+    
+    socket_fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
     if(socket_fd == -1) throw PlatformException("Couldn't create socket: ");
     
-    struct sockaddr_in address;
-    
-    address.sin_family = AF_INET;
-    address.sin_port = htons((uint16_t)port);
-    std::memset(address.sin_zero, 0, sizeof(address.sin_zero));
-
-    struct hostent *he;
-    
-    /*he = gethostbyname(host.c_str());
-    if(he == NULL) throw PlatformException(Misc::StreamAsString() << "Couldn't lookup host: " << strerror(h_errno));
-    std::cout << inet_ntoa(*(struct in_addr *)he) << std::endl;
-    address.sin_addr = *(struct in_addr *)he;*/
-    
-    
-    
-    if(connect(socket_fd, (struct sockaddr *)&address, sizeof(address)) == -1) {
-        throw PlatformException("Couldn't connect to host: ");
-    }
+    if(connect(socket_fd, rp->ai_addr, rp->ai_addrlen) == -1) throw PlatformException("Couldn't connect to host: ");
     
     /* Socket is now connected. */
     valid = true;
