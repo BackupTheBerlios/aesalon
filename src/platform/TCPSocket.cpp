@@ -15,7 +15,7 @@ namespace Aesalon {
 namespace Platform {
 
 TCPSocket::TCPSocket(std::string host, int port) {
-    struct addrinfo hints, *result, *rp;
+    struct addrinfo hints, *result;
     
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
@@ -26,14 +26,16 @@ TCPSocket::TCPSocket(std::string host, int port) {
         throw PlatformException(Misc::StreamAsString() << "Couldn't resolve hostname: " << gai_strerror(ret), false);
     }
     
-    if(rp->ai_next != NULL) {
+    if(result->ai_next != NULL) {
         std::cout << "Warning: Hostname \"" << host << "\" resolves to multiple IPs. Using the first." << std::endl;
     }
     
-    socket_fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+    socket_fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if(socket_fd == -1) throw PlatformException("Couldn't create socket: ");
     
-    if(connect(socket_fd, rp->ai_addr, rp->ai_addrlen) == -1) throw PlatformException("Couldn't connect to host: ");
+    if(connect(socket_fd, result->ai_addr, result->ai_addrlen) == -1) throw PlatformException("Couldn't connect to host: ");
+    
+    std::cout << "Connected successfully!" << std::endl;
     
     /* Socket is now connected. */
     valid = true;
