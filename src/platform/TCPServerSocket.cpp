@@ -15,8 +15,6 @@ namespace Aesalon {
 namespace Platform {
 
 TCPServerSocket::TCPServerSocket(int port) : port(port) {
-    std::cout << "Constructing TCPServerSocket, port is: " << port << std::endl;
-    
     struct addrinfo hints, *result, *rp;
     
     memset(&hints, 0, sizeof(hints));

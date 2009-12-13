@@ -9,7 +9,6 @@ namespace Aesalon {
 namespace GUI {
 
 Program::Program() {
-    std::cout << "Program::Program(): Beginning initialization . . ." << std::endl;
     QSettings settings;
     
     arguments = settings.value("Program/arguments").toString().toStdString();
@@ -25,17 +24,19 @@ Program::Program() {
     argument_list.from_string(arguments + " ");
     
     
-    std::cout << "Program::Program(): launching aesalon gdb interface . . ." << std::endl;
     bi_pipe = new Platform::BidirectionalPipe(settings.value("Core/aesalon-path").toString().toStdString(), argument_list, true);
-    std::cout << "Program::Program(): launched aesalon gdb interface!" << std::endl;
     
     memory = new Platform::Memory();
     
-    std::cout << "Program::Program(): Declared Memory instance, creating socket for communications . . ." << std::endl;
-    
-    socket = new Platform::TCPSocket("127.0.0.1", port);
-    
-    std::cout << "Program::Program(): Exiting from constructor . . ." << std::endl;
+    socket = NULL;
+    while(!socket.is_valid()) {
+        try {
+            socket = new Platform::TCPSocket("127.0.0.1", port);
+        }
+        catch(Platform::PlatformException pe) {
+            socket = NULL;
+        }
+    }
 }
 
 } // namespace GUI

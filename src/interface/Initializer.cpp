@@ -55,16 +55,16 @@ void Initializer::initialize() {
         return;
     }
     
-    int port;
-    Misc::String::to<int>(ap->get_argument("tcp port").to<Misc::StringArgument>()->get_value(), port);
-    server_socket = new Platform::TCPServerSocket(port);
-    
     if(ap->get_files()) {
+        int port;
+        Misc::String::to<int>(ap->get_argument("tcp port").to<Misc::StringArgument>()->get_value(), port);
+        server_socket = new Platform::TCPServerSocket(port);
+        
         Platform::ArgumentList al;
         al.add_argument(ap->get_argument("gdb executable").to<Misc::StringArgument>()->get_value());
         al.add_argument("--interpreter=mi2");
         al.add_argument(ap->get_file(0)->get_filename());
-        /*for(std::size_t x = 0; x < ap->get_files(); x ++) al.add_argument(ap->get_file(x)->get_filename());*/
+        
         bi_pipe = new Platform::BidirectionalPipe(ap->get_argument("gdb executable").to<Misc::StringArgument>()->get_value(), al, true);
     }
     else {
