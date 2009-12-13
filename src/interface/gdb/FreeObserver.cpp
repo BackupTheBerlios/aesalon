@@ -22,6 +22,7 @@ bool FreeObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
                 Misc::StreamAsString() << "-break-disable " << BreakpointSetupObserver::FREE);
             Initializer::get_instance()->get_controller()->send_command("-exec-finish");
             waiting = true;
+            return true;
         }
         else if(StringFollower(async).follow("'reason' rhs") == "function-finished" && waiting) {
             Initializer::get_instance()->get_controller()->send_command(

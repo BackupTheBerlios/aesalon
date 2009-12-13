@@ -55,7 +55,8 @@ void MainWindow::create_menus() {
 }
 
 void MainWindow::quit_requested() {
-    if(!mdi_area->subWindowList().size()) this->close();
+    while(mdi_area->subWindowList().size()) mdi_area->closeAllSubWindows();
+    this->close();
 }
 
 void MainWindow::new_program() {

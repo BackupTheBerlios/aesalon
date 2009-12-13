@@ -43,10 +43,10 @@ void Controller::add_observers() {
     get_observer_manager()->add_temporary_observer(new BreakpointSetupObserver());
     
     /* Now for the regular observers . . . */
-    get_observer_manager()->add_observer(new BreakpointObserver());
-    get_observer_manager()->add_observer(new ExitObserver());
     get_observer_manager()->add_observer(new MallocObserver(event_queue));
     get_observer_manager()->add_observer(new FreeObserver(event_queue));
+    get_observer_manager()->add_observer(new BreakpointObserver());
+    get_observer_manager()->add_observer(new ExitObserver());
 }
 
 void Controller::listen() {

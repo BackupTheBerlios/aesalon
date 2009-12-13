@@ -57,7 +57,7 @@ public:
     void add_element(Misc::SmartPointer<ParseResult> new_element)
         { tuple_map[new_element->get_name()] = new_element; }
     Misc::SmartPointer<ParseData> get_element(std::string name) const
-        { return tuple_map.at(name); }
+        { return static_cast<tuple_map_t>(tuple_map)[name]; }
     
     virtual std::string get_type() const { return "ParseTuple"; }
 };

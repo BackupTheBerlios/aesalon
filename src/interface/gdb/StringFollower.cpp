@@ -17,7 +17,7 @@ std::string StringFollower::follow(std::string path) {
     while(stream >> token) {
         if(token[0] == '[') { /* list element */
             if(token[token.length()-1] != ']') {
-                throw StringFollowerInvalidPathException("Expected terminating ']' at end of token.");
+                throw StringFollowerInvalidPathException("Expected terminating ']' at end of token");
             }
             int number;
             Misc::String::to<int>(token.substr(1, token.length()-2), number);
@@ -26,14 +26,14 @@ std::string StringFollower::follow(std::string path) {
         }
         else if(token[0] == '\'') { /* tuple element */
             if(token[token.length()-1] != '\'') {
-                throw StringFollowerInvalidPathException("Expected terminating \' at end of token.");
+                throw StringFollowerInvalidPathException("Expected terminating \' at end of token");
             }
             std::string key = token.substr(1, token.length()-2);
             data = data.to<ParseTuple>()->get_element(key);
         }
         else if(token[0] == '\"') { /* tuple element */
             if(token[token.length()-1] != '\"') {
-                throw StringFollowerInvalidPathException("Expected terminating \" at end of token.");
+                throw StringFollowerInvalidPathException("Expected terminating \" at end of token");
             }
             std::string key = token.substr(1, token.length()-2);
             data = data.to<ParseTuple>()->get_element(key);
@@ -45,6 +45,8 @@ std::string StringFollower::follow(std::string path) {
             Misc::SmartPointer<ParseResult> result = data.to<ParseResult>();
             data = result->get_value();
         }
+        
+        if(!data.is_valid()) throw StringFollowerException("NULL value in StringFollower resolution");
     }
     
     return data.to<ParseString>()->get_data();

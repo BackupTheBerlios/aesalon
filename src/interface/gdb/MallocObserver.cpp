@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "MallocObserver.h"
 #include "StringFollower.h"
 #include "interface/Initializer.h"
@@ -10,8 +12,9 @@ namespace Interface {
 namespace GDB {
 
 bool MallocObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
+    std::cout << "MallocObserver::notify(): waiting is: " << waiting << std::endl;
     if(async->get_data()->get_first() == "stopped") {
-        if(StringFollower(async).follow("'reason' rhs") == "breakpoint-hit") {
+        if(StringFollower(async).follow("'reason' rhs") == "breakpoint-hit" && !waiting) {
             int breakpoint_number;
             Misc::String::to<int>(StringFollower(async).follow("'bkptno' rhs"), breakpoint_number);
             if(breakpoint_number != BreakpointSetupObserver::MALLOC) return false;
@@ -28,16 +31,28 @@ bool MallocObserver::notify(Misc::SmartPointer<AsyncOutput> async) {
                 Misc::StreamAsString() << "-break-disable " << BreakpointSetupObserver::MALLOC);
             Initializer::get_instance()->get_controller()->send_command("-exec-finish");
             waiting = true;
+            return true;
         }
-        else if(StringFollower(async).follow("'reason' rhs") == "function-finished" && waiting) {
-            Initializer::get_instance()->get_controller()->send_command(
+        else if(waiting) {
+            /*
+Normal:
+*stopped,reason="breakpoint-hit",disp="keep",bkptno="10",frame={addr="0x4005a2",func="main",args=[]},thread-id="1",stopped-threads="all"
+Special:
+*stopped,reason="breakpoint-hit",disp="keep",bkptno="11",frame={addr="0x04005bb",func="main",args=[]},gdb-result-var="$1",return-value="(void *) 0x601010",thread-id="1",stopped-threads="all"
+So, look to see if "'return-value' rhs" is a string or not . . .
+            */
+            if(async->get_data()->get_element("return-value").is_valid()) {
+                Initializer::get_instance()->get_controller()->send_command(
                 Misc::StreamAsString() << "-break-enable " << BreakpointSetupObserver::MALLOC);
             
-            Platform::MemoryAddress address;
-            Misc::String::to<Platform::MemoryAddress>(StringFollower(async).follow("'return-value' rhs").substr(std::string("(void *)").length()), address, true);
+                Platform::MemoryAddress address;
+                Misc::String::to<Platform::MemoryAddress>(StringFollower(async).follow("'return-value' rhs").substr(std::string("(void *)").length()), address, true);
             
-            event_queue->push_event(new Platform::MemoryBlockAllocEvent(address, last_size));
-            waiting = false;
+                event_queue->push_event(new Platform::MemoryBlockAllocEvent(address, last_size));
+                waiting = false;
+                Initializer::get_instance()->get_controller()->send_command(Misc::StreamAsString() << "-exec-continue");
+                return true;
+            }
         }
     }
     return false;
