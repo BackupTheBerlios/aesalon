@@ -24,6 +24,7 @@ Program::Program() {
     
     argument_list.from_string(arguments + " ");
     
+    
     std::cout << "Program::Program(): launching aesalon gdb interface . . ." << std::endl;
     bi_pipe = new Platform::BidirectionalPipe(settings.value("Core/aesalon-path").toString().toStdString(), argument_list, true);
     std::cout << "Program::Program(): launched aesalon gdb interface!" << std::endl;

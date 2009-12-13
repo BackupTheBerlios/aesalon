@@ -16,6 +16,7 @@ namespace Platform {
 
 TCPSocket::TCPSocket(std::string host, int port) {
     std::cout << "TCPSocket::TCPSocket(): beginning initialization . . ." << std::endl;
+    std::cout << "TCPSocket::TCPSocket(): attempting to connect to " << host << ":" << port << std::endl;
     struct addrinfo hints, *result;
     
     memset(&hints, 0, sizeof(hints));

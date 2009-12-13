@@ -20,6 +20,7 @@ ProgramDisplay::~ProgramDisplay() {
 }
 
 void ProgramDisplay::create_launch_widget() {
+    QSettings settings;
     launch_widget = new QWidget();
     launch_layout = new QVBoxLayout();
     
@@ -27,7 +28,7 @@ void ProgramDisplay::create_launch_widget() {
     
     launch_program_label = new QLabel(tr("Executable path:"));
     launch_program_layout->addWidget(launch_program_label, 0, 0);
-    launch_program_name = new QLineEdit("");
+    launch_program_name = new QLineEdit(settings.value("Program/executable", "").toString());
     launch_program_layout->addWidget(launch_program_name, 0, 1);
     
     launch_layout->addLayout(launch_program_layout);
@@ -35,12 +36,12 @@ void ProgramDisplay::create_launch_widget() {
     
     launch_program_arguments_label = new QLabel(tr("Program arguments:"));
     launch_program_layout->addWidget(launch_program_arguments_label, 1, 0);
-    launch_program_arguments = new QLineEdit("");
+    launch_program_arguments = new QLineEdit(settings.value("Program/arguments", "").toString());
     launch_program_layout->addWidget(launch_program_arguments, 1, 1);
     
     launch_port_label = new QLabel(tr("TCP port to use: "));
     launch_program_layout->addWidget(launch_port_label, 2, 0);
-    launch_port = new QLineEdit("6321");
+    launch_port = new QLineEdit(settings.value("Program/port", 6321).toString());
     launch_program_layout->addWidget(launch_port, 2, 1);
     
     launch_program_xterm = new QCheckBox("&Launch executable in terminal");

@@ -7,8 +7,8 @@ namespace Aesalon {
 namespace GUI {
 
 Application::Application(int argc, char *argv[]) : QApplication(argc, argv) {
-    QCoreApplication::setApplicationName("Aesalon GUI");
-    QCoreApplication::setOrganizationName("Aesalon development team");
+    QCoreApplication::setApplicationName("gui");
+    QCoreApplication::setOrganizationName("aesalon");
     QCoreApplication::setOrganizationDomain("");
 }
 
