@@ -63,7 +63,7 @@ void Controller::listen() {
 
 void Controller::process(std::string line) {
     if(line.length() == 0) return;
-    std::cout << "Received line from gdb: " << line << std::endl;
+    /*std::cout << "Received line from gdb: " << line << std::endl;*/
     if(Misc::String::begins_with(line, "(gdb)")) {
         return;
     }
