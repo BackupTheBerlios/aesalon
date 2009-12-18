@@ -71,7 +71,7 @@ void PTracePortal::write_memory(Platform::MemoryAddress address, Word value) {
 void PTracePortal::write_memory(Platform::MemoryAddress address, Byte value) {
     Word original = read_memory(address);
     /* Clear the first eight bits of original */
-    original &= ~0xff;
+    original &= ~Word(0xff);
     /* Set first eight bits to new value */
     original |= value;
     ptrace(PTRACE_POKEDATA, pid, address, value);

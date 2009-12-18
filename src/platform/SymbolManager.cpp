@@ -28,7 +28,7 @@ void SymbolManager::setup_pipe() {
     argument_list.add_argument(Misc::StreamAsString() << "--demangle" << (demangle_style != "" ? "=" + demangle_style : ""));
     argument_list.add_argument("--format=bsd");
     argument_list.add_argument(executable_name);
-    bi_pipe = new Platform::BidirectionalPipe(nm_path, argument_list, true);
+    bi_pipe = new Platform::BidirectionalPipe(nm_path, argument_list, true, false);
     parse_nm_output();
 }
 

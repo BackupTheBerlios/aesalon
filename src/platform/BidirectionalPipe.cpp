@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <sys/types.h>
+#include <sys/ptrace.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <iostream>
@@ -15,7 +16,7 @@ BidirectionalPipeException::BidirectionalPipeException(std::string message,
 }
 
 BidirectionalPipe::BidirectionalPipe(std::string executable,
-    ArgumentList argument_list, bool block) : block(block) {
+    ArgumentList argument_list, bool block, bool trace) : block(block) {
         
     pipe(pc_pipe_fd);
     pipe(cp_pipe_fd);
@@ -32,6 +33,8 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
         
         dup2(pc_pipe_fd[0], STDIN_FILENO);
         dup2(cp_pipe_fd[1], STDOUT_FILENO);
+        
+        if(trace) ptrace(PTRACE_TRACEME, 0, 0, 0);
         
         execv(executable.c_str(), argument_list.get_as_argv());
         
