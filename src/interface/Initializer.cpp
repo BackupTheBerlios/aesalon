@@ -33,7 +33,6 @@ void Initializer::initialize() {
     ap->add_argument("usage", new Misc::BooleanArgument("--usage", 'h', "", 0, false));
     ap->add_argument("logfile", new Misc::StringArgument("--log-file", 'l', ""));
     ap->add_argument("tcp port", new Misc::StringArgument("--use-port", 0, Misc::StreamAsString() << DEFAULT_PORT));
-    ap->add_argument("overload path", new Misc::StringArgument("--overload-path", 0, "./libaesalon_overload.so"));
     
     ap->parse_argv(argv);
     
@@ -89,6 +88,8 @@ void Initializer::usage() {
 void Initializer::run() {
     program_manager->execute();
     while(program_manager->is_running()) {
+        program_manager->wait();
+        program_manager->handle();
         if(event_queue->peek_event().is_valid()) get_socket()->send_data(event_queue);
     }
 }

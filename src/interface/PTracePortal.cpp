@@ -1,5 +1,7 @@
 #include <sys/user.h>
 #include <sys/ptrace.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <errno.h>
 #include <signal.h>
 
@@ -118,6 +120,12 @@ void PTracePortal::continue_execution(int signal) {
 
 void PTracePortal::single_step() {
     ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL);
+}
+
+void PTracePortal::wait_for_signal() {
+    int status;
+    wait(&status);
+    /* NOTE: is status required? . . . */
 }
 
 } // namespace Interface

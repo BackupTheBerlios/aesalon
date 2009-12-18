@@ -1,3 +1,4 @@
+#include <signal.h>
 #include "ProgramManager.h"
 
 namespace Aesalon {
@@ -8,6 +9,18 @@ void ProgramManager::execute() {
     running = true;
     ptrace_portal = new PTracePortal(bi_pipe->get_child_pid());
     ptrace_portal->attach();
+}
+
+void ProgramManager::wait() {
+    ptrace_portal->wait_for_signal();
+}
+
+void ProgramManager::handle() {
+    int signal = ptrace_portal->handle_signal();
+    
+    if(signal == SIGTRAP) {
+        
+    }
 }
 
 } // namespace Interface

@@ -125,6 +125,8 @@ public:
     void continue_execution(int signal = 0);
     /** Tells the child to execute a single instruction. */
     void single_step();
+    
+    void wait_for_signal();
 };
 
 } // namespace Interface

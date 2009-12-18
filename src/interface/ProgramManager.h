@@ -23,6 +23,8 @@ public:
     virtual ~ProgramManager() {}
     
     void execute();
+    void wait();
+    void handle();
     
     Misc::SmartPointer<Platform::ArgumentList> get_argument_list() const { return argument_list; }
     
