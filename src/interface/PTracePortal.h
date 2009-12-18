@@ -16,6 +16,7 @@ namespace Interface {
 
 class PTracePortal {
 public:
+    /** An enum representing the different registers available. */
     enum register_e {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         RAX,
@@ -51,36 +52,79 @@ public:
     
     typedef std::vector<Misc::SmartPointer<Breakpoint> > breakpoint_list_t;
 private:
+    /** The PID of the attached process. */
     pid_t pid;
     
+    /** The vector of breakpoints. */
     breakpoint_list_t breakpoint_list;
     
+    /** Adds a breakpoint onto the list.
+        @param breakpoint The breakpoint to add.
+    */
     void add_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint) {
         breakpoint_list.push_back(breakpoint);
     }
 public:
+    /** Generic constructor for PTracePortal.
+        @param pid The PID of the child process.
+    */
     PTracePortal(pid_t pid) : pid(pid) {}
+    /** Virtual destructor, does nothing. */
     virtual ~PTracePortal() {}
     
-    /*void temp() {
-        struct user_regs_struct regs;
-        regs.
-    }*/
-    
+    /** Retrieve the value of a specific register.
+        @param which The register to get the value of.
+        @return The value of the specified register.
+    */
     Platform::MemoryAddress get_register(register_e which) const;
     
+    /** Read a Word of memory.
+        @param address The address to read.
+        @return The value at @a address.
+    */
     Word read_memory(Platform::MemoryAddress address) const;
+    /** Write a Word of memory.
+        @param address The address to write to.
+        @param value The value to write.
+    */
     void write_memory(Platform::MemoryAddress address, Word value);
+    /** Write a Byte of memory.
+        @param address The address to write to.
+        @param value The value to write.
+    */
     void write_memory(Platform::MemoryAddress address, Byte value);
     
+    /** Attaches onto the PID @a pid. */
     void attach();
     
+    /** Places a breakpoint at a specified address.
+        @param address The address to place the breakpoint at.
+    */
     void place_breakpoint(Platform::MemoryAddress address);
     
+    /** Returns a breakpoint by iterator.
+        @param which The breakpoint to find.
+        @return A SmartPointer to the given breakpoint. Not valid if the breakpoint iterator does not exist.
+    */
     Misc::SmartPointer<Breakpoint> get_breakpoint(breakpoint_list_t::size_type which) const {
         return breakpoint_list.at(which);
     }
+    /** Returns a breakpoint by address.
+        @param address The address to search for.
+        @return A SmartPointer to the given breakpoint. Not valid if no breakpoint exists at @a address.
+    */
     Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Platform::MemoryAddress address) const;
+    
+    /** Handles a signal from the child.
+        @return The signal caught.
+    */
+    int handle_signal();
+    /** Continues execution, with a given signal sent to the child.
+        @param signal The signal to send; none if zero.
+    */
+    void continue_execution(int signal = 0);
+    /** Tells the child to execute a single instruction. */
+    void single_step();
 };
 
 } // namespace Interface

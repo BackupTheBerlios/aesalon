@@ -1,6 +1,7 @@
 #include <sys/user.h>
 #include <sys/ptrace.h>
 #include <errno.h>
+#include <signal.h>
 
 #include "PTracePortal.h"
 
@@ -77,7 +78,6 @@ void PTracePortal::write_memory(Platform::MemoryAddress address, Byte value) {
     ptrace(PTRACE_POKEDATA, pid, address, value);
 }
 
-
 void PTracePortal::attach() {
     ptrace(PTRACE_ATTACH, pid, NULL, NULL);
 }
@@ -93,6 +93,31 @@ Misc::SmartPointer<Breakpoint> PTracePortal::get_breakpoint_by_address(Platform:
         if((*i)->get_address() == address) return *i;
     }
     return NULL;
+}
+
+int PTracePortal::handle_signal() {
+    siginfo_t signal_info;
+    
+    ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info);
+    
+    if(signal_info.si_signo != SIGSTOP) return signal_info.si_signo;
+    
+    Platform::MemoryAddress rip = get_register(RIP);
+    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(rip);
+    if(!breakpoint.is_valid()) return signal_info.si_signo;
+    write_memory(rip, breakpoint->get_original());
+    single_step();
+    write_memory(rip, Byte(0xcc));
+    
+    return signal_info.si_signo;
+}
+
+void PTracePortal::continue_execution(int signal) {
+    ptrace(PTRACE_CONT, pid, NULL, signal);
+}
+
+void PTracePortal::single_step() {
+    ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL);
 }
 
 } // namespace Interface
