@@ -66,7 +66,7 @@ void Initializer::initialize() {
 }
 
 void Initializer::deinitialize() {
-    if(bi_pipe) delete bi_pipe;
+    if(program_manager) delete program_manager;
     if(symbol_manager) delete symbol_manager;
     if(server_socket) delete server_socket;
     if(event_queue) delete event_queue;
@@ -78,7 +78,7 @@ void Initializer::deinitialize() {
 }
 
 void Initializer::usage() {
-    std::cout << "aesalon program interface, version " << AESALON_MAJOR_VERSION << "." << AESALON_MINOR_VERSION << "." << AESALON_PATCHLEVEL;
+    std::cout << "aesalon program monitor, version " << AESALON_MAJOR_VERSION << "." << AESALON_MINOR_VERSION << "." << AESALON_PATCHLEVEL;
     std::cout << ", copyright (C) 2009" << std::endl;
     std::cout << "usage: " << argv[0] << " [arguments] executable [executable arguments]" << std::endl;
     std::cout << "\t--usage, -h\t\tPrint this usage message." << std::endl;
@@ -87,7 +87,8 @@ void Initializer::usage() {
 }
 
 void Initializer::run() {
-    while(bi_pipe->is_open()) {
+    program_manager->execute();
+    while(program_manager->is_running()) {
         if(event_queue->peek_event().is_valid()) get_socket()->send_data(event_queue);
     }
 }

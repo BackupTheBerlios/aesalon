@@ -20,7 +20,7 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
     pipe(pc_pipe_fd);
     pipe(cp_pipe_fd);
     
-    pid_t pid = fork();
+    pid = fork();
     
     if(pid == -1) throw BidirectionalPipeException("Could not fork to execute child process: ", true);
     else if(pid == 0) {

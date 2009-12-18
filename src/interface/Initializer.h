@@ -19,8 +19,6 @@ private:
     char **argv;
     /** The socket used to communicate with the GUI. */
     Misc::SmartPointer<Platform::TCPServerSocket> server_socket;
-    /** The BidirectionalPipe instance used to communicate with gdb. */
-    Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
     /** The EventQueue instance; used to keep the local copy of the program's memory updated. */
     Misc::SmartPointer<Platform::EventQueue> event_queue;
     
