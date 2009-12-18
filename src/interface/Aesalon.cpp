@@ -19,7 +19,7 @@
     Aesalon is a program that allows a user to visualize, in real-time, the
     dynamically-allocated memory of a program.
     
-    Aesalon was originally designed and written by strange <kawk256@gmail.com>.
+    Aesalon was originally designed and written by strange &lt;kawk256@gmail.com&gt;.
     
 */
 

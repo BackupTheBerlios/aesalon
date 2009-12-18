@@ -20,6 +20,10 @@ public:
     
     void add_argument(std::string argument) { argument_vector.push_back(argument); }
     char **get_as_argv();
+    
+    std::string get_argument(argument_vector_t::size_type which) {
+        return argument_vector[which];
+    }
 };
 
 } // namespace Platform
