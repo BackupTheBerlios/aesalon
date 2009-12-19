@@ -136,7 +136,7 @@ public:
     /** Checks if the current smart pointer is referencing a valid object.
         @return True if the pointer is valid.
     */
-    bool is_valid() {
+    bool is_valid() const {
         return get_data() != NULL;
     }
     

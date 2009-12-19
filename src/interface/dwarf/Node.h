@@ -10,13 +10,13 @@ namespace DWARF {
 class Node {
 private:
     Misc::SmartPointer<Node> child;
-    Misc::SmartPointer<Node> sibling;
+    Misc::SmartPointer<Node> next;
+    Misc::SmartPointer<Node> prev;
 public:
     Node() {}
     virtual ~Node() {}
     
     bool has_children() const { return child.is_valid(); }
-    bool has_sibling() const { return sibling.is_valid(); }
 };
 
 } // namespace DWARF
