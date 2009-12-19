@@ -36,6 +36,8 @@ private:
 public:
     Parser(std::string filename);
     virtual ~Parser() {}
+    
+    Misc::SmartPointer<Section> get_section(std::string name) const;
 };
 
 } // namespace ELF

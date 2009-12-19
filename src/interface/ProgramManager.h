@@ -6,6 +6,7 @@
 #include "platform/ArgumentList.h"
 #include "PTracePortal.h"
 #include "elf/Parser.h"
+#include "dwarf/Parser.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -20,6 +21,7 @@ private:
     Misc::SmartPointer<PTracePortal> ptrace_portal;
     
     Misc::SmartPointer<ELF::Parser> elf_parser;
+    Misc::SmartPointer<DWARF::Parser> dwarf_parser;
 public:
     ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list);
     virtual ~ProgramManager() {}

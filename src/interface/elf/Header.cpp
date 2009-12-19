@@ -28,7 +28,6 @@ Header::Header(int file_fd) {
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86
     if(data.e_ident[EI_CLASS] != ELFCLASS32) throw ParserException("ELF file type is not ELFCLASS32");
 #endif
-    std::cout << "ELF::Header::Header(): ELF header parsed successfully" << std::endl;
 }
 
 } // namespace ELF

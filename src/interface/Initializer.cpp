@@ -86,7 +86,7 @@ void Initializer::usage() {
 }
 
 void Initializer::run() {
-    /*program_manager->execute();*/
+    program_manager->execute();
     while(program_manager->is_running()) {
         program_manager->wait();
         program_manager->handle();

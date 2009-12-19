@@ -29,11 +29,16 @@ Parser::Parser(std::string filename) : filename(filename) {
         char *p = string_table->get_content();
         p = p + (*i)->get_name_offset();
         (*i)->set_name(p);
-        std::cout << "ELF::Parser::Parser(): Setting name of section to \"" << p << "\", offset is: " << (*i)->get_name_offset() << "\n";
-        if((*i)->is_string_table()) std::cout << "\t^^ is string table" << std::endl;
     }
     
     close(file_fd);
+}
+
+Misc::SmartPointer<Section> Parser::get_section(std::string name) const {
+    for(section_list_t::const_iterator i = section_list.begin(); i != section_list.end(); i ++) {
+        if((*i)->get_name() == name) return *i;
+    }
+    return NULL;
 }
 
 } // namespace ELF

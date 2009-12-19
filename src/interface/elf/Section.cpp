@@ -15,7 +15,6 @@ Section::Section(int file_fd) : file_fd(file_fd) {
 }
 
 void Section::read_content() {
-    std::cout << "Section::read_content(): data.sh_addr is: " << data.sh_offset << std::endl;
     lseek(file_fd, data.sh_offset, SEEK_SET);
     content = new char[data.sh_size];
     std::size_t bytes = read(file_fd, content, data.sh_size);

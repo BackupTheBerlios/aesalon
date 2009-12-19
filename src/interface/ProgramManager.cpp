@@ -8,6 +8,7 @@ ProgramManager::ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argume
     : bi_pipe(NULL), argument_list(argument_list), running(false) {
     
     elf_parser = new ELF::Parser(argument_list->get_argument(0));
+    dwarf_parser = new DWARF::Parser(elf_parser);
 }
 
 void ProgramManager::execute() {
