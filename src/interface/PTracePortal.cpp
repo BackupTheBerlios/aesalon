@@ -63,7 +63,8 @@ Platform::MemoryAddress PTracePortal::get_register(register_e which) const {
 
 Word PTracePortal::read_memory(Platform::MemoryAddress address) const {
     Word ret = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
-    if(errno) return 0;
+    
+    if(errno != 0) return 0;
     return ret;
 }
 
