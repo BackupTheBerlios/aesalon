@@ -5,6 +5,7 @@
 #include "platform/BidirectionalPipe.h"
 #include "platform/ArgumentList.h"
 #include "PTracePortal.h"
+#include "elf/Parser.h"
 
 namespace Aesalon {
 namespace Interface {
@@ -17,9 +18,10 @@ private:
     bool running;
     
     Misc::SmartPointer<PTracePortal> ptrace_portal;
+    
+    Misc::SmartPointer<ELF::Parser> elf_parser;
 public:
-    ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list)
-        : bi_pipe(NULL), argument_list(argument_list), running(false) {}
+    ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list);
     virtual ~ProgramManager() {}
     
     void execute();

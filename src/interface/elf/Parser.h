@@ -30,6 +30,7 @@ private:
     Misc::SmartPointer<Header> header;
     
     section_list_t section_list;
+    Misc::SmartPointer<Section> string_table;
     
     int file_fd;
 public:

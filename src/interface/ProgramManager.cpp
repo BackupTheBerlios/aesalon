@@ -4,6 +4,12 @@
 namespace Aesalon {
 namespace Interface {
 
+ProgramManager::ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list)
+    : bi_pipe(NULL), argument_list(argument_list), running(false) {
+    
+    elf_parser = new ELF::Parser(argument_list->get_argument(0));
+}
+
 void ProgramManager::execute() {
     bi_pipe = new Platform::BidirectionalPipe(get_argument_list()->get_argument(0), get_argument_list(), false, true);
     running = true;

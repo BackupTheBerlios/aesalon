@@ -3,6 +3,9 @@
 
 #include <linux/elf.h>
 
+#include "misc/SmartPointer.h"
+#include "platform/MemoryAddress.h"
+
 namespace Aesalon {
 namespace Interface {
 namespace ELF {
@@ -14,12 +17,27 @@ private:
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86
     typedef Elf32_Shdr section_t;
 #endif
+    
+    int file_fd;
 
+    section_t data;
+    
+    Misc::SmartPointer<char> content;
+    
+    std::string name;
 public:
-    Section() {}
+    Section(int file_fd);
     virtual ~Section() {}
     
-    void parse();
+    void read_content();
+    Misc::SmartPointer<char> get_content() const { return content; }
+    
+    std::string get_name() const { return name; }
+    void set_name(std::string new_name) { name = new_name; }
+    
+    Platform::MemoryAddress get_name_offset() const { return data.sh_name; }
+    
+    bool is_string_table() const { return data.sh_type == SHT_STRTAB; }
 };
 
 } // namespace ELF

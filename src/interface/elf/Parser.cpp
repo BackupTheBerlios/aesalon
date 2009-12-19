@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <iostream>
 
 #include "Parser.h"
 
@@ -12,27 +13,31 @@ namespace ELF {
 Parser::Parser(std::string filename) : filename(filename) {
     file_fd = open(filename.c_str(), O_RDONLY);
     
-    /*read(file_fd, &header, sizeof(header));
+    header = new Header(file_fd);
     
-    if(header.e_shentsize != sizeof(section_t)) throw ParserException("Invalid ELF file");
+    lseek(file_fd, header->get_section_header_offset(), SEEK_SET);
     
-    lseek(file_fd, header.e_shoff, SEEK_SET);
-    int x = 0;
-    for(x = 0; x < header.e_shnum; x ++) {
-        Misc::SmartPointer<Section> s = new Section(file_fd);
-        section_list.push_back(s);
+    std::size_t string_table_index = 0;
+    for(std::size_t x = 0; x < header->get_num_sections(); x ++) {
+        section_list.push_back(new Section(file_fd));
     }
     
-    section_list_t::size_type string_table_index = 0;
+    /* NOTE: !!! This is *EXTREMELY* unportable and probably won't work across different programs, let alone platforms . . . */
+    string_table_index = header->get_num_sections() - 3;
     
-    for(; string_table_index < section_list.size(); string_table_index ++) {
-        if(section_list[string_table_index].sh_type == SHT_STRTAB) break;
+    string_table = section_list[string_table_index];
+    
+    string_table->read_content();
+    
+    for(section_list_t::iterator i = section_list.begin(); i != section_list.end(); i ++) {
+        char *p = string_table->get_content();
+        p = p + (*i)->get_name_offset();
+        (*i)->set_name(p);
+        std::cout << "ELF::Parser::Parser(): Setting name of section to \"" << p << "\", offset is: " << (*i)->get_name_offset() << "\n";
+        if((*i)->is_string_table()) std::cout << "\t^^ is string table" << std::endl;
     }
-    if(string_table_index == section_list.size()) throw ParserException("Couldn't find string table");
     
-    section_t *string_table = &section_list[string_table_index];
-    
-    */
+    close(file_fd);
 }
 
 } // namespace ELF
