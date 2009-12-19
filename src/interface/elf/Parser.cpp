@@ -17,15 +17,11 @@ Parser::Parser(std::string filename) : filename(filename) {
     
     lseek(file_fd, header->get_section_header_offset(), SEEK_SET);
     
-    std::size_t string_table_index = 0;
     for(std::size_t x = 0; x < header->get_num_sections(); x ++) {
         section_list.push_back(new Section(file_fd));
     }
     
-    /* NOTE: !!! This is *EXTREMELY* unportable and probably won't work across different programs, let alone platforms . . . */
-    string_table_index = header->get_num_sections() - 3;
-    
-    string_table = section_list[string_table_index];
+    string_table = section_list[header->get_string_table_index()];
     
     string_table->read_content();
     

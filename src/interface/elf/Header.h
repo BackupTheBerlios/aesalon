@@ -31,6 +31,8 @@ public:
     Platform::MemoryAddress get_section_header_offset() const { return data.e_shoff; }
     std::size_t get_num_sections() const { return data.e_shnum; } 
     
+    std::size_t get_string_table_index() const { return data.e_shstrndx; }
+    
     endian_mode_e get_endian_mode() const { return endian_mode; }
 };
 
