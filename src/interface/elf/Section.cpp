@@ -16,7 +16,7 @@ Section::Section(int file_fd) : file_fd(file_fd) {
 
 void Section::read_content() {
     lseek(file_fd, data.sh_offset, SEEK_SET);
-    content = new char[data.sh_size];
+    content = new char[get_content_size()];
     std::size_t bytes = read(file_fd, content, data.sh_size);
     if(bytes != data.sh_size) throw ParserException("Section data ended unexpectedly");
 }

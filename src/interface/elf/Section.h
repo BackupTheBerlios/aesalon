@@ -31,6 +31,7 @@ public:
     
     void read_content();
     Misc::SmartPointer<char> get_content() const { return content; }
+    std::size_t get_content_size() const { return data.sh_size; }
     
     std::string get_name() const { return name; }
     void set_name(std::string new_name) { name = new_name; }

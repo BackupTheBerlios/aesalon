@@ -3,6 +3,8 @@
 
 #include "elf/Parser.h"
 
+#include "EntryManager.h"
+
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
@@ -12,6 +14,8 @@ namespace DWARF {
 class Parser {
 private:
     Misc::SmartPointer<ELF::Parser> elf_parser;
+    
+    Misc::SmartPointer<EntryManager> entry_manager;
 public:
     Parser(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {}
     virtual ~Parser() {}

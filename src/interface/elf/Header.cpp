@@ -19,6 +19,8 @@ Header::Header(int file_fd) {
         data.e_ident[EI_MAG2] != ELFMAG2 ||
         data.e_ident[EI_MAG3] != ELFMAG3) throw ParserException("ELF signature invalid");
     
+    if(data.e_type != ET_EXEC) throw ParserException("Non-executable ELF file given");
+    
     if(data.e_ident[EI_DATA] == ELFDATA2LSB)
         endian_mode = ENDIAN_LITTLE;
     else endian_mode = ENDIAN_BIG;
