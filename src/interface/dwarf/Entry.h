@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "EntryID.h"
 #include "Tag.h"
 
 namespace Aesalon {
@@ -16,7 +17,6 @@ private:
     Misc::SmartPointer<Tag> tag;
     
     Misc::SmartPointer<Entry> child;
-    Misc::SmartPointer<Entry> sibling;
 public:
     Entry(std::string name = "");
     virtual ~Entry() {}
@@ -31,9 +31,6 @@ public:
     
     Misc::SmartPointer<Entry> get_child() const { return child; }
     void set_child(Misc::SmartPointer<Entry> new_child) { child = new_child; }
-    
-    Misc::SmartPointer<Entry> get_sibling() const { return sibling; }
-    void set_sibling(Misc::SmartPointer<Entry> new_sibling) { sibling = new_sibling; }
 };
 
 } // namespace DWARF

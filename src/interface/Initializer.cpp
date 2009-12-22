@@ -78,7 +78,7 @@ void Initializer::deinitialize() {
 
 void Initializer::usage() {
     std::cout << "aesalon program monitor, version " << AESALON_MAJOR_VERSION << "." << AESALON_MINOR_VERSION << "." << AESALON_PATCHLEVEL;
-    std::cout << ", copyright (C) 2009" << std::endl;
+    std::cout << ", copyright (C) 2009 strange <kawk256@gmail.com>" << std::endl;
     std::cout << "usage: " << argv[0] << " [arguments] executable [executable arguments]" << std::endl;
     std::cout << "\t--usage, -h\t\tPrint this usage message." << std::endl;
     std::cout << "\t--log-file, -l\t\tSets the file to log memory events to, for future reconstruction." << std::endl;
