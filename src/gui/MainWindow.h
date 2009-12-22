@@ -6,6 +6,9 @@
 #include <QAction>
 #include <QMdiArea>
 
+#include "AesalonConfiguration.h"
+#include "GUIConfiguration.h"
+
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
@@ -17,9 +20,15 @@ private:
     QAction *aesalon_menu_new;
     QAction *aesalon_menu_connect;
     QAction *aesalon_menu_quit;
+    QMenu *tools_menu;
+    QAction *tools_menu_config_aesalon;
+    QAction *tools_menu_config_gui;
     QMenu *help_menu;
     QAction *help_menu_about;
     QMdiArea *mdi_area;
+    
+    AesalonConfiguration *aesalon_configuration;
+    GUIConfiguration *gui_configuration;
     
     void create_menus();
 public:
