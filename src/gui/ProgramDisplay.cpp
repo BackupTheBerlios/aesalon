@@ -1,3 +1,4 @@
+#include <iostream>
 #include <QSettings>
 #include "ProgramDisplay.h"
 #include "ProgramDisplay.moc"
@@ -28,7 +29,10 @@ void ProgramDisplay::create_launch_widget() {
     
     launch_program_label = new QLabel(tr("Executable path:"));
     launch_program_layout->addWidget(launch_program_label, 0, 0);
-    launch_program_name = new QLineEdit(settings.value("Program/executable", "").toString());
+    launch_program_name = new QComboBox();
+    launch_program_name->setEditable(true);
+    launch_program_name->setInsertPolicy(QComboBox::InsertAtTop);
+    launch_program_name->insertItems(0, settings.value("Program/executable", "").toStringList());
     launch_program_layout->addWidget(launch_program_name, 0, 1);
     
     launch_layout->addLayout(launch_program_layout);
@@ -36,7 +40,10 @@ void ProgramDisplay::create_launch_widget() {
     
     launch_program_arguments_label = new QLabel(tr("Program arguments:"));
     launch_program_layout->addWidget(launch_program_arguments_label, 1, 0);
-    launch_program_arguments = new QLineEdit(settings.value("Program/arguments", "").toString());
+    launch_program_arguments = new QComboBox();
+    launch_program_arguments->setEditable(true);
+    launch_program_name->setInsertPolicy(QComboBox::InsertAtTop);
+    launch_program_arguments->addItems(settings.value("Program/arguments", "").toStringList());
     launch_program_layout->addWidget(launch_program_arguments, 1, 1);
     
     launch_port_label = new QLabel(tr("TCP port to use: "));
@@ -74,7 +81,7 @@ void ProgramDisplay::create_running_widget() {
     
     running_general_program_label = new QLabel(tr("Executable path:"));
     running_general_program_layout->addWidget(running_general_program_label);
-    running_general_program_name_label = new QLabel(launch_program_name->text());
+    running_general_program_name_label = new QLabel(launch_program_name->lineEdit()->text());
     running_general_program_layout->addWidget(running_general_program_name_label);
     
     running_general_layout->addLayout(running_general_program_layout);
@@ -92,18 +99,32 @@ void ProgramDisplay::create_running_widget() {
     running_widget->setLayout(running_layout);
     setWidget(running_widget);
     
-    setWindowTitle(tr("Running program (") + launch_program_name->text() + tr(")"));
+    setWindowTitle(tr("Running program (") + launch_program_name->currentText() + tr(")"));
 }
 
 void ProgramDisplay::begin_program() {
     create_running_widget();
     int port;
+    if(launch_program_name->currentIndex() == 0) launch_program_name->addItem(launch_program_name->lineEdit()->text());
+    if(launch_program_arguments->currentIndex() == 0) {
+        launch_program_arguments->addItem(launch_program_arguments->lineEdit()->text());
+    }
     Misc::String::to<int>(launch_port->text().toStdString(), port);
+    
     QSettings settings;
-    settings.setValue("Program/executable", launch_program_name->text());
-    settings.setValue("Program/arguments", launch_program_arguments->text());
+    QStringList executable_list;
+    for(int x = 0; x < launch_program_name->count(); x ++) {
+        executable_list.append(launch_program_name->itemText(x));
+    }
+    settings.setValue("Program/executable", executable_list);
+    QStringList arguments_list;
+    for(int x = 0; x < launch_program_arguments->count(); x ++) {
+        arguments_list << launch_program_arguments->itemText(x);
+    }
+    settings.setValue("Program/arguments", arguments_list);
     settings.setValue("Program/port", launch_port->text());
     settings.setValue("Program/in-xterm", launch_program_xterm->isChecked());
+    settings.sync();
     program = new Program();
 }
 

@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QTabWidget>
 #include <QCheckBox>
+#include <QComboBox>
 
 #include "ProgramBlockDisplay.h"
 #include "ProgramReferenceDisplay.h"
@@ -30,9 +31,9 @@ private:
     QWidget *launch_widget;
     QVBoxLayout *launch_layout;
     QGridLayout *launch_program_layout;
-    QLineEdit *launch_program_name;
+    QComboBox *launch_program_name;
     QLabel *launch_program_label;
-    QLineEdit *launch_program_arguments;
+    QComboBox *launch_program_arguments;
     QLabel *launch_program_arguments_label;
     QLabel *launch_port_label;
     QLineEdit *launch_port;
