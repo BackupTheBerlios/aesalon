@@ -9,6 +9,7 @@
 #include <QTabWidget>
 #include <QFormLayout>
 #include <QLineEdit>
+#include <QDialogButtonBox>
 
 namespace Aesalon {
 namespace GUI {
@@ -22,9 +23,7 @@ private:
     QFormLayout *general_layout;
     QLineEdit *general_aesalon_path;
     
-    QHBoxLayout *dialog_buttons;
-    QPushButton *accept_button;
-    QPushButton *cancel_button;
+    QDialogButtonBox *dialog_buttons;
     
     QSettings settings;
 public:
