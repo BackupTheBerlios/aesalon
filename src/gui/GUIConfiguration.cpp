@@ -5,6 +5,7 @@ namespace Aesalon {
 namespace GUI {
 
 GUIConfiguration::GUIConfiguration(QWidget *parent) : QDialog(parent) {
+    this->resize(700, 400);
     main_layout = new QVBoxLayout();
     tab_widget = new QTabWidget();
     
@@ -22,8 +23,8 @@ GUIConfiguration::GUIConfiguration(QWidget *parent) : QDialog(parent) {
     dialog_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(dialog_buttons, SIGNAL(accepted()), this, SLOT(accept()));
     connect(dialog_buttons, SIGNAL(rejected()), this, SLOT(reject()));
-    main_layout->addWidget(dialog_buttons);
-    main_layout->addStretch(1);
+    main_layout->addWidget(dialog_buttons, 0, Qt::AlignBottom | Qt::AlignRight);
+    /*main_layout->addStretch(1);*/
     
     setLayout(main_layout);
     
