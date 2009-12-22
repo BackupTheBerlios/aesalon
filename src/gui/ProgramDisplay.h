@@ -54,6 +54,8 @@ private:
     
     void create_launch_widget();
     void create_running_widget();
+public slots:
+    bool close();
 private slots:
     void begin_program();
 public:

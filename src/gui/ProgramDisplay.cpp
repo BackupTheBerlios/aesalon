@@ -107,5 +107,10 @@ void ProgramDisplay::begin_program() {
     program = new Program();
 }
 
+bool ProgramDisplay::close() {
+    if(!program->is_running()) return QMdiSubWindow::close();
+    return false;
+}
+
 } // namespace GUI
 } // namespace Aesalon

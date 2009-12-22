@@ -30,6 +30,8 @@ public:
     std::string get_executable() const { return executable; }
     std::string get_arguments() const { return arguments; }
     bool is_in_xterm() const { return in_xterm; }
+    
+    bool is_running() const { if(bi_pipe.is_valid()) return bi_pipe->is_open(); return false; }
 };
 
 } // namespace GUI
