@@ -4,7 +4,7 @@ namespace Aesalon {
 namespace Interface {
 namespace DWARF {
 
-Word Parser::parse_leb128(Misc::SmartPointer<Byte> block, bool is_signed) {
+Word Parser::parse_leb128(Block block, bool is_signed) {
     Word result = 0;
     int shift = 0;
     Word offset = 0;
@@ -20,6 +20,8 @@ Word Parser::parse_leb128(Misc::SmartPointer<Byte> block, bool is_signed) {
         }
         shift += 7;
     }
+    
+    block.erase(block.begin(), block.begin() + offset);
     
     return result;
 }

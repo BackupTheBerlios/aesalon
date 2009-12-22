@@ -20,7 +20,7 @@ public:
     Parser(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {}
     virtual ~Parser() {}
     
-    Word parse_leb128(Misc::SmartPointer<Byte> block, bool is_signed);
+    Word parse_leb128(Block block, bool is_signed);
 };
 
 } // namespace DWARF

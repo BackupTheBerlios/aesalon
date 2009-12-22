@@ -146,7 +146,7 @@ public:
         @return A SmartPointer referencing the converted data.
     */
     template<typename ConvertedType>
-    SmartPointer<ConvertedType>to() {
+    SmartPointer<ConvertedType>to() const {
         ConvertedType *ct = dynamic_cast<ConvertedType *>(get_nonnull_data());
         if(ct == NULL) throw InvalidCastException();
         return ct;

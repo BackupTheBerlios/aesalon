@@ -3,6 +3,8 @@
 
 #include <linux/elf.h>
 
+#include "Types.h"
+
 #include "misc/SmartPointer.h"
 #include "platform/MemoryAddress.h"
 
@@ -22,7 +24,8 @@ private:
 
     section_t data;
     
-    Misc::SmartPointer<char> content;
+    Block content;
+    Misc::SmartPointer<Byte> byte_content;
     
     std::string name;
 public:
@@ -30,7 +33,9 @@ public:
     virtual ~Section() {}
     
     void read_content();
-    Misc::SmartPointer<char> get_content() const { return content; }
+    Block get_content() const { return content; }
+    Misc::SmartPointer<Byte> get_byte_content() const { return byte_content; }
+    Misc::SmartPointer<char> get_char_content() { return (char *)byte_content.operator Byte *(); }
     std::size_t get_content_size() const { return data.sh_size; }
     
     std::string get_name() const { return name; }

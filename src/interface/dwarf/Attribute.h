@@ -39,7 +39,7 @@ private:
     data_type_e data_type;
     struct {
         Word word_data;
-        Misc::SmartPointer<Byte> block_data;
+        Block block_data;
         std::string string_data;
         bool flag_data;
     } internal_data;
@@ -48,12 +48,12 @@ public:
     virtual ~Attribute() {}
     
     void set_data(data_type_e new_type, Word word_data);
-    void set_data(data_type_e new_type, Misc::SmartPointer<Byte> block_data);
+    void set_data(data_type_e new_type, Block block_data);
     void set_data(data_type_e new_type, std::string string_data);
     void set_data(data_type_e new_type, bool flag_data);
     
     Word as_word() const;
-    Misc::SmartPointer<Byte> as_block() const;
+    Block as_block() const;
     std::string as_string() const;
     bool as_flag() const;
     

@@ -17,7 +17,7 @@ void Attribute::set_data(data_type_e new_type, Word word_data) {
     }
 }
 
-void Attribute::set_data(data_type_e new_type, Misc::SmartPointer<Byte> block_data) {
+void Attribute::set_data(data_type_e new_type, Block block_data) {
     if(new_type != BLOCK_DATA) throw TypeMismatchException();
     internal_data.block_data = block_data;
 }
@@ -42,7 +42,7 @@ Word Attribute::as_word() const {
         }   
     }
 }
-Misc::SmartPointer<Byte> Attribute::as_block() const {
+Block Attribute::as_block() const {
     if(get_data_type() != BLOCK_DATA) throw TypeMismatchException();
     return internal_data.block_data;
 }

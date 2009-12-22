@@ -21,17 +21,18 @@ Parser::Parser(std::string filename) : filename(filename) {
         section_list.push_back(new Section(file_fd));
     }
     
-    /* Remove the first section, since, according to the standard, is "reserved and should be all zeros" */
-    section_list.erase(section_list.begin());
+    /* Remove the first section, since, according to the standard, it is "reserved and should be all zeros" */
+    /*section_list.erase(section_list.begin());*/
     
     string_table = section_list[header->get_string_table_index()];
     
     string_table->read_content();
     
     for(section_list_t::iterator i = section_list.begin(); i != section_list.end(); i ++) {
-        char *p = string_table->get_content();
+        Byte *p = &*string_table->get_byte_content();
         p += (*i)->get_name_offset();
-        (*i)->set_name(p);
+        
+        (*i)->set_name((char *)p);
     }
     
     close(file_fd);
