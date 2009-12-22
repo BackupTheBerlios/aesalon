@@ -1,9 +1,11 @@
+#include <iostream>
 #include <sys/user.h>
 #include <sys/ptrace.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
 #include <signal.h>
+#include <cstring>
 
 #include "PTracePortal.h"
 
@@ -13,6 +15,7 @@ namespace Interface {
 Platform::MemoryAddress PTracePortal::get_register(register_e which) const {
     struct user_regs_struct regs;
     ptrace(PTRACE_GETREGS, pid, 0, &regs);
+    std::cout << "PTracePortal::get_register(): Value of register requested" << std::endl;
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         case RAX:
@@ -62,6 +65,7 @@ Platform::MemoryAddress PTracePortal::get_register(register_e which) const {
 }
 
 Word PTracePortal::read_memory(Platform::MemoryAddress address) const {
+    std::cout << "PTracePortal::read_memory(): address is " << address << std::endl;
     Word ret = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
     
     if(errno != 0) return 0;
@@ -99,9 +103,15 @@ Misc::SmartPointer<Breakpoint> PTracePortal::get_breakpoint_by_address(Platform:
 }
 
 int PTracePortal::handle_signal() {
+    std::cout << "PTracePortal::handle_signal(): called" << std::endl;
     siginfo_t signal_info;
+    memset(&signal_info, 0, sizeof(signal_info));
     
     ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info);
+    
+    std::cout << "PTracePortal::handle_signal(): signal is: " << signal_info.si_signo << std::endl;
+    std::cout << "PTracePortal::handle_signal(): errno is: " << signal_info.si_errno << std::endl;
+    std::cout << "PTracePortal::handle_signal(): code is: " << signal_info.si_code << std::endl;
     
     if(signal_info.si_signo != SIGSTOP) return signal_info.si_signo;
     

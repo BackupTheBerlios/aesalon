@@ -12,11 +12,9 @@ namespace ELF {
 Section::Section(int file_fd) : file_fd(file_fd) {
     std::size_t bytes = read(file_fd, &data, sizeof(data));
     if(bytes != sizeof(data)) throw ParserException("Section entry truncated");
-    std::cout << "Section::Section(): data.sh_offset: " << data.sh_offset << std::endl;
 }
 
 void Section::read_content() {
-    std::cout << "Section::read_content(): data.sh_offset:" << data.sh_offset << std::endl;
     lseek(file_fd, data.sh_offset, SEEK_SET);
     byte_content = new Byte[get_content_size()];
     
