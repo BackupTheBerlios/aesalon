@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <cstring>
+#include <iostream>
 
 #include "PTracePortal.h"
 
@@ -13,76 +14,42 @@ namespace Aesalon {
 namespace Interface {
 
 Platform::MemoryAddress PTracePortal::get_register(register_e which) const {
-    struct user_regs_struct regs;
-    ptrace(PTRACE_GETREGS, pid, 0, &regs);
-    std::cout << "PTracePortal::get_register(): Value of register requested" << std::endl;
+    struct user_regs_struct registers;
+    if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
+        throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
+    
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         case RAX:
-            return regs.rax;
+            std::cout << "Value of RAX requested; RAX is " << registers.rax << ", ORIG_RAX is " << registers.orig_rax << std::endl;
+            return registers.orig_rax;
         case RBX:
-            return regs.rbx;
-        case RCX:
-            return regs.rcx;
-        case RDX:
-            return regs.rdx;
-        case R9:
-            return regs.r9;
-        case R10:
-            return regs.r10;
-        case R11:
-            return regs.r11;
-        case R12:
-            return regs.r12;
-        case R13:
-            return regs.r13;
-        case R14:
-            return regs.r14;
-        case R15:
-            return regs.r15;
-        case RDI:
-            return regs.rdi;
-        case RSI:
-            return regs.rsi;
-        case RBP:
-            return regs.rbp;
-        case RSP:
-            return regs.rsp;
+            return registers.rbx;
         case RIP:
-            return regs.rip;
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-        case EAX:
-            return regs.eax;
-        /* TODO: implement the rest of the 32-bit registers */
+            return registers.rip;
 #endif
-        case CS:
-            return regs.cs;
-        case SS:
-            return regs.ss;
         default:
-            return 0;
+            throw PTraceException("Value of invalid register requested");
     }
 }
 
 Word PTracePortal::read_memory(Platform::MemoryAddress address) const {
-    std::cout << "PTracePortal::read_memory(): address is " << address << std::endl;
-    Word ret = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
-    
-    if(errno != 0) return 0;
-    return ret;
+    SWord return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
+    if(return_value == -1 && errno != 0)
+        throw PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
+    /* NOTE: what happens if return_value is < 0? . ..  */
+    return return_value;
 }
 
 void PTracePortal::write_memory(Platform::MemoryAddress address, Word value) {
-    ptrace(PTRACE_POKEDATA, pid, address, value);
+    if(ptrace(PTRACE_POKEDATA, pid, address, value) == -1) 
+        throw PTraceException(Misc::StreamAsString() << "Couldn't write memory: " << strerror(errno));
 }
 
 void PTracePortal::write_memory(Platform::MemoryAddress address, Byte value) {
-    Word original = read_memory(address);
-    /* Clear the first eight bits of original */
-    original &= ~Word(0xff);
-    /* Set first eight bits to new value */
-    original |= value;
-    ptrace(PTRACE_POKEDATA, pid, address, value);
+    Word current_value = read_memory(address);
+    current_value &= ~0xff;
+    write_memory(address, current_value | value);
 }
 
 void PTracePortal::attach() {
@@ -90,56 +57,23 @@ void PTracePortal::attach() {
 }
 
 void PTracePortal::place_breakpoint(Platform::MemoryAddress address) {
-    add_breakpoint(new Breakpoint(address, read_memory(address) & 0xff));
-    write_memory(address, Byte(0xcc));
 }
 
-Misc::SmartPointer<Breakpoint> PTracePortal::get_breakpoint_by_address(Platform::MemoryAddress address) const {
-    breakpoint_list_t::const_iterator i = breakpoint_list.begin();
-    for(; i != breakpoint_list.end(); i ++) {
-        if((*i)->get_address() == address) return *i;
+void PTracePortal::handle_signal() {
+    int signal;
+    
+    for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
+        if((*i)->handle_signal(signal)) return;
     }
-    return NULL;
-}
-
-int PTracePortal::handle_signal() {
-    std::cout << "PTracePortal::handle_signal(): called" << std::endl;
-    siginfo_t signal_info;
-    memset(&signal_info, 0, sizeof(signal_info));
-    
-    if(ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info) == -1) {
-        std::cout << "pid is: " << pid << std::endl;
-        throw PTraceException(Misc::StreamAsString() << "PTRACE_GETSIGINFO failed: " << strerror(errno));
-    }
-    
-    std::cout << "PTracePortal::handle_signal(): signal is: " << signal_info.si_signo << std::endl;
-    std::cout << "PTracePortal::handle_signal(): errno is: " << signal_info.si_errno << std::endl;
-    std::cout << "PTracePortal::handle_signal(): code is: " << signal_info.si_code << std::endl;
-    
-    if(signal_info.si_signo != SIGSTOP) return signal_info.si_signo;
-    
-    Platform::MemoryAddress rip = get_register(RIP);
-    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(rip);
-    if(!breakpoint.is_valid()) return signal_info.si_signo;
-    write_memory(rip, breakpoint->get_original());
-    single_step();
-    write_memory(rip, Byte(0xcc));
-    
-    return signal_info.si_signo;
 }
 
 void PTracePortal::continue_execution(int signal) {
-    ptrace(PTRACE_CONT, pid, NULL, signal);
 }
 
 void PTracePortal::single_step() {
-    ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL);
 }
 
 void PTracePortal::wait_for_signal() {
-    int status;
-    wait(&status);
-    /* NOTE: is status required? . . . */
 }
 
 } // namespace Interface

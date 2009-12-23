@@ -8,6 +8,7 @@
 
 #include "Breakpoint.h"
 #include "Types.h"
+#include "PTraceSignalObserver.h"
 #include "platform/MemoryAddress.h"
 #include "misc/SmartPointer.h"
 
@@ -57,6 +58,8 @@ public:
     };
     
     typedef std::vector<Misc::SmartPointer<Breakpoint> > breakpoint_list_t;
+    
+    typedef std::vector<Misc::SmartPointer<PTraceSignalObserver> > signal_observer_list_t;
 private:
     /** The PID of the attached process. */
     pid_t pid;
@@ -70,6 +73,8 @@ private:
     void add_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint) {
         breakpoint_list.push_back(breakpoint);
     }
+    
+    signal_observer_list_t signal_observer_list;
 public:
     /** Generic constructor for PTracePortal.
         @param pid The PID of the child process.
@@ -119,7 +124,7 @@ public:
         @param address The address to search for.
         @return A SmartPointer to the given breakpoint. Not valid if no breakpoint exists at @a address.
     */
-    Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Platform::MemoryAddress address) const;
+    /*Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Platform::MemoryAddress address) const;*/
     
     /** Handles a signal from the child.
         @return The signal caught.
@@ -133,6 +138,10 @@ public:
     void single_step();
     
     void wait_for_signal();
+    
+    void add_signal_observer(Misc::SmartPointer<PTraceSignalObserver> new_observer) {
+        signal_observer_list.push_back(new_observer);
+    }
 };
 
 } // namespace Interface
