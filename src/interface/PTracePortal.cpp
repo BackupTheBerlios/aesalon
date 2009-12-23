@@ -107,7 +107,10 @@ int PTracePortal::handle_signal() {
     siginfo_t signal_info;
     memset(&signal_info, 0, sizeof(signal_info));
     
-    ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info);
+    if(ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info) == -1) {
+        std::cout << "pid is: " << pid << std::endl;
+        throw PTraceException(Misc::StreamAsString() << "PTRACE_GETSIGINFO failed: " << strerror(errno));
+    }
     
     std::cout << "PTracePortal::handle_signal(): signal is: " << signal_info.si_signo << std::endl;
     std::cout << "PTracePortal::handle_signal(): errno is: " << signal_info.si_errno << std::endl;

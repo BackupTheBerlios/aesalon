@@ -35,11 +35,11 @@ void MainWindow::create_menus() {
     
     aesalon_menu_new = new QAction(tr("&New program"), this);
     connect(aesalon_menu_new, SIGNAL(triggered()), this, SLOT(new_program()));
-    aesalon_menu_new->setShortcut(Qt::CTRL | Qt::Key_N);
+    aesalon_menu_new->setShortcut(Qt::CTRL + Qt::Key_N);
     aesalon_menu->addAction(aesalon_menu_new);
     
     aesalon_menu_connect = new QAction(tr("&Connect to program . . ."), this);
-    aesalon_menu_connect->setShortcut(Qt::CTRL | Qt::Key_O);
+    aesalon_menu_connect->setShortcut(Qt::CTRL + Qt::Key_O);
     aesalon_menu->addAction(aesalon_menu_connect);
     
     aesalon_menu->addSeparator();
@@ -57,7 +57,7 @@ void MainWindow::create_menus() {
     
     tools_menu_config_gui = new QAction(tr("Configure Aesalon &GUI . . ."), this);
     connect(tools_menu_config_gui, SIGNAL(triggered()), gui_configuration, SLOT(exec()));
-    tools_menu_config_gui->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_P);
+    tools_menu_config_gui->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_P);
     tools_menu->addAction(tools_menu_config_gui);
     
     menuBar()->addMenu(tools_menu);

@@ -14,6 +14,12 @@
 namespace Aesalon {
 namespace Interface {
 
+class PTraceException : public Misc::Exception {
+public:
+    PTraceException(std::string message) : Misc::Exception(message) {}
+    virtual ~PTraceException() {}
+};
+
 class PTracePortal {
 public:
     /** An enum representing the different registers available. */
