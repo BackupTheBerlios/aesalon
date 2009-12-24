@@ -23,7 +23,6 @@ private:
     Misc::SmartPointer<Platform::EventQueue> event_queue;
     
     Misc::SmartPointer<ProgramManager> program_manager;
-    
     Misc::SmartPointer<Platform::SymbolManager> symbol_manager;
     
     /** Initialize the aeslaon gdb interface. */
@@ -51,6 +50,9 @@ public:
         @return The named pipe created by this aesalon gdb instance.
     */
     Misc::SmartPointer<Platform::TCPServerSocket> get_socket() const { return server_socket; }
+    
+    Misc::SmartPointer<ProgramManager> get_program_manager() const { return program_manager; }
+    Misc::SmartPointer<Platform::EventQueue> get_event_queue() const { return event_queue; }
     
     int get_return_value() const { return return_value; }
     void set_return_value(int new_return_value) { return_value = new_return_value; }

@@ -5,12 +5,12 @@ namespace Aesalon {
 namespace Interface {
 namespace PTrace {
 
-class PTraceSignalObserver {
+class SignalObserver {
 public:
-    PTraceSignalObserver() {}
-    virtual ~PTraceSignalObserver() {}
+    SignalObserver() {}
+    virtual ~SignalObserver() {}
     
-    virtual bool handle_signal(int signal) = 0;
+    virtual bool handle_signal(int signal, int status) = 0;
 };
 
 } // namespace PTrace

@@ -89,7 +89,6 @@ void Initializer::run() {
     program_manager->execute();
     while(program_manager->is_running()) {
         program_manager->wait();
-        program_manager->handle();
         if(event_queue->peek_event().is_valid()) get_socket()->send_data(event_queue);
     }
 }

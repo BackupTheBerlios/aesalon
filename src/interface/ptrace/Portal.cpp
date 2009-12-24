@@ -62,13 +62,17 @@ void Portal::place_breakpoint(Platform::MemoryAddress address) {
 
 void Portal::handle_signal() {
     int signal;
-    siginfo_t signal_info;
-    if(ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info) == -1) {
-        throw PTraceException(Misc::StreamAsString() << "Failed to get signal information: " << strerror(errno));
+    int status = wait_for_signal();
+    if(!WIFEXITED(status)) {
+        siginfo_t signal_info;
+        if(ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info) == -1) {
+            throw PTraceException(Misc::StreamAsString() << "Failed to get signal information: " << strerror(errno));
+        }
+        signal = signal_info.si_signo;
     }
-    signal = signal_info.si_signo;
+    else signal = SIGKILL;
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
-        if((*i)->handle_signal(signal)) return;
+        if((*i)->handle_signal(signal, status)) return;
     }
 }
 
@@ -80,7 +84,10 @@ void Portal::single_step() {
         throw PTraceException(Misc::StreamAsString() << "Couldn't single-step program:" << strerror(errno));
 }
 
-void Portal::wait_for_signal() {
+int Portal::wait_for_signal() {
+    int status;
+    wait(&status);
+    return status;
 }
 
 } // namespace PTrace

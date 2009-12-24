@@ -11,7 +11,7 @@
 namespace Aesalon {
 namespace Interface {
 
-class ProgramManager {
+class ProgramManager  {
 private:
     Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
     Misc::SmartPointer<Platform::ArgumentList> argument_list;
@@ -28,10 +28,10 @@ public:
     
     void execute();
     void wait();
-    void handle();
     
     Misc::SmartPointer<Platform::ArgumentList> get_argument_list() const { return argument_list; }
     
+    void set_running(bool new_running) { running = new_running; }
     bool is_running() const { return running; }
 };
 

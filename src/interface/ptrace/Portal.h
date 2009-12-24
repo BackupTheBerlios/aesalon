@@ -60,7 +60,7 @@ public:
     
     typedef std::vector<Misc::SmartPointer<Breakpoint> > breakpoint_list_t;
     
-    typedef std::vector<Misc::SmartPointer<PTraceSignalObserver> > signal_observer_list_t;
+    typedef std::vector<Misc::SmartPointer<SignalObserver> > signal_observer_list_t;
 private:
     /** The PID of the attached process. */
     pid_t pid;
@@ -76,6 +76,8 @@ private:
     }
     
     signal_observer_list_t signal_observer_list;
+    
+    int wait_for_signal();
 public:
     /** Generic constructor for PTracePortal.
         @param pid The PID of the child process.
@@ -135,9 +137,7 @@ public:
     /** Tells the child to execute a single instruction. */
     void single_step();
     
-    void wait_for_signal();
-    
-    void add_signal_observer(Misc::SmartPointer<PTraceSignalObserver> new_observer) {
+    void add_signal_observer(Misc::SmartPointer<SignalObserver> new_observer) {
         signal_observer_list.push_back(new_observer);
     }
 };
