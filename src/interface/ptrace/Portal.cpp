@@ -76,6 +76,8 @@ void Portal::continue_execution(int signal) {
 }
 
 void Portal::single_step() {
+    if(ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL) == -1)
+        throw PTraceException(Misc::StreamAsString() << "Couldn't single-step program:" << strerror(errno));
 }
 
 void Portal::wait_for_signal() {
