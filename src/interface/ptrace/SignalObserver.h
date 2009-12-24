@@ -3,6 +3,7 @@
 
 namespace Aesalon {
 namespace Interface {
+namespace PTrace {
 
 class PTraceSignalObserver {
 public:
@@ -12,6 +13,7 @@ public:
     virtual bool handle_signal(int signal) = 0;
 };
 
+} // namespace PTrace
 } // namespace Interface
 } // namespace Aesalon
 

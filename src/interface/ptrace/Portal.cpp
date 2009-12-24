@@ -8,12 +8,13 @@
 #include <cstring>
 #include <iostream>
 
-#include "PTracePortal.h"
+#include "Portal.h"
 
 namespace Aesalon {
 namespace Interface {
+namespace PTrace {
 
-Platform::MemoryAddress PTracePortal::get_register(register_e which) const {
+Platform::MemoryAddress Portal::get_register(register_e which) const {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
@@ -33,7 +34,7 @@ Platform::MemoryAddress PTracePortal::get_register(register_e which) const {
     }
 }
 
-Word PTracePortal::read_memory(Platform::MemoryAddress address) const {
+Word Portal::read_memory(Platform::MemoryAddress address) const {
     SWord return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
     if(return_value == -1 && errno != 0)
         throw PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
@@ -41,40 +42,45 @@ Word PTracePortal::read_memory(Platform::MemoryAddress address) const {
     return return_value;
 }
 
-void PTracePortal::write_memory(Platform::MemoryAddress address, Word value) {
+void Portal::write_memory(Platform::MemoryAddress address, Word value) {
     if(ptrace(PTRACE_POKEDATA, pid, address, value) == -1) 
         throw PTraceException(Misc::StreamAsString() << "Couldn't write memory: " << strerror(errno));
 }
 
-void PTracePortal::write_memory(Platform::MemoryAddress address, Byte value) {
+void Portal::write_memory(Platform::MemoryAddress address, Byte value) {
     Word current_value = read_memory(address);
     current_value &= ~0xff;
     write_memory(address, current_value | value);
 }
 
-void PTracePortal::attach() {
+void Portal::attach() {
     ptrace(PTRACE_ATTACH, pid, NULL, NULL);
 }
 
-void PTracePortal::place_breakpoint(Platform::MemoryAddress address) {
+void Portal::place_breakpoint(Platform::MemoryAddress address) {
 }
 
-void PTracePortal::handle_signal() {
+void Portal::handle_signal() {
     int signal;
-    
+    siginfo_t signal_info;
+    if(ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info) == -1) {
+        throw PTraceException(Misc::StreamAsString() << "Failed to get signal information: " << strerror(errno));
+    }
+    signal = signal_info.si_signo;
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal)) return;
     }
 }
 
-void PTracePortal::continue_execution(int signal) {
+void Portal::continue_execution(int signal) {
 }
 
-void PTracePortal::single_step() {
+void Portal::single_step() {
 }
 
-void PTracePortal::wait_for_signal() {
+void Portal::wait_for_signal() {
 }
 
+} // namespace PTrace
 } // namespace Interface
 } // namespace Aesalon

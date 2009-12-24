@@ -4,7 +4,7 @@
 #include "misc/SmartPointer.h"
 #include "platform/BidirectionalPipe.h"
 #include "platform/ArgumentList.h"
-#include "PTracePortal.h"
+#include "ptrace/Portal.h"
 #include "elf/Parser.h"
 #include "dwarf/Parser.h"
 
@@ -18,7 +18,7 @@ private:
     
     bool running;
     
-    Misc::SmartPointer<PTracePortal> ptrace_portal;
+    Misc::SmartPointer<PTrace::Portal> ptrace_portal;
     
     Misc::SmartPointer<ELF::Parser> elf_parser;
     Misc::SmartPointer<DWARF::Parser> dwarf_parser;

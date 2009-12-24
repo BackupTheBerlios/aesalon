@@ -8,12 +8,13 @@
 
 #include "Breakpoint.h"
 #include "Types.h"
-#include "PTraceSignalObserver.h"
+#include "SignalObserver.h"
 #include "platform/MemoryAddress.h"
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
 namespace Interface {
+namespace PTrace {
 
 class PTraceException : public Misc::Exception {
 public:
@@ -21,7 +22,7 @@ public:
     virtual ~PTraceException() {}
 };
 
-class PTracePortal {
+class Portal {
 public:
     /** An enum representing the different registers available. */
     enum register_e {
@@ -79,9 +80,9 @@ public:
     /** Generic constructor for PTracePortal.
         @param pid The PID of the child process.
     */
-    PTracePortal(pid_t pid) : pid(pid) {}
+    Portal(pid_t pid) : pid(pid) {}
     /** Virtual destructor, does nothing. */
-    virtual ~PTracePortal() {}
+    virtual ~Portal() {}
     
     /** Retrieve the value of a specific register.
         @param which The register to get the value of.
@@ -126,10 +127,7 @@ public:
     */
     /*Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Platform::MemoryAddress address) const;*/
     
-    /** Handles a signal from the child.
-        @return The signal caught.
-    */
-    int handle_signal();
+    void handle_signal();
     /** Continues execution, with a given signal sent to the child.
         @param signal The signal to send; none if zero.
     */
@@ -144,6 +142,7 @@ public:
     }
 };
 
+} // namespace PTrace
 } // namespace Interface
 } // namespace Aesalon
 
