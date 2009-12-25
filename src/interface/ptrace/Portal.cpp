@@ -14,18 +14,20 @@
 #include "ExitObserver.h"
 #include "TrapObserver.h"
 
+#include "Message.h"
+
 namespace Aesalon {
 namespace Interface {
 namespace PTrace {
 
-Portal::Portal(std::string executable, Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0) {
+Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0) {
     
     pid = fork();
     if(pid == -1)
         throw PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
     else if(pid == 0) {
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
-        if(execv(executable.c_str(), argument_list->get_as_argv()) == -1) {
+        if(execv(argument_list->get_argument(0).c_str(), argument_list->get_as_argv()) == -1) {
             throw PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
         }
     }
@@ -137,9 +139,9 @@ int Portal::wait_for_signal() {
 void Portal::handle_breakpoint() {
     Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(get_register(RIP));
     if(!breakpoint.is_valid()) {
-        throw PTraceException("Portal::handle_breakpoint() called when not on a breakpoint");
+        Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");
+        return;
     }
-    
     write_memory(breakpoint->get_address(), breakpoint->get_original());
     single_step();
     write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());

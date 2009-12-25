@@ -11,7 +11,7 @@
 namespace Aesalon {
 namespace Interface {
 
-class ProgramManager  {
+class ProgramManager {
 private:
     Misc::SmartPointer<Platform::ArgumentList> argument_list;
     

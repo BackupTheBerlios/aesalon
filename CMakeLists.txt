@@ -10,7 +10,9 @@ enable_language(C)
 project(aesalon)
 
 include(build.config)
-execute_process(COMMAND ./version_info.sh)
+if(DEVELOPMENT_BUILD)
+    execute_process(COMMAND ./version_info.sh)
+endif(DEVELOPMENT_BUILD)
 include(version_info)
 
 add_subdirectory(src)

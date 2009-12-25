@@ -78,7 +78,7 @@ public:
     /** Generic constructor for PTracePortal.
         @param pid The PID of the child process.
     */
-    Portal(std::string executable, Misc::SmartPointer<Platform::ArgumentList> argument_list);
+    Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list);
     /** Virtual destructor, does nothing. */
     virtual ~Portal() {}
     

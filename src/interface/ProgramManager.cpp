@@ -13,7 +13,7 @@ ProgramManager::ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argume
 
 void ProgramManager::execute() {
     running = true;
-    ptrace_portal = new PTrace::Portal(get_argument_list()->get_argument(0), get_argument_list());
+    ptrace_portal = new PTrace::Portal(get_argument_list());
 }
 
 void ProgramManager::wait() {
