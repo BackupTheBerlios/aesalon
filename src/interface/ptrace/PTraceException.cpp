@@ -1,9 +1,9 @@
-#include "Breakpoint.h"
+#include "PTraceException.h"
 
 namespace Aesalon {
 namespace Interface {
+namespace PTrace {
 
-Byte Breakpoint::BREAKPOINT_CHARACTER = 0xcc;
-
+} // namespace PTrace
 } // namespace Interface
 } // namespace Aesalon

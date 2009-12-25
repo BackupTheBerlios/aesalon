@@ -11,6 +11,7 @@ class Breakpoint {
 private:
     Platform::MemoryAddress address;
     Byte original;
+    static Byte BREAKPOINT_CHARACTER;
 public:
     Breakpoint(Platform::MemoryAddress address, Byte original)
         : address(address), original(original) {}
@@ -18,6 +19,7 @@ public:
     
     Byte get_original() const { return original; }
     Platform::MemoryAddress get_address() const { return address; }
+    Byte get_breakpoint_character() const { return BREAKPOINT_CHARACTER; }
 };
 
 } // namespace Interface

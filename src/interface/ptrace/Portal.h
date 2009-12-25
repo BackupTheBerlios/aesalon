@@ -12,16 +12,11 @@
 #include "platform/MemoryAddress.h"
 #include "platform/ArgumentList.h"
 #include "misc/SmartPointer.h"
+#include "PTraceException.h"
 
 namespace Aesalon {
 namespace Interface {
 namespace PTrace {
-
-class PTraceException : public Misc::Exception {
-public:
-    PTraceException(std::string message) : Misc::Exception(message) {}
-    virtual ~PTraceException() {}
-};
 
 class Portal {
 public:
@@ -128,7 +123,9 @@ public:
         @param address The address to search for.
         @return A SmartPointer to the given breakpoint. Not valid if no breakpoint exists at @a address.
     */
-    /*Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Platform::MemoryAddress address) const;*/
+    Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Platform::MemoryAddress address) const;
+    
+    void handle_breakpoint();
     
     void handle_signal();
     /** Continues execution, with a given signal sent to the child.

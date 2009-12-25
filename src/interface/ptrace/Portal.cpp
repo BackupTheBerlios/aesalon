@@ -30,6 +30,8 @@ Portal::Portal(std::string executable, Misc::SmartPointer<Platform::ArgumentList
         }
     }
     
+    /*ptrace(PTRACE_SETOPTIONS, pid, 0, PTRACE_O_TRACESYSGOOD);*/
+    
     add_signal_observer(new ExitObserver());
     add_signal_observer(new TrapObserver());
 }
@@ -78,7 +80,18 @@ void Portal::attach() {
 }
 
 void Portal::place_breakpoint(Platform::MemoryAddress address) {
+    Byte original = read_memory(address) & 0xff;
+    add_breakpoint(new Breakpoint(address, original));
+    write_memory(address, Byte(0xcc));
 }
+
+Misc::SmartPointer<Breakpoint> Portal::get_breakpoint_by_address(Platform::MemoryAddress address) const {
+    for(breakpoint_list_t::const_iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
+        if((*i)->get_address() == address) return *i;
+    }
+    return NULL;
+}
+
 
 void Portal::handle_signal() {
     int signal;
@@ -119,6 +132,17 @@ int Portal::wait_for_signal() {
     int status;
     if(waitpid(pid, &status, 0) == -1) throw PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
     return status;
+}
+
+void Portal::handle_breakpoint() {
+    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(get_register(RIP));
+    if(!breakpoint.is_valid()) {
+        throw PTraceException("Portal::handle_breakpoint() called when not on a breakpoint");
+    }
+    
+    write_memory(breakpoint->get_address(), breakpoint->get_original());
+    single_step();
+    write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());
 }
 
 } // namespace PTrace
