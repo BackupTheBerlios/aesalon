@@ -10,7 +10,7 @@ add_subdirectory(misc)
 add_subdirectory(platform)
 
 if(BUILD_MONITOR)
-    add_subdirectory(interface)
+    add_subdirectory(monitor)
 endif(BUILD_MONITOR)
 
 if(BUILD_GUI)

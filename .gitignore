@@ -5,6 +5,7 @@
 *.so
 .gdb_history
 core
+*.sr.orig
 
 # Buildsystem (CMake) ignores
 CMakeFiles
@@ -17,7 +18,7 @@ version_info
 *kdev*
 
 # Executable ignores
-src/interface/aesalon
+src/monitor/aesalon
 
 # Generated documentation (doxygen) ignores
 doc/html*
