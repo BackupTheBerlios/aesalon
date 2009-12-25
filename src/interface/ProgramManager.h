@@ -29,6 +29,8 @@ public:
     void execute();
     void wait();
     
+    Misc::SmartPointer<PTrace::Portal> get_ptrace_portal() const { return ptrace_portal; }
+    
     Misc::SmartPointer<Platform::ArgumentList> get_argument_list() const { return argument_list; }
     
     void set_running(bool new_running) { running = new_running; }

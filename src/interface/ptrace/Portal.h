@@ -82,7 +82,7 @@ public:
     /** Generic constructor for PTracePortal.
         @param pid The PID of the child process.
     */
-    Portal(pid_t pid) : pid(pid) {}
+    Portal(pid_t pid);
     /** Virtual destructor, does nothing. */
     virtual ~Portal() {}
     

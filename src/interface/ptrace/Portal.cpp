@@ -10,9 +10,17 @@
 
 #include "Portal.h"
 
+#include "ExitObserver.h"
+#include "TrapObserver.h"
+
 namespace Aesalon {
 namespace Interface {
 namespace PTrace {
+
+Portal::Portal(pid_t pid) : pid(pid) {
+    add_signal_observer(new ExitObserver());
+    add_signal_observer(new TrapObserver());
+}
 
 Platform::MemoryAddress Portal::get_register(register_e which) const {
     struct user_regs_struct registers;
@@ -63,20 +71,31 @@ void Portal::place_breakpoint(Platform::MemoryAddress address) {
 void Portal::handle_signal() {
     int signal;
     int status = wait_for_signal();
-    if(!WIFEXITED(status)) {
+    if(!WIFEXITED(status) && WIFSTOPPED(status)) {
         siginfo_t signal_info;
         if(ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info) == -1) {
             throw PTraceException(Misc::StreamAsString() << "Failed to get signal information: " << strerror(errno));
         }
         signal = signal_info.si_signo;
     }
-    else signal = SIGKILL;
+    else signal = -1;
+    
+    std::cout << "Portal::handle_signal(): status: (" << status << "): ";
+    
+    for(int mask = 1 << 20; mask > 0; mask >>= 1) {
+        std::cout << ((status & mask)?"1":"0");
+    }
+    
+    std::cout << ", signal: " << signal << std::endl;
+    
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
     }
 }
 
 void Portal::continue_execution(int signal) {
+    if(ptrace(PTRACE_CONT, pid, NULL, NULL) == -1)
+        throw PTraceException(Misc::StreamAsString() << "Couldn't continue program execution: " << strerror(errno));
 }
 
 void Portal::single_step() {
@@ -86,7 +105,7 @@ void Portal::single_step() {
 
 int Portal::wait_for_signal() {
     int status;
-    wait(&status);
+    if(waitpid(pid, &status, 0) == -1) throw PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
     return status;
 }
 

@@ -57,16 +57,16 @@ void Initializer::initialize() {
     
     event_queue = new Platform::EventQueue();
     
-    symbol_manager = new Platform::SymbolManager();
+    /*symbol_manager = new Platform::SymbolManager();*/
     
-    symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());
+    /*symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());*/
     
     run();
 }
 
 void Initializer::deinitialize() {
     if(program_manager) delete program_manager;
-    if(symbol_manager) delete symbol_manager;
+    /*if(symbol_manager) delete symbol_manager;*/
     if(server_socket) delete server_socket;
     if(event_queue) delete event_queue;
     
