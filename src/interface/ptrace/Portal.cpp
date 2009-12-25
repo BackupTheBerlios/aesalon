@@ -3,6 +3,7 @@
 #include <sys/ptrace.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #include <errno.h>
 #include <signal.h>
 #include <cstring>
@@ -17,7 +18,18 @@ namespace Aesalon {
 namespace Interface {
 namespace PTrace {
 
-Portal::Portal(pid_t pid) : pid(pid) {
+Portal::Portal(std::string executable, Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0) {
+    
+    pid = fork();
+    if(pid == -1)
+        throw PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
+    else if(pid == 0) {
+        ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+        if(execv(executable.c_str(), argument_list->get_as_argv()) == -1) {
+            throw PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
+        }
+    }
+    
     add_signal_observer(new ExitObserver());
     add_signal_observer(new TrapObserver());
 }

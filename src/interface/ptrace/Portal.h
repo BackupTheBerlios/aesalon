@@ -10,6 +10,7 @@
 #include "Types.h"
 #include "SignalObserver.h"
 #include "platform/MemoryAddress.h"
+#include "platform/ArgumentList.h"
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
@@ -82,7 +83,7 @@ public:
     /** Generic constructor for PTracePortal.
         @param pid The PID of the child process.
     */
-    Portal(pid_t pid);
+    Portal(std::string executable, Misc::SmartPointer<Platform::ArgumentList> argument_list);
     /** Virtual destructor, does nothing. */
     virtual ~Portal() {}
     

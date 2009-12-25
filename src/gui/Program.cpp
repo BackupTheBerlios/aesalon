@@ -23,7 +23,7 @@ Program::Program() {
     
     argument_list.from_string(arguments + " ");
     
-    bi_pipe = new Platform::BidirectionalPipe(settings.value("Core/aesalon-path").toString().toStdString(), argument_list, true, false);
+    bi_pipe = new Platform::BidirectionalPipe(settings.value("Core/aesalon-path").toString().toStdString(), argument_list, true);
     
     memory = new Platform::Memory();
     

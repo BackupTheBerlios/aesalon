@@ -13,7 +13,6 @@ namespace Interface {
 
 class ProgramManager  {
 private:
-    Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
     Misc::SmartPointer<Platform::ArgumentList> argument_list;
     
     bool running;
