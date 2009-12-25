@@ -47,7 +47,10 @@ void Initializer::initialize() {
         server_socket = new Platform::TCPServerSocket(port);
         
         Misc::SmartPointer<Platform::ArgumentList> al = new Platform::ArgumentList;
-        al->add_argument(ap->get_file(0)->get_filename());
+        /*al->add_argument(ap->get_file(0)->get_filename());*/
+        for(std::size_t x = 0; x < ap->get_files(); x ++) {
+            al->add_argument(ap->get_file(x)->get_filename());
+        }
         program_manager = new ProgramManager(al);
     }
     else {
