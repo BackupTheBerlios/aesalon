@@ -3,6 +3,7 @@
 
 #include "Types.h"
 #include "elf/Parser.h"
+#include "EntryManager.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -20,6 +21,8 @@ private:
     Word dwarf_version;
     Word abbrev_offset;
     Word address_size;
+    
+    Misc::SmartPointer<EntryManager> entry_manager;
 public:
     CompilationUnit(Misc::SmartPointer<ELF::Parser> elf_parser);
     virtual ~CompilationUnit() {}

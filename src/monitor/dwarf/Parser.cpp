@@ -9,25 +9,10 @@ namespace DWARF {
 Parser::Parser(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {
     Misc::SmartPointer<ELF::Section> debug_info_section = elf_parser->get_section(".debug_info");
     Misc::SmartPointer<Block> debug_info = elf_parser->get_section(".debug_info")->get_content();
-#if 0
-    /*Message(Message::DEBUG_MESSAGE, Misc::StreamAsString() << "debug_info.get_data(): " << debug_info.get_data());*/
-    Word initial_length = parse_u32(debug_info);
     
-    /* According to the DWARF 3 specification (section 7.4), the format is 64-bit if the first four bits are 0xff. */
-    if(initial_length == 0xffffffff) {
-        dwarf_format = DWARF_64;
-        Message(Message::DEBUG_MESSAGE, "DWARF .debug_info data is in DWARF_64 format");
-        initial_length = parse_u64(debug_info);
+    while(debug_info->get_size()) {
+        compilation_unit_list.push_back(new CompilationUnit(elf_parser));
     }
-    else {
-        /* Else it's a 32-bit DWARF file. */
-        dwarf_format = DWARF_32;
-        
-        Message(Message::DEBUG_MESSAGE, "DWARF .debug_info data is in DWARF_32 format");
-    }
-    Message(Message::DEBUG_MESSAGE, Misc::StreamAsString() << "DWARF .debug_info initial length is " << initial_length);
-    
-#endif
 }
 
 Word Parser::parse_uleb128(Block &block) {

@@ -1,9 +1,11 @@
 #ifndef AESALON_MONITOR_DWARF_PARSER_H
 #define AESALON_MONITOR_DWARF_PARSER_H
 
+#include <vector>
+
 #include "elf/Parser.h"
 
-#include "EntryManager.h"
+#include "CompilationUnit.h"
 
 #include "misc/SmartPointer.h"
 
@@ -13,9 +15,11 @@ namespace DWARF {
 
 class Parser {
 public:
+    typedef std::vector<Misc::SmartPointer<CompilationUnit> > compilation_unit_list_t;
 private:
     Misc::SmartPointer<ELF::Parser> elf_parser;
-    Misc::SmartPointer<EntryManager> entry_manager;
+    
+    compilation_unit_list_t compilation_unit_list;
 public:
     Parser(Misc::SmartPointer<ELF::Parser> elf_parser);
     virtual ~Parser() {}

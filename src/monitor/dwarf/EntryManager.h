@@ -18,7 +18,7 @@ public:
 private:
     entry_list_t entry_list;
 public:
-    EntryManager();
+    EntryManager() {}
     virtual ~EntryManager() {}
     
     Misc::SmartPointer<Entry> get_entry(EntryID id) const;
