@@ -8,9 +8,13 @@ namespace Monitor {
 namespace DWARF {
 
 class Tag {
+private:
+    std::string type;
 public:
-    Tag() {}
+    Tag(std::string type) : type(type) {}
     virtual ~Tag() {}
+    
+    static Misc::SmartPointer<Tag> parse_from(Misc::SmartPointer<Block> block);
 };
 
 } // namespace DWARF
