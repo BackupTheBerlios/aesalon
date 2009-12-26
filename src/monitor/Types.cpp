@@ -13,6 +13,8 @@ void Block::remove(std::size_t from, std::size_t to) {
     for(std::size_t x = from; (x+remove_size) < get_size(); x ++) new_data[x] = old_data[x + remove_size];
     
     set_size(get_size() - remove_size);
+    set_data(new_data);
+    delete old_data;
 }
 
 } // namespace Monitor

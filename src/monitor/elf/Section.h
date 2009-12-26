@@ -25,18 +25,16 @@ private:
     section_t data;
     
     Block content;
-    Misc::SmartPointer<Byte> byte_content;
     
     std::string name;
+    
+    std::size_t get_content_size() const { return data.sh_size; }
 public:
     Section(int file_fd);
     virtual ~Section() {}
     
     void read_content();
-    Block get_content() const { return content; }
-    Misc::SmartPointer<Byte> get_byte_content() const { return byte_content; }
-    Misc::SmartPointer<char> get_char_content() { return (char *)byte_content.operator Byte *(); }
-    std::size_t get_content_size() const { return data.sh_size; }
+    Block &get_content() { return content; }
     
     std::string get_name() const { return name; }
     void set_name(std::string new_name) { name = new_name; }

@@ -1,3 +1,4 @@
+#include "Message.h"
 #include "Parser.h"
 
 namespace Aesalon {
@@ -6,6 +7,7 @@ namespace DWARF {
 
 Parser::Parser(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {
     Block debug_info = elf_parser->get_section(".debug_info")->get_content();
+    Message(Message::DEBUG_MESSAGE, Misc::StreamAsString() << "debug_info.get_data(): " << debug_info.get_data());
     Word initial_length = 0;
     if((*debug_info[0] == 0xff) &&
         (*debug_info[1] == 0xff) &&
