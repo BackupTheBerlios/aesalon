@@ -29,6 +29,12 @@ public:
     dwarf_format_e get_dwarf_format() const { return dwarf_format; }
     
     Word parse_leb128(Block &block, bool is_signed);
+    
+    Word parse_u32(Misc::SmartPointer<Block> block);
+    Word parse_s32(Misc::SmartPointer<Block> block);
+    Word parse_u64(Misc::SmartPointer<Block> block);
+    Word parse_s64(Misc::SmartPointer<Block> block);
+    
 };
 
 } // namespace DWARF

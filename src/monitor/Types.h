@@ -18,7 +18,7 @@ class Block {
 public:
     Block() : data(data), data_size(0) {}
     Block(Byte *data, std::size_t data_size) : data(data), data_size(data_size) {}
-    Byte *get_data() const { return data; }
+    Byte *get_data(std::size_t offset = 0) const { return data + offset; }
     void set_data(Byte *new_data) { data = new_data; }
     std::size_t get_size() const { return data_size; }
     void set_size(std::size_t new_size) { data_size = new_size; }

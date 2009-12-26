@@ -146,7 +146,7 @@ int Portal::wait_for_signal() {
 void Portal::handle_breakpoint() {
     Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(get_register(RIP));
     if(!breakpoint.is_valid()) {
-        Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");
+        /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
     }
     write_memory(breakpoint->get_address(), breakpoint->get_original());

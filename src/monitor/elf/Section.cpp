@@ -17,16 +17,12 @@ Section::Section(int file_fd) : file_fd(file_fd) {
 }
 
 void Section::read_content() {
-    std::cout << "Section::read_content(): file_fd is: " << file_fd << std::endl;
     lseek(file_fd, data.sh_offset, SEEK_SET);
     Byte *byte_content = new Byte[get_content_size()];
     
-    std::cout << "Section::read_content(): data.sh_size is: " << data.sh_size << std::endl;
-    
     ssize_t bytes = read(file_fd, byte_content, data.sh_size);
     if(bytes == -1) throw ParserException(Misc::StreamAsString() << "Error while reading section content: " << strerror(errno));
-    if(bytes != data.sh_size) {
-        std::cout << "Section::read_content(): only read " << bytes << " bytes . . ." << std::endl;
+    if(bytes != ssize_t(data.sh_size)) {
         throw ParserException("Section data ended unexpectedly");
     }
     
