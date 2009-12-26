@@ -9,25 +9,27 @@ namespace DWARF {
 Parser::Parser(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {
     Misc::SmartPointer<ELF::Section> debug_info_section = elf_parser->get_section(".debug_info");
     Misc::SmartPointer<Block> debug_info = elf_parser->get_section(".debug_info")->get_content();
-    
-    while(debug_info->get_size()) {
-        compilation_unit_list.push_back(new CompilationUnit(elf_parser));
-    }
 }
 
-Word Parser::parse_uleb128(Block &block) {
+Word Parser::parse_uleb128(Misc::SmartPointer<Block> block) {
     Word result = 0;
-    int shift = 0;
-    Word offset = 0;
+    int offset = 0;
     
     while(true) {
-        Byte next = *block[offset++];
-        result |= (next & 0x7f) << shift;
+        Byte next = *block->get_data(offset);
+        result |= (next & 0x7f) << (offset * 7);
         if(next & 0x80) break;
-        shift += 7;
+        offset ++;
     }
     
-    block.remove(0, offset);
+    block->remove(0, offset);
+    
+    return result;
+}
+
+SWord Parser::parse_sleb128(Misc::SmartPointer<Block> block) {
+    SWord result = 0;
+    int offset = 0;
     
     return result;
 }

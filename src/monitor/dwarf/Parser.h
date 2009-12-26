@@ -5,8 +5,6 @@
 
 #include "elf/Parser.h"
 
-#include "CompilationUnit.h"
-
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
@@ -15,16 +13,14 @@ namespace DWARF {
 
 class Parser {
 public:
-    typedef std::vector<Misc::SmartPointer<CompilationUnit> > compilation_unit_list_t;
 private:
     Misc::SmartPointer<ELF::Parser> elf_parser;
-    
-    compilation_unit_list_t compilation_unit_list;
 public:
     Parser(Misc::SmartPointer<ELF::Parser> elf_parser);
     virtual ~Parser() {}
     
-    Word parse_uleb128(Block &block);
+    static Word parse_uleb128(Misc::SmartPointer<Block> block);
+    static SWord parse_sleb128(Misc::SmartPointer<Block> block);
     
     static Word parse_u8(Misc::SmartPointer<Block> block);
     static Word parse_u16(Misc::SmartPointer<Block> block);
