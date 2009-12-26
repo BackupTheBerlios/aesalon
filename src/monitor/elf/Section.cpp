@@ -21,9 +21,8 @@ void Section::read_content() {
     std::size_t bytes = read(file_fd, byte_content, data.sh_size);
     if(bytes != data.sh_size) throw ParserException("Section data ended unexpectedly");
     
-    for(char *p = (char *)byte_content.operator Byte*(); (p-(char *)byte_content.operator Byte*()) < (Elf64_Word)data.sh_size; p ++) {
-        content.push_back(*p);
-    }
+    content.set_data(byte_content);
+    content.set_size(bytes);
 }
 
 } // namespace ELF
