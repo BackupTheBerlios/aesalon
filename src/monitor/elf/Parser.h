@@ -35,7 +35,7 @@ private:
     int file_fd;
 public:
     Parser(std::string filename);
-    virtual ~Parser() {}
+    virtual ~Parser();
     
     Misc::SmartPointer<Section> get_section(std::string name) const;
 };

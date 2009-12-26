@@ -29,12 +29,14 @@ Parser::Parser(std::string filename) : filename(filename) {
     string_table->read_content();
     
     for(section_list_t::iterator i = section_list.begin(); i != section_list.end(); i ++) {
-        Byte *p = string_table->get_content().get_data();
+        Byte *p = string_table->get_content()->get_data();
         p += (*i)->get_name_offset();
         
         (*i)->set_name((char *)p);
     }
-    
+}
+
+Parser::~Parser() {
     close(file_fd);
 }
 

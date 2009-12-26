@@ -6,6 +6,7 @@ namespace Monitor {
 namespace DWARF {
 
 Parser::Parser(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {
+    Misc::SmartPointer<ELF::Section> debug_info_section = elf_parser->get_section(".debug_info");
     Block debug_info = elf_parser->get_section(".debug_info")->get_content();
     Message(Message::DEBUG_MESSAGE, Misc::StreamAsString() << "debug_info.get_data(): " << debug_info.get_data());
     Word initial_length = 0;

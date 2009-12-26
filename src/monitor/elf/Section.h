@@ -24,7 +24,7 @@ private:
 
     section_t data;
     
-    Block content;
+    Misc::SmartPointer<Block> content;
     
     std::string name;
     
@@ -34,7 +34,10 @@ public:
     virtual ~Section() {}
     
     void read_content();
-    Block &get_content() { return content; }
+    Misc::SmartPointer<Block> get_content() {
+        if(!content.is_valid()) read_content();
+        return content;
+    }
     
     std::string get_name() const { return name; }
     void set_name(std::string new_name) { name = new_name; }
