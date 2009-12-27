@@ -41,6 +41,13 @@ public:
         @param to Where to end deleteing.
     */
     void remove(std::size_t from, std::size_t to);
+    
+    /** Creates a copy of a subset of the block of represented data.
+        @param from Where to begin copying.
+        @param to Where to end copying.
+        @return The subset of the block.
+    */
+    Misc::SmartPointer<Block> subset(std::size_t from, std::size_t to) const;
 };
 
 } // namespace Monitor
