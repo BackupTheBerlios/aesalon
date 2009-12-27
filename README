@@ -1,46 +1,41 @@
-This is the README for aesalon, version 0.0.1 (pre-release)
+This is the README for Aesalon.
 
----- OVERVIEW
-    In a nutshell, Aesalon is a program to graphically display the dynamically-
-allocated memory that another program has allocated. This can be utilized in a
-number of different ways.
+Aesalon is a program to monitor the dynamically-allocated memory of another
+program. It uses ptrace and some trickery with DWARF debugging information to
+form a reference counter that is then used to display statistics on the memory
+allocated.
 
----- BUILDING
-To build the aesalon executable, you will need the following:
-- g++ (only tested with 4.3 and 4.4; but any recent g++ should work. Aesalon is
-    99% ISO-c++0x compatible; there may be a few things that are not.)
-- libpthread, or some other pthread implementation (NOTE: LinuxThreads will
-    *not* work)
-- CMake (at least version 2.6)
-- bisonc++ (tested with 2.4.8, but older versions should also work)
+-- What is required to run aesalon
+In order to run the aesalon monitor on a program, it simply must have been
+compiled with debugging information, in the DWARF format. Beyond that, nothing
+else is required.
 
-For the aesalon GUI, you will additionally need:
-- qt devel libraries (tested with Qt 4.5.2, but Qt 4.3 or greater should work)
-- qt devel programs (moc4, etc. Note that qmake is *not* required)
+Currently, the only implemented graphical display utilizes Qt4. However,
+aesalon communicates information from the monitor to the display with TCP
+network sockets; therefore it is entirely possible to monitor a program
+remotely.
 
-Building aesalon is simplicity itself. (Well, maybe.) Depending on your
-version of g++, there may be some hand modifications required. Assuming you've
-accquired the source from somewhere, simply run these commands:
+-- What is required to compile aesalon
+Aesalon is written in c++0x-compatible C++, and is mostly POSIX-compliant; it
+uses very few features that are not specified in the POSIX.1-2001. Therefore,
+g++ and libstdc++ should be sufficient. Beyond that, aesalon additionally
+requires a pthreads implementation to be installed. It is rare, however, for a
+standard Linux distribution to not have the required pacakges. Simply install
+g++ (only tested with version 4.4, but others should work), and cmake, the
+buildsystem generator (tested with 2.6 and 2.8).
 
-For both aesalon and aesalon_gui:
-user@host[aesalon]$ cmake .
-user@host[aesalon]$ make
+-- How to compile aesalon
+First, edit the build.config file to change what is built, and what is not
+built. The only thing that most users will need to change is the PLATFORM
+variable. Currently, only x86 and x86_64 are actually supported, though ports
+to other platforms are certainly welcome.
 
-For only aesalon:
-user@host[aesalon]$ cmake .
-user@host[aesalon]$ make aesalon
+Run 'cmake .' in the project root directory once you are done. This will
+generate the Makefiles required to actually build aesalon. Once that is done,
+run 'make', and that should be all that is required. The two symlinks in the
+project root directory (aesalon and aesalon_gui) should get you started.
 
-For only aesalon_gui:
-user@host[aesalon]$ cmake .
-user@host[aesalon]$ make aesalon_gui
+Good luck, and happy hacking!
 
-If there are any configuration errors, correct them. (You may need to install
-additional development libraries.)
-
-The two symlinks in the root of the source directory (aesalon and aesalon_gui)
-should now be valid, and pointing to executables. Simply run the symlinks to
-run each program. If you so desire, you may copy the executables to a path;
-neither requires any data files beyond standard Qt files.
-
-And that is it, ladies and gentlemen -- aesalon is compiled.
+ -- strange <kawk256@gmail.com>
 
