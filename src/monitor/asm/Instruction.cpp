@@ -4,17 +4,14 @@ namespace Aesalon {
 namespace Monitor {
 namespace ASM {
 
-Instruction::Instruction(Platform::MemoryAddress address, Misc::SmartPointer<Block> raw)
+Instruction::Instruction(Word address, Misc::SmartPointer<Block> raw)
     : address(address), raw(raw) {
     
     parse_opcode();
 }
 
 void Instruction::parse_opcode() {
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86
-    if(*raw->get_data(0) == 0x0f) { /* it's a two-byte opcode */ }
-#endif
-    
+    opcode.parse(raw);
 }
 
 } // namespace ASM

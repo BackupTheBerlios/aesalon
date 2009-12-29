@@ -2,7 +2,6 @@
 #define AESALON_MONITOR_ASM_INSTRUCTION_H
 
 #include "Types.h"
-#include "platform/MemoryAddress.h"
 #include "Opcode.h"
 #include "Operand.h"
 
@@ -20,10 +19,10 @@ private:
     
     void parse_opcode();
 public:
-    Instruction(Platform::MemoryAddress address, Misc::SmartPointer<Block> raw);
+    Instruction(Word address, Misc::SmartPointer<Block> raw);
     virtual ~Instruction() {}
     
-    Platform::MemoryAddress get_address() const { return address; }
+    Word get_address() const { return address; }
 };
 
 } // namespace ASM

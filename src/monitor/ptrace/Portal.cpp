@@ -144,7 +144,13 @@ int Portal::wait_for_signal() {
 }
 
 void Portal::handle_breakpoint() {
-    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(get_register(ASM::Register::RIP));
+    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(get_register(
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+    ASM::Register::RIP
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    ASM::Register::EIP
+#endif
+    ));
     if(!breakpoint.is_valid()) {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
