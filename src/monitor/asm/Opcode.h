@@ -12,13 +12,29 @@ class Opcode {
 public:
     enum opcode_type_e {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-        MOV,
+        ADC,
         ADD,
-        SUB,
-        MUL,
-        DIV,
-        INC,
-        DEC
+        AND,
+        BSF,
+        BSR,
+        BSWAP,
+        BT,
+        BTC,
+        BTR,
+        BTS,
+        CALL,
+        CALLF,
+        CBW,
+        CWDE,
+        CDQE,
+        CLC,
+        CLD,
+        CLFLUSH,
+        CLI,
+        CLTS,
+        CMC,
+        CMOVB,
+        
 #endif
     };
 private:
