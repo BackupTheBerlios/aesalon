@@ -38,19 +38,19 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     add_signal_observer(new TrapObserver());
 }
 
-Platform::MemoryAddress Portal::get_register(register_e which) const {
+Platform::MemoryAddress Portal::get_register(ASM::Register which) const {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-        case RAX:
+        case ASM::Register::RAX:
             std::cout << "Value of RAX requested; RAX is " << registers.rax << ", ORIG_RAX is " << registers.orig_rax << std::endl;
             return registers.orig_rax;
-        case RBX:
+        case ASM::Register::RBX:
             return registers.rbx;
-        case RIP:
+        case ASM::Register::RIP:
             return registers.rip;
 #endif
         default:
@@ -144,7 +144,7 @@ int Portal::wait_for_signal() {
 }
 
 void Portal::handle_breakpoint() {
-    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(get_register(RIP));
+    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(get_register(ASM::Register::RIP));
     if(!breakpoint.is_valid()) {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;

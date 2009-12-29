@@ -13,6 +13,7 @@
 #include "platform/ArgumentList.h"
 #include "misc/SmartPointer.h"
 #include "PTraceException.h"
+#include "asm/Register.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -20,40 +21,6 @@ namespace PTrace {
 
 class Portal {
 public:
-    /** An enum representing the different registers available. */
-    enum register_e {
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-        RAX,
-        RBX,
-        RCX,
-        RDX,
-        R9,
-        R10,
-        R11,
-        R12,
-        R13,
-        R14,
-        R15,
-        RBP,
-        RSP,
-        RIP,
-        RDI,
-        RSI,
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-        EAX,
-        EBX,
-        ECX,
-        EDX,
-        EBP,
-        ESP,
-        EIP,
-        EDI,
-        ESI,
-#endif
-        CS,
-        SS
-    };
-    
     typedef std::vector<Misc::SmartPointer<Breakpoint> > breakpoint_list_t;
     
     typedef std::vector<Misc::SmartPointer<SignalObserver> > signal_observer_list_t;
@@ -86,7 +53,7 @@ public:
         @param which The register to get the value of.
         @return The value of the specified register.
     */
-    Platform::MemoryAddress get_register(register_e which) const;
+    Platform::MemoryAddress get_register(ASM::Register which) const;
     
     /** Read a Word of memory.
         @param address The address to read.

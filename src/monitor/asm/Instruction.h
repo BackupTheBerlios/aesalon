@@ -3,6 +3,8 @@
 
 #include "Types.h"
 #include "platform/MemoryAddress.h"
+#include "Opcode.h"
+#include "Operand.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -12,6 +14,9 @@ class Instruction {
 private:
     Platform::MemoryAddress address;
     Misc::SmartPointer<Block> raw;
+    
+    Opcode opcode;
+    std::vector<Operand> operands;
     
     void parse_opcode();
 public:

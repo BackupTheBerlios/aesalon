@@ -11,9 +11,10 @@ Instruction::Instruction(Platform::MemoryAddress address, Misc::SmartPointer<Blo
 }
 
 void Instruction::parse_opcode() {
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86 || AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86
     if(*raw->get_data(0) == 0x0f) { /* it's a two-byte opcode */ }
 #endif
+    
 }
 
 } // namespace ASM
