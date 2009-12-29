@@ -9,41 +9,20 @@ namespace Monitor {
 namespace ASM {
 
 class Opcode {
-public:
-    enum opcode_type_e {
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-        ADC,
-        ADD,
-        AND,
-        BSF,
-        BSR,
-        BSWAP,
-        BT,
-        BTC,
-        BTR,
-        BTS,
-        CALL,
-        CALLF,
-        CBW,
-        CWDE,
-        CDQE,
-        CLC,
-        CLD,
-        CLFLUSH,
-        CLI,
-        CLTS,
-        CMC,
-        CMOVB,
-        
-#endif
-    };
 private:
-    
+    std::string opcode;
+    bool change_memory;
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+    void handle_two_byte();
+#endif
 public:
-    Opcode() {}
+    Opcode() : opcode(""), change_memory(false) {}
     virtual ~Opcode() {}
     
     void parse(Misc::SmartPointer<Block> block);
+    std::string get_opcode() const { return opcode; }
+    
+    bool changes_memory() const { return change_memory; }
 };
 
 } // namespace ASM

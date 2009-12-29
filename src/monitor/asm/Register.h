@@ -8,6 +8,28 @@ namespace ASM {
 class Register {
 public:
     enum register_e {
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86 || AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+        AL,
+        AH,
+        BL,
+        BH,
+        CL,
+        CH,
+        DL,
+        DH,
+        AX,
+        BX,
+        CX,
+        DX,
+        EAX,
+        EBX,
+        ECX,
+        EDX,
+        ESI,
+        EDI,
+        ESP,
+        EBP,
+        EIP,
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         RAX,
         RBX,
@@ -25,17 +47,10 @@ public:
         RDI,
         RSP,
         RBP,
-        RIP
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-        EAX,
-        EBX,
-        ECX,
-        EDX,
-        ESI,
-        EDI,
-        ESP,
-        EBP,
-        EIP
+        RIP,
+#endif
+        CS,
+        SS
 #endif
     };
 private:
