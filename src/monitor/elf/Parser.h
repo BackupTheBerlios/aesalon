@@ -7,6 +7,8 @@
 
 #include "Section.h"
 #include "Header.h"
+#include "Symbol.h"
+#include "SymbolParser.h"
 
 #include "misc/SmartPointer.h"
 #include "misc/Exception.h"
@@ -32,12 +34,18 @@ private:
     section_list_t section_list;
     Misc::SmartPointer<Section> string_table;
     
+    Misc::SmartPointer<SymbolParser> symbol_parser;
+    
     int file_fd;
 public:
     Parser(std::string filename);
     virtual ~Parser();
     
     Misc::SmartPointer<Section> get_section(std::string name) const;
+    
+    Misc::SmartPointer<Symbol> get_symbol(std::string name) const;
+    
+    int get_fd() const { return file_fd; }
 };
 
 } // namespace ELF

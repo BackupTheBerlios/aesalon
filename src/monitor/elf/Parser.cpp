@@ -34,6 +34,8 @@ Parser::Parser(std::string filename) : filename(filename) {
         
         (*i)->set_name((char *)p);
     }
+    
+    symbol_parser = new SymbolParser(this);
 }
 
 Parser::~Parser() {
@@ -45,6 +47,10 @@ Misc::SmartPointer<Section> Parser::get_section(std::string name) const {
         if((*i)->get_name() == name) return *i;
     }
     return NULL;
+}
+
+Misc::SmartPointer<Symbol> Parser::get_symbol(std::string name) const {
+    return symbol_parser->get_symbol(name);
 }
 
 } // namespace ELF

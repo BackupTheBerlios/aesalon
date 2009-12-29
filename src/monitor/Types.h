@@ -48,6 +48,13 @@ public:
         @return The subset of the block.
     */
     Misc::SmartPointer<Block> subset(std::size_t from, std::size_t to) const;
+    
+    /** Acts like the POSIX read() function -- reads a specific amount of
+        data into a buffer.
+        @param data The buffer to read into.
+        @param size The amount of data to read.
+    */
+    void read(void *data, std::size_t size);
 };
 
 } // namespace Monitor

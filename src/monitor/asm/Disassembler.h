@@ -26,6 +26,8 @@ public:
     virtual ~Disassembler();
     
     Misc::SmartPointer<Instruction> get_instruction_at(Platform::MemoryAddress address) const;
+    
+    void parse_symbol(std::string symbol_name);
 };
 
 } // namespace ASM

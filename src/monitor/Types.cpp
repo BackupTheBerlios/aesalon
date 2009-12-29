@@ -23,5 +23,14 @@ Misc::SmartPointer<Block> Block::subset(std::size_t from, std::size_t to) const 
     return new Block(&temp_data[0], temp_data.size());
 }
 
+void Block::read(void *data, std::size_t size) {
+    if(size > get_size()) return;
+    if(data == NULL) return;
+    for(std::size_t x = 0; x < size; x ++) {
+        *((Byte *)data + x) = *get_data(x);
+    }
+    remove(0, size);
+}
+
 } // namespace Monitor
 } // namespace Aesalon

@@ -6,7 +6,6 @@
 #include "platform/TCPServerSocket.h"
 #include "platform/BidirectionalPipe.h"
 #include "platform/EventQueue.h"
-#include "platform/SymbolManager.h"
 #include "ProgramManager.h"
 
 namespace Aesalon {
@@ -23,7 +22,6 @@ private:
     Misc::SmartPointer<Platform::EventQueue> event_queue;
     
     Misc::SmartPointer<ProgramManager> program_manager;
-    Misc::SmartPointer<Platform::SymbolManager> symbol_manager;
     
     /** Initialize the aeslaon gdb monitor. */
     void initialize();
