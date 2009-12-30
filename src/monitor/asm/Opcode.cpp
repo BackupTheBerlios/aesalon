@@ -15,7 +15,7 @@ Opcode::Opcode(Misc::SmartPointer<Block> block) {
 }
 
 void Opcode::parse() {
-    expected_operands.push_back(OperandType(Aesalon::Monitor::ASM::OperandType::REGISTER, 8));
+    /*expected_operands.push_back(OperandType(Aesalon::Monitor::ASM::OperandType::REGISTER, 8));*/
 }
 
 } // namespace ASM
