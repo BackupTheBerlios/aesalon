@@ -10,21 +10,27 @@ namespace ASM {
 
 class OperandType {
 public:
-    enum operand_type_e {
-        REGISTER,
-        REGISTER_OFFSET,
-        CONSTANT,
-        DEREF_CONSTANT
+    enum {
+        REGISTER = 0x01,
+        REGISTER_OFFSET = 0x02,
+        CONSTANT = 0x04,
+        DEREF_CONSTANT = 0x08
+    };
+    enum {
+        BYTE = 0x01,
+        WORD = 0x02,
+        DWORD = 0x04,
+        QWORD = 0x08
     };
 private:
-    operand_type_e operand_type;
+    std::size_t operand_type;
     std::size_t data_size;
 public:
-    OperandType(operand_type_e operand_type = REGISTER, std::size_t data_size = -1) :
+    OperandType(std::size_t operand_type = 0, std::size_t data_size = 0) :
         operand_type(operand_type), data_size(data_size) {}
     
-    operand_type_e get_type() const { return operand_type; }
-    void set_type(operand_type_e new_type) { operand_type = new_type; }
+    std::size_t get_type() const { return operand_type; }
+    void set_type(std::size_t new_type) { operand_type = new_type; }
     std::size_t get_data_size() const { return data_size; }
     void set_data_size(std::size_t new_size) { data_size = new_size; }
 };
