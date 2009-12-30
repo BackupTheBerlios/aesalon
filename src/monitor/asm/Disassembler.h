@@ -1,33 +1,28 @@
 #ifndef AESALON_MONITOR_ASM_DISASSEMBLER_H
 #define AESALON_MONITOR_ASM_DISASSEMBLER_H
 
-#include <string>
-#include <vector>
+#include <map>
 
 #include "elf/Parser.h"
-
-#include "Instruction.h"
-
-#include "misc/Singleton.h"
+#include "elf/Symbol.h"
+#include "InstructionList.h"
 
 namespace Aesalon {
 namespace Monitor {
 namespace ASM {
 
-class Disassembler : public Misc::Singleton<Disassembler> {
-protected:
-    typedef std::vector<Misc::SmartPointer<Instruction> > instruction_vector_t;
+class Disassembler {
+public:
+    typedef std::map<std::string, Misc::SmartPointer<InstructionList> > symbol_to_il_t;
 private:
     Misc::SmartPointer<ELF::Parser> elf_parser;
     
-    instruction_vector_t instruction_vector;
+    symbol_to_il_t symbol_to_il;
 public:
     Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser);
-    virtual ~Disassembler();
+    virtual ~Disassembler() {}
     
-    Misc::SmartPointer<Instruction> get_instruction_at(Platform::MemoryAddress address) const;
-    
-    void parse_symbol(std::string symbol_name);
+    Misc::SmartPointer<InstructionList> get_symbol_il(std::string symbol_name);
 };
 
 } // namespace ASM

@@ -6,7 +6,6 @@
 #include "Types.h"
 
 #include "misc/SmartPointer.h"
-#include "platform/MemoryAddress.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -41,8 +40,11 @@ public:
     
     std::string get_name() const { return name; }
     void set_name(std::string new_name) { name = new_name; }
+
+    Word get_name_offset() const { return data.sh_name; }
+    Word get_data_offset() const { return data.sh_offset; }
     
-    Platform::MemoryAddress get_name_offset() const { return data.sh_name; }
+    Word get_virtual_address() const { return data.sh_addr; }
     
     bool is_string_table() const { return data.sh_type == SHT_STRTAB; }
 };

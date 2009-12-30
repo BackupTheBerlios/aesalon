@@ -43,7 +43,7 @@ private:
     int wait_for_signal();
 public:
     /** Generic constructor for PTracePortal.
-        @param pid The PID of the child process.
+        @param argument_list The arguments to spawn the child with.
     */
     Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list);
     /** Virtual destructor, does nothing. */

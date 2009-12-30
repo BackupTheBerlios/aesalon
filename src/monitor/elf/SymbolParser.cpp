@@ -15,7 +15,7 @@ SymbolParser::SymbolParser(Misc::SmartPointer<Parser> elf_parser) : elf_parser(e
         std::string symbol_name;
         
         char *name = (char *)elf_parser->get_section(".strtab")->get_content()->get_data(sym.st_name);
-        if(sym.st_value) symbol_vector.push_back(new Symbol(name, sym.st_value));
+        if(sym.st_value) symbol_vector.push_back(new Symbol(name, sym.st_value, sym.st_size));
     }
 }
 

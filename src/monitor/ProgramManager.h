@@ -7,6 +7,7 @@
 #include "ptrace/Portal.h"
 #include "elf/Parser.h"
 #include "dwarf/Parser.h"
+#include "asm/Disassembler.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -21,6 +22,7 @@ private:
     
     Misc::SmartPointer<ELF::Parser> elf_parser;
     Misc::SmartPointer<DWARF::Parser> dwarf_parser;
+    Misc::SmartPointer<ASM::Disassembler> disassembler;
 public:
     ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list);
     virtual ~ProgramManager() {}

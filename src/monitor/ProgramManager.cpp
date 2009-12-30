@@ -9,6 +9,9 @@ ProgramManager::ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argume
     
     elf_parser = new ELF::Parser(argument_list->get_argument(0));
     dwarf_parser = new DWARF::Parser(elf_parser);
+    disassembler = new ASM::Disassembler(elf_parser);
+    
+    disassembler->get_symbol_il("main");
 }
 
 void ProgramManager::execute() {

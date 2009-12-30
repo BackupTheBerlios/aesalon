@@ -3,7 +3,6 @@
 
 #include "Types.h"
 #include "Opcode.h"
-#include "Operand.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -11,18 +10,10 @@ namespace ASM {
 
 class Instruction {
 private:
-    Platform::MemoryAddress address;
-    Misc::SmartPointer<Block> raw;
-    
-    Opcode opcode;
-    std::vector<Operand> operands;
-    
-    void parse_opcode();
+    Misc::SmartPointer<Opcode> opcode;
 public:
-    Instruction(Word address, Misc::SmartPointer<Block> raw);
+    Instruction(Misc::SmartPointer<Block> block);
     virtual ~Instruction() {}
-    
-    Word get_address() const { return address; }
 };
 
 } // namespace ASM
