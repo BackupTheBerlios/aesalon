@@ -10,8 +10,13 @@ void Opcode::parse(Misc::SmartPointer<Block> block) {
     
     if(first == 0x0f) handle_two_byte();
     
-    if(first == 0x00) {
-    }
+    if(first <= 0x05) opcode = "ADD";
+    else if(first >= 0x08 && first <= 0x0D) opcode = "OR";
+    else if(first >= 0x10 && first <= 0x15) opcode = "ADC";
+    else if(first >= 0x18 && first <= 0x1D) opcode = "SBB";
+    else if(first >= 0x20 && first <= 0x25) opcode = "AND";
+    else if(first >= 0x28 && first <= 0x2D) opcode = "SUB";
+    else opcode = "<invalid opcode>";
 }
 
 void Opcode::handle_two_byte() {

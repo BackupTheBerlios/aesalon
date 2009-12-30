@@ -1,6 +1,8 @@
 #ifndef AESALON_MONITOR_ASM_REGISTER_H
 #define AESALON_MONITOR_ASM_REGISTER_H
 
+#include <cstddef>
+
 namespace Aesalon {
 namespace Monitor {
 namespace ASM {
@@ -79,6 +81,7 @@ public:
     register_e operator=(const Register &other) {
         return (reg = other.reg);
     }
+    std::size_t get_register_size() const;
 };
 
 } // namespace ASM
