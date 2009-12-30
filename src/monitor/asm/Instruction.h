@@ -12,11 +12,14 @@ class Instruction {
 protected:
     typedef std::vector<Misc::SmartPointer<Operand> > operand_list_t;
 private:
-    Misc::SmartPointer<Opcode> opcode;
     operand_list_t operands;
 public:
-    Instruction(Misc::SmartPointer<Block> block);
+    Instruction() {}
     virtual ~Instruction() {}
+    
+    Misc::SmartPointer<Operand> get_operand(std::size_t which) const
+        { return operands[which]; }
+    std::size_t get_operands() const { return operands.size(); }
 };
 
 } // namespace ASM

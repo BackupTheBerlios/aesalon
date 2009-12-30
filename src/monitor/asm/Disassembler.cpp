@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Disassembler.h"
 
 namespace Aesalon {
@@ -12,10 +11,6 @@ Disassembler::Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_par
 Misc::SmartPointer<InstructionList> Disassembler::get_symbol_il(std::string symbol_name) {
     if(symbol_to_il[symbol_name] != NULL) return symbol_to_il[symbol_name];
     
-    std::cout << "Disassembling symbol \"" << symbol_name << "\"\n";
-    
-    std::cout << std::hex;
-    
     Misc::SmartPointer<ELF::Symbol> symbol = elf_parser->get_symbol(symbol_name);
     Word section_offset = elf_parser->get_section(".text")->get_virtual_address();
     
@@ -27,10 +22,16 @@ Misc::SmartPointer<InstructionList> Disassembler::get_symbol_il(std::string symb
     Misc::SmartPointer<InstructionList> il = new InstructionList(symbol->get_address());
     
     while(symbol_block->get_size() > 0) {
-        il->add_instruction(new Instruction(symbol_block));
+        il->add_instruction(parse_instruction(symbol_block));
     }
     
-    std::cout << std::dec;
+    symbol_to_il[symbol_name] = il;
+    
+    return il;
+}
+
+Misc::SmartPointer<Instruction> Disassembler::parse_instruction(Misc::SmartPointer<Block> block) {
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
     
     return NULL;
 }

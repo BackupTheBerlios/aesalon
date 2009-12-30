@@ -18,6 +18,8 @@ private:
     Misc::SmartPointer<ELF::Parser> elf_parser;
     
     symbol_to_il_t symbol_to_il;
+    
+    Misc::SmartPointer<Instruction> parse_instruction(Misc::SmartPointer<Block>);
 public:
     Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser);
     virtual ~Disassembler() {}
