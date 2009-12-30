@@ -10,6 +10,7 @@ namespace ASM {
 class Register {
 public:
     enum register_e {
+        INVALID,
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86 || AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         AL,
         AH,
@@ -58,7 +59,7 @@ public:
 private:
     register_e reg;
 public:
-    Register(register_e reg) : reg(reg) {}
+    Register(register_e reg = INVALID) : reg(reg) {}
     virtual ~Register() {}
     
     operator register_e() const {

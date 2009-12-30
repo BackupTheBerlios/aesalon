@@ -14,6 +14,10 @@ Opcode::Opcode(Misc::SmartPointer<Block> block) {
     block->remove(0, opcode_size);
 }
 
+void Opcode::parse() {
+    expected_operands.push_back(OperandType(Aesalon::Monitor::ASM::OperandType::REGISTER, 8));
+}
+
 } // namespace ASM
 } // namespace Monitor
 } // namespace Aesalon
