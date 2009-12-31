@@ -45,7 +45,7 @@ public:
     
     Misc::SmartPointer<Symbol> get_symbol(std::string name) const;
     
-    int get_fd() const { return file_fd; }
+    std::string get_filename() const { return filename; }
 };
 
 } // namespace ELF

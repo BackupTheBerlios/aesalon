@@ -1,39 +1,71 @@
+#include <iostream>
 #include "Disassembler.h"
+#include "platform/BidirectionalPipe.h"
+#include "platform/ArgumentList.h"
+#include "misc/String.h"
 
 namespace Aesalon {
 namespace Monitor {
 namespace ASM {
 
 Disassembler::Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {
+    Platform::ArgumentList al;
+    al.add_argument("/usr/bin/objdump"); /* NOTE: hardcoded path . . . */
+    al.add_argument("-dMintel");
+    al.add_argument("--section=.text");
+    al.add_argument(elf_parser->get_filename());
     
+    bi_pipe = new Platform::BidirectionalPipe(al, true);
+    
+    parse_objdump_output();
+    bi_pipe = NULL;
 }
 
-Misc::SmartPointer<InstructionList> Disassembler::get_symbol_il(std::string symbol_name) {
-    if(symbol_to_il[symbol_name] != NULL) return symbol_to_il[symbol_name];
-    
-    Misc::SmartPointer<ELF::Symbol> symbol = elf_parser->get_symbol(symbol_name);
-    Word section_offset = elf_parser->get_section(".text")->get_virtual_address();
-    
-    Word local_symbol_address = symbol->get_address() - section_offset;
-    
-    Misc::SmartPointer<Block> symbol_block = elf_parser->get_section(".text")->get_content()
-        ->subset(local_symbol_address, local_symbol_address + symbol->get_size());
-    
-    Misc::SmartPointer<InstructionList> il = new InstructionList(symbol->get_address());
-    
-    while(symbol_block->get_size() > 0) {
-        il->add_instruction(parse_instruction(symbol_block));
+void Disassembler::parse_objdump_output() {
+    std::string line;
+    Misc::SmartPointer<ELF::Symbol> symbol = NULL;
+    while(bi_pipe->is_open()) {
+        line = bi_pipe->get_string();
+        if(line == "") continue;
+        
+        std::cout << "parsing objdump line \"" << line << "\"\n";
+        
+        Word address = 0;
+        Misc::String::to<Word>(line, address, true);
+        if(address < elf_parser->get_section(".text")->get_virtual_address()) continue;
+        
+        line.erase(0, line.find(" "));
+        while(line[0] == ' ') line.erase(0, 1);
+        
+        if(line[0] == '<') {
+            line.erase(0, 1);
+            line.erase(line.find(">"));
+            /* NOTE: ignores all symbols beginning with __ . . . */
+            if(line.substr(0, 2) == "__") symbol = NULL;
+            else {
+                symbol = elf_parser->get_symbol(line);
+                std::cout << "\tSymbol name is \"" << line << "\"\n";
+            }
+            continue;
+        }
+        /* it's an instruction . . . */
+        if(!symbol.is_valid()) continue; /* Continue if there's no resolved symbol ATM . . . */
+        if(line.find("<") != std::string::npos) line.erase(line.find("<"));
+        bool finished = false;
+        while(!finished) {
+            Byte value = 0;
+            Misc::String::to<Byte>(line.substr(0, 2), value, true);
+            if(value == 0) break;
+            line.erase(0, 1);
+        }
+        while(line[line.length()-1] == ' ') line.erase(line.length()-1);
+        while(line[0] == ' ' || line[0] == '\t') {
+            line.erase(0, 1);
+        }
+        if(line == "") continue;
+        std::cout << "\tAssembly instruction is \"" << line << "\"\n";
+        /* Now parse the instruction and push it onto the InstructionList for the symbol . . . */
     }
-    
-    symbol_to_il[symbol_name] = il;
-    
-    return il;
-}
-
-Misc::SmartPointer<Instruction> Disassembler::parse_instruction(Misc::SmartPointer<Block> block) {
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    
-    return NULL;
 }
 
 } // namespace ASM

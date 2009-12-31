@@ -6,6 +6,7 @@
 #include "elf/Parser.h"
 #include "elf/Symbol.h"
 #include "InstructionList.h"
+#include "platform/BidirectionalPipe.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -19,12 +20,15 @@ private:
     
     symbol_to_il_t symbol_to_il;
     
-    Misc::SmartPointer<Instruction> parse_instruction(Misc::SmartPointer<Block>);
+    Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
+    
+    void parse_objdump_output();
 public:
     Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser);
     virtual ~Disassembler() {}
     
-    Misc::SmartPointer<InstructionList> get_symbol_il(std::string symbol_name);
+    Misc::SmartPointer<InstructionList> get_symbol_il(std::string symbol_name)
+        { return symbol_to_il[symbol_name]; }
 };
 
 } // namespace ASM

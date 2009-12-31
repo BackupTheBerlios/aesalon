@@ -15,8 +15,7 @@ BidirectionalPipeException::BidirectionalPipeException(std::string message,
     bool strerr) : Misc::Exception(Misc::StreamAsString() << message << (strerr?strerror(errno):"")) {
 }
 
-BidirectionalPipe::BidirectionalPipe(std::string executable,
-    ArgumentList argument_list, bool block) : block(block) {
+BidirectionalPipe::BidirectionalPipe(ArgumentList argument_list, bool block) : block(block) {
         
     pipe(pc_pipe_fd);
     pipe(cp_pipe_fd);
@@ -34,7 +33,7 @@ BidirectionalPipe::BidirectionalPipe(std::string executable,
         dup2(pc_pipe_fd[0], STDIN_FILENO);
         dup2(cp_pipe_fd[1], STDOUT_FILENO);
         
-        execv(executable.c_str(), argument_list.get_as_argv());
+        execv(argument_list.get_argument(0).c_str(), argument_list.get_as_argv());
         
         throw BidirectionalPipeException("Failed to execute file: ", true);
     }

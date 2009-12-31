@@ -23,9 +23,9 @@ private:
     
     Misc::SmartPointer<ProgramManager> program_manager;
     
-    /** Initialize the aeslaon gdb monitor. */
+    /** Initialize the aesalon monitor. */
     void initialize();
-    /** Deinitialize the aesalon gdb monitor. */
+    /** Deinitialize the aesalon monitor. */
     void deinitialize();
     
     /** Print usage information about aesalon, including a list of all flags. */

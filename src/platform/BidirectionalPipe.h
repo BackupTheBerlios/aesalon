@@ -25,7 +25,7 @@ private:
     bool block;
     pid_t pid;
 public:
-    BidirectionalPipe(std::string executable, ArgumentList argument_list, bool block);
+    BidirectionalPipe(ArgumentList argument_list, bool block);
     virtual ~BidirectionalPipe();
     
     void send_string(std::string data);
