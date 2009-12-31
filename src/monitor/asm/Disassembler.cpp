@@ -28,7 +28,7 @@ void Disassembler::parse_objdump_output() {
         line = bi_pipe->get_string();
         if(line == "") continue;
         
-        std::cout << "parsing objdump line \"" << line << "\"\n";
+        /*std::cout << "parsing objdump line \"" << line << "\"\n";*/
         
         Word address = 0;
         Misc::String::to<Word>(line, address, true);
@@ -44,7 +44,7 @@ void Disassembler::parse_objdump_output() {
             if(line.substr(0, 2) == "__") symbol = NULL;
             else {
                 symbol = elf_parser->get_symbol(line);
-                std::cout << "\tSymbol name is \"" << line << "\"\n";
+                /*std::cout << "\tSymbol name is \"" << line << "\"\n";*/
             }
             continue;
         }
@@ -58,12 +58,12 @@ void Disassembler::parse_objdump_output() {
             if(value == 0) break;
             line.erase(0, 1);
         }
-        while(line[line.length()-1] == ' ') line.erase(line.length()-1);
-        while(line[0] == ' ' || line[0] == '\t') {
+        while(line.length() && line[line.length()-1] == ' ') line.erase(line.length()-1);
+        while(line.length() && (line[0] == ' ' || line[0] == '\t')) {
             line.erase(0, 1);
         }
         if(line == "") continue;
-        std::cout << "\tAssembly instruction is \"" << line << "\"\n";
+        /*std::cout << "\tAssembly instruction is \"" << line << "\"\n";*/
         /* Now parse the instruction and push it onto the InstructionList for the symbol . . . */
     }
 }
