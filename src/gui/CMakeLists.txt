@@ -12,3 +12,4 @@ add_executable(aesalon_gui ${SOURCES})
 
 target_link_libraries(aesalon_gui aesalon_platform aesalon_misc QtCore QtGui pthread)
 
+install(TARGETS aesalon_gui RUNTIME DESTINATION bin)

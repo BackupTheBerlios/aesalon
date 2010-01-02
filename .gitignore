@@ -13,6 +13,8 @@ CMakeCache.txt
 cmake_install.cmake
 Makefile
 version_info
+install
+install_manifest.txt
 
 # IDE (KDevelop 4) ignores
 *kdev*

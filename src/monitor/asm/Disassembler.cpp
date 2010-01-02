@@ -3,6 +3,7 @@
 #include "platform/BidirectionalPipe.h"
 #include "platform/ArgumentList.h"
 #include "misc/String.h"
+#include "Message.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -17,7 +18,9 @@ Disassembler::Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_par
     
     bi_pipe = new Platform::BidirectionalPipe(al, true);
     
+    Message::Message(Aesalon::Monitor::Message::DEBUG_MESSAGE, "Beginning disassembly of target");
     parse_objdump_output();
+    Message::Message(Aesalon::Monitor::Message::DEBUG_MESSAGE, "Disassembly of target completed");
     bi_pipe = NULL;
 }
 
