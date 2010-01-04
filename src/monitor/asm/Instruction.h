@@ -14,7 +14,7 @@ protected:
 private:
     operand_list_t operands;
 public:
-    Instruction() {}
+    Instruction(std::string instruction);
     virtual ~Instruction() {}
     
     Misc::SmartPointer<Operand> get_operand(std::size_t which) const

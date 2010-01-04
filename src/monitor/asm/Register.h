@@ -56,6 +56,14 @@ public:
         SS
 #endif
     };
+    
+    enum data_size_e {
+        SIZE_BYTE,
+        SIZE_WORD,
+        SIZE_DWORD,
+        SIZE_QWORD
+    };
+
 private:
     register_e reg;
 public:
@@ -82,7 +90,7 @@ public:
     register_e operator=(const Register &other) {
         return (reg = other.reg);
     }
-    std::size_t get_register_size() const;
+    data_size_e get_register_size() const;
 };
 
 } // namespace ASM

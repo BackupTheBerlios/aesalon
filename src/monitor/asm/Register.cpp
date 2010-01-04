@@ -4,7 +4,7 @@ namespace Aesalon {
 namespace Monitor {
 namespace ASM {
 
-std::size_t Register::get_register_size() const {
+Register::data_size_e Register::get_register_size() const {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86 || AESALON_PLATFORM_x86_64
     switch(reg) {
         case AL:
@@ -15,12 +15,12 @@ std::size_t Register::get_register_size() const {
         case CH:
         case DL:
         case DH:
-            return 8;
+            return SIZE_BYTE;
         case AX:
         case BX:
         case CX:
         case DX:
-            return 16;
+            return SIZE_WORD;
         case EAX:
         case EBX:
         case ECX:
@@ -29,7 +29,7 @@ std::size_t Register::get_register_size() const {
         case ESI:
         case EBP:
         case ESP:
-            return 32;
+            return SIZE_DWORD;
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         case RAX:
         case RBX:
@@ -48,13 +48,13 @@ std::size_t Register::get_register_size() const {
         case RSP:
         case RBP:
         case RIP:
-            return 64;
+            return SIZE_QWORD;
         default:
-            return 0;
+            return SIZE_BYTE;
 #endif
     }
 #endif
-    return 0;
+    return SIZE_BYTE;
 }
 
 } // namespace ASM
