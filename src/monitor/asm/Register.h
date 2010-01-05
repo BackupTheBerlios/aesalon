@@ -2,6 +2,8 @@
 #define AESALON_MONITOR_ASM_REGISTER_H
 
 #include <cstddef>
+#include <vector>
+#include <string>
 
 namespace Aesalon {
 namespace Monitor {
@@ -10,7 +12,7 @@ namespace ASM {
 class Register {
 public:
     enum register_e {
-        INVALID,
+        INVALID = 0,
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86 || AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         AL,
         AH,
@@ -91,6 +93,8 @@ public:
         return (reg = other.reg);
     }
     data_size_e get_register_size() const;
+    
+    static Register from_string(std::string string);
 };
 
 } // namespace ASM

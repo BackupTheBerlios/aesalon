@@ -66,7 +66,7 @@ void Disassembler::parse_objdump_output() {
             line.erase(0, 1);
         }
         if(line == "") continue;
-        std::cout << "\tAssembly instruction is \"" << line << "\"\n";
+        std::cout << "Assembly instruction is \"" << line << "\"\n";
         /* Now parse the instruction and push it onto the InstructionList for the symbol . . . */
         if(!symbol_to_il[symbol->get_symbol_name()].is_valid())
             symbol_to_il[symbol->get_symbol_name()] = new InstructionList(symbol->get_address());

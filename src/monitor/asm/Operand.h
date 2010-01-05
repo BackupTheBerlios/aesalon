@@ -12,29 +12,26 @@ class Operand {
 public:
     enum operand_type_e {
         REGISTER,
-        CONSTANT,
-        DEREF_CONSTANT,
+        MEMORY_ADDRESS,
         REGISTER_OFFSET
     };
 private:
     operand_type_e operand_type;
-    Register::data_size_e operand_size;
+    Word address;
+    SWord offset;
+    Register reg;
+    Register::data_size_e data_size;
 public:
-    Operand(operand_type_e type, Register::data_size_e size) : operand_type(type), operand_size(size) {}
+    Operand(std::string operand_string);
+    Operand(operand_type_e operand_type, Word address = 0, Register reg = Register::INVALID, SWord offset = 0)
+        : operand_type(operand_type), address(address), reg(reg) {}
     virtual ~Operand() {}
     
-    operand_type_e get_type() const { return operand_type; }
-    Register::data_size_e get_size() const { return operand_size; }
-protected:
-    void set_size(Register::data_size_e new_size) { operand_size = new_size; }
-};
-
-class RegisterOperand : public Operand {
-private:
-    Register which_register;
-public:
-    RegisterOperand(Register reg);
-    virtual ~RegisterOperand() {}
+    Word get_address() const { return address; }
+    void set_address(Word new_address) { address = new_address; }
+    
+    Register get_register() const { return reg; }
+    void set_register(Register new_register) { reg = new_register; }
 };
 
 } // namespace ASM

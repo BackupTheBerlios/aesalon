@@ -38,6 +38,12 @@ public:
     template<typename Type> static std::string from(Type &instance) {
         return Misc::StreamAsString() << instance;
     }
+    
+    /** Strips whitespace from the beginning of a string.
+        @param string The string to strip the whitespace from.
+        @return @a string, without whitespace.
+    */
+    static std::string strip_whitespace(std::string string);
 };
 
 } // namespace Misc

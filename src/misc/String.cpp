@@ -50,5 +50,10 @@ bool String::begins_with(std::string string, std::string beginning) {
     return string.substr(0, beginning.length()) == beginning;
 }
 
+std::string String::strip_whitespace(std::string string) {
+    while(std::isspace(string[0]) && string.length()) string.erase(0, 1);
+    return string;
+}
+
 } // namespace Misc
 } // namespace Aesalon

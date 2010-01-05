@@ -2,24 +2,27 @@
 #define AESALON_MONITOR_ASM_INSTRUCTION_H
 
 #include "Types.h"
-#include "Opcode.h"
+#include "Operand.h"
 
 namespace Aesalon {
 namespace Monitor {
 namespace ASM {
 
 class Instruction {
-protected:
-    typedef std::vector<Misc::SmartPointer<Operand> > operand_list_t;
 private:
-    operand_list_t operands;
+    bool memory_change;
+    Misc::SmartPointer<Operand> source;
+    Misc::SmartPointer<Operand> destination;
+    
+    void handle_opcode(std::string opcode, std::string operands);
 public:
     Instruction(std::string instruction);
     virtual ~Instruction() {}
     
-    Misc::SmartPointer<Operand> get_operand(std::size_t which) const
-        { return operands[which]; }
-    std::size_t get_operands() const { return operands.size(); }
+    bool changes_memory() const { return memory_change; }
+    
+    Misc::SmartPointer<Operand> get_source() const { return source; }
+    Misc::SmartPointer<Operand> get_destination() const { return destination; }
 };
 
 } // namespace ASM

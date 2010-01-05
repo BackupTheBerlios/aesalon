@@ -1,3 +1,5 @@
+#include <map>
+#include <iostream>
 #include "Register.h"
 
 namespace Aesalon {
@@ -55,6 +57,59 @@ Register::data_size_e Register::get_register_size() const {
     }
 #endif
     return SIZE_BYTE;
+}
+
+Register Register::from_string(std::string string) {
+    std::map<std::string, register_e> reg_map;
+    
+    reg_map["al"] = AL;
+    reg_map["ah"] = AH;
+    reg_map["bl"] = BL;
+    reg_map["bh"] = BH;
+    reg_map["cl"] = CL;
+    reg_map["ch"] = CH;
+    reg_map["dl"] = DL;
+    reg_map["dh"] = DH;
+    reg_map["ax"] = AX;
+    reg_map["bx"] = BX;
+    reg_map["cx"] = CX;
+    reg_map["dx"] = DX;
+    reg_map["eax"] = EAX;
+    reg_map["ebx"] = EBX;
+    reg_map["ecx"] = ECX;
+    reg_map["edx"] = EDX;
+    reg_map["esi"] = ESI;
+    reg_map["edi"] = EDI;
+    reg_map["esp"] = ESP;
+    reg_map["ebp"] = EBP;
+    reg_map["eip"] = EIP;
+    reg_map["rax"] = RAX;
+    reg_map["rbx"] = RBX;
+    reg_map["rcx"] = RCX;
+    reg_map["rdx"] = RDX;
+    reg_map["r8"] = R8;
+    reg_map["r9"] = R9;
+    reg_map["r10"] = R10;
+    reg_map["r11"] = R11;
+    reg_map["r12"] = R12;
+    reg_map["r13"] = R13;
+    reg_map["r14"] = R14;
+    reg_map["r15"] = R15;
+    reg_map["rsi"] = RSI;
+    reg_map["rdi"] = RDI;
+    reg_map["rsp"] = RSP;
+    reg_map["rbp"] = RBP;
+    reg_map["rip"] = RIP;
+    reg_map["cs"] = CS;
+    reg_map["ss"] = SS;
+    
+    for(std::string::iterator i = string.begin(); i != string.end(); i ++) {
+        (*i) = std::tolower(*i);
+    }
+    
+    std::cout << "Register::from_string(): resulting register string is \"" << string << "\"\n";
+    
+    return reg_map[string];
 }
 
 } // namespace ASM
