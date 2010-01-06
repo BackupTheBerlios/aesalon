@@ -9,6 +9,7 @@
 #include "Breakpoint.h"
 #include "Types.h"
 #include "SignalObserver.h"
+#include "BreakpointObserver.h"
 #include "platform/MemoryAddress.h"
 #include "platform/ArgumentList.h"
 #include "misc/SmartPointer.h"
@@ -20,10 +21,11 @@ namespace Monitor {
 namespace PTrace {
 
 class Portal {
-public:
+protected:
     typedef std::vector<Misc::SmartPointer<Breakpoint> > breakpoint_list_t;
     
     typedef std::vector<Misc::SmartPointer<SignalObserver> > signal_observer_list_t;
+    typedef std::vector<Misc::SmartPointer<BreakpointObserver> > breakpoint_observer_list_t;
 private:
     /** The PID of the attached process. */
     pid_t pid;
@@ -39,6 +41,8 @@ private:
     }
     
     signal_observer_list_t signal_observer_list;
+    
+    breakpoint_observer_list_t breakpoint_observer_list;
     
     int wait_for_signal();
 public:
@@ -107,6 +111,9 @@ public:
     
     void add_signal_observer(Misc::SmartPointer<SignalObserver> new_observer) {
         signal_observer_list.push_back(new_observer);
+    }
+    void add_breakpoint_observer(Misc::SmartPointer<BreakpointObserver> new_observer) {
+        breakpoint_observer_list.push_back(new_observer);
     }
 };
 

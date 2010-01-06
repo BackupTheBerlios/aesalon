@@ -17,7 +17,7 @@ Operand::Operand(std::string operand_string) {
         Misc::String::to<Word>(operand_string, address);
         return;
     }
-    std::cout << "NOTE: Register offsets NYI." << std::endl;
+    std::cout << "\tregister offset operand: \"" << operand_string << "\"\n";
 }
 
 } // namespace ASM

@@ -13,6 +13,7 @@
 
 #include "ExitObserver.h"
 #include "TrapObserver.h"
+#include "MallocObserver.h"
 
 #include "Message.h"
 
@@ -36,6 +37,7 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     
     add_signal_observer(new ExitObserver());
     add_signal_observer(new TrapObserver());
+    add_breakpoint_observer(new MallocObserver());
 }
 
 Platform::MemoryAddress Portal::get_register(ASM::Register which) const {
@@ -156,6 +158,12 @@ void Portal::handle_breakpoint() {
         return;
     }
     Message(Message::DEBUG_MESSAGE, "handle_breakpoint() found a breakpoint . . .");
+    
+    /* NOTE: reverse iterator for speed concerns. */
+    for(breakpoint_observer_list_t::const_reverse_iterator i = breakpoint_observer_list.rbegin(); i != breakpoint_observer_list.rend(); i ++) {
+        if((*i)->handle_breakpoint(breakpoint)) break;
+    }
+    
     write_memory(breakpoint->get_address(), breakpoint->get_original());
     single_step();
     write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());
