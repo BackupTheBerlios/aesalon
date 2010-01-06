@@ -31,6 +31,7 @@ public:
     void wait();
     
     Misc::SmartPointer<PTrace::Portal> get_ptrace_portal() const { return ptrace_portal; }
+    Misc::SmartPointer<ELF::Parser> get_elf_parser() const { return elf_parser; }
     
     Misc::SmartPointer<Platform::ArgumentList> get_argument_list() const { return argument_list; }
     

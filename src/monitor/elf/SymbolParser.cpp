@@ -43,7 +43,7 @@ SymbolParser::SymbolParser(Misc::SmartPointer<Parser> elf_parser) : elf_parser(e
         char *name = (char *)elf_parser->get_section(".dynstr")->get_content()->get_data(sym.st_name);
         std::cout << "Dynamic symbol: name is \"" << name << "\", address is " << sym.st_value << std::endl;
         std::cout << "Dynamic offset for this symbol is: " << dynamic_offsets[index] << std::endl;
-        if(sym.st_value) symbol_vector.push_back(new Symbol(name, dynamic_offsets[index], sym.st_size));
+        if(sym.st_name) symbol_vector.push_back(new Symbol(name, dynamic_offsets[index], sym.st_size));
         index ++;
     }
     std::cout << std::dec;

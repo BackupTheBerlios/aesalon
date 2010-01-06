@@ -1,3 +1,4 @@
+#include <iostream>
 #include <signal.h>
 #include "ProgramManager.h"
 
@@ -17,7 +18,8 @@ ProgramManager::ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argume
 void ProgramManager::execute() {
     running = true;
     ptrace_portal = new PTrace::Portal(get_argument_list());
-    elf_parser->dump_symbols();
+    /*elf_parser->dump_symbols();*/
+    std::cout << "ProgramManager: address of malloc is: " << elf_parser->get_symbol("malloc")->get_address() << std::endl;
 }
 
 void ProgramManager::wait() {
