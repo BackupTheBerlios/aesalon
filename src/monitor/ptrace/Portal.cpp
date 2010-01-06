@@ -155,6 +155,7 @@ void Portal::handle_breakpoint() {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
     }
+    Message(Message::DEBUG_MESSAGE, "handle_breakpoint() found a breakpoint . . .");
     write_memory(breakpoint->get_address(), breakpoint->get_original());
     single_step();
     write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());

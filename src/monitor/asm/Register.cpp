@@ -107,8 +107,6 @@ Register Register::from_string(std::string string) {
         (*i) = std::tolower(*i);
     }
     
-    std::cout << "Register::from_string(): resulting register string is \"" << string << "\"\n";
-    
     return reg_map[string];
 }
 

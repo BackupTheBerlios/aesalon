@@ -15,10 +15,9 @@ Operand::Operand(std::string operand_string) {
     }
     if(std::isdigit(operand_string[0])) {
         Misc::String::to<Word>(operand_string, address);
-        std::cout << "Constant, value is " << address << std::endl;
         return;
     }
-    std::cout << "Register offsets NYI." << std::endl;
+    std::cout << "NOTE: Register offsets NYI." << std::endl;
 }
 
 } // namespace ASM

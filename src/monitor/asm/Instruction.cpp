@@ -16,16 +16,28 @@ Instruction::Instruction(std::string instruction) {
     }
     instruction.erase(0, opcode.length());
     
-    std::cout << "\tInstruction opcode is: \"" << opcode << "\"\n";
+    /*std::cout << "\tInstruction opcode is: \"" << opcode << "\"\n";*/
     
     handle_opcode(opcode, Misc::String::strip_whitespace(instruction));
 }
 
 
 void Instruction::handle_opcode(std::string opcode, std::string operands) {
-    if(opcode == "mov") {
-        source = new Operand(operands.substr(0, operands.find(",")));
-        destination = new Operand(operands.substr(operands.find(",")+1));
+    std::vector<std::string> operand;
+    if(operands.find("#") != std::string::npos) operands.erase(operands.find("#"));
+    while(operands.length()) {
+        operand.push_back(operands.substr(0, operands.find(",")));
+        if(operands.find(",") != std::string::npos) operands.erase(0, operands.find(",")+1);
+        else operands = "";
+    }
+    
+    if(Misc::String::begins_with(opcode, "mov")) {
+        source = new Operand(operand[0]);
+        destination = new Operand(operand[1]);
+    }
+    else if(Misc::String::begins_with(opcode, "add")) {
+        source = new Operand(operand[0]);
+        destination = new Operand(Aesalon::Monitor::ASM::Operand::REGISTER, 0, Register::RAX);
     }
 }
 

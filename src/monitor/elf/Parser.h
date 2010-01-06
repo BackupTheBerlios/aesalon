@@ -44,6 +44,7 @@ public:
     Misc::SmartPointer<Section> get_section(std::string name) const;
     
     Misc::SmartPointer<Symbol> get_symbol(std::string name) const;
+    void dump_symbols() const { symbol_parser->dump_symbols(); }
     
     std::string get_filename() const { return filename; }
 };

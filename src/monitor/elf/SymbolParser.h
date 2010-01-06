@@ -20,6 +20,8 @@ public:
     virtual ~SymbolParser() {}
     
     Misc::SmartPointer<Symbol> get_symbol(std::string name) const;
+    
+    void dump_symbols() const;
 };
 
 } // namespace ELF

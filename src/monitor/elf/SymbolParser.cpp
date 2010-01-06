@@ -26,6 +26,13 @@ Misc::SmartPointer<Symbol> SymbolParser::get_symbol(std::string name) const {
     return NULL;
 }
 
+void SymbolParser::dump_symbols() const {
+    std::cout << "Symbol dump: \n";
+    for(symbol_vector_t::const_iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
+        std::cout << "\tSymbol: name is \"" << (*i)->get_symbol_name() << "\", address is 0x" << std::hex << (*i)->get_address() << std::dec << std::endl;
+    }
+}
+
 } // namespace ELF
 } // namespace Monitor
 } // namespace Aesalon
