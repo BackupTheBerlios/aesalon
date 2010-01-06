@@ -55,6 +55,8 @@ public:
         @param size The amount of data to read.
     */
     void read(void *data, std::size_t size);
+    
+    void hexdump();
 };
 
 } // namespace Monitor

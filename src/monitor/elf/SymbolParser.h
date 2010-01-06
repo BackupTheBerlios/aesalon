@@ -1,6 +1,8 @@
 #ifndef AESALON_MONITOR_ELF_SYMBOL_PARSER_H
 #define AESALON_MONITOR_ELF_SYMBOL_PARSER_H
 
+#include <vector>
+
 #include "Symbol.h"
 
 namespace Aesalon {
@@ -12,9 +14,11 @@ class Parser;
 class SymbolParser {
 protected:
     typedef std::vector<Misc::SmartPointer<Symbol> > symbol_vector_t;
+    typedef std::vector<Word> dynamic_offsets_t;
 private:
     Misc::SmartPointer<Parser> elf_parser;
     symbol_vector_t symbol_vector;
+    dynamic_offsets_t dynamic_offsets;
 public:
     SymbolParser(Misc::SmartPointer<Parser> elf_parser);
     virtual ~SymbolParser() {}

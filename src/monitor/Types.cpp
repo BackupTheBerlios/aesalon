@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Types.h"
 
 namespace Aesalon {
@@ -30,6 +31,16 @@ void Block::read(void *data, std::size_t size) {
         *((Byte *)data + x) = *get_data(x);
     }
     remove(0, size);
+}
+
+void Block::hexdump() {
+    std::cout << std::hex;
+    std::size_t x = 0;
+    for(x = 0; x < get_size(); x ++) {
+        std::cout << (int)*get_data(x) << " ";
+        if((x % 40) == 39) std::cout << std::endl;
+    }
+    std::cout << std::dec << std::endl;
 }
 
 } // namespace Monitor
