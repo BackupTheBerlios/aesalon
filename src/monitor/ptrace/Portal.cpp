@@ -13,6 +13,7 @@
 
 #include "ExitObserver.h"
 #include "TrapObserver.h"
+#include "SegfaultObserver.h"
 #include "MallocObserver.h"
 
 #include "Message.h"
@@ -35,8 +36,10 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     
     /*ptrace(PTRACE_SETOPTIONS, pid, 0, PTRACE_O_TRACESYSGOOD);*/
     
-    add_signal_observer(new ExitObserver());
+    /* Trap signals are the most common, so add the TrapObserver on first. */
     add_signal_observer(new TrapObserver());
+    add_signal_observer(new ExitObserver());
+    add_signal_observer(new SegfaultObserver());
     add_breakpoint_observer(new MallocObserver());
 }
 
@@ -130,18 +133,24 @@ void Portal::handle_signal() {
 }
 
 void Portal::continue_execution(int signal) {
+    std::cout << "Portal::continue_execution() called . . ." << std::endl;
     if(ptrace(PTRACE_CONT, pid, NULL, NULL) == -1)
         throw PTraceException(Misc::StreamAsString() << "Couldn't continue program execution: " << strerror(errno));
+    std::cout << "\tExecution continued." << std::endl;
 }
 
 void Portal::single_step() {
+    std::cout << "Portal::single_step() called . . ." << std::endl;
     if(ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL) == -1)
         throw PTraceException(Misc::StreamAsString() << "Couldn't single-step program:" << strerror(errno));
+    std::cout << "\tSingle-step successful. " << std::endl;
 }
 
 int Portal::wait_for_signal() {
+    std::cout << "Portal::wait_for_signal() called . . ." << std::endl;
     int status;
     if(waitpid(pid, &status, 0) == -1) throw PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
+    std::cout << "\tGot signal." << std::endl;
     return status;
 }
 

@@ -18,9 +18,9 @@ bool TrapObserver::handle_signal(int signal, int status) {
         program_manager->get_ptrace_portal()->place_breakpoint(program_manager->get_elf_parser()->get_symbol("malloc")->get_address());
         first_run = false;
     }
-    std::cout << "handle_breakpoint() called . . ." << std::endl;
+    std::cout << "TrapObserver::handle_signal(): calling handle_breakpoint() . . ." << std::endl;
     program_manager->get_ptrace_portal()->handle_breakpoint();
-    std::cout << "continuing execution . . ." << std::endl;
+    std::cout << "TrapObserver::handle_signal(): calling continue_execution() . . ." << std::endl;
     program_manager->get_ptrace_portal()->continue_execution();
     return true;
 }
