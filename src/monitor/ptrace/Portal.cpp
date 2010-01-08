@@ -207,6 +207,7 @@ void Portal::handle_breakpoint() {
     write_memory(breakpoint->get_address(), breakpoint->get_original());
     /* Single-step over that instruction . . . */
     single_step();
+    wait_for_signal(); /* single_step() throws out a SIGTRAP when it's done. */
     /* Re-write out the trap instruction . . . */
     write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());
     /* And then TrapObserver will call continue_execution(). */
