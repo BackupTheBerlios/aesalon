@@ -86,7 +86,6 @@ Word Portal::read_memory(Platform::MemoryAddress address) const {
     Word return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
     if(return_value == Word(-1) && errno != 0)
         throw PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
-    /* NOTE: what happens if return_value is < 0? . ..  */
     return return_value;
 }
 
@@ -100,7 +99,7 @@ void Portal::write_memory(Platform::MemoryAddress address, Byte value) {
     std::cout << "Portal::write_memory(address, Byte) called . . ." << std::endl;
     Word current_value = read_memory(address);
     current_value &= ~0xff;
-    write_memory(address, (current_value | value));
+    write_memory(address, Word(current_value | value));
 }
 
 void Portal::attach() {
