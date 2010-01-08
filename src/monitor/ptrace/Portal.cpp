@@ -43,7 +43,7 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     add_breakpoint_observer(new MallocObserver());
 }
 
-Platform::MemoryAddress Portal::get_register(ASM::Register which) const {
+Word Portal::get_register(ASM::Register which) const {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
@@ -63,20 +63,41 @@ Platform::MemoryAddress Portal::get_register(ASM::Register which) const {
     }
 }
 
+void Portal::set_register(ASM::Register which, Word new_value) {
+    struct user_regs_struct registers;
+    if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
+        throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
+    
+    switch(which) {
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+        case ASM::Register::RIP:
+            registers.rip = new_value;
+            break;
+#endif
+        default:
+            throw PTraceException("Asked to set value of invalid register");
+    }
+    if(ptrace(PTRACE_SETREGS, pid, NULL, &registers) == -1)
+        throw PTraceException(Misc::StreamAsString() << "Couldn't set register values: " << strerror(errno));
+}
+
 Word Portal::read_memory(Platform::MemoryAddress address) const {
-    SWord return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
-    if(return_value == -1 && errno != 0)
+    std::cout << "Portal::read_memory() called . . ." << std::endl;
+    Word return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
+    if(return_value == Word(-1) && errno != 0)
         throw PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
     /* NOTE: what happens if return_value is < 0? . ..  */
     return return_value;
 }
 
 void Portal::write_memory(Platform::MemoryAddress address, Word value) {
+    std::cout << "Portal::write_memory(address, Word) called . . ." << std::endl;
     if(ptrace(PTRACE_POKEDATA, pid, address, value) == -1) 
         throw PTraceException(Misc::StreamAsString() << "Couldn't write memory: " << strerror(errno));
 }
 
 void Portal::write_memory(Platform::MemoryAddress address, Byte value) {
+    std::cout << "Portal::write_memory(address, Byte) called . . ." << std::endl;
     Word current_value = read_memory(address);
     current_value &= ~0xff;
     write_memory(address, (current_value | value));
@@ -87,6 +108,8 @@ void Portal::attach() {
 }
 
 void Portal::place_breakpoint(Platform::MemoryAddress address) {
+    std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
+    std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
     Byte original = read_memory(address) & 0xff;
     add_breakpoint(new Breakpoint(address, original));
     write_memory(address, Byte(0xcc));
@@ -163,22 +186,31 @@ void Portal::handle_breakpoint() {
     ASM::Register::EIP
 #endif
     );
+    /* Subtract one from the IP, since the 0xcc SIGTRAP instruction was executed . . . */
+    ip --;
     Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(ip);
-    std::cout << "\tIP: " << ip << std::endl;
+    std::cout << "\tIP: " << std::hex << ip << std::dec << std::endl;
     if(!breakpoint.is_valid()) {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
     }
     Message(Message::DEBUG_MESSAGE, "handle_breakpoint() found a breakpoint . . .");
     
+    /* ip is currently $rip - 1, to use gdb notation. In other words, back up one byte. */
+    set_register(ASM::Register::RIP, ip);
+    
     /* NOTE: reverse iterator for speed concerns. */
     for(breakpoint_observer_list_t::const_reverse_iterator i = breakpoint_observer_list.rbegin(); i != breakpoint_observer_list.rend(); i ++) {
         if((*i)->handle_breakpoint(breakpoint)) break;
     }
     
+    /* Write out the original instruction . . . */
     write_memory(breakpoint->get_address(), breakpoint->get_original());
+    /* Single-step over that instruction . . . */
     single_step();
+    /* Re-write out the trap instruction . . . */
     write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());
+    /* And then TrapObserver will call continue_execution(). */
 }
 
 } // namespace PTrace

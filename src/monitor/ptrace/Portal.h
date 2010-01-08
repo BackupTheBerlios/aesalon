@@ -59,6 +59,8 @@ public:
     */
     Platform::MemoryAddress get_register(ASM::Register which) const;
     
+    void set_register(ASM::Register which, Word new_value);
+    
     /** Read a Word of memory.
         @param address The address to read.
         @return The value at @a address.
