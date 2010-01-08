@@ -10,9 +10,10 @@ namespace PTrace {
 bool SegfaultObserver::handle_signal(int signal, int status) {
     if(signal == SIGSEGV) {
         Initializer::get_instance()->get_program_manager()->set_running(false);
-        Message::Message(Message::WARNING_MESSAGE, "Program segfaulted");
+        Message::Message(Message::WARNING_MESSAGE, "Program received SIGSEGV, aborting");
         return true;
     }
+    
     return false;
 }
 

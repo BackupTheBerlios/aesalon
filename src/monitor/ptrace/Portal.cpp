@@ -79,7 +79,7 @@ void Portal::write_memory(Platform::MemoryAddress address, Word value) {
 void Portal::write_memory(Platform::MemoryAddress address, Byte value) {
     Word current_value = read_memory(address);
     current_value &= ~0xff;
-    write_memory(address, current_value | value);
+    write_memory(address, (current_value | value));
 }
 
 void Portal::attach() {
@@ -155,13 +155,16 @@ int Portal::wait_for_signal() {
 }
 
 void Portal::handle_breakpoint() {
-    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(get_register(
+    std::cout << "Portal::handle_breakpoint() called . . ." << std::endl;
+    Word ip = get_register(
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
     ASM::Register::RIP
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86
     ASM::Register::EIP
 #endif
-    ));
+    );
+    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(ip);
+    std::cout << "\tIP: " << ip << std::endl;
     if(!breakpoint.is_valid()) {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
