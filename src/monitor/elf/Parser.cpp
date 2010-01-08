@@ -32,7 +32,7 @@ Parser::Parser(std::string filename) : filename(filename) {
         Byte *p = string_table->get_content()->get_data();
         p += (*i)->get_name_offset();
         
-        std::cout << "Section, name is \"" << (char *)p << "\'\n";
+        /*std::cout << "Section, name is \"" << (char *)p << "\'\n";*/
         
         (*i)->set_name((char *)p);
     }
