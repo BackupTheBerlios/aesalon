@@ -15,7 +15,8 @@ bool TrapObserver::handle_signal(int signal, int status) {
     Misc::SmartPointer<ProgramManager> program_manager = Initializer::get_instance()->get_program_manager();
     
     if(first_run) {
-        program_manager->get_ptrace_portal()->place_breakpoint(program_manager->get_elf_parser()->get_symbol("main")->get_address());
+        std::cout << "\tTrapObserver::handle_signal(): libc offset is " << program_manager->get_ptrace_portal()->get_libc_offset() << std::endl;
+        /*program_manager->get_ptrace_portal()->place_breakpoint(program_manager->get_elf_parser()->get_symbol("malloc")->get_address());*/
         first_run = false;
         program_manager->get_ptrace_portal()->continue_execution();
         return true;

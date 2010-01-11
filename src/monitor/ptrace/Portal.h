@@ -44,6 +44,8 @@ private:
     
     breakpoint_observer_list_t breakpoint_observer_list;
     
+    Word libc_offset;
+    
     int wait_for_signal();
 public:
     /** Generic constructor for PTracePortal.
@@ -117,6 +119,8 @@ public:
     void add_breakpoint_observer(Misc::SmartPointer<BreakpointObserver> new_observer) {
         breakpoint_observer_list.push_back(new_observer);
     }
+    
+    Word get_libc_offset();
 };
 
 } // namespace PTrace
