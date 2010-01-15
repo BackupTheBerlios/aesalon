@@ -31,6 +31,10 @@ else(DEVELOPMENT_BUILD)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif(DEVELOPMENT_BUILD)
 
+# Compile the tests if this is a dev build
+if(DEVELOPMENT_BUILD)
+    add_subdirectory(tests)
+endif(DEVELOPMENT_BUILD)
 
 # Now compile everything . . .
 add_subdirectory(src)
