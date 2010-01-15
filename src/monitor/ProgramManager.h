@@ -20,7 +20,7 @@ private:
     
     Misc::SmartPointer<PTrace::Portal> ptrace_portal;
     
-    Misc::SmartPointer<ELF::Parser> elf_parser;
+    Misc::SmartPointer<ELF::Parser> elf_parser, libc_parser;
     Misc::SmartPointer<DWARF::Parser> dwarf_parser;
     Misc::SmartPointer<ASM::Disassembler> disassembler;
 public:
@@ -30,8 +30,12 @@ public:
     void execute();
     void wait();
     
+    /* called from a PTrace signal observer when the first SIGTRAP is caught, e.g. the child is loaded into memory */
+    void place_initial_breakpoints();
+    
     Misc::SmartPointer<PTrace::Portal> get_ptrace_portal() const { return ptrace_portal; }
     Misc::SmartPointer<ELF::Parser> get_elf_parser() const { return elf_parser; }
+    Misc::SmartPointer<ELF::Parser> get_libc_parser() const { return libc_parser; }
     
     Misc::SmartPointer<Platform::ArgumentList> get_argument_list() const { return argument_list; }
     

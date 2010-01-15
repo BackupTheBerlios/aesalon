@@ -81,6 +81,8 @@ public:
     
     /** Attaches onto the PID @a pid. */
     void attach();
+    /** Detaches from running program. */
+    void detach();
     
     /** Places a breakpoint at a specified address.
         @param address The address to place the breakpoint at.
@@ -120,6 +122,9 @@ public:
         breakpoint_observer_list.push_back(new_observer);
     }
     
+    /** Reads the memory map in /proc for the child process to determine the address libc is lodaded into.
+        @return The address of libc, or 0 if libc is not currently loaded.
+    */
     Word get_libc_offset();
 };
 

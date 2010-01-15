@@ -127,6 +127,10 @@ void Portal::attach() {
     ptrace(PTRACE_ATTACH, pid, NULL, NULL);
 }
 
+void Portal::detach() {
+    ptrace(PTRACE_DETACH, pid, NULL, NULL);
+}
+
 void Portal::place_breakpoint(Platform::MemoryAddress address) {
     std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
     std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
@@ -237,7 +241,8 @@ void Portal::handle_breakpoint() {
 }
 
 Word Portal::get_libc_offset() {
-    if(libc_offset) return libc_offset;
+    if(libc_offset != 0) return libc_offset;
+    libc_offset = 0;
     
     std::string map_file;
     map_file = Misc::StreamAsString() << "/proc/" << pid << "/maps";
