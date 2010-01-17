@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <climits>
 
 #include "Portal.h"
 #include "Initializer.h"
@@ -18,6 +19,7 @@
 #include "TrapObserver.h"
 #include "SegfaultObserver.h"
 #include "MallocObserver.h"
+#include "MainObserver.h"
 
 #include "misc/String.h"
 
@@ -45,7 +47,10 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     add_signal_observer(new TrapObserver());
     add_signal_observer(new ExitObserver());
     add_signal_observer(new SegfaultObserver());
+    
     add_breakpoint_observer(new MallocObserver());
+    /* This is a single-shot breakpoint observer, but since there's currently no way to remove observers, stick it on last. */
+    add_breakpoint_observer(new MainObserver());
     
     std::cout << "Portal::Portal(): waiting for SIGTRAP call from child . . ." << std::endl;
     /* Wait for the SIGTRAP that indicates a exec() call . . . */
@@ -81,12 +86,14 @@ Word Portal::get_register(ASM::Register which) const {
 
 void Portal::set_register(ASM::Register which, Word new_value) {
     struct user_regs_struct registers;
+    std::cout << "Portal::set_register() called . . .\n";
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         case ASM::Register::RIP:
+            std::cout << "\tSetting RIP to " << std::hex << new_value << std::dec << std::endl;
             registers.rip = new_value;
             break;
 #endif
@@ -117,12 +124,11 @@ void Portal::write_memory(Platform::MemoryAddress address, Byte value) {
     std::cout << "Portal::write_memory(address, Byte) called . . ." << std::endl;
     std::cout << "\tWriting 0x" << std::hex << (int)value << " to " << address << std::endl;
     Word current_value = read_memory(address);
-    /* Let's assume, for the moment, that current_value is now 0x0123456789abcdef.
-        Now, value is 0xff. So . . . is this system little-endian or big-endian?
-        The zeroing mask wanted is ~0xff.
-    */
-    current_value &= ~0xff;
-    write_memory(address, Word(current_value | value));
+    Word word_offset = 0;
+    word_offset = address & 0x08;
+    
+    current_value &= ~(0xff << (word_offset * CHAR_BIT));
+    write_memory(address - word_offset, Word(current_value | (value << (word_offset * CHAR_BIT))));
 }
 
 void Portal::attach() {
@@ -137,8 +143,9 @@ void Portal::place_breakpoint(Platform::MemoryAddress address) {
     std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
     std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
     Byte original = read_memory(address) & 0xff;
-    add_breakpoint(new Breakpoint(address, original));
-    write_memory(address, Byte(0xcc));
+    Misc::SmartPointer<Breakpoint> new_bp = new Breakpoint(address, original);
+    add_breakpoint(new_bp);
+    write_memory(address, new_bp->get_breakpoint_character());
 }
 
 void Portal::remove_breakpoint(Platform::MemoryAddress address) {
@@ -245,7 +252,7 @@ void Portal::handle_breakpoint() {
     }
     Message(Message::DEBUG_MESSAGE, "handle_breakpoint() found a breakpoint . . .");
     
-    /* ip is currently $rip - 1, to use gdb notation. In other words, back up one byte. */
+    /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
     set_register(ASM::Register::RIP, ip);
     
     /* NOTE: reverse iterator for speed concerns. */
