@@ -37,11 +37,12 @@ void ProgramManager::place_initial_breakpoints() {
     std::cout << "ProgramManager::place_initial_breakpoints(): placing malloc breakpoint . . ." << std::endl;
     std::cout << "\tlibc offset is " << libc_offset << std::endl;
     std::cout << "\tmalloc offset is " << get_libc_parser()->get_symbol("malloc")->get_address() << std::endl;
-    std::cout << "\tmalloc address is " << libc_offset + get_libc_parser()->get_symbol("malloc")->get_address() << std::endl;
-    get_ptrace_portal()->place_breakpoint(libc_offset + get_libc_parser()->get_symbol("malloc")->get_address());
+    Word malloc_address = libc_offset + get_libc_parser()->get_symbol("malloc")->get_address();
+    std::cout << "\tmalloc address is " << malloc_address << std::endl;
+    get_ptrace_portal()->place_breakpoint(malloc_address, get_ptrace_portal()->get_malloc_observer());
     
     /* Remove the breakpoint on main(), it's not required any more. */
-    get_ptrace_portal()->get_breakpoint_by_address(get_elf_parser()->get_symbol("main")->get_address())->set_valid(false);
+    /*get_ptrace_portal()->get_breakpoint_by_address(get_elf_parser()->get_symbol("main")->get_address())->set_valid(false);*/
 }
 
 } // namespace Monitor

@@ -1,12 +1,13 @@
 #include "MallocObserver.h"
 #include "Initializer.h"
 #include "platform/MemoryEvent.h"
+#include "BreakpointReference.h"
 
 namespace Aesalon {
 namespace Monitor {
 namespace PTrace {
 
-bool MallocObserver::handle_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint) {
+bool MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     Misc::SmartPointer<ELF::Symbol> malloc_symbol = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc");
     Misc::SmartPointer<Portal> portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
     
@@ -36,7 +37,7 @@ bool MallocObserver::handle_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint
     /* TODO: find where the return address is really being stored . . . */
     return_address = portal->read_memory(rbp-40);
     std::cout << "\tReturn address: " << return_address << std::endl;
-    breakpoints.insert(portal->place_breakpoint(return_address));
+    breakpoints.insert(portal->place_breakpoint(return_address, this));
     std::cout << "\tMemory block size will be " << portal->get_register(ASM::Register::RDI) << std::endl;
     last_size = portal->get_register(ASM::Register::RDI);
     

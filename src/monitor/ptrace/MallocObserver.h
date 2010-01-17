@@ -17,7 +17,7 @@ private:
 public:
     MallocObserver() {}
     virtual ~MallocObserver() {}
-    virtual bool handle_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint);
+    virtual bool handle_breakpoint(const BreakpointReference &breakpoint);
 };
 
 } // namespace PTrace

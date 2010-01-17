@@ -25,7 +25,6 @@ protected:
     typedef std::vector<Misc::SmartPointer<Breakpoint> > breakpoint_list_t;
     
     typedef std::vector<Misc::SmartPointer<SignalObserver> > signal_observer_list_t;
-    typedef std::vector<Misc::SmartPointer<BreakpointObserver> > breakpoint_observer_list_t;
 private:
     /** The PID of the attached process. */
     pid_t pid;
@@ -41,12 +40,13 @@ private:
     }
     
     signal_observer_list_t signal_observer_list;
-    
-    breakpoint_observer_list_t breakpoint_observer_list;
-    
+        
     Word libc_offset;
     
     int wait_for_signal();
+    
+    Misc::SmartPointer<BreakpointObserver> initial_observer;
+    Misc::SmartPointer<BreakpointObserver> malloc_observer;
 public:
     /** Generic constructor for PTracePortal.
         @param argument_list The arguments to spawn the child with.
@@ -86,9 +86,10 @@ public:
     
     /** Places a breakpoint at a specified address.
         @param address The address to place the breakpoint at.
+        @param observer The initial observer to use for the breakpoint.
         @return The ID of the newly-inserted breakpoint.
     */
-    std::size_t place_breakpoint(Platform::MemoryAddress address);
+    std::size_t place_breakpoint(Platform::MemoryAddress address, Misc::SmartPointer<BreakpointObserver> observer);
     
     void remove_breakpoint(Platform::MemoryAddress address);
     
@@ -121,16 +122,13 @@ public:
     void add_signal_observer(Misc::SmartPointer<SignalObserver> new_observer) {
         signal_observer_list.push_back(new_observer);
     }
-    void add_breakpoint_observer(Misc::SmartPointer<BreakpointObserver> new_observer) {
-        breakpoint_observer_list.push_back(new_observer);
-    }
+    
+    Misc::SmartPointer<BreakpointObserver> get_malloc_observer() const { return malloc_observer; }
     
     /** Reads the memory map in /proc for the child process to determine the address libc is lodaded into.
         @return The address of libc, or 0 if libc is not currently loaded.
     */
     Word get_libc_offset();
-    
-    void wait_for_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint);
 };
 
 } // namespace PTrace

@@ -29,7 +29,7 @@ Word Parser::parse_uleb128(Misc::SmartPointer<Block> block) {
 
 SWord Parser::parse_sleb128(Misc::SmartPointer<Block> block) {
     SWord result = 0;
-    int offset = 0;
+    /*int offset = 0;*/
     
     return result;
 }

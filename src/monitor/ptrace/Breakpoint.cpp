@@ -1,7 +1,9 @@
 #include "Breakpoint.h"
+#include "BreakpointReference.h"
 
 namespace Aesalon {
 namespace Monitor {
+namespace PTrace {
 
 Breakpoint::Breakpoint(Platform::MemoryAddress address, Byte original)
     : address(address), original(original), 
@@ -17,5 +19,12 @@ Breakpoint::Breakpoint(Platform::MemoryAddress address, Byte original)
     
 }
 
+void Breakpoint::notify() {
+    for(observer_list_t::iterator i = observer_list.begin(); i != observer_list.end(); i ++) {
+        (*i)->handle_breakpoint(BreakpointReference(this));
+    }
+}
+
+} // namespace PTrace
 } // namespace Monitor
 } // namespace Aesalon

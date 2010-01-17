@@ -20,6 +20,7 @@
 #include "SegfaultObserver.h"
 #include "MallocObserver.h"
 #include "MainObserver.h"
+#include "BreakpointReference.h"
 
 #include "misc/String.h"
 
@@ -48,16 +49,17 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     add_signal_observer(new ExitObserver());
     add_signal_observer(new SegfaultObserver());
     
-    add_breakpoint_observer(new MallocObserver());
     /* This is a single-shot breakpoint observer, but since there's currently no way to remove observers, stick it on last. */
-    add_breakpoint_observer(new MainObserver());
+    initial_observer = new MainObserver();
+    malloc_observer = new MallocObserver();
     
     std::cout << "Portal::Portal(): waiting for SIGTRAP call from child . . ." << std::endl;
     /* Wait for the SIGTRAP that indicates a exec() call . . . */
     wait_for_signal();
     std::cout << "Portal::Portal(): got SIGTRAP call, placing breakpoint on main . . ." << std::endl;
     /* place a breakpoint at main, for intialization purposes. */
-    place_breakpoint(Initializer::get_instance()->get_program_manager()->get_elf_parser()->get_symbol("main")->get_address());
+    Word main_address = Initializer::get_instance()->get_program_manager()->get_elf_parser()->get_symbol("main")->get_address();
+    place_breakpoint(main_address, initial_observer);
     
     std::cout << "Portal::Portal(): continuing execution until breakpoint on main . . ." << std::endl;
     /* Now continue until main(). */
@@ -150,14 +152,18 @@ void Portal::detach() {
     ptrace(PTRACE_DETACH, pid, NULL, NULL);
 }
 
-std::size_t Portal::place_breakpoint(Platform::MemoryAddress address) {
+std::size_t Portal::place_breakpoint(Platform::MemoryAddress address, Misc::SmartPointer<BreakpointObserver> observer) {
     std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
     std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
-    Byte original = read_memory(address) & 0xff;
-    Misc::SmartPointer<Breakpoint> new_bp = new Breakpoint(address, original);
-    add_breakpoint(new_bp);
-    write_memory(address, new_bp->get_breakpoint_character());
-    return new_bp->get_id();
+    Misc::SmartPointer<Breakpoint> bp = get_breakpoint_by_address(address);
+    if(!bp.is_valid()) {
+        Byte original = read_memory(address) & 0xff;
+        bp = new Breakpoint(address, original);
+        add_breakpoint(bp);
+        write_memory(address, bp->get_breakpoint_character());
+    }
+    bp->add_observer(observer);
+    return bp->get_id();
 }
 
 void Portal::remove_breakpoint(Platform::MemoryAddress address) {
@@ -267,9 +273,7 @@ void Portal::handle_breakpoint() {
     /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
     set_register(ASM::Register::RIP, ip);
     
-    for(breakpoint_observer_list_t::const_reverse_iterator i = breakpoint_observer_list.rbegin(); i != breakpoint_observer_list.rend(); i ++) {
-        if((*i)->handle_breakpoint(breakpoint)) break;
-    }
+    breakpoint->notify();
     
     /* Write out the original instruction . . . */
     write_memory(breakpoint->get_address(), breakpoint->get_original());

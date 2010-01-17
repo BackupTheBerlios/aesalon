@@ -94,24 +94,20 @@ public:
     }
     
     /** Comparison operator; takes another smart pointer to compare against.
-        @param other The smart pointer to compare dereferenced data against.
-            Uses the Type::operator== for the heavy work.
-        @return True if the Type::operator== returns true, false otherwise.
+        @param other The smart pointer to compare pointer data against.
+        @return True if the pointers are equal, false otherwise.
     */
     bool operator==(const SmartPointer<Type> &other) const {
-        if(get_data() == NULL && other.get_data() == NULL) return true;
-        return *get_nonnull_data() == *other.get_nonnull_data();
+        return get_data() == other.get_data();
     }
     
     /** Less-than comparison operator; takes a smart pointer to compare
             against.
-        @param other A smart pointer, used for comparison. Uses
-            *(this->data)::operator< for the heavy lifting.
-        @return The result of *(this->data)::operator<.
+        @param other A smart pointer, used for comparison.
+        @return The result of the pointer comparison.
     */
     bool operator<(const SmartPointer<Type> &other) const {
-        if(get_data() == NULL && other.get_data() == NULL) return false;
-        return *get_nonnull_data() < *other.get_nonnull_data();
+        return get_data() < other.get_data();
     }
     
     /** Passthrough operator to allow the usage of a SmartPointer in a

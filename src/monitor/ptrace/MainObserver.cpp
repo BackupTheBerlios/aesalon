@@ -1,11 +1,12 @@
 #include "MainObserver.h"
 #include "Initializer.h"
+#include "BreakpointReference.h"
 
 namespace Aesalon {
 namespace Monitor {
 namespace PTrace {
 
-bool MainObserver::handle_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint) {
+bool MainObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     static bool first_run = true;
     if(first_run) {
         first_run = false;
