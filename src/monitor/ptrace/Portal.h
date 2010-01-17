@@ -89,6 +89,8 @@ public:
     */
     void place_breakpoint(Platform::MemoryAddress address);
     
+    void remove_breakpoint(Platform::MemoryAddress address);
+    
     /** Returns a breakpoint by iterator.
         @param which The breakpoint to find.
         @return A SmartPointer to the given breakpoint. Not valid if the breakpoint iterator does not exist.

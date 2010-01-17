@@ -28,7 +28,7 @@ namespace Monitor {
 namespace PTrace {
 
 Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0), libc_offset(0) {
-    
+    std::cout << "Portal::Portal(): called, initialization begun . . . \n";
     pid = fork();
     if(pid == -1)
         throw PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
@@ -47,12 +47,14 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     add_signal_observer(new SegfaultObserver());
     add_breakpoint_observer(new MallocObserver());
     
+    std::cout << "Portal::Portal(): waiting for SIGTRAP call from child . . ." << std::endl;
     /* Wait for the SIGTRAP that indicates a exec() call . . . */
     wait_for_signal();
-    
+    std::cout << "Portal::Portal(): got SIGTRAP call, placing breakpoint on main . . ." << std::endl;
     /* place a breakpoint at main, for intialization purposes. */
     place_breakpoint(Initializer::get_instance()->get_program_manager()->get_elf_parser()->get_symbol("main")->get_address());
     
+    std::cout << "Portal::Portal(): continuing execution until breakpoint on main . . ." << std::endl;
     /* Now continue until main(). */
     continue_execution();
 }
@@ -139,6 +141,25 @@ void Portal::place_breakpoint(Platform::MemoryAddress address) {
     write_memory(address, Byte(0xcc));
 }
 
+void Portal::remove_breakpoint(Platform::MemoryAddress address) {
+    std::cout << "Portal::remove_breakpoint() called . . ." << std::endl;
+    std::cout << "\tRemoving breakpoint at " << std::hex << address << std::dec << std::endl;
+    
+    Misc::SmartPointer<Breakpoint> bp = get_breakpoint_by_address(address);
+    if(!bp.is_valid()) {
+        std::cout << "\tAsked to remove non-existent breakpoint!" << std::endl;
+        return;
+    }
+    Byte original = bp->get_original();
+    write_memory(bp->get_address(), original);
+    for(breakpoint_list_t::iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
+        if((*i)->get_id() == bp->get_id()) {
+            breakpoint_list.erase(i);
+            break;
+        }
+    }
+}
+
 Misc::SmartPointer<Breakpoint> Portal::get_breakpoint_by_id(std::size_t which) const {
     for(breakpoint_list_t::const_iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
         if((*i)->get_id() == which) return *i;
@@ -179,6 +200,7 @@ void Portal::handle_signal() {
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
     }
+    std::cout << "\twarning: unhandled signal!" << std::endl;
 }
 
 void Portal::continue_execution(int signal) {
@@ -249,7 +271,7 @@ Word Portal::get_libc_offset() {
     std::ifstream map_stream(map_file.c_str());
     if(!map_stream.is_open()) throw PTraceException(Misc::StreamAsString() << "Couldn't open " << map_file << ", perhaps permissions are screwy?");
     
-    std::cout << "Memory map: " << std::endl;
+    /*std::cout << "Memory map: " << std::endl;*/
     
     /* Example memory map excerpt (from bash):
         00400000-004d5000 r-xp 00000000 08:06 71555                              /bin/bash
@@ -281,10 +303,10 @@ Word Portal::get_libc_offset() {
         line_stream >> device;
         line_stream >> inode;
         line_stream >> path;
-        std::cout << "\tLibrary path is \"" << path << "\"\n";
+        /*std::cout << "\tLibrary path is \"" << path << "\"\n";
         std::cout << "\tAddress range is: 0x" << std::hex << from << " to 0x" << to << " (size 0x" << to-from << ")" << std::endl;
         std::cout << "\tMap mode is: \"" << mode << "\"\n";
-        std::cout << std::dec << std::endl;
+        std::cout << std::dec << std::endl;*/
         if(Misc::String::begins_with(path, "/lib/libc")) {
             if(mode == "r-xp") libc_offset = from;
         }

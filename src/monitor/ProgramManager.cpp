@@ -37,6 +37,9 @@ void ProgramManager::place_initial_breakpoints() {
     std::cout << "\tlibc offset is " << libc_offset << std::endl;
     std::cout << "\tmalloc offset is " << get_libc_parser()->get_symbol("malloc")->get_address() << std::endl;
     std::cout << "\tmalloc address is " << libc_offset + get_libc_parser()->get_symbol("malloc")->get_address() << std::endl;
+    
+    /* Remove the breakpoint on main(), it's not required any more. */
+    get_ptrace_portal()->remove_breakpoint(get_elf_parser()->get_symbol("main")->get_address());
 }
 
 } // namespace Monitor
