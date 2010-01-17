@@ -72,12 +72,16 @@ Word Portal::get_register(ASM::Register which) const {
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         case ASM::Register::RAX:
-            std::cout << "Value of RAX requested; RAX is " << registers.rax << ", ORIG_RAX is " << registers.orig_rax << std::endl;
-            return registers.orig_rax;
+            /*std::cout << "Value of RAX requested; RAX is " << registers.rax << ", ORIG_RAX is " << registers.orig_rax << std::endl;*/
+            return registers.rax;
         case ASM::Register::RBX:
             return registers.rbx;
         case ASM::Register::RIP:
             return registers.rip;
+        case ASM::Register::RBP:
+            return registers.rbp;
+        case ASM::Register::RSP:
+            return registers.rsp;
 #endif
         default:
             throw PTraceException("Value of invalid register requested");
@@ -123,12 +127,17 @@ void Portal::write_memory(Platform::MemoryAddress address, Word value) {
 void Portal::write_memory(Platform::MemoryAddress address, Byte value) {
     std::cout << "Portal::write_memory(address, Byte) called . . ." << std::endl;
     std::cout << "\tWriting 0x" << std::hex << (int)value << " to " << address << std::endl;
-    Word current_value = read_memory(address);
     Word word_offset = 0;
-    word_offset = address & 0x08;
+    word_offset = address & 0x07;
+    Word current_value = read_memory(address - word_offset);
     
-    current_value &= ~(0xff << (word_offset * CHAR_BIT));
-    write_memory(address - word_offset, Word(current_value | (value << (word_offset * CHAR_BIT))));
+    std::cout << "\tUtilizing write_memory(address, Word); word_offset is: " << word_offset << std::endl;
+    std::cout << "\tBefore byte clearing, current_value is: " << current_value << std::endl;
+    current_value &= ~(Word(0xff) << (word_offset * CHAR_BIT));
+    std::cout << "\tAfter byte clearing, current_value is: " << current_value << std::endl;
+    current_value |= (Word(value) << (word_offset * CHAR_BIT));
+    std::cout << "\tAfter byte insertion, current_value is: " << current_value << std::endl;
+    write_memory(address - word_offset, current_value);
 }
 
 void Portal::attach() {
@@ -139,13 +148,14 @@ void Portal::detach() {
     ptrace(PTRACE_DETACH, pid, NULL, NULL);
 }
 
-void Portal::place_breakpoint(Platform::MemoryAddress address) {
+std::size_t Portal::place_breakpoint(Platform::MemoryAddress address) {
     std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
     std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
     Byte original = read_memory(address) & 0xff;
     Misc::SmartPointer<Breakpoint> new_bp = new Breakpoint(address, original);
     add_breakpoint(new_bp);
     write_memory(address, new_bp->get_breakpoint_character());
+    return new_bp->get_id();
 }
 
 void Portal::remove_breakpoint(Platform::MemoryAddress address) {
@@ -255,7 +265,6 @@ void Portal::handle_breakpoint() {
     /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
     set_register(ASM::Register::RIP, ip);
     
-    /* NOTE: reverse iterator for speed concerns. */
     for(breakpoint_observer_list_t::const_reverse_iterator i = breakpoint_observer_list.rbegin(); i != breakpoint_observer_list.rend(); i ++) {
         if((*i)->handle_breakpoint(breakpoint)) break;
     }

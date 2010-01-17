@@ -86,8 +86,9 @@ public:
     
     /** Places a breakpoint at a specified address.
         @param address The address to place the breakpoint at.
+        @return The ID of the newly-inserted breakpoint.
     */
-    void place_breakpoint(Platform::MemoryAddress address);
+    std::size_t place_breakpoint(Platform::MemoryAddress address);
     
     void remove_breakpoint(Platform::MemoryAddress address);
     
@@ -128,6 +129,8 @@ public:
         @return The address of libc, or 0 if libc is not currently loaded.
     */
     Word get_libc_offset();
+    
+    void wait_for_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint);
 };
 
 } // namespace PTrace
