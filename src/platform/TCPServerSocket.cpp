@@ -89,7 +89,9 @@ void TCPServerSocket::send_data(std::string data) {
 
 void TCPServerSocket::send_data(Misc::SmartPointer<EventQueue> data) {
     while(data->peek_event()) {
-        send_data(data->peek_event().to<MemoryEvent>()->serialize());
+        std::string data_string = data->peek_event().to<MemoryEvent>()->serialize();
+        std::cout << "TCPServerSocket::send_data(): sending \"" << data_string << "\"\n";
+        send_data(data_string);
         data->pop_event();
     }
 }

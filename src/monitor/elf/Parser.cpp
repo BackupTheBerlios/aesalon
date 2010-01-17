@@ -11,6 +11,7 @@ namespace Monitor {
 namespace ELF {
 
 Parser::Parser(std::string filename) : filename(filename) {
+    std::cout << "ELF::Parser::Parser(): filename is \"" << filename << "\"\n";
     file_fd = open(filename.c_str(), O_RDONLY);
     
     header = new Header(file_fd);

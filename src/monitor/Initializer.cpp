@@ -100,7 +100,10 @@ void Initializer::run() {
     program_manager->execute();
     while(program_manager->is_running()) {
         program_manager->wait();
-        if(event_queue->peek_event().is_valid()) get_socket()->send_data(event_queue);
+        if(event_queue->peek_event().is_valid()) {
+            std::cout << "Sending data from event queue . . ." << std::endl;
+            get_socket()->send_data(event_queue);
+        }
     }
 }
 

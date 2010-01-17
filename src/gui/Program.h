@@ -1,6 +1,8 @@
 #ifndef AESALON_GUI_PROGRAM_H
 #define AESALON_GUI_PROGRAM_H
 
+#include <QThread>
+
 #include "platform/EventQueue.h"
 #include "platform/TCPSocket.h"
 #include "platform/Memory.h"
@@ -10,6 +12,18 @@
 
 namespace Aesalon {
 namespace GUI {
+
+class ProgramSocketThread : public QThread {
+private:
+    Misc::SmartPointer<Platform::TCPSocket> socket;
+    Misc::SmartPointer<Platform::Memory> memory;
+public:
+    ProgramSocketThread(Misc::SmartPointer<Platform::TCPSocket> socket, Misc::SmartPointer<Platform::Memory> memory);
+    virtual ~ProgramSocketThread() {}
+protected:
+    void run();
+};
+
 
 class Program {
 private:
@@ -23,6 +37,7 @@ private:
     bool in_xterm;
     
     Misc::SmartPointer<Platform::BidirectionalPipe> bi_pipe;
+    Misc::SmartPointer<ProgramSocketThread> socket_thread;
 public:
     Program();
     virtual ~Program() {}

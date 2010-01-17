@@ -107,6 +107,8 @@ void ProgramDisplay::create_running_widget() {
 void ProgramDisplay::begin_program() {
     create_running_widget();
     
+    QSettings settings;
+    settings.setValue("Program/executable", launch_program_name->currentText());
     program = new Program();
 }
 

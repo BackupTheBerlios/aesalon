@@ -76,6 +76,8 @@ Word Portal::get_register(ASM::Register which) const {
             return registers.rax;
         case ASM::Register::RBX:
             return registers.rbx;
+        case ASM::Register::RDI:
+            return registers.rdi;
         case ASM::Register::RIP:
             return registers.rip;
         case ASM::Register::RBP:
