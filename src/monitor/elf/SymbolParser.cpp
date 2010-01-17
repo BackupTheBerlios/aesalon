@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 #include "SymbolParser.h"
 #include "Parser.h"
@@ -24,18 +25,18 @@ SymbolParser::SymbolParser(Misc::SmartPointer<Parser> elf_parser) : elf_parser(e
     symbol_table = elf_parser->get_section(".rela.plt");
     if(symbol_table.is_valid()) {
         symbol_table->read_content();
-        Misc::SmartPointer<Block> address_table = elf_parser->get_section(".rela.plt")->get_content();
+        /*Misc::SmartPointer<Block> address_table = elf_parser->get_section(".rela.plt")->get_content();
         while(address_table->get_size()) {
             Elf64_Rela rela;
             address_table->read(&rela, sizeof(rela));
             Word symbol = ELF64_R_SYM(rela.r_info);
             if(symbol > dynamic_offsets.size()) dynamic_offsets.resize(symbol * 2);
             dynamic_offsets[symbol] = rela.r_offset;
-            /*std::cout << "Dynamic offset parsed:" << std::hex << std::endl;
+            std::cout << "Dynamic offset parsed:" << std::hex << std::endl;
             std::cout << "\tsymbol: " << symbol << std::endl;
             std::cout << "\tr_offset: " << rela.r_offset << std::endl;
-            std::cout << "\tr_addend: " << rela.r_addend << std::endl;*/
-        }
+            std::cout << "\tr_addend: " << rela.r_addend << std::endl;
+        }*/
         
         Misc::SmartPointer<Block> symbol_block;
         /* Now for the dynamic symbols. Otherwise known as the tricky ones. */
@@ -46,9 +47,14 @@ SymbolParser::SymbolParser(Misc::SmartPointer<Parser> elf_parser) : elf_parser(e
             symbol_block->read(&sym, sizeof(sym));
             
             char *name = (char *)elf_parser->get_section(".dynstr")->get_content()->get_data(sym.st_name);
+            /*if(!std::strcmp(name, "malloc")) {
+                std::cout << "malloc symbol:" << std::endl;
+                std::cout << "\tdynamic_offset is: " << dynamic_offsets[index] << std::endl;
+                std::cout << "\tvalue is " << sym.st_value << std::endl;
+            }*/
             /*std::cout << "Dynamic symbol: name is \"" << name << "\", address is " << sym.st_value << std::endl;
             std::cout << "Dynamic offset for this symbol is: " << dynamic_offsets[index] << std::endl;*/
-            if(sym.st_name) symbol_vector.push_back(new Symbol(name, dynamic_offsets[index], sym.st_size));
+            if(sym.st_name) symbol_vector.push_back(new Symbol(name, sym.st_value/* + dynamic_offsets[index]*/, sym.st_size));
             index ++;
         }
     }

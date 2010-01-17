@@ -264,8 +264,14 @@ void Portal::handle_breakpoint() {
     write_memory(breakpoint->get_address(), breakpoint->get_original());
     /* Single-step over that instruction . . . */
     single_step();
-    /* Re-write out the trap instruction . . . */
-    write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());
+    /* Only re-write out the trap instruction if the breakpoint is still valid. */
+    if(breakpoint->is_valid()) {
+        /* Re-write out the trap instruction . . . */
+        write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());
+    }
+    else {
+        remove_breakpoint(breakpoint->get_address());
+    }
     /* And then TrapObserver will call continue_execution(). */
 }
 
