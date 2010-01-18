@@ -10,14 +10,25 @@ SessionEditor::SessionEditor(QWidget *parent, Session *session) : QDialog(parent
     }
     create_widgets();
     this->setModal(true);
-    /*this->setGeometry(300, 300, 300, 200);*/
+    QSizePolicy expanding;
+    expanding.setHorizontalPolicy(QSizePolicy::Expanding);
+    expanding.setVerticalPolicy(QSizePolicy::Expanding);
+    this->setSizePolicy(expanding);
+    this->setMinimumSize(400, 100);
+    this->setWindowTitle(tr("Editing session"));
 }
 
 void SessionEditor::create_widgets() {
-    layout = new QFormLayout();
+    layout = new QVBoxLayout();
+    
+    form_layout = new QFormLayout();
     
     session_name = new QLineEdit(session->get_session_name());
-    layout->addRow(tr("Session name:"), session_name);
+    form_layout->addRow(tr("Session name:"), session_name);
+    executable_path = new QLineEdit(session->get_executable_path());
+    form_layout->addRow(tr("Executable path:"), executable_path);
+    
+    layout->addLayout(form_layout);
     
     button_box = new QDialogButtonBox();
     button_box->addButton(QDialogButtonBox::Save);
@@ -26,6 +37,8 @@ void SessionEditor::create_widgets() {
     connect(button_box, SIGNAL(accepted()), this, SLOT(accept()));
     connect(button_box, SIGNAL(rejected()), this, SLOT(reject()));
     
+    button_box->setCenterButtons(false);
+    
     layout->addWidget(button_box);
     
     this->setLayout(layout);
@@ -33,6 +46,7 @@ void SessionEditor::create_widgets() {
 
 void SessionEditor::accept() {
     session->set_session_name(session_name->text());
+    session->set_executable_path(executable_path->text());
     QDialog::accept();
 }
 

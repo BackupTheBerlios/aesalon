@@ -15,6 +15,7 @@ SessionManager::SessionManager(QWidget *parent) {
         settings.setArrayIndex(i);
         Session *session = new Session();
         session->set_session_name(settings.value("session-name").toString());
+        session->set_executable_path(settings.value("executable-path").toString());
         session_list.append(session);
     }
     settings.endArray();
@@ -42,7 +43,7 @@ SessionManager::SessionManager(QWidget *parent) {
     
     layout->addLayout(session_button_layout);
     this->setLayout(layout);
-    connect(session_list_view, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(launch_session(QListWidgetItem *)));
+    connect(session_list_view, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(edit_session(QListWidgetItem *)));
 }
 
 SessionManager::~SessionManager() {
@@ -55,6 +56,7 @@ void SessionManager::save_sessions() {
     for(int i = 0; i < session_list.size(); i ++) {
         settings.setArrayIndex(i);
         settings.setValue("session-name", session_list[i]->get_session_name());
+        settings.setValue("executable-path", session_list[i]->get_executable_path());
     }
     settings.endArray();
 }

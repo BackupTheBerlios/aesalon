@@ -8,7 +8,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QFormLayout>
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #include "Session.h"
 
@@ -19,8 +19,10 @@ class SessionEditor : public QDialog { Q_OBJECT
 private:
     Session *session;
     
-    QFormLayout *layout;
+    QVBoxLayout *layout;
+    QFormLayout *form_layout;
     QLineEdit *session_name;
+    QLineEdit *executable_path;
 
     QDialogButtonBox *button_box;
 
