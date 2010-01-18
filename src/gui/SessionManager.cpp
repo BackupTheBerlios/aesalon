@@ -35,9 +35,9 @@ SessionManager::SessionManager(QWidget *parent) {
     connect(new_session_button, SIGNAL(pressed()), this, SLOT(new_session()));
     session_button_layout->addWidget(new_session_button);
     
-    edit_session_button = new QPushButton("&Edit session");
+    /*edit_session_button = new QPushButton("&Edit session");
     connect(edit_session_button, SIGNAL(pressed()), this, SLOT(edit_current_session()));
-    session_button_layout->addWidget(edit_session_button);
+    session_button_layout->addWidget(edit_session_button);*/
     
     launch_session_button = new QPushButton("&Launch session");
     connect(launch_session_button, SIGNAL(pressed()), this, SLOT(launch_current_session()));
@@ -108,7 +108,6 @@ void SessionManager::delete_session(QListWidgetItem *session_item) {
 }
 
 void SessionManager::close_active_session(ActiveSession *session) {
-    std::cout << "Asked to close sesssion " << session << std::endl;
     emit remove_tab_request(session);
 }
 

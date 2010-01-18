@@ -12,12 +12,8 @@ public:
     MainArea(QWidget *parent = 0);
     virtual ~MainArea() {}
 public slots:
-    void add_new_tab(QWidget *new_tab, QString name) {
-        addTab(new_tab, name);
-    }
-    void remove_tab(QWidget *tab) {
-        remove_tab(tab);
-    }
+    void add_tab(QWidget *new_tab, QString name);
+    void remove_tab(QWidget *tab);
 };
 
 } // namespace GUI

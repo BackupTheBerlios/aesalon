@@ -9,7 +9,7 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : session(sessio
 }
 
 void ActiveSession::execute() {
-    emit close_session(this);
+    /*emit close_session(this);*/
 }
 
 } // namespace GUI

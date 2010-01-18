@@ -10,12 +10,12 @@ SessionListWidget::SessionListWidget(QWidget *parent) {
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(display_context_menu(QPoint)));
     
     context_menu = new QMenu();
-    context_menu->addAction("&New", this, SLOT(context_menu_new()));
-    context_menu->addAction("&Edit", this, SLOT(context_menu_edit()));
-    context_menu->addAction("&Delete", this, SLOT(context_menu_delete()));
+    context_menu->addAction("&New session", this, SLOT(context_menu_new()));
+    context_menu->addAction("&Edit session", this, SLOT(context_menu_edit()));
+    context_menu->addAction("&Delete session", this, SLOT(context_menu_delete()));
     
     new_context_menu = new QMenu();
-    new_context_menu->addAction("&New", this, SLOT(context_menu_new()));
+    new_context_menu->addAction("&New session", this, SLOT(context_menu_new()));
     
     delete_shortcut = new QAction(this);
     delete_shortcut->setShortcut(Qt::Key_Delete);
