@@ -17,7 +17,7 @@ public:
 
     void execute();
 signals:
-    void remove_me(QWidget *tab);
+    void close_session(ActiveSession *session);
 };
 
 } // namespace GUI

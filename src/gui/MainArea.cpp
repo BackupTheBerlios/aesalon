@@ -9,6 +9,7 @@ MainArea::MainArea(QWidget *parent) {
     SessionManager *manager = new SessionManager;
     this->addTab(manager, tr("&Session Manager"));
     connect(manager, SIGNAL(new_tab_request(QWidget*, QString)), this, SLOT(add_new_tab(QWidget*, QString)));
+    connect(manager, SIGNAL(remove_tab_request(QWidget*)), this, SLOT(remove_tab(QWidget*)));
 }
 
 } // namespace GUI

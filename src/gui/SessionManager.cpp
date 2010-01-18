@@ -88,6 +88,8 @@ void SessionManager::launch_session(QListWidgetItem *session_item) {
     
     ActiveSession *as = new ActiveSession(session);
     emit new_tab_request(as, session_name);
+    connect(as, SIGNAL(close_session(ActiveSession *)), this, SLOT(close_active_session(ActiveSession *)));
+    as->execute();
 }
 
 void SessionManager::edit_session(QListWidgetItem *session_item) {
@@ -103,6 +105,11 @@ void SessionManager::delete_session(QListWidgetItem *session_item) {
     QString session_name = session_item->data(Qt::DisplayRole).toString();
     Session *session = get_session_by_name(session_name);
     if(session_list.removeOne(session)) session_list_view->update_list(session_list);
+}
+
+void SessionManager::close_active_session(ActiveSession *session) {
+    std::cout << "Asked to close sesssion " << session << std::endl;
+    emit remove_tab_request(session);
 }
 
 } // namespace GUI
