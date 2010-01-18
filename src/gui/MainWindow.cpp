@@ -1,93 +1,23 @@
-#include <iostream>
-
-#include <QMenuBar>
-#include <QString>
-#include <QStatusBar>
-#include <QMessageBox>
-
+#include <QApplication>
 #include "MainWindow.h"
 #include "MainWindow.moc"
-#include "ProgramDisplay.h"
+
+#include "MainArea.h"
 
 namespace Aesalon {
 namespace GUI {
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    this->setGeometry(0, 0, 800, 600);
-    this->setWindowTitle("Aesalon GUI");
-    
-    aesalon_configuration = new AesalonConfiguration(this);
-    gui_configuration = new GUIConfiguration(this);
-    
-    create_menus();
-    
-    mdi_area = new QMdiArea(this);
-    setCentralWidget(mdi_area);
-    
-    statusBar()->showMessage("Ready.");
+MainWindow::MainWindow(QWidget *parent) {
+    QSettings settings;
+    setup_menus();
+    setCentralWidget(new MainArea());
+    this->showMaximized();
 }
 
-MainWindow::~MainWindow() {
-}
-
-void MainWindow::create_menus() {
+void MainWindow::setup_menus() {
     aesalon_menu = new QMenu(tr("&Aesalon"));
-    
-    aesalon_menu_new = new QAction(tr("&New program"), this);
-    connect(aesalon_menu_new, SIGNAL(triggered()), this, SLOT(new_program()));
-    aesalon_menu_new->setShortcut(Qt::CTRL + Qt::Key_N);
-    aesalon_menu->addAction(aesalon_menu_new);
-    
-    aesalon_menu_connect = new QAction(tr("&Connect to program . . ."), this);
-    aesalon_menu_connect->setShortcut(Qt::CTRL + Qt::Key_O);
-    aesalon_menu->addAction(aesalon_menu_connect);
-    
-    aesalon_menu->addSeparator();
-    
-    aesalon_menu_quit = new QAction(tr("&Quit"), this);
-    connect(aesalon_menu_quit, SIGNAL(triggered()), this, SLOT(quit_requested()));
-    aesalon_menu->addAction(aesalon_menu_quit);
-    
+    aesalon_menu->addAction("&Quit", this, SLOT(close()));
     menuBar()->addMenu(aesalon_menu);
-    
-    tools_menu = new QMenu(tr("&Tools"));
-    tools_menu_config_aesalon = new QAction(tr("Configure Aesalon &Monitor . . ."), this);
-    connect(tools_menu_config_aesalon, SIGNAL(triggered()), aesalon_configuration, SLOT(exec()));
-    tools_menu->addAction(tools_menu_config_aesalon);
-    
-    tools_menu_config_gui = new QAction(tr("Configure Aesalon &GUI . . ."), this);
-    connect(tools_menu_config_gui, SIGNAL(triggered()), gui_configuration, SLOT(exec()));
-    tools_menu_config_gui->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_P);
-    tools_menu->addAction(tools_menu_config_gui);
-    
-    menuBar()->addMenu(tools_menu);
-    
-    help_menu = new QMenu(tr("&Help"));
-    
-    help_menu_about = new QAction(tr("&About Aesalon"), this);
-    connect(help_menu_about, SIGNAL(triggered()), this, SLOT(about_aesalon()));
-    help_menu->addAction(help_menu_about);
-    
-    menuBar()->addMenu(help_menu);
-}
-
-void MainWindow::quit_requested() {
-    while(mdi_area->subWindowList().size() && mdi_area->currentSubWindow()) {
-        if(!mdi_area->currentSubWindow()->close()) return;
-    }
-    this->close();
-}
-
-void MainWindow::new_program() {
-    ProgramDisplay *new_program = new ProgramDisplay(this);
-    mdi_area->addSubWindow(new_program);
-    new_program->show();
-}
-
-void MainWindow::about_aesalon() {
-    QMessageBox::about(this, QString("About Aesalon"), QString(std::string(Misc::StreamAsString() << "Aesalon is a program to graphically display, "
-        << "in real-time, the dynamically-allocated memory of a program, both the blocks that have been allocated and "
-        << "the references to said blocks.").c_str()));
 }
 
 } // namespace GUI
