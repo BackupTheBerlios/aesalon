@@ -3,6 +3,8 @@
 #include "SessionManager.h"
 #include "SessionManager.moc"
 #include "SessionEditor.h"
+#include "ActiveSession.h"
+#include "MainArea.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -70,14 +72,18 @@ Session *SessionManager::get_session_by_name(const QString &name) const {
 
 void SessionManager::new_session() {
     SessionEditor *se = new SessionEditor(this, NULL);
-    se->exec();
-    session_list.append(se->get_session());
-    session_list_view->update_list(session_list);
+    if(se->exec() == QDialog::Accepted) {
+        session_list.append(se->get_session());
+        session_list_view->update_list(session_list);
+    }
 }
 
 void SessionManager::launch_session(QListWidgetItem *session_item) {
     QString session_name = session_item->data(Qt::DisplayRole).toString();
     Session *session = get_session_by_name(session_name);
+    
+    ActiveSession *as = new ActiveSession(session);
+    emit new_tab_request(as, session_name);
 }
 
 void SessionManager::edit_session(QListWidgetItem *session_item) {

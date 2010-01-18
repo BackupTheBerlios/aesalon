@@ -35,6 +35,8 @@ public slots:
     void launch_current_session() { launch_session(session_list_view->currentItem()); }
     void edit_session(QListWidgetItem *session_item);
     void edit_current_session() { edit_session(session_list_view->currentItem()); }
+signals:
+    void new_tab_request(QWidget *new_tab, QString name);
 };
 
 } // namespace GUI
