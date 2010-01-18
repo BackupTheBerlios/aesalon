@@ -45,7 +45,11 @@ SessionManager::SessionManager(QWidget *parent) {
     
     layout->addLayout(session_button_layout);
     this->setLayout(layout);
+    
     connect(session_list_view, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(edit_session(QListWidgetItem *)));
+    connect(session_list_view, SIGNAL(new_request()), this, SLOT(new_session()));
+    connect(session_list_view, SIGNAL(edit_request(QListWidgetItem*)), this, SLOT(edit_session(QListWidgetItem*)));
+    connect(session_list_view, SIGNAL(delete_request(QListWidgetItem*)), this, SLOT(delete_session(QListWidgetItem*)));
 }
 
 SessionManager::~SessionManager() {
@@ -92,6 +96,13 @@ void SessionManager::edit_session(QListWidgetItem *session_item) {
     SessionEditor *se = new SessionEditor(this, session);
     se->exec();
     session_list_view->update_list(session_list);
+}
+
+void SessionManager::delete_session(QListWidgetItem *session_item) {
+    if(session_item == NULL) return;
+    QString session_name = session_item->data(Qt::DisplayRole).toString();
+    Session *session = get_session_by_name(session_name);
+    if(session_list.removeOne(session)) session_list_view->update_list(session_list);
 }
 
 } // namespace GUI

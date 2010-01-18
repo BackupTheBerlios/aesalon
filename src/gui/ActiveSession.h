@@ -16,6 +16,8 @@ public:
     virtual ~ActiveSession() {}
 
     void execute();
+signals:
+    void remove_me(QWidget *tab);
 };
 
 } // namespace GUI
