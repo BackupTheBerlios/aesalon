@@ -18,6 +18,7 @@ MainArea::MainArea(QWidget *parent) {
 
 void MainArea::add_tab(QWidget *tab, QString name) {
     this->addTab(tab, name);
+    this->setCurrentWidget(tab);
 }
 
 void MainArea::remove_tab(QWidget *tab) {

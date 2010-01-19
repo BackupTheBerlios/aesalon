@@ -10,6 +10,7 @@ class Session {
 private:
     QString session_name;
     QString executable_path;
+    QString arguments;
 public:
     Session() : session_name(""), executable_path("") {}
     virtual ~Session() {}
@@ -18,6 +19,9 @@ public:
     
     QString get_executable_path() const { return executable_path; }
     void set_executable_path(const QString &new_path) { executable_path = new_path; }
+    
+    QString get_arguments() const { return arguments; }
+    void set_arguments(const QString &new_arguments) { arguments = new_arguments; }
 };
 
 } // namespace GUI

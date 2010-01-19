@@ -18,6 +18,7 @@ SessionManager::SessionManager(QWidget *parent) {
         Session *session = new Session();
         session->set_session_name(settings.value("session-name").toString());
         session->set_executable_path(settings.value("executable-path").toString());
+        session->set_arguments(settings.value("arguments").toString());
         session_list.append(session);
     }
     settings.endArray();
@@ -64,6 +65,7 @@ void SessionManager::save_sessions() {
         settings.setArrayIndex(i);
         settings.setValue("session-name", session_list[i]->get_session_name());
         settings.setValue("executable-path", session_list[i]->get_executable_path());
+        settings.setValue("arguments", session_list[i]->get_arguments());
     }
     settings.endArray();
 }

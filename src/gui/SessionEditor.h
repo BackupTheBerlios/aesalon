@@ -9,6 +9,8 @@
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QFileDialog>
 
 #include "Session.h"
 
@@ -22,7 +24,11 @@ private:
     QVBoxLayout *layout;
     QFormLayout *form_layout;
     QLineEdit *session_name;
+    QHBoxLayout *executable_path_layout;
     QLineEdit *executable_path;
+    QPushButton *file_select_dialog;
+    QFileDialog *file_dialog;
+    QLineEdit *arguments;
 
     QDialogButtonBox *button_box;
 
@@ -34,6 +40,8 @@ public:
     Session *get_session() const { return session; }
 public slots:
     void accept();
+    void show_file_select_dialog();
+    void change_selected_file(QString new_filename);
 };
 
 } // namespace GUI

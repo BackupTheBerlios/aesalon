@@ -16,14 +16,10 @@ class ActiveSessionOverview : public QWidget { Q_OBJECT
 private:
     Session *session;
     QFormLayout *info_form;
-    QTime run_time;
-    QLabel *running_time;
-    QTimer *running_time_timer;
 public:
     ActiveSessionOverview(Session *session, QWidget *parent = 0);
     virtual ~ActiveSessionOverview() {}
 public slots:
-    void update_running_time();
 };
 
 } // namespace GUI
