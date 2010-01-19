@@ -14,6 +14,8 @@ public:
 public slots:
     void add_tab(QWidget *new_tab, QString name);
     void remove_tab(QWidget *tab);
+    
+    void tab_close_requested(int index);
 };
 
 } // namespace GUI

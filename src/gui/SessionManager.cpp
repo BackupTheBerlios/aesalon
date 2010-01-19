@@ -28,6 +28,7 @@ SessionManager::SessionManager(QWidget *parent) {
     session_list_view->update_list(session_list);
     layout->addWidget(session_list_view);
     
+    if(sessions) session_list_view->setCurrentRow(0);
     
     session_button_layout = new QHBoxLayout();
     
@@ -83,6 +84,7 @@ void SessionManager::new_session() {
 }
 
 void SessionManager::launch_session(QListWidgetItem *session_item) {
+    if(session_item == NULL) return;
     QString session_name = session_item->data(Qt::DisplayRole).toString();
     Session *session = get_session_by_name(session_name);
     
