@@ -23,6 +23,8 @@ private:
     Misc::SmartPointer<ELF::Parser> elf_parser, libc_parser;
     Misc::SmartPointer<DWARF::Parser> dwarf_parser;
     Misc::SmartPointer<ASM::Disassembler> disassembler;
+    
+    std::size_t malloc_breakpoint_id;
 public:
     ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list);
     virtual ~ProgramManager() {}
@@ -41,6 +43,8 @@ public:
     
     void set_running(bool new_running) { running = new_running; }
     bool is_running() const { return running; }
+    
+    std::size_t get_malloc_breakpoint_id() const { return malloc_breakpoint_id; }
 };
 
 } // namespace Monitor

@@ -39,7 +39,7 @@ void ProgramManager::place_initial_breakpoints() {
     std::cout << "\tmalloc offset is " << get_libc_parser()->get_symbol("malloc")->get_address() << std::endl;
     Word malloc_address = libc_offset + get_libc_parser()->get_symbol("malloc")->get_address();
     std::cout << "\tmalloc address is " << malloc_address << std::endl;
-    get_ptrace_portal()->place_breakpoint(malloc_address, get_ptrace_portal()->get_malloc_observer());
+    malloc_breakpoint_id = get_ptrace_portal()->place_breakpoint(malloc_address, get_ptrace_portal()->get_malloc_observer());
     
     /* Remove the breakpoint on main(), it's not required any more. */
     /*get_ptrace_portal()->get_breakpoint_by_address(get_elf_parser()->get_symbol("main")->get_address())->set_valid(false);*/

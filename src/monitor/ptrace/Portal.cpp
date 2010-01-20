@@ -163,6 +163,7 @@ std::size_t Portal::place_breakpoint(Platform::MemoryAddress address, Misc::Smar
         write_memory(address, bp->get_breakpoint_character());
     }
     bp->add_observer(observer);
+    std::cout << "\tplaced breakpoint #" << bp->get_id() << std::endl;
     return bp->get_id();
 }
 
