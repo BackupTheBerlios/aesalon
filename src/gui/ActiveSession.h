@@ -6,15 +6,18 @@
 
 #include "Session.h"
 
+#include "platform/Memory.h"
+
 namespace Aesalon {
 namespace GUI {
 
 class ActiveSession : public QTabWidget { Q_OBJECT
 private:
     Session *session;
+    Platform::Memory *memory;
 public:
     ActiveSession(Session *session, QWidget *parent = 0);
-    virtual ~ActiveSession() {}
+    virtual ~ActiveSession();
 
     void execute();
 public slots:

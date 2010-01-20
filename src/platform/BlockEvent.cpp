@@ -14,7 +14,7 @@ std::string BlockEvent::serialize() {
         case ALLOC_EVENT:
             return Misc::StreamAsString() << Event::serialize() << std::hex << get_address() << ":" << get_size();
         case REALLOC_EVENT:
-            return Misc::StreamAsString() << Event::serialize() << std::hex << get_address() << ":" << get_size() << ":" << get_new_address() << ":" << get_new_size();
+            return Misc::StreamAsString() << Event::serialize() << std::hex << get_address() << ":" << get_size() << ":" << get_new_address();
         case FREE_EVENT:
             return Misc::StreamAsString() << Event::serialize() << std::hex << get_address();
     }
@@ -36,9 +36,11 @@ Misc::SmartPointer<Event> BlockEvent::deserialize(std::string data) {
         return new BlockEvent(ALLOC_EVENT, address, size);
     }
     
-    /* TODO: handle deserialization of REALLOC_EVENTs . . . */
+    data.erase(0, data.find(":")+1);
+    MemoryAddress new_address;
+    Misc::String::to<MemoryAddress>(data, new_address, true);
     
-    return NULL;
+    return new BlockEvent(REALLOC_EVENT, address, size, new_address);
 }
 
 } // namespace Platform

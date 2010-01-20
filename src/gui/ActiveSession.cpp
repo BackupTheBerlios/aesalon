@@ -8,6 +8,12 @@ namespace GUI {
 ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(parent), session(session) {
     this->setTabPosition(West);
     this->addTab(new ActiveSessionOverview(session), "&Overview");
+    
+    memory = new Platform::Memory();
+}
+
+ActiveSession::~ActiveSession() {
+    delete memory;
 }
 
 void ActiveSession::execute() {

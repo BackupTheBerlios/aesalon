@@ -6,6 +6,7 @@
 
 #include "MemoryAddress.h"
 #include "MemoryBlock.h"
+#include "Event.h"
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
@@ -27,7 +28,7 @@ public:
     
     Misc::SmartPointer<MemoryBlock> get_block(MemoryAddress address) const;
     
-    
+    void handle_event(Misc::SmartPointer<Event> event);
 };
 
 } // namespace Platform

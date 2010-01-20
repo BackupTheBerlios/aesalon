@@ -17,17 +17,18 @@ public:
 private:
     block_event_type_e block_type;
     
-    MemoryAddress address, size, new_address, new_size;
+    MemoryAddress address, size, new_address;
 public:
     BlockEvent(block_event_type_e type, MemoryAddress address, MemoryAddress size = 0,
         MemoryAddress new_address = 0, MemoryAddress new_size = 0) : Event(BLOCK_EVENT), block_type(type),
-        address(address), size(size), new_address(new_address), new_size(new_size) {}
+        address(address), size(size), new_address(new_address) {}
     virtual ~BlockEvent() {}
+    
+    block_event_type_e get_block_type() const { return block_type; }
     
     MemoryAddress get_address() const { return address; }
     MemoryAddress get_size() const { return size; }
     MemoryAddress get_new_address() const { return new_address; }
-    MemoryAddress get_new_size() const { return new_size; }
     
     virtual std::string serialize();
     static Misc::SmartPointer<Event> deserialize(std::string data);
