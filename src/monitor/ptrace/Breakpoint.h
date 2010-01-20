@@ -2,6 +2,7 @@
 #define AESALON_MONITOR_BREAKPOINT_H
 
 #include <set>
+#include <vector>
 
 #include "Types.h"
 #include "platform/MemoryAddress.h"

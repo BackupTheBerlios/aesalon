@@ -20,8 +20,16 @@ Breakpoint::Breakpoint(Platform::MemoryAddress address, Byte original)
 }
 
 void Breakpoint::notify() {
-    for(observer_list_t::iterator i = observer_list.begin(); i != observer_list.end(); i ++) {
-        (*i)->handle_breakpoint(BreakpointReference(this));
+    if(observer_list.size() == 0) {
+        set_valid(false);
+        return;
+    }
+    int last_size = observer_list.size();
+    for(int x = 0; x < last_size && observer_list.size(); x ++) {
+        observer_list_t::iterator i = observer_list.begin();
+        for(int y = 0; y < x; y ++) i ++;
+        if((*i).is_valid()) (*i)->handle_breakpoint(BreakpointReference(this));
+        if((unsigned)last_size != observer_list.size()) x --;
     }
 }
 

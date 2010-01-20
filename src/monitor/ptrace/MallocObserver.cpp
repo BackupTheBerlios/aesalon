@@ -23,10 +23,6 @@ bool MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
             portal->get_register(ASM::Register::RAX), last_size));
         return true;
     }
-    static int called_times = 0;
-    /* NOTE: malloc() calls malloc() for some reason, so skip it. */
-    /* TODO: figure out why this happens, and find a workaround. */
-    if(called_times++ % 2) return true;
     std::cout << "MallocObserver::handle_breakpoint(): malloc breakpoint found . . ." << std::endl;
     Word rsp = portal->get_register(ASM::Register::RSP);
     std::cout << "\tRBP is: " << std::hex << rsp << std::endl;
