@@ -35,10 +35,11 @@ public:
     void set_valid(bool new_validity) { valid = new_validity; }
     
     void add_observer(Misc::SmartPointer<BreakpointObserver> observer)
-        { observer_list.insert(observer); }
+        { observer_list.insert(observer); this->set_valid(true); }
     void remove_observer(Misc::SmartPointer<BreakpointObserver> observer) {
         observer_list_t::iterator i = observer_list.find(observer);
         if(i != observer_list.end()) observer_list.erase(i);
+        if(observer_list.size() == 0) this->set_valid(false);
     }
     
     void notify();

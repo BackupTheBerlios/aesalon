@@ -1,6 +1,10 @@
 #ifndef AESALON_PLATFORM_EVENT_H
 #define AESALON_PLATFORM_EVENT_H
 
+#include <string>
+
+#include "misc/SmartPointer.h"
+
 namespace Aesalon {
 namespace Platform {
 
@@ -10,8 +14,7 @@ class Event {
 public:
     /** Event type enum, used for dynamic_cast<>ing later. */
     enum event_type_e {
-        MEMORY_EVENT,
-        EVENT_TYPES
+        BLOCK_EVENT
     };
 private:
     /** Current event type. */
@@ -26,6 +29,9 @@ public:
         @return The type of the current event.
     */
     event_type_e get_type() const { return type; }
+    
+    virtual std::string serialize();
+    static Misc::SmartPointer<Event> deserialize(std::string data);
 };
 
 } // namespace Platform

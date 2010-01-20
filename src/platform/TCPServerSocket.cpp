@@ -87,12 +87,12 @@ void TCPServerSocket::send_data(std::string data) {
 }
 
 void TCPServerSocket::send_data(Misc::SmartPointer<EventQueue> data) {
-    /*while(data->peek_event()) {
-        std::string data_string = data->peek_event().to<MemoryEvent>()->serialize();
+    while(data->peek_event()) {
+        std::string data_string = data->peek_event()->serialize();
         std::cout << "TCPServerSocket::send_data(): sending \"" << data_string << "\"\n";
         send_data(data_string);
         data->pop_event();
-    }*/
+    }
 }
 
 } // namespace Platform

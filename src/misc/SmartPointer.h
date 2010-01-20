@@ -39,7 +39,7 @@ private:
     */
     Type *get_nonnull_data() const {
         if(data) return data;
-        throw NullPointerException("dereferencing NULL smart pointer");
+        throw NullPointerException("Attempt to dereference NULL smart pointer");
     }
 public:
     /** Default constructor. Sets the reference data to NULL. */
@@ -99,6 +99,14 @@ public:
     */
     bool operator==(const SmartPointer<Type> &other) const {
         return get_data() == other.get_data();
+    }
+    
+    /** Inverse comparison operator, takes another smart pointer to compare against.
+        @param other The smart pointer to compare against.
+        @return True if the pointers reference different data.
+    */
+    bool operator!=(const SmartPointer<Type> &other) const {
+        return get_data() != other.get_data();
     }
     
     /** Less-than comparison operator; takes a smart pointer to compare

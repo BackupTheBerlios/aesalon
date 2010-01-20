@@ -17,18 +17,19 @@ remotely.
 
 -- What is required to compile aesalon
 Aesalon is written in c++0x-compatible C++, and is mostly POSIX-compliant; it
-uses very few features that are not specified in the POSIX.1-2001. Therefore,
-g++ and libstdc++ should be sufficient. Beyond that, aesalon additionally
-requires a pthreads implementation to be installed. It is rare, however, for a
-standard Linux distribution to not have the required pacakges. Simply install
-g++ (only tested with version 4.4, but others should work), and cmake, the
-buildsystem generator (tested with 2.6 and 2.8).
+uses very few features that are not specified in the POSIX.1-2001. Some parts
+of the program use GNU extensions and Linux-specific code (especially ptrace-
+specific). Therefore, g++ and libstdc++ should be sufficient. Beyond that,
+aesalon additionally requires a pthreads implementation to be installed. It is
+rare, however, for a standard Linux distribution to not have the required
+packages. Simply install g++ (only tested with version 4.4, but others should
+work), and cmake, the buildsystem generator (tested with 2.6 and 2.8).
 
 -- How to compile aesalon
 First, edit the build.config file to change what is built, and what is not
 built. The only thing that most users will need to change is the PLATFORM
-variable. Currently, only x86 and x86_64 are actually supported, though ports
-to other platforms are certainly welcome.
+variable. Currently, only x86_64 is actually supported (with x86 support
+partially implemented), though ports to other platforms are certainly welcome.
 
 Run 'cmake .' in the project root directory once you are done. This will
 generate the Makefiles required to actually build aesalon. Once that is done,
