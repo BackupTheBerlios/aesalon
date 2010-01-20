@@ -8,18 +8,17 @@ namespace Monitor {
 namespace PTrace {
 
 bool MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
+    std::cout << "MallocObserver::handle_breakpoint(): asked to handle breakpoint ID #" << breakpoint->get_id() << std::endl;
     Misc::SmartPointer<ELF::Symbol> malloc_symbol = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc");
     Misc::SmartPointer<Portal> portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
     
     static Word last_size = 0;
     
-    if(malloc_symbol.is_valid() && breakpoint->get_address() != (malloc_symbol->get_address()
-        + Initializer::get_instance()->get_program_manager()->get_ptrace_portal()->get_libc_offset())) {
+    if(breakpoint->get_id() > 1) {
+    /*if(malloc_symbol.is_valid() && breakpoint->get_address() != (malloc_symbol->get_address()
+        + Initializer::get_instance()->get_program_manager()->get_ptrace_portal()->get_libc_offset())) {*/
         
-        breakpoint_set_t::iterator i = breakpoints.find(breakpoint->get_id());
-        if(i == breakpoints.end()) return false;
-        
-        std::cout << "Return value from malloc() is:" << std::hex << portal->get_register(ASM::Register::RAX) << std::endl;
+        std::cout << "* MallocObserver::handle_breakpoint(): return value from malloc() is:" << std::hex << portal->get_register(ASM::Register::RAX) << std::endl;
         breakpoint->set_valid(false);
 /*        Initializer::get_instance()->get_event_queue()->push_event(new Platform::MemoryBlockAllocEvent(portal->get_register(ASM::Register::RAX), last_size));*/
         
