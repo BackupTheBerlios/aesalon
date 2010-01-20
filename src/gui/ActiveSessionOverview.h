@@ -16,10 +16,12 @@ class ActiveSessionOverview : public QWidget { Q_OBJECT
 private:
     Session *session;
     QFormLayout *info_form;
+    QLabel *status;
 public:
     ActiveSessionOverview(Session *session, QWidget *parent = 0);
     virtual ~ActiveSessionOverview() {}
 public slots:
+    void update_status(QString new_status);
 };
 
 } // namespace GUI
