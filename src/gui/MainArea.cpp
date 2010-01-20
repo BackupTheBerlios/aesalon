@@ -26,7 +26,6 @@ void MainArea::remove_tab(QWidget *tab) {
 }
 
 void MainArea::tab_close_requested(int index) {
-    std::cout << "Requested close of tab #" << index << std::endl;
     if(index == 0) return;
     this->widget(index)->deleteLater();
 }

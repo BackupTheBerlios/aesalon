@@ -17,7 +17,7 @@ SessionEditor::SessionEditor(QWidget *parent, Session *session) : QDialog(parent
     expanding.setHorizontalPolicy(QSizePolicy::Expanding);
     expanding.setVerticalPolicy(QSizePolicy::Expanding);
     this->setSizePolicy(expanding);
-    this->setMinimumSize(400, 100);
+    this->setMinimumSize(600, 100);
     this->setWindowTitle(tr("Editing session"));
 }
 
@@ -39,6 +39,13 @@ void SessionEditor::create_widgets() {
     
     arguments = new QLineEdit(session->get_arguments());
     form_layout->addRow(tr("Arguments:"), arguments);
+    
+    port = new QSpinBox();
+    port->setMinimum(1025);
+    port->setMaximum(65535);
+    if(session->get_port()) port->setValue(session->get_port());
+    else port->setValue(DEFAULT_PORT);
+    form_layout->addRow(tr("Port:"), port);
     
     layout->addLayout(form_layout);
     
@@ -65,6 +72,7 @@ void SessionEditor::accept() {
     session->set_session_name(session_name->text());
     session->set_executable_path(executable_path->text());
     session->set_arguments(arguments->text());
+    session->set_port(port->value());
     QDialog::accept();
 }
 

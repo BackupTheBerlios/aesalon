@@ -11,6 +11,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFileDialog>
+#include <QSpinBox>
 
 #include "Session.h"
 
@@ -29,6 +30,7 @@ private:
     QPushButton *file_select_dialog;
     QFileDialog *file_dialog;
     QLineEdit *arguments;
+    QSpinBox *port;
 
     QDialogButtonBox *button_box;
     

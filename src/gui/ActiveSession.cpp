@@ -13,11 +13,20 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
 }
 
 ActiveSession::~ActiveSession() {
+    memory_mutex.lock();
     delete memory;
+    memory_mutex.unlock();
 }
 
 void ActiveSession::execute() {
+    connect_to("localhost", session->get_port());
     /*emit close_session(this);*/
+}
+
+void ActiveSession::connect_to(QString host, int port) {
+    socket = new ActiveSessionSocket(host, port, memory, &memory_mutex);
+    socket->start();
+    connect(socket, SIGNAL(finished()), this, SLOT(terminate_session()));
 }
 
 } // namespace GUI

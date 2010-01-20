@@ -11,8 +11,9 @@ private:
     QString session_name;
     QString executable_path;
     QString arguments;
+    int port;
 public:
-    Session() : session_name(""), executable_path("") {}
+    Session() : session_name(""), executable_path(""), arguments(""), port(0) {}
     virtual ~Session() {}
     QString get_session_name() const { return session_name; }
     void set_session_name(const QString &new_name) { session_name = new_name; }
@@ -22,6 +23,9 @@ public:
     
     QString get_arguments() const { return arguments; }
     void set_arguments(const QString &new_arguments) { arguments = new_arguments; }
+    
+    int get_port() const { return port; }
+    void set_port(int new_port) { port = new_port; }
 };
 
 } // namespace GUI

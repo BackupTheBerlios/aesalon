@@ -3,8 +3,10 @@
 
 #include <QWidget>
 #include <QTabWidget>
+#include <QMutex>
 
 #include "Session.h"
+#include "ActiveSessionSocket.h"
 
 #include "platform/Memory.h"
 
@@ -14,14 +16,22 @@ namespace GUI {
 class ActiveSession : public QTabWidget { Q_OBJECT
 private:
     Session *session;
+    
+    QMutex memory_mutex;
     Platform::Memory *memory;
+    ActiveSessionSocket *socket;
 public:
     ActiveSession(Session *session, QWidget *parent = 0);
     virtual ~ActiveSession();
 
     void execute();
+    
+    QMutex &get_memory_mutex() { return memory_mutex; }
+    Platform::Memory *get_memory() const { return memory; }
+    
+    void connect_to(QString host, int port);
 public slots:
-    void terminate_session() { close_session(this); }
+    void terminate_session() { emit close_session(this); }
 signals:
     void close_session(ActiveSession *session);
 };

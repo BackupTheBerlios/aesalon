@@ -1,4 +1,4 @@
-add_definitions(-DLIBC_PATH="${LIBC_PATH}" -DDEFAULT_PORT=${DEFAULT_PORT})
+add_definitions(-DLIBC_PATH="${LIBC_PATH}") 
 
 aux_source_directory(. SOURCES)
 aux_source_directory(dwarf DWARF_SOURCES)
