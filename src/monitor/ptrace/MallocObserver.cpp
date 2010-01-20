@@ -1,6 +1,6 @@
 #include "MallocObserver.h"
 #include "Initializer.h"
-#include "platform/MemoryEvent.h"
+/*#include "platform/MemoryEvent.h"*/
 #include "BreakpointReference.h"
 
 namespace Aesalon {
@@ -21,7 +21,7 @@ bool MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
         
         std::cout << "Return value from malloc() is:" << std::hex << portal->get_register(ASM::Register::RAX) << std::endl;
         breakpoint->set_valid(false);
-        Initializer::get_instance()->get_event_queue()->push_event(new Platform::MemoryBlockAllocEvent(portal->get_register(ASM::Register::RAX), last_size));
+/*        Initializer::get_instance()->get_event_queue()->push_event(new Platform::MemoryBlockAllocEvent(portal->get_register(ASM::Register::RAX), last_size));*/
         
         return true;
     }

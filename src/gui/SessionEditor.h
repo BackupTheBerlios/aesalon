@@ -31,6 +31,8 @@ private:
     QLineEdit *arguments;
 
     QDialogButtonBox *button_box;
+    
+    static QString last_directory;
 
     void create_widgets();
 public:

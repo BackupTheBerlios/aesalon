@@ -5,6 +5,8 @@
 namespace Aesalon {
 namespace GUI {
 
+QString SessionEditor::last_directory = getenv("HOME");
+
 SessionEditor::SessionEditor(QWidget *parent, Session *session) : QDialog(parent), session(session) {
     if(this->session == NULL) {
         this->session = new Session();
@@ -52,7 +54,7 @@ void SessionEditor::create_widgets() {
     layout->addWidget(button_box);
     
     file_dialog = new QFileDialog();
-    file_dialog->setDirectory(getenv("HOME"));
+    file_dialog->setDirectory(last_directory);
     connect(file_dialog, SIGNAL(fileSelected(QString)), this, SLOT(change_selected_file(QString)));
     
     this->setLayout(layout);
@@ -72,8 +74,8 @@ void SessionEditor::show_file_select_dialog() {
 
 void SessionEditor::change_selected_file(QString new_filename) {
     executable_path->setText(new_filename);
-    QString directory = new_filename.left(new_filename.lastIndexOf('/'));
-    file_dialog->setDirectory(directory);
+    last_directory = new_filename.left(new_filename.lastIndexOf('/'));
+    file_dialog->setDirectory(last_directory);
 }
 
 } // namespace GUI
