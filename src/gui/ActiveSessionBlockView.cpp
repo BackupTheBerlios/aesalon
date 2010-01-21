@@ -13,7 +13,9 @@ ActiveSessionBlockView::ActiveSessionBlockView(Platform::Memory *memory, QWidget
     this->setSortingEnabled(true);
     this->setColumnWidth(0, 400);
     this->setColumnWidth(1, 100);
+    
     this->setShowGrid(false);
+    
     this->setSelectionMode(SingleSelection);
     this->setSelectionBehavior(SelectRows);
     this->sortByColumn(0, Qt::AscendingOrder);
@@ -28,6 +30,7 @@ void ActiveSessionBlockView::memory_changed(Platform::Event *event) {
     if(event->get_type() != Platform::Event::BLOCK_EVENT) return;
     Platform::BlockEvent *be = dynamic_cast<Platform::BlockEvent *>(event);
     /*this->addItem(QString().setNum(be->get_address()));*/
+    
     if(be->get_block_type() == Platform::BlockEvent::ALLOC_EVENT) {
         this->setRowCount(this->rowCount()+1);
         QTableWidgetItem *address, *size;
@@ -37,6 +40,7 @@ void ActiveSessionBlockView::memory_changed(Platform::Event *event) {
         size->setData(Qt::UserRole, (quint64)be->get_size());
         this->setItem(this->rowCount()-1, 0, address);
         this->setItem(this->rowCount()-1, 1, size);
+        resizeRowToContents(this->rowCount()-1);
     }
     else if(be->get_block_type() == Platform::BlockEvent::FREE_EVENT) {
         QList<QTableWidgetItem *> matches = this->findItems("0x" + QString().setNum((quint64)be->get_address(), 16), Qt::MatchExactly);

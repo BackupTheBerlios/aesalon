@@ -47,9 +47,10 @@ TCPSocket::~TCPSocket() {
 }
 
 void TCPSocket::send_data(std::string data) {
-    int sent = write(socket_fd, data.c_str(), data.length());
+    int sent = write(socket_fd, data.c_str(), data.length()+1);
     if(sent == -1) valid = false;
 }
+
 std::string TCPSocket::get_data() {
     if(!is_valid()) return "";
     uint16_t size;

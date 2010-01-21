@@ -6,6 +6,7 @@
 #include "misc/ReferenceCounter.h"
 #include "misc/StreamAsString.h"
 #include "misc/String.h"
+#include "Message.h"
 
 #include "platform/PlatformException.h"
 
@@ -71,6 +72,11 @@ void Initializer::initialize() {
     /*symbol_manager = new Platform::SymbolManager();*/
     
     /*symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());*/
+    
+    if(ap->get_argument("wait").to<Misc::BooleanArgument>()->get_status()) {
+        Message(Message::DEBUG_MESSAGE, "Waiting for TCP connection . . .");
+        server_socket->wait_for_connection();
+    }
     
     run();
     

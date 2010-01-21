@@ -20,6 +20,7 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
     
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_INET; /* NOTE: this is to prevent listening on TCP6 sockets for now. */
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     hints.ai_protocol = 0;
@@ -32,9 +33,14 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
         throw PlatformException(Misc::StreamAsString() << "Couldn't resolve hostname: " << gai_strerror(ret), false);
     }
     
+    int yes = 1;
+    
     for(rp = result; rp != NULL; rp = rp->ai_next) {
         socket_fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if(socket_fd == -1) continue;
+        
+        if(setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+            continue;
         
         if(bind(socket_fd, rp->ai_addr, rp->ai_addrlen) == 0) break;
         
@@ -46,11 +52,6 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
     freeaddrinfo(result);
     
     if(listen(socket_fd, 8) == -1) throw PlatformException("Couldn't listen on socket: ");
-    
-    int yes = 1;
-    
-    if(setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-        throw PlatformException("Couldn't set SO_REUSEADDR on socket: ");
 }
 
 TCPServerSocket::~TCPServerSocket() {
@@ -86,6 +87,11 @@ void TCPServerSocket::accept_connections() {
         }
         read_set = listen_set;
     }
+}
+
+void TCPServerSocket::wait_for_connection() {
+    int s_fd = accept(socket_fd, NULL, 0);
+    socket_list.push_back(new TCPSocket(s_fd));
 }
 
 void TCPServerSocket::remove_invalid_sockets() {

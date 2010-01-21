@@ -22,6 +22,7 @@ public:
     virtual ~TCPServerSocket();
     
     void accept_connections();
+    void wait_for_connection();
     void remove_invalid_sockets();
     void disconnect_all();
     

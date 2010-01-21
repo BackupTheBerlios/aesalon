@@ -22,7 +22,7 @@ void ActiveSessionSocket::handle_data() {
     QString str = data;
     while(data.length()) {
         QString string = data;
-        data.remove(0, string.length());
+        data.remove(0, string.length()+1);
         Platform::Event *event = Platform::Event::deserialize(string.toStdString());
         if(event) {
             memory->handle_event(event);
