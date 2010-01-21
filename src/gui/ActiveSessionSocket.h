@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 
 #include "platform/Memory.h"
+#include "platform/Event.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -19,8 +20,11 @@ public:
 public slots:
     void handle_data();
     void reemit_connected() { emit connected(); }
+    void reemit_disconnected() { emit disconnected(); }
 signals:
     void connected();
+    void disconnected();
+    void event_received(Platform::Event *event);
 };
 
 } // namespace GUI

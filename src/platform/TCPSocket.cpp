@@ -43,15 +43,11 @@ TCPSocket::TCPSocket(std::string host, int port) {
     valid = true;
 }
 TCPSocket::~TCPSocket() {
-    close(socket_fd);
+    if(socket_fd) close(socket_fd);
 }
 
 void TCPSocket::send_data(std::string data) {
-    std::string raw_data;
-    
-    raw_data = Misc::StreamAsString() << htons(data.length()) << data;
-    
-    int sent = write(socket_fd, raw_data.c_str(), raw_data.length());
+    int sent = write(socket_fd, data.c_str(), data.length());
     if(sent == -1) valid = false;
 }
 std::string TCPSocket::get_data() {
@@ -77,6 +73,13 @@ std::string TCPSocket::get_data() {
     }
     
     return data;
+}
+
+void TCPSocket::disconnect() {
+    if(socket_fd) {
+        close(socket_fd);
+        socket_fd = 0;
+    }
 }
 
 } // namespace Platform

@@ -7,6 +7,7 @@
 #include "Session.h"
 #include "ActiveSessionSocket.h"
 #include "ActiveSessionOverview.h"
+#include "ActiveSessionBlockView.h"
 
 #include "platform/Memory.h"
 
@@ -27,6 +28,7 @@ private:
     Platform::Memory *memory;
     ActiveSessionSocket *socket;
     ActiveSessionOverview *overview;
+    ActiveSessionBlockView *block_view;
     
     status_e status;
     void set_status(status_e new_status) {
@@ -49,6 +51,7 @@ public:
 public slots:
     void terminate_session() { emit close_session(this); }
     void socket_connection();
+    void socket_disconnection();
 signals:
     void close_session(ActiveSession *session);
     void status_changed(QString new_status);

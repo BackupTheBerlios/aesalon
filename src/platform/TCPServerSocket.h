@@ -23,6 +23,7 @@ public:
     
     void accept_connections();
     void remove_invalid_sockets();
+    void disconnect_all();
     
     void send_data(std::string data);
     void send_data(Misc::SmartPointer<EventQueue> data);

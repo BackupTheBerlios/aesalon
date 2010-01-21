@@ -18,6 +18,8 @@ public:
     void send_data(std::string data);
     std::string get_data();
     
+    void disconnect();
+    
     bool is_valid() const { return valid; }
 };
 

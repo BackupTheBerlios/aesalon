@@ -1,6 +1,8 @@
 #include <sys/types.h>
+#include <sys/time.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #include <cstring>
 #include <iostream>
 #include <netdb.h>
@@ -44,9 +46,15 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
     freeaddrinfo(result);
     
     if(listen(socket_fd, 8) == -1) throw PlatformException("Couldn't listen on socket: ");
+    
+    int yes = 1;
+    
+    if(setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+        throw PlatformException("Couldn't set SO_REUSEADDR on socket: ");
 }
 
 TCPServerSocket::~TCPServerSocket() {
+    
     close(socket_fd);
 }
 
@@ -60,8 +68,23 @@ int TCPServerSocket::get_port() const {
 void TCPServerSocket::accept_connections() {
     int s_fd;
     
-    while((s_fd = accept(socket_fd, NULL, 0))) {
-        socket_list.push_back(new TCPSocket(s_fd));
+    fd_set listen_set, read_set;
+    struct timeval tv;
+    FD_ZERO(&listen_set);
+    FD_ZERO(&read_set);
+    FD_SET(socket_fd, &listen_set);
+    
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    
+    read_set = listen_set;
+    
+    while(select(socket_fd+1, &read_set, NULL, NULL, &tv)) {
+        if(FD_ISSET(socket_fd, &read_set)) {
+            s_fd = accept(socket_fd, NULL, 0);
+            socket_list.push_back(new TCPSocket(s_fd));
+        }
+        read_set = listen_set;
     }
 }
 
@@ -92,6 +115,13 @@ void TCPServerSocket::send_data(Misc::SmartPointer<EventQueue> data) {
         std::cout << "TCPServerSocket::send_data(): sending \"" << data_string << "\"\n";
         send_data(data_string);
         data->pop_event();
+    }
+}
+
+void TCPServerSocket::disconnect_all() {
+    socket_list_t::iterator i = socket_list.begin();
+    for(; i != socket_list.end(); i ++) {
+        if((*i)->is_valid()) (*i)->disconnect();
     }
 }
 

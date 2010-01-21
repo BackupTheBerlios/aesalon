@@ -1,3 +1,4 @@
+#include <iostream>
 #include "ActiveSessionSocket.h"
 #include "ActiveSessionSocket.moc"
 
@@ -10,6 +11,7 @@ ActiveSessionSocket::ActiveSessionSocket(QString host, int port, Platform::Memor
     socket->connectToHost(host, port);
     connect(socket, SIGNAL(readyRead()), this, SLOT(handle_data()));
     connect(socket, SIGNAL(connected()), this, SLOT(reemit_connected()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(reemit_disconnected()));
 }
 
 ActiveSessionSocket::~ActiveSessionSocket() {
@@ -17,11 +19,16 @@ ActiveSessionSocket::~ActiveSessionSocket() {
 
 void ActiveSessionSocket::handle_data() {
     QByteArray data = socket->readAll();
+    QString str = data;
     while(data.length()) {
         QString string = data;
         data.remove(0, string.length());
         Platform::Event *event = Platform::Event::deserialize(string.toStdString());
-        if(event) memory->handle_event(event);
+        if(event) {
+            memory->handle_event(event);
+            emit event_received(event);
+            delete event;
+        }
     }
 }
 

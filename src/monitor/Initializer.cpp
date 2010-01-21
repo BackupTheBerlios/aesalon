@@ -73,6 +73,8 @@ void Initializer::initialize() {
     /*symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());*/
     
     run();
+    
+    server_socket->disconnect_all();
 }
 
 void Initializer::deinitialize() {
@@ -106,6 +108,7 @@ void Initializer::run() {
             std::cout << "Sending data from event queue . . ." << std::endl;
             get_socket()->send_data(event_queue);
         }
+        server_socket->accept_connections();
     }
 }
 
