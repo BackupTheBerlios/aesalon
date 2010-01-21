@@ -20,6 +20,7 @@
 #include "SegfaultObserver.h"
 #include "MallocObserver.h"
 #include "FreeObserver.h"
+#include "ReallocObserver.h"
 #include "MainObserver.h"
 #include "BreakpointReference.h"
 
@@ -54,6 +55,7 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     initial_observer = new MainObserver();
     malloc_observer = new MallocObserver();
     free_observer = new FreeObserver();
+    realloc_observer = new ReallocObserver();
     
     std::cout << "Portal::Portal(): waiting for SIGTRAP call from child . . ." << std::endl;
     /* Wait for the SIGTRAP that indicates a exec() call . . . */
@@ -82,6 +84,8 @@ Word Portal::get_register(ASM::Register which) const {
             return registers.rbx;
         case ASM::Register::RDI:
             return registers.rdi;
+        case ASM::Register::RSI:
+            return registers.rsi;
         case ASM::Register::RIP:
             return registers.rip;
         case ASM::Register::RBP:

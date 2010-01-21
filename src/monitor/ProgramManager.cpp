@@ -40,10 +40,16 @@ void ProgramManager::place_initial_breakpoints() {
     Word malloc_address = libc_offset + get_libc_parser()->get_symbol("malloc")->get_address();
     std::cout << "\tmalloc address is " << malloc_address << std::endl;
     malloc_breakpoint_id = get_ptrace_portal()->place_breakpoint(malloc_address, get_ptrace_portal()->get_malloc_observer());
+    
     std::cout << "ProgramManager::place_initial_breakpoints(): placing free breakpoint . . ." << std::endl;
     Word free_address = libc_offset + get_libc_parser()->get_symbol("free")->get_address();
     std::cout << "\tfree address is " << free_address << std::endl;
     free_breakpoint_id = get_ptrace_portal()->place_breakpoint(free_address, get_ptrace_portal()->get_free_observer());
+    
+    std::cout << "ProgramManager::place_initial_breakpoints(): placing realloc breakpoing . . ." << std::endl;
+    Word realloc_address = libc_offset + get_libc_parser()->get_symbol("realloc")->get_address();
+    std::cout << "\trealloc address is " << realloc_address << std::endl;
+    realloc_breakpoint_id = get_ptrace_portal()->place_breakpoint(realloc_address, get_ptrace_portal()->get_realloc_observer());
     
     /* Remove the breakpoint on main(), it's not required any more. */
     /*get_ptrace_portal()->get_breakpoint_by_address(get_elf_parser()->get_symbol("main")->get_address())->set_valid(false);*/

@@ -3,4 +3,5 @@ add_executable(malloc_test malloc_test.c)
 add_executable(sleep_test sleep_test.c)
 add_executable(sleep_malloc sleep_malloc.c)
 add_executable(interactive_malloc_test interactive_malloc_test.c)
+add_executable(realloc_test realloc_test.c)
 

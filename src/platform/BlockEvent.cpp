@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iostream>
 #include "BlockEvent.h"
 #include "misc/Exception.h"
 #include "misc/StreamAsString.h"
@@ -14,6 +15,10 @@ std::string BlockEvent::serialize() {
         case ALLOC_EVENT:
             return Misc::StreamAsString() << Event::serialize() << std::hex << get_address() << ":" << get_size();
         case REALLOC_EVENT:
+            std::cout << "* REALLOC_EVENT serialization:" << std::endl;
+            std::cout << "\taddress: " << get_address() << std::endl;
+            std::cout << "\tsize: " << get_size() << std::endl;
+            std::cout << "\tnew_Address: " << get_new_address() << std::endl;
             return Misc::StreamAsString() << Event::serialize() << std::hex << get_address() << ":" << get_size() << ":" << get_new_address();
         case FREE_EVENT:
             return Misc::StreamAsString() << Event::serialize() << std::hex << get_address();
