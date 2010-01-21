@@ -13,9 +13,9 @@ ProgramManager::ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argume
     std::string libc_path = Misc::ArgumentParser::get_instance()->get_argument("libc path").to<Misc::StringArgument>()->get_value();
     libc_parser = new ELF::Parser(libc_path);
     dwarf_parser = new DWARF::Parser(elf_parser);
-    disassembler = new ASM::Disassembler(elf_parser);
+    /*disassembler = new ASM::Disassembler(elf_parser);*/
     
-    disassembler->get_symbol_il("main");
+    /*disassembler->get_symbol_il("main");*/
 }
 
 void ProgramManager::execute() {

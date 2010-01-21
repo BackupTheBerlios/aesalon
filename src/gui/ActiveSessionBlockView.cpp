@@ -19,6 +19,8 @@ ActiveSessionBlockView::ActiveSessionBlockView(Platform::Memory *memory, QWidget
     this->setSelectionMode(SingleSelection);
     this->setSelectionBehavior(SelectRows);
     this->sortByColumn(0, Qt::AscendingOrder);
+    
+    this->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 ActiveSessionBlockView::~ActiveSessionBlockView() {

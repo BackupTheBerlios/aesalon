@@ -2,3 +2,5 @@
 - Change BreakpointObserver::handle_breakpoint() to return void, not bool
 - Make ActiveSession::execute() actually execute the program in question.
 
+- Buildsystem is completely broken when 'git tag' reports no version tags
+
