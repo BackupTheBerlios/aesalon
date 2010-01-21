@@ -30,7 +30,7 @@ bool MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     /* NOTE: qword [rsp] is where the return address is stored in libc 2.10.2-5, but don't rely on it! */
     return_address = portal->read_memory(rsp);
     std::cout << "\tReturn address: " << return_address << std::endl;
-    breakpoints.insert(portal->place_breakpoint(return_address, this));
+    portal->place_breakpoint(return_address, this);
     std::cout << "\tMemory block size will be " << portal->get_register(ASM::Register::RDI) << std::endl;
     last_size = portal->get_register(ASM::Register::RDI);
     

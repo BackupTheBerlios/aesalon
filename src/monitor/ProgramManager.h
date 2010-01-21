@@ -25,6 +25,7 @@ private:
     Misc::SmartPointer<ASM::Disassembler> disassembler;
     
     std::size_t malloc_breakpoint_id;
+    std::size_t free_breakpoint_id;
 public:
     ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list);
     virtual ~ProgramManager() {}
@@ -45,6 +46,7 @@ public:
     bool is_running() const { return running; }
     
     std::size_t get_malloc_breakpoint_id() const { return malloc_breakpoint_id; }
+    std::size_t get_free_breakpoint_id() const { return free_breakpoint_id; }
 };
 
 } // namespace Monitor

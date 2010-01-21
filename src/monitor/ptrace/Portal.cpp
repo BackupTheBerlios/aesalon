@@ -19,6 +19,7 @@
 #include "TrapObserver.h"
 #include "SegfaultObserver.h"
 #include "MallocObserver.h"
+#include "FreeObserver.h"
 #include "MainObserver.h"
 #include "BreakpointReference.h"
 
@@ -52,6 +53,7 @@ Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0
     /* This is a single-shot breakpoint observer, but since there's currently no way to remove observers, stick it on last. */
     initial_observer = new MainObserver();
     malloc_observer = new MallocObserver();
+    free_observer = new FreeObserver();
     
     std::cout << "Portal::Portal(): waiting for SIGTRAP call from child . . ." << std::endl;
     /* Wait for the SIGTRAP that indicates a exec() call . . . */

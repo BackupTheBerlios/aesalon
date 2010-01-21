@@ -47,6 +47,7 @@ private:
     
     Misc::SmartPointer<BreakpointObserver> initial_observer;
     Misc::SmartPointer<BreakpointObserver> malloc_observer;
+    Misc::SmartPointer<BreakpointObserver> free_observer;
 public:
     /** Generic constructor for PTracePortal.
         @param argument_list The arguments to spawn the child with.
@@ -124,6 +125,7 @@ public:
     }
     
     Misc::SmartPointer<BreakpointObserver> get_malloc_observer() const { return malloc_observer; }
+    Misc::SmartPointer<BreakpointObserver> get_free_observer() const { return free_observer; }
     
     /** Reads the memory map in /proc for the child process to determine the address libc is lodaded into.
         @return The address of libc, or 0 if libc is not currently loaded.
