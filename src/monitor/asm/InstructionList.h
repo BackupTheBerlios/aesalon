@@ -25,6 +25,9 @@ public:
         if(address > offset) return NULL;
         return instruction_list[address-offset];
     }
+    std::size_t get_instruction_count() const;
+    Misc::SmartPointer<Instruction> get_instruction_by_index(std::size_t index) const;
+    
 };
 
 } // namespace ASM

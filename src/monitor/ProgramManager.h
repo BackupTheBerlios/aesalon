@@ -8,6 +8,7 @@
 #include "elf/Parser.h"
 #include "dwarf/Parser.h"
 #include "asm/Disassembler.h"
+#include "TaintTracker.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -23,6 +24,8 @@ private:
     Misc::SmartPointer<ELF::Parser> elf_parser, libc_parser;
     Misc::SmartPointer<DWARF::Parser> dwarf_parser;
     Misc::SmartPointer<ASM::Disassembler> disassembler;
+    
+    Misc::SmartPointer<TaintTracker> taint_tracker;
     
     std::size_t malloc_breakpoint_id;
     std::size_t free_breakpoint_id;
@@ -49,6 +52,8 @@ public:
     std::size_t get_malloc_breakpoint_id() const { return malloc_breakpoint_id; }
     std::size_t get_free_breakpoint_id() const { return free_breakpoint_id; }
     std::size_t get_realloc_breakpoint_id() const { return realloc_breakpoint_id; }    
+    
+    Misc::SmartPointer<TaintTracker> get_taint_tracker() const { return taint_tracker; }
 };
 
 } // namespace Monitor

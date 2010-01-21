@@ -71,7 +71,7 @@ void Disassembler::parse_objdump_output() {
         if(!symbol_to_il[symbol->get_symbol_name()].is_valid())
             symbol_to_il[symbol->get_symbol_name()] = new InstructionList(symbol->get_address());
         
-        symbol_to_il[symbol->get_symbol_name()]->add_instruction(new Instruction(line));
+        symbol_to_il[symbol->get_symbol_name()]->add_instruction(new Instruction(line, address));
     }
 }
 

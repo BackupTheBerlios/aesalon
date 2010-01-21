@@ -100,14 +100,12 @@ Word Portal::get_register(ASM::Register which) const {
 
 void Portal::set_register(ASM::Register which, Word new_value) {
     struct user_regs_struct registers;
-    std::cout << "Portal::set_register() called . . .\n";
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         case ASM::Register::RIP:
-            std::cout << "\tSetting RIP to " << std::hex << new_value << std::dec << std::endl;
             registers.rip = new_value;
             break;
 #endif
@@ -129,7 +127,6 @@ Word Portal::read_memory(Platform::MemoryAddress address) const {
 
 void Portal::write_memory(Platform::MemoryAddress address, Word value) {
     std::cout << "Portal::write_memory(address, Word) called . . ." << std::endl;
-    std::cout << "\tWriting " << std::hex <<value << " to " << address << std::endl;
     if(ptrace(PTRACE_POKEDATA, pid, address, value) == -1) 
         throw PTraceException(Misc::StreamAsString() << "Couldn't write memory: " << strerror(errno));
 }
@@ -141,12 +138,8 @@ void Portal::write_memory(Platform::MemoryAddress address, Byte value) {
     word_offset = address & 0x07;
     Word current_value = read_memory(address - word_offset);
     
-    std::cout << "\tUtilizing write_memory(address, Word); word_offset is: " << word_offset << std::endl;
-    std::cout << "\tBefore byte clearing, current_value is: " << current_value << std::endl;
     current_value &= ~(Word(0xff) << (word_offset * CHAR_BIT));
-    std::cout << "\tAfter byte clearing, current_value is: " << current_value << std::endl;
     current_value |= (Word(value) << (word_offset * CHAR_BIT));
-    std::cout << "\tAfter byte insertion, current_value is: " << current_value << std::endl;
     write_memory(address - word_offset, current_value);
 }
 

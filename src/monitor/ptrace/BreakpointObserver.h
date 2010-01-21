@@ -12,7 +12,7 @@ public:
     BreakpointObserver() {}
     virtual ~BreakpointObserver() {}
     
-    virtual bool handle_breakpoint(const BreakpointReference &breakpoint) = 0;
+    virtual void handle_breakpoint(const BreakpointReference &breakpoint) = 0;
 };
 
 } // namespace PTrace

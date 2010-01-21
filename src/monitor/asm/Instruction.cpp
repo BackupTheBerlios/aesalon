@@ -6,7 +6,7 @@ namespace Aesalon {
 namespace Monitor {
 namespace ASM {
 
-Instruction::Instruction(std::string instruction) {
+Instruction::Instruction(std::string instruction, Word address) : address(address) {
     std::string opcode;
     bool has_operands = false;
     if(instruction.find(" ") == std::string::npos) opcode = instruction;

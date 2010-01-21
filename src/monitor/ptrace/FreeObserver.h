@@ -9,7 +9,7 @@ namespace PTrace {
 
 class FreeObserver : public BreakpointObserver {
 public:
-    virtual bool handle_breakpoint(const BreakpointReference &breakpoint);
+    virtual void handle_breakpoint(const BreakpointReference &breakpoint);
 };
 
 } // namespace PTrace
