@@ -1,2 +1,7 @@
+Monitor:
 - Fix Breakpoint's method of storing observers to be more efficient
+- Implement proper taint-tracking so references can be calculated
+- Stop using Platform::MemoryAddress and Word interchangably
+GUI:
+- Add configuration screen, mainly for the aesalon path
 

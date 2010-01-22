@@ -36,7 +36,7 @@ void ActiveSessionOverview::handle_event(Platform::Event *event) {
     if(be->get_block_type() != Platform::BlockEvent::ALLOC_EVENT) deallocations ++;
     if(be->get_block_type() != Platform::BlockEvent::FREE_EVENT) allocations ++;
     allocation_info->setText(QString().setNum(allocations) + "/" + QString().setNum(deallocations));
-    active_blocks->setText(QString().setNum(allocations-deallocations));
+    active_blocks->setText(QString().setNum((signed)(allocations-deallocations)));
 }
 
 } // namespace GUI

@@ -46,6 +46,8 @@ SessionManager::SessionManager(QWidget *parent) {
     layout->addLayout(session_button_layout);
     this->setLayout(layout);
     
+    session_list_view->setFocus(Qt::ActiveWindowFocusReason);
+    
     connect(session_list_view, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(edit_session(QListWidgetItem *)));
     connect(session_list_view, SIGNAL(new_request()), this, SLOT(new_session()));
     connect(session_list_view, SIGNAL(edit_request(QListWidgetItem*)), this, SLOT(edit_session(QListWidgetItem*)));
