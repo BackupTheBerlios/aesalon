@@ -22,7 +22,7 @@ private:
     SessionListWidget *session_list_view;
     QHBoxLayout *session_button_layout;
     QPushButton *new_session_button;
-    QPushButton *edit_session_button;
+    QPushButton *connect_to_session_button;
     QPushButton *launch_session_button;
 public:
     SessionManager(QWidget *parent = 0);

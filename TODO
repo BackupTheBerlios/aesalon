@@ -1,4 +1,2 @@
 - Fix Breakpoint's method of storing observers to be more efficient
-- Change BreakpointObserver::handle_breakpoint() to return void, not bool
-- Make ActiveSession::execute() actually execute the program in question.
 

@@ -225,7 +225,9 @@ void Portal::handle_signal() {
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
     }
-    std::cout << "\twarning: unhandled signal!" << std::endl;
+    Message::Message(Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Caught unknown signal " << signal << ", resuming execution with signal");
+    /* Default action: continue */
+    continue_execution(signal);
 }
 
 void Portal::continue_execution(int signal) {

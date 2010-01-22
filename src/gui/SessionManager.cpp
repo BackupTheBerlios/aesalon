@@ -20,6 +20,7 @@ SessionManager::SessionManager(QWidget *parent) {
         session->set_executable_path(settings.value("executable-path").toString());
         session->set_arguments(settings.value("arguments").toString());
         session->set_port(settings.value("port").toInt());
+        session->set_session_type(Session::session_type_e(settings.value("session-type").toInt()));
         session_list.append(session);
     }
     settings.endArray();
@@ -37,10 +38,6 @@ SessionManager::SessionManager(QWidget *parent) {
     new_session_button = new QPushButton("&New session");
     connect(new_session_button, SIGNAL(pressed()), this, SLOT(new_session()));
     session_button_layout->addWidget(new_session_button);
-    
-    /*edit_session_button = new QPushButton("&Edit session");
-    connect(edit_session_button, SIGNAL(pressed()), this, SLOT(edit_current_session()));
-    session_button_layout->addWidget(edit_session_button);*/
     
     launch_session_button = new QPushButton("&Launch session");
     connect(launch_session_button, SIGNAL(pressed()), this, SLOT(launch_current_session()));
@@ -68,6 +65,7 @@ void SessionManager::save_sessions() {
         settings.setValue("executable-path", session_list[i]->get_executable_path());
         settings.setValue("arguments", session_list[i]->get_arguments());
         settings.setValue("port", session_list[i]->get_port());
+        settings.setValue("session-type", session_list[i]->get_session_type());
     }
     settings.endArray();
 }
@@ -95,7 +93,8 @@ void SessionManager::launch_session(QListWidgetItem *session_item) {
     ActiveSession *as = new ActiveSession(session);
     emit new_tab_request(as, session_name);
     connect(as, SIGNAL(close_session(ActiveSession *)), this, SLOT(close_active_session(ActiveSession *)));
-    as->execute();
+    if(session->get_session_type() == Session::LAUNCH_SESSION) as->execute();
+    else as->connect_to(session->get_executable_path(), session->get_port());
 }
 
 void SessionManager::edit_session(QListWidgetItem *session_item) {

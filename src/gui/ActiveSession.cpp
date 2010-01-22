@@ -1,5 +1,12 @@
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <QSettings>
+
 #include "ActiveSession.h"
 #include "ActiveSession.moc"
+
+#include "platform/ArgumentList.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -23,6 +30,18 @@ ActiveSession::~ActiveSession() {
 }
 
 void ActiveSession::execute() {
+    QSettings settings;
+    Platform::ArgumentList al;
+    al.add_argument(settings.value("aesalon-path").toString().toStdString());
+    al.add_argument("--wait");
+    al.add_argument(session->get_executable_path().toStdString());
+    /* TODO: handle arguments in here . . . */
+    pid_t pid = fork();
+    if(pid == -1) return;
+    else if(pid == 0) {
+        execv(al.get_argument(0).c_str(), al.get_as_argv());
+        exit(1);
+    }
     connect_to("localhost", session->get_port());
 }
 
@@ -32,6 +51,7 @@ void ActiveSession::connect_to(QString host, int port) {
     connect(socket, SIGNAL(disconnected()), this, SLOT(socket_disconnection()));
     
     connect(socket, SIGNAL(event_received(Platform::Event*)), block_view, SLOT(memory_changed(Platform::Event*)));
+    connect(socket, SIGNAL(event_received(Platform::Event*)), overview, SLOT(handle_event(Platform::Event*)));
 }
 
 void ActiveSession::socket_connection() {
