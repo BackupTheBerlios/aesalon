@@ -21,5 +21,15 @@ void TaintTracker::place_breakpoints(std::string symbol) {
     }
 }
 
+Misc::SmartPointer<TaintedData> TaintTracker::get_tainted_data(Word address) const {
+    tainted_data_t::const_reverse_iterator i = tainted_data.rbegin();
+    
+    for(; i != tainted_data.rend(); i ++) {
+        if((*i)->get_address() == address) return *i;
+    }
+    
+    return NULL;
+}
+
 } // namespace Monitor
 } // namespace Aesalon
