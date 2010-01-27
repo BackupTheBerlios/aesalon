@@ -24,7 +24,7 @@ void MainWindow::setup_menus() {
 }
 
 void MainWindow::open_configuration() {
-    Configuration *config = new Configuration();
+    Configuration *config = new Configuration(this);
     config->exec();
 }
 

@@ -36,6 +36,8 @@ ActiveSession::~ActiveSession() {
 void ActiveSession::execute() {
     QSettings settings;
     Platform::ArgumentList al;
+    al.add_argument("/usr/bin/x-terminal-emulator");
+    al.add_argument("-e");
     al.add_argument(settings.value("aesalon-path").toString().toStdString());
     al.add_argument("--wait");
     al.add_argument("--use-port");
