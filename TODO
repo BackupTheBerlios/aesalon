@@ -3,5 +3,7 @@ Monitor:
 - Implement proper taint-tracking so references can be calculated
 - Stop using Platform::MemoryAddress and Word interchangably
 GUI:
-- Add configuration screen, mainly for the aesalon path
+- Embed Konsole inside ActiveSession?
+- Add "temporary sessions", e.g. sessions that aren't saved
+Platform:
 

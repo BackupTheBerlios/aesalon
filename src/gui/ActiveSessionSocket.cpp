@@ -35,7 +35,6 @@ void ActiveSessionSocket::handle_data() {
 }
 
 void ActiveSessionSocket::error_caught(QAbstractSocket::SocketError error) {
-    qDebug("Caught socket error: %i", error);
     /* if it's a timeout or connection-refused, try reconnecting in 500ms . . . */
     if(error == QAbstractSocket::SocketTimeoutError) {
         QTimer::singleShot(500, this, SLOT(try_connecting()));

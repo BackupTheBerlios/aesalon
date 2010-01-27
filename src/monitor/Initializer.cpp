@@ -41,6 +41,7 @@ void Initializer::initialize() {
     ap->add_argument("logfile", new Misc::StringArgument("--log-file", 'l', ""));
     ap->add_argument("tcp port", new Misc::StringArgument("--use-port", 0, Misc::StreamAsString() << DEFAULT_PORT));
     ap->add_argument("wait", new Misc::BooleanArgument("--wait", 'w', "", 0, false));
+    ap->add_argument("wait for", new Misc::StringArgument("--wait-for", 0, "1"));
     ap->add_argument("libc path", new Misc::StringArgument("--libc-path", 0, LIBC_PATH));
     
     ap->parse_argv(argv);
@@ -74,8 +75,14 @@ void Initializer::initialize() {
     /*symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());*/
     
     if(ap->get_argument("wait").to<Misc::BooleanArgument>()->get_status()) {
-        Message(Message::DEBUG_MESSAGE, "Waiting for TCP connection . . .");
-        server_socket->wait_for_connection();
+        int number;
+        Misc::String::to<int>(
+            ap->get_argument("wait for").to<Misc::StringArgument>()->get_value(), number);
+        
+        Message(Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Waiting for " << number << " TCP connection(s) . . .");
+        for(int x = 0; x < number; x ++) {
+            server_socket->wait_for_connection();
+        }
     }
     
     run();
