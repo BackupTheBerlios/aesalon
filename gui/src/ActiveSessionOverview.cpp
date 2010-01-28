@@ -2,7 +2,6 @@
 
 #include "ActiveSessionOverview.h"
 #include "ActiveSessionOverview.moc"
-#include "platform/BlockEvent.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -28,15 +27,6 @@ ActiveSessionOverview::ActiveSessionOverview(Session *session, QWidget *parent) 
 
 void ActiveSessionOverview::update_status(QString new_status) {
     status->setText(new_status);
-}
-
-void ActiveSessionOverview::handle_event(Platform::Event *event) {
-    if(event->get_type() != Platform::Event::BLOCK_EVENT) return;
-    Platform::BlockEvent *be = dynamic_cast<Platform::BlockEvent *>(event);
-    if(be->get_block_type() != Platform::BlockEvent::ALLOC_EVENT) deallocations ++;
-    if(be->get_block_type() != Platform::BlockEvent::FREE_EVENT) allocations ++;
-    allocation_info->setText(QString().setNum(allocations) + "/" + QString().setNum(deallocations));
-    active_blocks->setText(QString().setNum((signed)(allocations-deallocations)));
 }
 
 } // namespace GUI

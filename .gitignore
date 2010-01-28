@@ -19,12 +19,6 @@ install_manifest.txt
 # IDE (KDevelop 4) ignores
 *kdev*
 
-# Executable ignores
-src/monitor/aesalon
-
-# Generated documentation (doxygen) ignores
-doc/html*
-
 # Valgrind file ignores
 valgrind.*
 

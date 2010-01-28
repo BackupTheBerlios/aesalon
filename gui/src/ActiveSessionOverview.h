@@ -8,7 +8,6 @@
 #include <QTimer>
 
 #include "Session.h"
-#include "platform/Event.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -26,7 +25,6 @@ public:
     virtual ~ActiveSessionOverview() {}
 public slots:
     void update_status(QString new_status);
-    void handle_event(Platform::Event *event);
 };
 
 } // namespace GUI

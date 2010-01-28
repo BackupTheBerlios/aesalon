@@ -7,7 +7,6 @@
 #include "Session.h"
 #include "ActiveSessionSocket.h"
 #include "ActiveSessionOverview.h"
-#include "ActiveSessionBlockView.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -25,7 +24,6 @@ private:
     
     ActiveSessionSocket *socket;
     ActiveSessionOverview *overview;
-    ActiveSessionBlockView *block_view;
     
     status_e status;
     void set_status(status_e new_status) {

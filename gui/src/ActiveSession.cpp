@@ -7,8 +7,6 @@
 #include "ActiveSession.h"
 #include "ActiveSession.moc"
 
-#include "misc/ArgumentList.h"
-
 namespace Aesalon {
 namespace GUI {
 
@@ -30,7 +28,8 @@ ActiveSession::~ActiveSession() {
 
 void ActiveSession::execute() {
     QSettings settings;
-    Misc::ArgumentList al;
+    /* NOTE: reimplement this function */\
+#if 0
     al.add_argument(settings.value("xterm-path").toString().toStdString());
     al.add_argument("-e");
     al.add_argument(settings.value("aesalon-path").toString().toStdString());
@@ -45,6 +44,7 @@ void ActiveSession::execute() {
         execv(al.get_argument(0).c_str(), al.get_as_argv());
         exit(1);
     }
+#endif
     connect_to("localhost", session->get_port());
 }
 
@@ -52,9 +52,6 @@ void ActiveSession::connect_to(QString host, int port) {
     socket = new ActiveSessionSocket(host, port);
     connect(socket, SIGNAL(connected()), this, SLOT(socket_connection()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(socket_disconnection()));
-    
-    connect(socket, SIGNAL(event_received(Platform::Event*)), block_view, SLOT(memory_changed(Platform::Event*)));
-    connect(socket, SIGNAL(event_received(Platform::Event*)), overview, SLOT(handle_event(Platform::Event*)));
 }
 
 void ActiveSession::socket_connection() {

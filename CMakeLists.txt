@@ -36,6 +36,13 @@ if(DEVELOPMENT_BUILD)
     add_subdirectory(tests)
 endif(DEVELOPMENT_BUILD)
 
-# Now compile everything . . .
-add_subdirectory(src)
+# Compile the monitor, if wanted
+if(BUILD_MONITOR)
+    add_subdirectory(monitor)
+endif(BUILD_MONITOR)
+
+# Compile the GUI, if wanted
+if(BUILD_GUI)
+    add_subdirectory(gui)
+endif(BUILD_GUI)
 

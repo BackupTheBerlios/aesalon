@@ -4,20 +4,16 @@
 #include <QObject>
 #include <QTcpSocket>
 
-#include "platform/Memory.h"
-#include "platform/Event.h"
-
 namespace Aesalon {
 namespace GUI {
 
 class ActiveSessionSocket : public QObject { Q_OBJECT
 private:
-    Platform::Memory *memory;
     QTcpSocket *socket;
     QString host;
     int port;
 public:
-    ActiveSessionSocket(QString host, int port, Platform::Memory *memory);
+    ActiveSessionSocket(QString host, int port);
     virtual ~ActiveSessionSocket();
 public slots:
     void handle_data();
@@ -28,7 +24,6 @@ public slots:
 signals:
     void connected();
     void disconnected();
-    void event_received(Platform::Event *event);
 };
 
 } // namespace GUI
