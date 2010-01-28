@@ -5,13 +5,11 @@
 #include "Types.h"
 #include "Instruction.h"
 
-namespace Aesalon {
-namespace Monitor {
 namespace ASM {
 
 class InstructionList {
 protected:
-    typedef std::vector<Misc::SmartPointer<Instruction> > instruction_list_t;
+    typedef std::vector<Instruction *> instruction_list_t;
 private:
     Word offset;
     instruction_list_t instruction_list;
@@ -19,19 +17,17 @@ public:
     InstructionList(Word offset = 0) : offset(offset) {}
     virtual ~InstructionList() {}
     
-    void add_instruction(Misc::SmartPointer<Instruction> new_instruction)
+    void add_instruction(Instruction *new_instruction)
         { instruction_list.push_back(new_instruction); }
-    Misc::SmartPointer<Instruction> get_instruction(Word address) const {
+    Instruction *get_instruction(Word address) const {
         if(address > offset) return NULL;
         return instruction_list[address-offset];
     }
     std::size_t get_instruction_count() const;
-    Misc::SmartPointer<Instruction> get_instruction_by_index(std::size_t index) const;
+    Instruction *get_instruction_by_index(std::size_t index) const;
     
 };
 
 } // namespace ASM
-} // namespace Monitor
-} // namespace Aesalon
 
 #endif

@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Types.h"
 
-namespace Aesalon {
-namespace Monitor {
+
+
 
 Block::Block(Byte *data, std::size_t data_size) {
     this->data.reserve(data_size);
@@ -17,7 +17,7 @@ void Block::remove(std::size_t from, std::size_t to) {
     data.erase(data.begin()+from, data.begin()+to);
 }
 
-Misc::SmartPointer<Block> Block::subset(std::size_t from, std::size_t to) const {
+Block *Block::subset(std::size_t from, std::size_t to) const {
     if(from > get_size() || to > get_size() || from >= to) return NULL;
     /* NOTE: this is rather inefficient, since the Block constuctor is copying this data again . . . */
     std::vector<Byte> temp_data(data.begin() + from, data.begin() + to);
@@ -43,5 +43,5 @@ void Block::hexdump() {
     std::cout << std::dec << std::endl;
 }
 
-} // namespace Monitor
-} // namespace Aesalon
+
+

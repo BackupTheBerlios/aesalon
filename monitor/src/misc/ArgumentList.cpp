@@ -2,7 +2,6 @@
 #include <iostream>
 #include "ArgumentList.h"
 
-namespace Aesalon {
 namespace Misc {
 
 void ArgumentList::from_string(std::string string) {
@@ -30,4 +29,3 @@ char **ArgumentList::get_as_argv() {
 }
 
 } // namespace Misc
-} // namespace Aesalon

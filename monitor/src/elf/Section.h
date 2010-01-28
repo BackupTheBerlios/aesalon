@@ -5,11 +5,11 @@
 
 #include "Types.h"
 
-#include "misc/SmartPointer.h"
+#
 
-namespace Aesalon {
-namespace Monitor {
-namespace ELF {
+
+
+
 
 class Section {
 private:
@@ -23,7 +23,7 @@ private:
 
     section_t data;
     
-    Misc::SmartPointer<Block> content;
+    Block *content;
     
     std::string name;
     
@@ -33,7 +33,7 @@ public:
     virtual ~Section() {}
     
     void read_content();
-    Misc::SmartPointer<Block> get_content() {
+    Block *get_content() {
         if(!content.is_valid()) read_content();
         return content;
     }
@@ -49,8 +49,8 @@ public:
     bool is_string_table() const { return data.sh_type == SHT_STRTAB; }
 };
 
-} // namespace ELF
-} // namespace Monitor
-} // namespace Aesalon
+
+
+
 
 #endif

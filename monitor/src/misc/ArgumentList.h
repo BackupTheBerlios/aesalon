@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-namespace Aesalon {
 namespace Misc {
 
 class ArgumentList {
@@ -27,6 +26,5 @@ public:
 };
 
 } // namespace Misc
-} // namespace Aesalon
 
 #endif

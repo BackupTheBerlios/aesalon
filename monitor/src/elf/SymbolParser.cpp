@@ -4,16 +4,16 @@
 #include "SymbolParser.h"
 #include "Parser.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace ELF {
 
-SymbolParser::SymbolParser(Misc::SmartPointer<Parser> elf_parser) : elf_parser(elf_parser) {
+
+
+
+SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
     std::cout << std::hex;
     /* Start off with the static symbols . . . */
-    Misc::SmartPointer<Section> symbol_table = elf_parser->get_section(".symtab");
+    Section *symbol_table = elf_parser->get_section(".symtab");
     if(symbol_table.is_valid()) { /* Only try to parse the symbols if the .symtab section exists */
-        Misc::SmartPointer<Block> symbol_block = symbol_table->get_content();
+        Block *symbol_block = symbol_table->get_content();
         while(symbol_block->get_size()) {
             Elf64_Sym sym;
             symbol_block->read(&sym, sizeof(sym));
@@ -25,7 +25,7 @@ SymbolParser::SymbolParser(Misc::SmartPointer<Parser> elf_parser) : elf_parser(e
     symbol_table = elf_parser->get_section(".rela.plt");
     if(symbol_table.is_valid()) {
         symbol_table->read_content();
-        /*Misc::SmartPointer<Block> address_table = elf_parser->get_section(".rela.plt")->get_content();
+        /*Block *address_table = elf_parser->get_section(".rela.plt")->get_content();
         while(address_table->get_size()) {
             Elf64_Rela rela;
             address_table->read(&rela, sizeof(rela));
@@ -38,7 +38,7 @@ SymbolParser::SymbolParser(Misc::SmartPointer<Parser> elf_parser) : elf_parser(e
             std::cout << "\tr_addend: " << rela.r_addend << std::endl;
         }*/
         
-        Misc::SmartPointer<Block> symbol_block;
+        Block *symbol_block;
         /* Now for the dynamic symbols. Otherwise known as the tricky ones. */
         symbol_block = elf_parser->get_section(".dynsym")->get_content();
         std::size_t index = 0;
@@ -61,7 +61,7 @@ SymbolParser::SymbolParser(Misc::SmartPointer<Parser> elf_parser) : elf_parser(e
     std::cout << std::dec;
 }
 
-Misc::SmartPointer<Symbol> SymbolParser::get_symbol(std::string name) const {
+Symbol *SymbolParser::get_symbol(std::string name) const {
     for(symbol_vector_t::const_iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
         if((*i)->get_symbol_name() == name) return *i;
     }
@@ -75,6 +75,6 @@ void SymbolParser::dump_symbols() const {
     }
 }
 
-} // namespace ELF
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

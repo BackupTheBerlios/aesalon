@@ -5,11 +5,9 @@
 #include "misc/String.h"
 #include "Message.h"
 
-namespace Aesalon {
-namespace Monitor {
 namespace ASM {
 
-Disassembler::Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {
+Disassembler::Disassembler(ELF::Parser *elf_parser) : elf_parser(elf_parser) {
     Misc::ArgumentList al;
     al.add_argument("/usr/bin/objdump"); /* NOTE: hardcoded path . . . */
     al.add_argument("-dMintel");
@@ -18,15 +16,15 @@ Disassembler::Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_par
     
     bi_pipe = new Platform::BidirectionalPipe(al, true);
     
-    Message::Message(Aesalon::Monitor::Message::DEBUG_MESSAGE, "Beginning disassembly of target");
+    Message::Message(Message::DEBUG_MESSAGE, "Beginning disassembly of target");
     parse_objdump_output();
-    Message::Message(Aesalon::Monitor::Message::DEBUG_MESSAGE, "Disassembly of target completed");
+    Message::Message(Message::DEBUG_MESSAGE, "Disassembly of target completed");
     bi_pipe = NULL;
 }
 
 void Disassembler::parse_objdump_output() {
     std::string line;
-    Misc::SmartPointer<ELF::Symbol> symbol = NULL;
+    ELF::Symbol *symbol = NULL;
     while(bi_pipe->is_open()) {
         line = bi_pipe->get_string();
         if(line == "") continue;
@@ -76,5 +74,3 @@ void Disassembler::parse_objdump_output() {
 }
 
 } // namespace ASM
-} // namespace Monitor
-} // namespace Aesalon

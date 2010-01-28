@@ -2,8 +2,6 @@
 #include "Operand.h"
 #include "misc/String.h"
 
-namespace Aesalon {
-namespace Monitor {
 namespace ASM {
 
 Operand::Operand(std::string operand_string) {
@@ -38,10 +36,8 @@ Operand::Operand(std::string operand_string) {
         offset = operand_string.substr(operand_string.find("-"));
         operand_string.erase(operand_string.find("-"));
     }
-    Misc::String::to<SWord>(offset, this->offset);
+    String::to<SWord>(offset, this->offset);
     this->reg = Register::from_string(operand_string);
 }
 
 } // namespace ASM
-} // namespace Monitor
-} // namespace Aesalon

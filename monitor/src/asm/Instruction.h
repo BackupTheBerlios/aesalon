@@ -4,15 +4,13 @@
 #include "Types.h"
 #include "Operand.h"
 
-namespace Aesalon {
-namespace Monitor {
 namespace ASM {
 
 class Instruction {
 private:
     bool memory_change;
-    Misc::SmartPointer<Operand> source;
-    Misc::SmartPointer<Operand> destination;
+    Operand *source;
+    Operand *destination;
     
     Word address;
     
@@ -23,14 +21,12 @@ public:
     
     bool changes_memory() const { return memory_change; }
     
-    Misc::SmartPointer<Operand> get_source() const { return source; }
-    Misc::SmartPointer<Operand> get_destination() const { return destination; }
+    Operand *get_source() const { return source; }
+    Operand *get_destination() const { return destination; }
     
     Word get_address() const { return address; }
 };
 
 } // namespace ASM
-} // namespace Monitor
-} // namespace Aesalon
 
 #endif

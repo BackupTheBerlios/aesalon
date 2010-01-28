@@ -3,9 +3,9 @@
 
 #include "misc/Exception.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 class PTraceException : public Misc::Exception {
 public:
@@ -13,8 +13,8 @@ public:
     virtual ~PTraceException() {}
 };
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+
 
 #endif

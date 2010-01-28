@@ -3,17 +3,17 @@
 
 #include "BreakpointObserver.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 class FreeObserver : public BreakpointObserver {
 public:
     virtual void handle_breakpoint(const BreakpointReference &breakpoint);
 };
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+
 
 #endif

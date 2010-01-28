@@ -18,8 +18,8 @@
     #define LIBC_PATH "/lib/libc.so.6"
 #endif
 
-namespace Aesalon {
-namespace Monitor {
+
+
 
 template<> Initializer *Misc::Singleton<Initializer>::instance = 0;
 
@@ -54,7 +54,7 @@ void Initializer::initialize() {
         Misc::String::to<int>(ap->get_argument("tcp port").to<Misc::StringArgument>()->get_value(), port);
         server_socket = new TCPServerSocket(port);
         
-        Misc::SmartPointer<Misc::ArgumentList> al = new Misc::ArgumentList();
+        Misc::ArgumentList *al = new Misc::ArgumentList();
         /*al->add_argument(ap->get_file(0)->get_filename());*/
         for(std::size_t x = 0; x < ap->get_files(); x ++) {
             al->add_argument(ap->get_file(x)->get_filename());
@@ -123,5 +123,5 @@ void Initializer::run() {
     }
 }
 
-} // namespace Monitor
-} // namespace Aesalon
+
+

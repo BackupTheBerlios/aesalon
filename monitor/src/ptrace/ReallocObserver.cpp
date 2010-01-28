@@ -4,12 +4,12 @@
 #include "misc/BlockEvent.h"
 #include "Initializer.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 void ReallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
-    Misc::SmartPointer<Portal> portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
+    Portal *portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
     
     static Word last_size = 0;
     static Word last_address = 0;
@@ -31,6 +31,6 @@ void ReallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     return;
 }
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

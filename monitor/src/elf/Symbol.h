@@ -5,9 +5,9 @@
 
 #include "Types.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace ELF {
+
+
+
 
 class Symbol {
 private:
@@ -23,8 +23,8 @@ public:
     Word get_size() const { return size; }
 };
 
-} // namespace ELF
-} // namespace Monitor
-} // namespace Aesalon
+
+
+
 
 #endif

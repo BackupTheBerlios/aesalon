@@ -3,9 +3,9 @@
 #include "Initializer.h"
 #include "Message.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 bool SegfaultObserver::handle_signal(int signal, int status) {
     if(signal == SIGSEGV) {
@@ -17,6 +17,6 @@ bool SegfaultObserver::handle_signal(int signal, int status) {
     return false;
 }
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

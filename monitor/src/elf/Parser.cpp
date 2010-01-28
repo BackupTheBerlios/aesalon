@@ -6,9 +6,9 @@
 
 #include "Parser.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace ELF {
+
+
+
 
 Parser::Parser(std::string filename) : filename(filename) {
     std::cout << "ELF::Parser::Parser(): filename is \"" << filename << "\"\n";
@@ -45,17 +45,17 @@ Parser::~Parser() {
     close(file_fd);
 }
 
-Misc::SmartPointer<Section> Parser::get_section(std::string name) const {
+Section *Parser::get_section(std::string name) const {
     for(section_list_t::const_iterator i = section_list.begin(); i != section_list.end(); i ++) {
         if((*i)->get_name() == name) return *i;
     }
     return NULL;
 }
 
-Misc::SmartPointer<Symbol> Parser::get_symbol(std::string name) const {
+Symbol *Parser::get_symbol(std::string name) const {
     return symbol_parser->get_symbol(name);
 }
 
-} // namespace ELF
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

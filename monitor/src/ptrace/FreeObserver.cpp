@@ -5,9 +5,9 @@
 #include "Portal.h"
 #include "misc/BlockEvent.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 void FreeObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     Initializer::get_instance()->get_event_queue()->push_event(
@@ -15,6 +15,6 @@ void FreeObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
             Initializer::get_instance()->get_program_manager()->get_ptrace_portal()->get_register(ASM::Register::RAX)));
 }
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

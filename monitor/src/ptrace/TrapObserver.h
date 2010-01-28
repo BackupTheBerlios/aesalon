@@ -3,9 +3,9 @@
 
 #include "SignalObserver.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 class TrapObserver : public SignalObserver {
 public:
@@ -15,8 +15,8 @@ public:
     virtual bool handle_signal(int signal, int status);
 };
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+
 
 #endif

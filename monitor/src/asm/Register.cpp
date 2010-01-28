@@ -2,8 +2,6 @@
 #include <iostream>
 #include "Register.h"
 
-namespace Aesalon {
-namespace Monitor {
 namespace ASM {
 
 Register::data_size_e Register::get_register_size() const {
@@ -111,5 +109,3 @@ Register Register::from_string(std::string string) {
 }
 
 } // namespace ASM
-} // namespace Monitor
-} // namespace Aesalon

@@ -5,10 +5,9 @@
 
 #include <vector>
 
-#include "misc/SmartPointer.h"
 
-namespace Aesalon {
-namespace Monitor {
+
+
 
 /** Byte typedef; simply an 8-bit integer. */
 typedef u_int8_t Byte;
@@ -56,7 +55,7 @@ public:
         @param to Where to end copying.
         @return The subset of the block.
     */
-    Misc::SmartPointer<Block> subset(std::size_t from, std::size_t to) const;
+    Block *subset(std::size_t from, std::size_t to) const;
     
     /** Acts like the POSIX read() function -- reads a specific amount of
         data into a buffer.
@@ -68,7 +67,7 @@ public:
     void hexdump();
 };
 
-} // namespace Monitor
-} // namespace Aesalon
+
+
 
 #endif

@@ -1,5 +1,5 @@
 /** Aesalon, a program to visualize dynamic memory allocations in real-time.
-    Copyright (C) 2009
+    Copyright (C) 2009-2010 strange &lt;kawk256@gmail.com&gt;
 
     This program is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
@@ -25,17 +25,17 @@
 
 #include <iostream>
 #include "Initializer.h"
-#include "misc/Exception.h"
+#include "exception/BasicException.h"
 
 int main(int argc, char *argv[]) {
     try {
-        new Aesalon::Monitor::Initializer(argv);
+        new Initializer(argv);
     }
-    catch(Aesalon::Misc::Exception e) {
+    catch(Exception::BasicException e) {
         std::cout << e.get_message() << std::endl;
         return 1;
     }
-    int return_value = Aesalon::Monitor::Initializer::get_instance()->get_return_value();
-    if(Aesalon::Monitor::Initializer::get_instance()) delete Aesalon::Monitor::Initializer::get_instance();
+    int return_value = Initializer::get_instance()->get_return_value();
+    if(Initializer::get_instance()) delete Initializer::get_instance();
     return return_value;
 }

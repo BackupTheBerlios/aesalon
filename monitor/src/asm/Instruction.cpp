@@ -2,8 +2,6 @@
 #include "Instruction.h"
 #include "misc/String.h"
 
-namespace Aesalon {
-namespace Monitor {
 namespace ASM {
 
 Instruction::Instruction(std::string instruction, Word address) : address(address) {
@@ -37,10 +35,8 @@ void Instruction::handle_opcode(std::string opcode, std::string operands) {
     }
     else if(Misc::String::begins_with(opcode, "add")) {
         source = new Operand(operand[0]);
-        destination = new Operand(Aesalon::Monitor::ASM::Operand::REGISTER, 0, Register::RAX);
+        destination = new Operand(ASM::Operand::REGISTER, 0, Register::RAX);
     }
 }
 
 } // namespace ASM
-} // namespace Monitor
-} // namespace Aesalon

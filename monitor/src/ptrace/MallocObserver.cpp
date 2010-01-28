@@ -3,14 +3,14 @@
 #include "misc/BlockEvent.h"
 #include "BreakpointReference.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 void MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     std::cout << "MallocObserver::handle_breakpoint(): asked to handle breakpoint ID #" << breakpoint->get_id() << std::endl;
-    Misc::SmartPointer<ELF::Symbol> malloc_symbol = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc");
-    Misc::SmartPointer<Portal> portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
+    ELF::Symbol *malloc_symbol = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc");
+    Portal *portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
     
     static Word last_size = 0;
     
@@ -37,6 +37,6 @@ void MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     return;
 }
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

@@ -3,9 +3,9 @@
 #include "ExitObserver.h"
 #include "Initializer.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 bool ExitObserver::handle_signal(int signal, int status) {
     if(signal == SIGKILL || signal == -1) {
@@ -15,6 +15,6 @@ bool ExitObserver::handle_signal(int signal, int status) {
     return false;
 }
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

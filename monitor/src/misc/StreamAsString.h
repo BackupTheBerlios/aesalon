@@ -4,13 +4,12 @@
 #include <string>
 #include <sstream>
 
-namespace Aesalon {
 namespace Misc {
 
 /** StreamAsString class.
 
-    Allows for nice inline stringstreams, such as
-Exception(StreamAsString() << "Exception occured, line " << __line__);
+    Allows for nice inline stringstreams, such as BasicException(StreamAsString()
+        << "Exception occured, line " << __line__);
 */
 class StreamAsString {
 public:
@@ -45,6 +44,5 @@ private:
 };
 
 } // namespace Misc
-} // namespace Aesalon
 
 #endif

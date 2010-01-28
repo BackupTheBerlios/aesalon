@@ -5,13 +5,13 @@
 #include "Initializer.h"
 #include "PTraceException.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 bool TrapObserver::handle_signal(int signal, int status) {
     if(signal != SIGTRAP) return false;
-    Misc::SmartPointer<ProgramManager> program_manager = Initializer::get_instance()->get_program_manager();
+    ProgramManager *program_manager = Initializer::get_instance()->get_program_manager();
     
     std::cout << "TrapObserver::handle_signal(): calling handle_breakpoint() . . ." << std::endl;
     program_manager->get_ptrace_portal()->handle_breakpoint();
@@ -20,6 +20,6 @@ bool TrapObserver::handle_signal(int signal, int status) {
     return true;
 }
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

@@ -1,9 +1,8 @@
 #include <sstream>
 
 #include "String.h"
-#include "Exception.h"
+#include "exception/BasicException.h"
 
-namespace Aesalon {
 namespace Misc {
 
 bool String::is_escaped(std::string string, std::string::size_type position) {
@@ -25,7 +24,7 @@ std::string String::remove_escapes(std::string string) {
         if(*i == '\\') {
             i ++;
             if(i == string.end()) {
-                throw Exception("Trailing backslash in string being un-escaped");
+                throw Exception::BasicException("Trailing backslash in string being un-escaped");
             }
             
             switch(*i) {
@@ -56,4 +55,3 @@ std::string String::strip_whitespace(std::string string) {
 }
 
 } // namespace Misc
-} // namespace Aesalon

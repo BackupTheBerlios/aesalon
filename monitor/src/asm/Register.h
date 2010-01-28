@@ -5,8 +5,6 @@
 #include <vector>
 #include <string>
 
-namespace Aesalon {
-namespace Monitor {
 namespace ASM {
 
 class Register {
@@ -98,7 +96,5 @@ public:
 };
 
 } // namespace ASM
-} // namespace Monitor
-} // namespace Aesalon
 
 #endif

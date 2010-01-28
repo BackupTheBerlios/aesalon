@@ -5,8 +5,6 @@
 
 #include "Types.h"
 
-namespace Aesalon {
-namespace Monitor {
 namespace ELF {
 
 class Header {
@@ -37,7 +35,5 @@ public:
 };
 
 } // namespace ELF
-} // namespace Monitor
-} // namespace Aesalon
 
 #endif

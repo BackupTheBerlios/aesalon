@@ -6,7 +6,6 @@
 
 #include "StreamAsString.h"
 
-namespace Aesalon {
 namespace Misc {
 
 /** Generic string operations class. */
@@ -47,6 +46,5 @@ public:
 };
 
 } // namespace Misc
-} // namespace Aesalon
 
 #endif

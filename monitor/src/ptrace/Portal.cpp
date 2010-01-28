@@ -28,11 +28,11 @@
 
 #include "Message.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
 
-Portal::Portal(Misc::SmartPointer<Misc::ArgumentList> argument_list) : pid(0), libc_offset(0) {
+
+
+
+Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
     std::cout << "Portal::Portal(): called, initialization begun . . . \n";
     pid = fork();
     if(pid == -1)
@@ -151,10 +151,10 @@ void Portal::detach() {
     ptrace(PTRACE_DETACH, pid, NULL, NULL);
 }
 
-std::size_t Portal::place_breakpoint(Word address, Misc::SmartPointer<BreakpointObserver> observer) {
+std::size_t Portal::place_breakpoint(Word address, BreakpointObserver *observer) {
     std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
     std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
-    Misc::SmartPointer<Breakpoint> bp = get_breakpoint_by_address(address);
+    Breakpoint *bp = get_breakpoint_by_address(address);
     if(!bp.is_valid()) {
         Byte original = read_memory(address) & 0xff;
         bp = new Breakpoint(address, original);
@@ -170,7 +170,7 @@ void Portal::remove_breakpoint(Word address) {
     std::cout << "Portal::remove_breakpoint() called . . ." << std::endl;
     std::cout << "\tRemoving breakpoint at " << std::hex << address << std::dec << std::endl;
     
-    Misc::SmartPointer<Breakpoint> bp = get_breakpoint_by_address(address);
+    Breakpoint *bp = get_breakpoint_by_address(address);
     if(!bp.is_valid()) {
         std::cout << "\tAsked to remove non-existent breakpoint!" << std::endl;
         return;
@@ -185,14 +185,14 @@ void Portal::remove_breakpoint(Word address) {
     }
 }
 
-Misc::SmartPointer<Breakpoint> Portal::get_breakpoint_by_id(std::size_t which) const {
+Breakpoint *Portal::get_breakpoint_by_id(std::size_t which) const {
     for(breakpoint_list_t::const_iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
         if((*i)->get_id() == which) return *i;
     }
     return NULL;
 }
 
-Misc::SmartPointer<Breakpoint> Portal::get_breakpoint_by_address(Word address) const {
+Breakpoint *Portal::get_breakpoint_by_address(Word address) const {
     for(breakpoint_list_t::const_iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
         if((*i)->get_address() == address) return *i;
     }
@@ -264,7 +264,7 @@ void Portal::handle_breakpoint() {
     );
     /* Subtract one from the IP, since the 0xcc SIGTRAP instruction was executed . . . */
     ip --;
-    Misc::SmartPointer<Breakpoint> breakpoint = get_breakpoint_by_address(ip);
+    Breakpoint *breakpoint = get_breakpoint_by_address(ip);
     std::cout << "\tIP: " << std::hex << ip << std::dec << std::endl;
     if(!breakpoint.is_valid()) {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
@@ -347,6 +347,6 @@ Word Portal::get_libc_offset() {
     return libc_offset;
 }
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

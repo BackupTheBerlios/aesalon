@@ -11,19 +11,19 @@
 #include "SignalObserver.h"
 #include "BreakpointObserver.h"
 #include "misc/ArgumentList.h"
-#include "misc/SmartPointer.h"
+#
 #include "PTraceException.h"
 #include "asm/Register.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 class Portal {
 protected:
-    typedef std::vector<Misc::SmartPointer<Breakpoint> > breakpoint_list_t;
+    typedef std::vector<Breakpoint *> breakpoint_list_t;
     
-    typedef std::vector<Misc::SmartPointer<SignalObserver> > signal_observer_list_t;
+    typedef std::vector<SignalObserver *> signal_observer_list_t;
 private:
     /** The PID of the attached process. */
     pid_t pid;
@@ -34,7 +34,7 @@ private:
     /** Adds a breakpoint onto the list.
         @param breakpoint The breakpoint to add.
     */
-    void add_breakpoint(Misc::SmartPointer<Breakpoint> breakpoint) {
+    void add_breakpoint(Breakpoint *breakpoint) {
         breakpoint_list.push_back(breakpoint);
     }
     
@@ -44,15 +44,15 @@ private:
     
     int wait_for_signal();
     
-    Misc::SmartPointer<BreakpointObserver> initial_observer;
-    Misc::SmartPointer<BreakpointObserver> malloc_observer;
-    Misc::SmartPointer<BreakpointObserver> free_observer;
-    Misc::SmartPointer<BreakpointObserver> realloc_observer;
+    BreakpointObserver *initial_observer;
+    BreakpointObserver *malloc_observer;
+    BreakpointObserver *free_observer;
+    BreakpointObserver *realloc_observer;
 public:
     /** Generic constructor for PTracePortal.
         @param argument_list The arguments to spawn the child with.
     */
-    Portal(Misc::SmartPointer<Misc::ArgumentList> argument_list);
+    Portal(Misc::ArgumentList *argument_list);
     /** Virtual destructor, does nothing. */
     virtual ~Portal() {}
     
@@ -90,7 +90,7 @@ public:
         @param observer The initial observer to use for the breakpoint.
         @return The ID of the newly-inserted breakpoint.
     */
-    std::size_t place_breakpoint(Word address, Misc::SmartPointer<BreakpointObserver> observer);
+    std::size_t place_breakpoint(Word address, BreakpointObserver *observer);
     
     void remove_breakpoint(Word address);
     
@@ -98,17 +98,17 @@ public:
         @param which The breakpoint to find.
         @return A SmartPointer to the given breakpoint. Not valid if the breakpoint iterator does not exist.
     */
-    Misc::SmartPointer<Breakpoint> get_breakpoint(breakpoint_list_t::size_type which) const {
+    Breakpoint *get_breakpoint(breakpoint_list_t::size_type which) const {
         return breakpoint_list.at(which);
     }
     
-    Misc::SmartPointer<Breakpoint> get_breakpoint_by_id(std::size_t which) const;
+    Breakpoint *get_breakpoint_by_id(std::size_t which) const;
     
     /** Returns a breakpoint by address.
         @param address The address to search for.
         @return A SmartPointer to the given breakpoint. Not valid if no breakpoint exists at @a address.
     */
-    Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Word address) const;
+    Breakpoint *get_breakpoint_by_address(Word address) const;
     
     void handle_breakpoint();
     
@@ -120,13 +120,13 @@ public:
     /** Tells the child to execute a single instruction. */
     void single_step();
     
-    void add_signal_observer(Misc::SmartPointer<SignalObserver> new_observer) {
+    void add_signal_observer(SignalObserver *new_observer) {
         signal_observer_list.push_back(new_observer);
     }
     
-    Misc::SmartPointer<BreakpointObserver> get_malloc_observer() const { return malloc_observer; }
-    Misc::SmartPointer<BreakpointObserver> get_free_observer() const { return free_observer; }
-    Misc::SmartPointer<BreakpointObserver> get_realloc_observer() const { return realloc_observer; }
+    BreakpointObserver *get_malloc_observer() const { return malloc_observer; }
+    BreakpointObserver *get_free_observer() const { return free_observer; }
+    BreakpointObserver *get_realloc_observer() const { return realloc_observer; }
     
     /** Reads the memory map in /proc for the child process to determine the address libc is lodaded into.
         @return The address of libc, or 0 if libc is not currently loaded.
@@ -134,8 +134,8 @@ public:
     Word get_libc_offset();
 };
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+
 
 #endif

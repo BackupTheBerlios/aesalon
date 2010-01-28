@@ -5,31 +5,31 @@
 
 #include "Symbol.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace ELF {
+
+
+
 
 class Parser;
 
 class SymbolParser {
 protected:
-    typedef std::vector<Misc::SmartPointer<Symbol> > symbol_vector_t;
+    typedef std::vector<Symbol *> symbol_vector_t;
     typedef std::vector<Word> dynamic_offsets_t;
 private:
-    Misc::SmartPointer<Parser> elf_parser;
+    Parser *elf_parser;
     symbol_vector_t symbol_vector;
     dynamic_offsets_t dynamic_offsets;
 public:
-    SymbolParser(Misc::SmartPointer<Parser> elf_parser);
+    SymbolParser(Parser *elf_parser);
     virtual ~SymbolParser() {}
     
-    Misc::SmartPointer<Symbol> get_symbol(std::string name) const;
+    Symbol *get_symbol(std::string name) const;
     
     void dump_symbols() const;
 };
 
-} // namespace ELF
-} // namespace Monitor
-} // namespace Aesalon
+
+
+
 
 #endif

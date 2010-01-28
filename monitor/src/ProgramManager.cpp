@@ -1,18 +1,14 @@
 #include <iostream>
 #include <signal.h>
 #include "ProgramManager.h"
-#include "misc/ArgumentParser.h"
 
-namespace Aesalon {
-namespace Monitor {
-
-ProgramManager::ProgramManager(Misc::SmartPointer<Misc::ArgumentList> argument_list)
+ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
     : argument_list(argument_list), running(false) {
     
     elf_parser = new ELF::Parser(argument_list->get_argument(0));
-    std::string libc_path = Misc::ArgumentParser::get_instance()->get_argument("libc path").to<Misc::StringArgument>()->get_value();
+    /*std::string libc_path = Misc::ArgumentParser::get_instance()->get_argument("libc path").to<Misc::StringArgument>()->get_value();*/
+    std::string libc_path = LIBC_PATH;
     libc_parser = new ELF::Parser(libc_path);
-    dwarf_parser = new DWARF::Parser(elf_parser);
     disassembler = new ASM::Disassembler(elf_parser);
     
     disassembler->get_symbol_il("main");
@@ -54,6 +50,3 @@ void ProgramManager::place_initial_breakpoints() {
     /* Remove the breakpoint on main(), it's not required any more. */
     /*get_ptrace_portal()->get_breakpoint_by_address(get_elf_parser()->get_symbol("main")->get_address())->set_valid(false);*/
 }
-
-} // namespace Monitor
-} // namespace Aesalon

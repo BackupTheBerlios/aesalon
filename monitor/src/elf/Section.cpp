@@ -7,9 +7,9 @@
 #include "Parser.h"
 #include <iostream>
 
-namespace Aesalon {
-namespace Monitor {
-namespace ELF {
+
+
+
 
 Section::Section(int file_fd) : file_fd(file_fd) {
     std::size_t bytes = read(file_fd, &data, sizeof(data));
@@ -29,6 +29,6 @@ void Section::read_content() {
     content = new Block(byte_content, bytes);
 }    
 
-} // namespace ELF
-} // namespace Monitor
-} // namespace Aesalon
+
+
+

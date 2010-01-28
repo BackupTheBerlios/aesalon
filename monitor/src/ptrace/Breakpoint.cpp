@@ -1,9 +1,9 @@
 #include "Breakpoint.h"
 #include "BreakpointReference.h"
 
-namespace Aesalon {
-namespace Monitor {
-namespace PTrace {
+
+
+
 
 Breakpoint::Breakpoint(Word address, Byte original)
     : address(address), original(original), 
@@ -33,6 +33,6 @@ void Breakpoint::notify() {
     }
 }
 
-} // namespace PTrace
-} // namespace Monitor
-} // namespace Aesalon
+
+
+
