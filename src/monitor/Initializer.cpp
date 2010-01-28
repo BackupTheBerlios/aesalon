@@ -8,8 +8,6 @@
 #include "misc/String.h"
 #include "Message.h"
 
-#include "platform/PlatformException.h"
-
 #include "Initializer.h"
 
 #ifndef DEFAULT_PORT
@@ -54,9 +52,9 @@ void Initializer::initialize() {
     if(ap->get_files()) {
         int port;
         Misc::String::to<int>(ap->get_argument("tcp port").to<Misc::StringArgument>()->get_value(), port);
-        server_socket = new Platform::TCPServerSocket(port);
+        server_socket = new TCPServerSocket(port);
         
-        Misc::SmartPointer<Platform::ArgumentList> al = new Platform::ArgumentList;
+        Misc::SmartPointer<Misc::ArgumentList> al = new Misc::ArgumentList();
         /*al->add_argument(ap->get_file(0)->get_filename());*/
         for(std::size_t x = 0; x < ap->get_files(); x ++) {
             al->add_argument(ap->get_file(x)->get_filename());
@@ -68,7 +66,7 @@ void Initializer::initialize() {
         return;
     }
     
-    event_queue = new Platform::EventQueue();
+    event_queue = new Misc::EventQueue();
     
     /*symbol_manager = new Platform::SymbolManager();*/
     

@@ -1,14 +1,14 @@
-#ifndef AESALON_PLATFORM_TCPSERVER_SOCKET_H
-#define AESALON_PLATFORM_TCPSERVER_SOCKET_H
+#ifndef AESALON_MONITOR_TCPSERVER_SOCKET_H
+#define AESALON_MONITOR_TCPSERVER_SOCKET_H
 
 #include <vector>
 
 #include "TCPSocket.h"
-#include "EventQueue.h"
+#include "misc/EventQueue.h"
 #include "misc/SmartPointer.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Monitor {
 
 class TCPServerSocket {
 public:
@@ -27,12 +27,12 @@ public:
     void disconnect_all();
     
     void send_data(std::string data);
-    void send_data(Misc::SmartPointer<EventQueue> data);
+    void send_data(Misc::SmartPointer<Misc::EventQueue> data);
     
     int get_port() const;
 };
 
-} // namespace Platform
+} // namespace Monitor
 } // namespace Aesalon
 
 #endif

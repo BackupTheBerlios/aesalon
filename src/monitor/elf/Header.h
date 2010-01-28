@@ -3,7 +3,7 @@
 
 #include <linux/elf.h>
 
-#include "platform/MemoryAddress.h"
+#include "Types.h"
 
 namespace Aesalon {
 namespace Monitor {
@@ -28,7 +28,7 @@ public:
     Header(int file_fd);
     virtual ~Header() {}
     
-    Platform::MemoryAddress get_section_header_offset() const { return data.e_shoff; }
+    Word get_section_header_offset() const { return data.e_shoff; }
     std::size_t get_num_sections() const { return data.e_shnum; } 
     
     std::size_t get_string_table_index() const { return data.e_shstrndx; }

@@ -2,7 +2,7 @@
 #include <iostream>
 
 namespace Aesalon {
-namespace Platform {
+namespace Misc {
 
 void EventQueue::push_event(Misc::SmartPointer<Event> event) {
     if(event.is_valid()) event_queue.push(event);
@@ -20,6 +20,6 @@ Misc::SmartPointer<Event> EventQueue::peek_event() {
     return event_queue.front();
 }
 
-} // namespace Platform
+} // namespace Misc
 } // namespace Aesalon
 

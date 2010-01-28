@@ -6,7 +6,7 @@
 namespace Aesalon {
 namespace Monitor {
 
-ProgramManager::ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list)
+ProgramManager::ProgramManager(Misc::SmartPointer<Misc::ArgumentList> argument_list)
     : argument_list(argument_list), running(false) {
     
     elf_parser = new ELF::Parser(argument_list->get_argument(0));

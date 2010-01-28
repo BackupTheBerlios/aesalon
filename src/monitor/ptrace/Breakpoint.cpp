@@ -5,7 +5,7 @@ namespace Aesalon {
 namespace Monitor {
 namespace PTrace {
 
-Breakpoint::Breakpoint(Platform::MemoryAddress address, Byte original)
+Breakpoint::Breakpoint(Word address, Byte original)
     : address(address), original(original), 
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86
         BREAKPOINT_CHARACTER(0xcc),

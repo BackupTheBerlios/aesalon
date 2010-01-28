@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Disassembler.h"
 #include "platform/BidirectionalPipe.h"
-#include "platform/ArgumentList.h"
+#include "misc/ArgumentList.h"
 #include "misc/String.h"
 #include "Message.h"
 
@@ -10,7 +10,7 @@ namespace Monitor {
 namespace ASM {
 
 Disassembler::Disassembler(Misc::SmartPointer<ELF::Parser> elf_parser) : elf_parser(elf_parser) {
-    Platform::ArgumentList al;
+    Misc::ArgumentList al;
     al.add_argument("/usr/bin/objdump"); /* NOTE: hardcoded path . . . */
     al.add_argument("-dMintel");
     al.add_argument("--section=.text");

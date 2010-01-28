@@ -9,8 +9,6 @@
 #include "ActiveSessionOverview.h"
 #include "ActiveSessionBlockView.h"
 
-#include "platform/Memory.h"
-
 namespace Aesalon {
 namespace GUI {
 
@@ -25,7 +23,6 @@ public:
 private:
     Session *session;
     
-    Platform::Memory *memory;
     ActiveSessionSocket *socket;
     ActiveSessionOverview *overview;
     ActiveSessionBlockView *block_view;
@@ -41,8 +38,6 @@ public:
     virtual ~ActiveSession();
 
     void execute();
-    
-    Platform::Memory *get_memory() const { return memory; }
     
     status_e get_status() const { return status; }
     QString get_status_as_string() const;

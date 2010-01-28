@@ -7,7 +7,7 @@
 #include "ActiveSession.h"
 #include "ActiveSession.moc"
 
-#include "platform/ArgumentList.h"
+#include "misc/ArgumentList.h"
 
 namespace Aesalon {
 namespace GUI {
@@ -17,25 +17,20 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     overview = new ActiveSessionOverview(session);
     this->addTab(overview, tr("&Overview"));
     
-    memory = new Platform::Memory();
     status = WAITING_FOR_CONNECTION;
     connect(this, SIGNAL(status_changed(QString)), overview, SLOT(update_status(QString)));
     emit status_changed(get_status_as_string());
-    
-    block_view = new ActiveSessionBlockView(memory);
-    this->addTab(block_view, tr("&Block view"));
     
     QShortcut *close_tab = new QShortcut(Qt::Key_W + Qt::CTRL, this);
     connect(close_tab, SIGNAL(activated()), this, SLOT(terminate_session()));
 }
 
 ActiveSession::~ActiveSession() {
-    delete memory;
 }
 
 void ActiveSession::execute() {
     QSettings settings;
-    Platform::ArgumentList al;
+    Misc::ArgumentList al;
     al.add_argument(settings.value("xterm-path").toString().toStdString());
     al.add_argument("-e");
     al.add_argument(settings.value("aesalon-path").toString().toStdString());
@@ -54,7 +49,7 @@ void ActiveSession::execute() {
 }
 
 void ActiveSession::connect_to(QString host, int port) {
-    socket = new ActiveSessionSocket(host, port, memory);
+    socket = new ActiveSessionSocket(host, port);
     connect(socket, SIGNAL(connected()), this, SLOT(socket_connection()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(socket_disconnection()));
     

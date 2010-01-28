@@ -1,15 +1,15 @@
-#ifndef AESALON_PLATFORM_EVENT_QUEUE_H
-#define AESALON_PLATFORM_EVENT_QUEUE_H
+#ifndef AESALON_MISC_EVENT_QUEUE_H
+#define AESALON_MISC_EVENT_QUEUE_H
 
 #include <iostream>
 #include <queue>
 
 #include "Event.h"
 
-#include "misc/SmartPointer.h"
+#include "SmartPointer.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Misc {
 
 /** Event queue class. Wrapper around std::queue. */
 class EventQueue {
@@ -35,7 +35,7 @@ public:
     Misc::SmartPointer<Event> peek_event();
 };
 
-} // namespace Platform
+} // namespace Misc
 } // namespace Aesalon
 
 #endif

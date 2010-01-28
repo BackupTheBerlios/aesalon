@@ -4,13 +4,13 @@
 #include <string>
 #include <set>
 
-#include "MemoryAddress.h"
 #include "MemoryBlock.h"
-#include "Event.h"
+#include "misc/Event.h"
 #include "misc/SmartPointer.h"
+#include "Types.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Monitor {
 
 /** Stores the memory associated with a program. */
 class Memory {
@@ -33,15 +33,15 @@ public:
         @param address The address to look for.
         @return The @a MemoryBlock at @a address, or NULL if not found.
     */
-    Misc::SmartPointer<MemoryBlock> get_block(MemoryAddress address) const;
+    Misc::SmartPointer<MemoryBlock> get_block(Word address) const;
     
     /** Handle an event as a "diff", and apply it to the current memory representation.
         @param event The event to handle.
     */
-    void handle_event(Misc::SmartPointer<Event> event);
+    void handle_event(Misc::SmartPointer<Misc::Event> event);
 };
 
-} // namespace Platform
+} // namespace Monitor
 } // namespace Aesalon
 
 #endif

@@ -32,7 +32,7 @@ namespace Aesalon {
 namespace Monitor {
 namespace PTrace {
 
-Portal::Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list) : pid(0), libc_offset(0) {
+Portal::Portal(Misc::SmartPointer<Misc::ArgumentList> argument_list) : pid(0), libc_offset(0) {
     std::cout << "Portal::Portal(): called, initialization begun . . . \n";
     pid = fork();
     if(pid == -1)
@@ -116,7 +116,7 @@ void Portal::set_register(ASM::Register which, Word new_value) {
         throw PTraceException(Misc::StreamAsString() << "Couldn't set register values: " << strerror(errno));
 }
 
-Word Portal::read_memory(Platform::MemoryAddress address) const {
+Word Portal::read_memory(Word address) const {
     std::cout << "Portal::read_memory() called . . ." << std::endl;
     std::cout << "\tReading address " << std::hex << address << std::endl;
     Word return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
@@ -125,13 +125,13 @@ Word Portal::read_memory(Platform::MemoryAddress address) const {
     return return_value;
 }
 
-void Portal::write_memory(Platform::MemoryAddress address, Word value) {
+void Portal::write_memory(Word address, Word value) {
     std::cout << "Portal::write_memory(address, Word) called . . ." << std::endl;
     if(ptrace(PTRACE_POKEDATA, pid, address, value) == -1) 
         throw PTraceException(Misc::StreamAsString() << "Couldn't write memory: " << strerror(errno));
 }
 
-void Portal::write_memory(Platform::MemoryAddress address, Byte value) {
+void Portal::write_memory(Word address, Byte value) {
     std::cout << "Portal::write_memory(address, Byte) called . . ." << std::endl;
     std::cout << "\tWriting 0x" << std::hex << (int)value << " to " << address << std::endl;
     Word word_offset = 0;
@@ -151,7 +151,7 @@ void Portal::detach() {
     ptrace(PTRACE_DETACH, pid, NULL, NULL);
 }
 
-std::size_t Portal::place_breakpoint(Platform::MemoryAddress address, Misc::SmartPointer<BreakpointObserver> observer) {
+std::size_t Portal::place_breakpoint(Word address, Misc::SmartPointer<BreakpointObserver> observer) {
     std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
     std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
     Misc::SmartPointer<Breakpoint> bp = get_breakpoint_by_address(address);
@@ -166,7 +166,7 @@ std::size_t Portal::place_breakpoint(Platform::MemoryAddress address, Misc::Smar
     return bp->get_id();
 }
 
-void Portal::remove_breakpoint(Platform::MemoryAddress address) {
+void Portal::remove_breakpoint(Word address) {
     std::cout << "Portal::remove_breakpoint() called . . ." << std::endl;
     std::cout << "\tRemoving breakpoint at " << std::hex << address << std::dec << std::endl;
     
@@ -192,7 +192,7 @@ Misc::SmartPointer<Breakpoint> Portal::get_breakpoint_by_id(std::size_t which) c
     return NULL;
 }
 
-Misc::SmartPointer<Breakpoint> Portal::get_breakpoint_by_address(Platform::MemoryAddress address) const {
+Misc::SmartPointer<Breakpoint> Portal::get_breakpoint_by_address(Word address) const {
     for(breakpoint_list_t::const_iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
         if((*i)->get_address() == address) return *i;
     }

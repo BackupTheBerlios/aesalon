@@ -10,8 +10,7 @@
 #include "Types.h"
 #include "SignalObserver.h"
 #include "BreakpointObserver.h"
-#include "platform/MemoryAddress.h"
-#include "platform/ArgumentList.h"
+#include "misc/ArgumentList.h"
 #include "misc/SmartPointer.h"
 #include "PTraceException.h"
 #include "asm/Register.h"
@@ -53,7 +52,7 @@ public:
     /** Generic constructor for PTracePortal.
         @param argument_list The arguments to spawn the child with.
     */
-    Portal(Misc::SmartPointer<Platform::ArgumentList> argument_list);
+    Portal(Misc::SmartPointer<Misc::ArgumentList> argument_list);
     /** Virtual destructor, does nothing. */
     virtual ~Portal() {}
     
@@ -61,7 +60,7 @@ public:
         @param which The register to get the value of.
         @return The value of the specified register.
     */
-    Platform::MemoryAddress get_register(ASM::Register which) const;
+    Word get_register(ASM::Register which) const;
     
     void set_register(ASM::Register which, Word new_value);
     
@@ -69,17 +68,17 @@ public:
         @param address The address to read.
         @return The value at @a address.
     */
-    Word read_memory(Platform::MemoryAddress address) const;
+    Word read_memory(Word address) const;
     /** Write a Word of memory.
         @param address The address to write to.
         @param value The value to write.
     */
-    void write_memory(Platform::MemoryAddress address, Word value);
+    void write_memory(Word address, Word value);
     /** Write a Byte of memory.
         @param address The address to write to.
         @param value The value to write.
     */
-    void write_memory(Platform::MemoryAddress address, Byte value);
+    void write_memory(Word address, Byte value);
     
     /** Attaches onto the PID @a pid. */
     void attach();
@@ -91,9 +90,9 @@ public:
         @param observer The initial observer to use for the breakpoint.
         @return The ID of the newly-inserted breakpoint.
     */
-    std::size_t place_breakpoint(Platform::MemoryAddress address, Misc::SmartPointer<BreakpointObserver> observer);
+    std::size_t place_breakpoint(Word address, Misc::SmartPointer<BreakpointObserver> observer);
     
-    void remove_breakpoint(Platform::MemoryAddress address);
+    void remove_breakpoint(Word address);
     
     /** Returns a breakpoint by iterator.
         @param which The breakpoint to find.
@@ -109,7 +108,7 @@ public:
         @param address The address to search for.
         @return A SmartPointer to the given breakpoint. Not valid if no breakpoint exists at @a address.
     */
-    Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Platform::MemoryAddress address) const;
+    Misc::SmartPointer<Breakpoint> get_breakpoint_by_address(Word address) const;
     
     void handle_breakpoint();
     

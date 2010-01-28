@@ -1,6 +1,6 @@
 #include "MallocObserver.h"
 #include "Initializer.h"
-#include "platform/BlockEvent.h"
+#include "misc/BlockEvent.h"
 #include "BreakpointReference.h"
 
 namespace Aesalon {
@@ -19,7 +19,7 @@ void MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
             << std::hex << portal->get_register(ASM::Register::RAX) << std::endl;
         breakpoint->remove_observer(this);
         Initializer::get_instance()->get_event_queue()->push_event(
-            new Platform::BlockEvent(Platform::BlockEvent::ALLOC_EVENT,
+            new Misc::BlockEvent(Misc::BlockEvent::ALLOC_EVENT,
             portal->get_register(ASM::Register::RAX), last_size));
         return;
     }

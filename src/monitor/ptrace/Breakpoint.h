@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "Types.h"
-#include "platform/MemoryAddress.h"
 #include "BreakpointObserver.h"
 
 namespace Aesalon {
@@ -16,7 +15,7 @@ class Breakpoint {
 protected:
     typedef std::set<Misc::SmartPointer<BreakpointObserver> > observer_list_t;
 private:
-    Platform::MemoryAddress address;
+    Word address;
     Byte original;
     const Byte BREAKPOINT_CHARACTER;
     std::size_t id;
@@ -24,12 +23,12 @@ private:
     
     observer_list_t observer_list;
 public:
-    Breakpoint(Platform::MemoryAddress address, Byte original);
+    Breakpoint(Word address, Byte original);
     virtual ~Breakpoint() {}
     
     std::size_t get_id() const { return id; }
     Byte get_original() const { return original; }
-    Platform::MemoryAddress get_address() const { return address; }
+    Word get_address() const { return address; }
     Byte get_breakpoint_character() const { return BREAKPOINT_CHARACTER; }
     
     bool is_valid() const { return valid; }

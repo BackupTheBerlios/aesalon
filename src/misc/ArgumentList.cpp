@@ -3,7 +3,7 @@
 #include "ArgumentList.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Misc {
 
 void ArgumentList::from_string(std::string string) {
     /* TODO: support quoted arguments . . . */
@@ -29,5 +29,5 @@ char **ArgumentList::get_as_argv() {
     return arguments;
 }
 
-} // namespace Platform
+} // namespace Misc
 } // namespace Aesalon

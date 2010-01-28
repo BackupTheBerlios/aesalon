@@ -4,7 +4,7 @@
 #include <string>
 #include <sys/types.h>
 
-#include "ArgumentList.h"
+#include "misc/ArgumentList.h"
 #include "misc/Exception.h"
 #include "misc/StreamAsString.h"
 
@@ -25,7 +25,7 @@ private:
     bool block;
     pid_t pid;
 public:
-    BidirectionalPipe(ArgumentList argument_list, bool block);
+    BidirectionalPipe(Misc::ArgumentList argument_list, bool block);
     virtual ~BidirectionalPipe();
     
     void send_string(std::string data);

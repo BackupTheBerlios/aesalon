@@ -1,11 +1,11 @@
 #include <sstream>
 #include "BlockEvent.h"
-#include "misc/Exception.h"
-#include "misc/StreamAsString.h"
-#include "misc/String.h"
+#include "Exception.h"
+#include "StreamAsString.h"
+#include "String.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Misc {
 
 std::string BlockEvent::serialize() {
     std::string serialized = Event::serialize();
@@ -22,26 +22,26 @@ std::string BlockEvent::serialize() {
 }
 
 Misc::SmartPointer<Event> BlockEvent::deserialize(std::string data) {
-    MemoryAddress address;
-    Misc::String::to<MemoryAddress>(data, address, true);
+    uint_64 address;
+    Misc::String::to<uint_64>(data, address, true);
     /* If there's no colon, then it's a FREE_EVENT . . . */
     if(data.find(":") == std::string::npos) {
         return new BlockEvent(FREE_EVENT, address);
     }
     data.erase(0, data.find(":")+1);
     
-    MemoryAddress size;
-    Misc::String::to<MemoryAddress>(data, size, true);
+    uint_64 size;
+    Misc::String::to<uint_64>(data, size, true);
     if(data.find(":") == std::string::npos) {
         return new BlockEvent(ALLOC_EVENT, address, size);
     }
     
     data.erase(0, data.find(":")+1);
-    MemoryAddress new_address;
-    Misc::String::to<MemoryAddress>(data, new_address, true);
+    uint_64 new_address;
+    Misc::String::to<uint_64>(data, new_address, true);
     
     return new BlockEvent(REALLOC_EVENT, address, size, new_address);
 }
 
-} // namespace Platform
+} // namespace Misc
 } // namespace Aesalon

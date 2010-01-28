@@ -15,7 +15,7 @@ BidirectionalPipeException::BidirectionalPipeException(std::string message,
     bool strerr) : Misc::Exception(Misc::StreamAsString() << message << (strerr?strerror(errno):"")) {
 }
 
-BidirectionalPipe::BidirectionalPipe(ArgumentList argument_list, bool block) : block(block) {
+BidirectionalPipe::BidirectionalPipe(Misc::ArgumentList argument_list, bool block) : block(block) {
         
     pipe(pc_pipe_fd);
     pipe(cp_pipe_fd);

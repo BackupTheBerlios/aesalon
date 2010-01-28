@@ -1,11 +1,11 @@
-#ifndef AESALON_PLATFORM_ARGUMENT_LIST_H
-#define AESALON_PLATFORM_ARGUMENT_LIST_H
+#ifndef AESALON_MISC_ARGUMENT_LIST_H
+#define AESALON_MISC_ARGUMENT_LIST_H
 
 #include <string>
 #include <vector>
 
 namespace Aesalon {
-namespace Platform {
+namespace Misc {
 
 class ArgumentList {
 public:
@@ -26,7 +26,7 @@ public:
     }
 };
 
-} // namespace Platform
+} // namespace Misc
 } // namespace Aesalon
 
 #endif

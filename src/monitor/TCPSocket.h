@@ -1,10 +1,10 @@
-#ifndef AESALON_PLATFORM_TCPSOCKET_H
-#define AESALON_PLATFORM_TCPSOCKET_H
+#ifndef AESALON_MONITOR_TCPSOCKET_H
+#define AESALON_MONITOR_TCPSOCKET_H
 
 #include <string>
 
 namespace Aesalon {
-namespace Platform {
+namespace Monitor {
 
 class TCPSocket {
 private:
@@ -23,7 +23,7 @@ public:
     bool is_valid() const { return valid; }
 };
 
-} // namespace Platform
+} // namespace Monitor
 } // namespace Aesalon
 
 #endif

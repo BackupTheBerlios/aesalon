@@ -1,12 +1,12 @@
-#ifndef AESALON_PLATFORM_EVENT_H
-#define AESALON_PLATFORM_EVENT_H
+#ifndef AESALON_MISC_EVENT_H
+#define AESALON_MISC_EVENT_H
 
 #include <string>
 
-#include "misc/SmartPointer.h"
+#include "SmartPointer.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Misc {
 
 /** Event class. Note that until overloaded, this base class is rather
     useless. */
@@ -34,7 +34,7 @@ public:
     static Misc::SmartPointer<Event> deserialize(std::string data);
 };
 
-} // namespace Platform
+} // namespace Misc
 } // namespace Aesalon
 
 #endif

@@ -3,7 +3,7 @@
 
 #include "misc/SmartPointer.h"
 #include "platform/BidirectionalPipe.h"
-#include "platform/ArgumentList.h"
+#include "misc/ArgumentList.h"
 #include "ptrace/Portal.h"
 #include "elf/Parser.h"
 #include "dwarf/Parser.h"
@@ -15,7 +15,7 @@ namespace Monitor {
 
 class ProgramManager {
 private:
-    Misc::SmartPointer<Platform::ArgumentList> argument_list;
+    Misc::SmartPointer<Misc::ArgumentList> argument_list;
     
     bool running;
     
@@ -31,7 +31,7 @@ private:
     std::size_t free_breakpoint_id;
     std::size_t realloc_breakpoint_id;
 public:
-    ProgramManager(Misc::SmartPointer<Platform::ArgumentList> argument_list);
+    ProgramManager(Misc::SmartPointer<Misc::ArgumentList> argument_list);
     virtual ~ProgramManager() {}
     
     void execute();
@@ -44,7 +44,7 @@ public:
     Misc::SmartPointer<ELF::Parser> get_elf_parser() const { return elf_parser; }
     Misc::SmartPointer<ELF::Parser> get_libc_parser() const { return libc_parser; }
     
-    Misc::SmartPointer<Platform::ArgumentList> get_argument_list() const { return argument_list; }
+    Misc::SmartPointer<Misc::ArgumentList> get_argument_list() const { return argument_list; }
     
     void set_running(bool new_running) { running = new_running; }
     bool is_running() const { return running; }

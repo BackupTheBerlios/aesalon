@@ -1,10 +1,10 @@
 #include "Event.h"
 #include "BlockEvent.h"
-#include "misc/StreamAsString.h"
-#include "misc/Exception.h"
+#include "StreamAsString.h"
+#include "Exception.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Misc {
 
 std::string Event::serialize() {
     if(type == BLOCK_EVENT) return Misc::StreamAsString() << 0x01;
@@ -16,5 +16,5 @@ Misc::SmartPointer<Event> Event::deserialize(std::string data) {
     return NULL;
 }
 
-} // namespace Platform
+} // namespace Misc
 } // namespace Aesalon

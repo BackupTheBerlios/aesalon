@@ -9,11 +9,10 @@
 #include <errno.h>
 
 #include "TCPServerSocket.h"
-#include "PlatformException.h"
 #include "misc/String.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Monitor {
 
 TCPServerSocket::TCPServerSocket(int port) : port(port) {
     struct addrinfo hints, *result, *rp;
@@ -30,7 +29,7 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
     
     int ret = getaddrinfo(NULL, Misc::String::from<int>(port).c_str(), &hints, &result);
     if(ret != 0) {
-        throw PlatformException(Misc::StreamAsString() << "Couldn't resolve hostname: " << gai_strerror(ret), false);
+        throw Misc::Exception(Misc::StreamAsString() << "Couldn't resolve hostname: " << gai_strerror(ret));
     }
     
     int yes = 1;
@@ -48,10 +47,10 @@ TCPServerSocket::TCPServerSocket(int port) : port(port) {
         close(socket_fd);
         errno = e;
     }
-    if(rp == NULL) throw PlatformException("Couldn't open port for listening: ");
+    if(rp == NULL) throw Misc::Exception(Misc::StreamAsString() << "Couldn't open port for listening: " << strerror(errno));
     freeaddrinfo(result);
     
-    if(listen(socket_fd, 8) == -1) throw PlatformException("Couldn't listen on socket: ");
+    if(listen(socket_fd, 8) == -1) throw Misc::Exception(Misc::StreamAsString() << "Couldn't listen on socket: " << strerror(errno));
 }
 
 TCPServerSocket::~TCPServerSocket() {
@@ -115,7 +114,7 @@ void TCPServerSocket::send_data(std::string data) {
     }
 }
 
-void TCPServerSocket::send_data(Misc::SmartPointer<EventQueue> data) {
+void TCPServerSocket::send_data(Misc::SmartPointer<Misc::EventQueue> data) {
     while(data->peek_event()) {
         std::string data_string = data->peek_event()->serialize();
         std::cout << "TCPServerSocket::send_data(): sending \"" << data_string << "\"\n";
@@ -131,5 +130,5 @@ void TCPServerSocket::disconnect_all() {
     }
 }
 
-} // namespace Platform
+} // namespace Monitor
 } // namespace Aesalon

@@ -7,12 +7,12 @@
 #include <errno.h>
 
 #include "TCPSocket.h"
-#include "PlatformException.h"
 #include "misc/StreamAsString.h"
 #include "misc/String.h"
+#include "misc/Exception.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Monitor {
 
 TCPSocket::TCPSocket(std::string host, int port) {
     struct addrinfo hints, *result;
@@ -23,7 +23,7 @@ TCPSocket::TCPSocket(std::string host, int port) {
     hints.ai_flags = hints.ai_protocol = 0;
     int ret = getaddrinfo(host.c_str(), Misc::String::from<int>(port).c_str(), &hints, &result);
     if(ret != 0) {
-        throw PlatformException(Misc::StreamAsString() << "Couldn't resolve hostname: " << gai_strerror(ret), false);
+        throw Misc::Exception(Misc::StreamAsString() << "Couldn't resolve hostname: " << gai_strerror(ret));
     }
     
     if(result->ai_next != NULL) {
@@ -32,11 +32,11 @@ TCPSocket::TCPSocket(std::string host, int port) {
     
     
     socket_fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if(socket_fd == -1) throw PlatformException("Couldn't create socket: ");
+    if(socket_fd == -1) throw Misc::Exception(Misc::StreamAsString() << "Couldn't create socket: " << strerror(errno));
     
     if(connect(socket_fd, result->ai_addr, result->ai_addrlen) == -1) {
         close(socket_fd);
-        throw PlatformException("Couldn't connect to host: ");
+        throw Misc::Exception(Misc::StreamAsString() << "Couldn't connect to host: " << strerror(errno));
     }
     
     /* Socket is now connected. */
@@ -83,5 +83,5 @@ void TCPSocket::disconnect() {
     }
 }
 
-} // namespace Platform
+} // namespace Monitor
 } // namespace Aesalon

@@ -1,7 +1,7 @@
 #include <iostream>
 #include "ReallocObserver.h"
 #include "BreakpointReference.h"
-#include "platform/BlockEvent.h"
+#include "misc/BlockEvent.h"
 #include "Initializer.h"
 
 namespace Aesalon {
@@ -17,7 +17,7 @@ void ReallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     if(breakpoint->get_id() != Initializer::get_instance()->get_program_manager()->get_realloc_breakpoint_id()) {
         breakpoint->remove_observer(this);
         Initializer::get_instance()->get_event_queue()->push_event(
-            new Platform::BlockEvent(Platform::BlockEvent::REALLOC_EVENT,
+            new Misc::BlockEvent(Misc::BlockEvent::REALLOC_EVENT,
             last_address, last_size, portal->get_register(ASM::Register::RAX)));
         return;
     }

@@ -1,6 +1,8 @@
 #ifndef AESALON_MONITOR_TYPES_H
 #define AESALON_MONITOR_TYPES_H
 
+#include <sys/types.h>
+
 #include <vector>
 
 #include "misc/SmartPointer.h"
@@ -9,11 +11,18 @@ namespace Aesalon {
 namespace Monitor {
 
 /** Byte typedef; simply an 8-bit integer. */
-typedef unsigned char Byte;
+typedef u_int8_t Byte;
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
 /** Unsigned word, 32-bits on 32-bit machines, 64 bits on 64-bit machines. */
-typedef unsigned long Word;
+typedef u_int64_t Word;
 /** Signed-word, signed version of @a Word. */
-typedef long SWord;
+typedef int64_t SWord;
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+/** Unsigned word, 32-bits on 32-bit machines, 64 bits on 64-bit machines. */
+typedef u_int32_t Word;
+/** Signed-word, signed version of @a Word. */
+typedef int32_t SWord;
+#endif
 
 /** A block of data, presumably from an executable file. Custom version of std::vector&lt;Byte&gt;.*/
 class Block {

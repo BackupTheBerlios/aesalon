@@ -1,7 +1,7 @@
 #include "MemoryBlock.h"
 
 namespace Aesalon {
-namespace Platform {
+namespace Monitor {
 
-} // namespace Platform
+} // namespace Monitor
 } // namespace Aesalon
