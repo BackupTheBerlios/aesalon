@@ -36,10 +36,6 @@ void Initializer::initialize() {
 
     argument_parser->parse();
 
-    /*if(ap->get_argument("usage").to<Misc::BooleanArgument>()->get_status()) {
-        usage();
-        return;
-    }*/
     if(argument_parser->get_argument("usage")->is_found()) {
         usage();
         return;

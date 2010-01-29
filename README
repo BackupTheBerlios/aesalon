@@ -7,8 +7,9 @@ allocated.
 
 -- What is required to run aesalon
 In order to run the aesalon monitor on a program, it simply must have been
-compiled with debugging information, in the DWARF format. Beyond that, nothing
-else is required.
+compiled with debugging information, in the DWARF format. Beyond that, the
+operating system utilized must be a Linux derivative (see note below, in the
+compilation section).
 
 Currently, the only implemented graphical display utilizes Qt4. However,
 aesalon communicates information from the monitor to the display with TCP
@@ -16,14 +17,19 @@ network sockets; therefore it is entirely possible to monitor a program
 remotely.
 
 -- What is required to compile aesalon
-Aesalon is written in c++0x-compatible C++, and is mostly POSIX-compliant; it
-uses very few features that are not specified in the POSIX.1-2001. Some parts
-of the program use GNU extensions and Linux-specific code (especially ptrace-
-specific). Therefore, g++ and libstdc++ should be sufficient. Beyond that,
-aesalon additionally requires a pthreads implementation to be installed. It is
-rare, however, for a standard Linux distribution to not have the required
-packages. Simply install g++ (only tested with version 4.4, but others should
-work), and cmake, the buildsystem generator (tested with 2.6 and 2.8).
+The monitor is written in 95% c++0x-compatible C++, but utilizes a few GNU
+extensions to libc (getopt_long, etc). Also, the monitor is partially Linux-
+specific, but that could change in the future if someone using BSD or similar
+is interested enough to request a port. This means, in essence, that you need
+a Linux-based operating system, g++ (tested with 4.4, but 4.3 or earlier
+should also work), and a non-ancient version of libstdc++.
+
+The GUI is written using Qt, so any platform that supports Qt will also
+support the monitor (in theory -- some Qt extensions are used that may not be
+available on some platforms, such as OpenGL rendering, etc.)
+
+CMake is used as the buildsystem for both the monitor and the GUI (tested with
+2.6 and 2.8).
 
 -- How to compile aesalon
 First, edit the build.config file to change what is built, and what is not
