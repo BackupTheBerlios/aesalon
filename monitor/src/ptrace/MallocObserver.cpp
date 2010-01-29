@@ -6,7 +6,6 @@ namespace PTrace {
 
 void MallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     std::cout << "MallocObserver::handle_breakpoint(): asked to handle breakpoint ID #" << breakpoint->get_id() << std::endl;
-    ELF::Symbol *malloc_symbol = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc");
     Portal *portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
     
     static Word last_size = 0;

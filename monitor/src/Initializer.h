@@ -5,8 +5,9 @@
 #include "tcp/ServerSocket.h"
 #include "event/Queue.h"
 #include "ProgramManager.h"
+#include "misc/ArgumentParser.h"
 
-/** Initializer class. Basically handles initialization of the Monitor namespace. */
+/** Initializer class. Basically, handles initialization of the Monitor. */
 class Initializer : public Misc::Singleton<Initializer> {
 private:
     /** A copy of argv, used for initializing the ArgumentParser. */
@@ -17,6 +18,8 @@ private:
     Event::Queue *event_queue;
     
     ProgramManager *program_manager;
+    
+    Misc::ArgumentParser *argument_parser;
     
     /** Initialize the aesalon monitor. */
     void initialize();
@@ -46,6 +49,7 @@ public:
     
     ProgramManager *get_program_manager() const { return program_manager; }
     Event::Queue *get_event_queue() const { return event_queue; }
+    Misc::ArgumentParser *get_argument_parser() const { return argument_parser; }
     
     int get_return_value() const { return return_value; }
     void set_return_value(int new_return_value) { return_value = new_return_value; }

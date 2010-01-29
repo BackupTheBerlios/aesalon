@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
-/*#include "misc/ArgumentParser.h"*/
 #include "misc/StreamAsString.h"
 #include "misc/String.h"
 #include "misc/Message.h"
@@ -17,7 +16,6 @@
     #define LIBC_PATH "/lib/libc.so.6"
 #endif
 
-
 template<> Initializer *Misc::Singleton<Initializer>::instance = 0;
 
 Initializer::Initializer(char *argv[]) : Misc::Singleton<Initializer>(), argv(argv) {
@@ -29,50 +27,52 @@ Initializer::~Initializer() {
 }
 
 void Initializer::initialize() {
-    /*Misc::ArgumentParser *ap = new Misc::ArgumentParser();
+    argument_parser = new Misc::ArgumentParser(argv);
     
-    ap->add_argument("usage", new Misc::BooleanArgument("--usage", 'h', "", 0, false));
-    ap->add_argument("logfile", new Misc::StringArgument("--log-file", 'l', ""));
-    ap->add_argument("tcp port", new Misc::StringArgument("--use-port", 0, Misc::StreamAsString() << DEFAULT_PORT));
-    ap->add_argument("wait", new Misc::BooleanArgument("--wait", 'w', "", 0, false));
-    ap->add_argument("wait for", new Misc::StringArgument("--wait-for", 0, "1"));
-    ap->add_argument("libc path", new Misc::StringArgument("--libc-path", 0, LIBC_PATH));
-    
-    ap->parse_argv(argv);*/
-    
+    argument_parser->add_argument(new Misc::Argument("usage", 'h', Misc::Argument::NO_ARGUMENT, ""));
+    argument_parser->add_argument(new Misc::Argument("tcp-port", 'p', Misc::Argument::REQUIRED_ARGUMENT, "6321"));
+    argument_parser->add_argument(new Misc::Argument("wait", 'w', Misc::Argument::OPTIONAL_ARGUMENT, "1"));
+    argument_parser->add_argument(new Misc::Argument("libc-path", 0, Misc::Argument::REQUIRED_ARGUMENT, LIBC_PATH));
+
+    argument_parser->parse();
+
     /*if(ap->get_argument("usage").to<Misc::BooleanArgument>()->get_status()) {
         usage();
         return;
     }*/
+    if(argument_parser->get_argument("usage")->is_found()) {
+        usage();
+        return;
+    }
     
-    /*if(ap->get_files()) {
+    if(argument_parser->get_postargs()) {
         int port;
-        Misc::String::to<int>(ap->get_argument("tcp port").to<Misc::StringArgument>()->get_value(), port);
-        server_socket = new TCPServerSocket(port);
+        Misc::String::to<int>(argument_parser->get_argument("tcp-port")->get_data(), port);
+        server_socket = new TCP::ServerSocket(port);
         
         Misc::ArgumentList *al = new Misc::ArgumentList();
-        for(std::size_t x = 0; x < ap->get_files(); x ++) {
-            al->add_argument(ap->get_file(x)->get_filename());
+        for(std::size_t x = 0; x < argument_parser->get_postargs(); x ++) {
+            al->add_argument(argument_parser->get_postarg(x));
         }
         program_manager = new ProgramManager(al);
     }
-    else {*/
+    else {
         usage();
         return;
-    /*}*/
+    }
     
     event_queue = new Event::Queue();
     
-    /*if(ap->get_argument("wait").to<Misc::BooleanArgument>()->get_status()) {
+    if(argument_parser->get_argument("wait")->is_found()) {
         int number;
         Misc::String::to<int>(
-            ap->get_argument("wait for").to<Misc::StringArgument>()->get_value(), number);
+            argument_parser->get_argument("wait")->get_data(), number);
         
-        Message(Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Waiting for " << number << " TCP connection(s) . . .");
+        Misc::Message(Misc::Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Waiting for " << number << " TCP connection(s) . . .");
         for(int x = 0; x < number; x ++) {
             server_socket->wait_for_connection();
         }
-    }*/
+    }
     
     run();
     

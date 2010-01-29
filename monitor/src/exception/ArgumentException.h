@@ -16,22 +16,6 @@ public:
     }
 };
 
-class NoArgumentToArgumentException : public ArgumentException {
-public:
-    NoArgumentToArgumentException(std::string which) : ArgumentException(Misc::StreamAsString()
-        << "Argument expects argument: " << which) {}
-    NoArgumentToArgumentException(char which) : ArgumentException(Misc::StreamAsString()
-        << "Argument expects argument: -" << which) {}
-};
-
-class UnknownArgumentException : public ArgumentException {
-public:
-    UnknownArgumentException(std::string what) : ArgumentException(Misc::StreamAsString()
-        << "Unknown argument encountered: \"" << what << "\"") {}
-    UnknownArgumentException(char what) : ArgumentException(Misc::StreamAsString()
-        << "Unknown short-form argument: \'" << what << "\'") {}
-};
-
 } // namespace Exception
 
 #endif
