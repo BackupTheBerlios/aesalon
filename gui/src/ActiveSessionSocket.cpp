@@ -21,8 +21,7 @@ ActiveSessionSocket::~ActiveSessionSocket() {
 
 void ActiveSessionSocket::handle_data() {
     QByteArray data = socket->readAll();
-    QString str = data;
-    /*qDebug("Received data from monitor: \"%s\"", str.toStdString().c_str());*/
+    emit received_data(data);
 }
 
 void ActiveSessionSocket::error_caught(QAbstractSocket::SocketError error) {

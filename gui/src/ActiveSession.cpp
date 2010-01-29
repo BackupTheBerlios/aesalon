@@ -19,6 +19,8 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     
     QShortcut *close_tab = new QShortcut(Qt::Key_W + Qt::CTRL, this);
     connect(close_tab, SIGNAL(activated()), this, SLOT(terminate_session()));
+    
+    memory = new ActiveSessionMemory(this);
 }
 
 ActiveSession::~ActiveSession() {
@@ -26,6 +28,7 @@ ActiveSession::~ActiveSession() {
 
 void ActiveSession::execute() {
     QSettings settings;
+    
     QString command = "";
     /* NOTE: reimplement this function */
 
@@ -70,6 +73,7 @@ void ActiveSession::connect_to(QString host, int port) {
     socket = new ActiveSessionSocket(host, port);
     connect(socket, SIGNAL(connected()), this, SLOT(socket_connection()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(socket_disconnection()));
+    connect(socket, SIGNAL(received_data(QByteArray)), memory, SLOT(process_data(QByteArray)));
 }
 
 void ActiveSession::socket_connection() {

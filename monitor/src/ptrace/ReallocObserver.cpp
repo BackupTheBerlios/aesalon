@@ -1,6 +1,6 @@
 #include <iostream>
 #include "ReallocObserver.h"
-#include "event/Block.h"
+#include "event/BlockEvent.h"
 #include "Initializer.h"
 
 namespace PTrace {
@@ -14,7 +14,7 @@ void ReallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     if(breakpoint->get_id() != Initializer::get_instance()->get_program_manager()->get_realloc_breakpoint_id()) {
         breakpoint->remove_observer(this);
         Initializer::get_instance()->get_event_queue()->push_event(
-            new Event::Block(Event::Block::REALLOC_EVENT,
+            new Event::BlockEvent(Event::BlockEvent::REALLOC_EVENT,
             last_address, last_size, portal->get_register(ASM::Register::RAX)));
         return;
     }

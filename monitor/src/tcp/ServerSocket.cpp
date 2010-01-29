@@ -106,7 +106,7 @@ void ServerSocket::remove_invalid_sockets() {
     }
 }
 
-void ServerSocket::send_data(std::string data) {
+void ServerSocket::send_data(Block *data) {
     socket_list_t::iterator i = socket_list.begin();
     
     for(; i != socket_list.end(); i ++) {
@@ -116,10 +116,10 @@ void ServerSocket::send_data(std::string data) {
 
 void ServerSocket::send_data(Event::Queue *data) {
     while(data->peek_event()) {
-        std::string data_string = data->peek_event()->serialize();
-        std::cout << "ServerSocket::send_data(): sending \"" << data_string << "\"\n";
-        send_data(data_string);
+        Block *raw_data = data->peek_event()->serialize();
+        send_data(raw_data);
         data->pop_event();
+        delete raw_data;
     }
 }
 

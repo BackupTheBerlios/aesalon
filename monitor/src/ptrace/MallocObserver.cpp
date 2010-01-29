@@ -1,6 +1,6 @@
 #include "MallocObserver.h"
 #include "Initializer.h"
-#include "event/Block.h"
+#include "event/BlockEvent.h"
 
 namespace PTrace {
 
@@ -15,7 +15,7 @@ void MallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
             << std::hex << portal->get_register(ASM::Register::RAX) << std::endl;
         breakpoint->remove_observer(this);
         Initializer::get_instance()->get_event_queue()->push_event(
-            new Event::Block(Event::Block::ALLOC_EVENT,
+            new Event::BlockEvent(Event::BlockEvent::ALLOC_EVENT,
             portal->get_register(ASM::Register::RAX), last_size));
         return;
     }

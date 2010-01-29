@@ -47,12 +47,12 @@ Socket::~Socket() {
     if(socket_fd) close(socket_fd);
 }
 
-void Socket::send_data(std::string data) {
-    int sent = write(socket_fd, data.c_str(), data.length()+1);
+void Socket::send_data(Block *data) {
+    int sent = write(socket_fd, data->get_data(), data->get_size());
     if(sent == -1) valid = false;
 }
 
-std::string Socket::get_data() {
+/*std::string Socket::get_data() {
     if(!is_valid()) return "";
     uint16_t size;
     read(socket_fd, &size, 2);
@@ -75,7 +75,7 @@ std::string Socket::get_data() {
     }
     
     return data;
-}
+}*/
 
 void Socket::disconnect() {
     if(socket_fd) {

@@ -6,7 +6,7 @@
 
 namespace Event {
 
-class Block : public BasicEvent {
+class BlockEvent : public BasicEvent {
 public:
     enum block_event_type_e {
         ALLOC_EVENT,
@@ -18,10 +18,10 @@ private:
     
     Word address, size, new_address;
 public:
-    Block(block_event_type_e type, Word address, Word size = 0,
+    BlockEvent(block_event_type_e type, Word address, Word size = 0,
         Word new_address = 0, Word new_size = 0) : BasicEvent(BLOCK_EVENT), block_type(type),
         address(address), size(size), new_address(new_address) {}
-    virtual ~Block() {}
+    virtual ~BlockEvent() {}
     
     block_event_type_e get_block_type() const { return block_type; }
     
@@ -29,7 +29,7 @@ public:
     Word get_size() const { return size; }
     Word get_new_address() const { return new_address; }
     
-    virtual std::string serialize();
+    virtual Block *serialize();
 };
 
 } // namesace Event

@@ -5,10 +5,6 @@
 
 #include <vector>
 
-
-
-
-
 /** Byte typedef; simply an 8-bit integer. */
 typedef u_int8_t Byte;
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
@@ -65,6 +61,12 @@ public:
     void read(void *data, std::size_t size);
     
     void hexdump();
+    
+    void resize(std::size_t new_size) {
+        data.resize(new_size, 0);
+    }
+    
+    void push_word(Word data);
 };
 
 

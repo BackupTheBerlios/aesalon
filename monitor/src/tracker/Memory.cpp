@@ -1,5 +1,5 @@
 #include "Memory.h"
-#include "event/Block.h"
+#include "event/BlockEvent.h"
 
 namespace Tracker {
 
@@ -20,15 +20,15 @@ void Memory::remove_block(MemoryBlock *block) {
 
 void Memory::handle_event(Event::BasicEvent *event) {
     if(event->get_type() == Event::BasicEvent::BLOCK_EVENT) {
-        Event::Block *be = dynamic_cast<Event::Block *>(event);
+        Event::BlockEvent *be = dynamic_cast<Event::BlockEvent *>(event);
         switch(be->get_block_type()) {
-            case Event::Block::ALLOC_EVENT:
+            case Event::BlockEvent::ALLOC_EVENT:
                 add_block(new MemoryBlock(be->get_address(), be->get_size()));
                 break;
-            case Event::Block::FREE_EVENT:
+            case Event::BlockEvent::FREE_EVENT:
                 remove_block(get_block(be->get_address()));
                 break;
-            case Event::Block::REALLOC_EVENT:
+            case Event::BlockEvent::REALLOC_EVENT:
                 MemoryBlock *block = get_block(be->get_address());
                 block->set_address(be->get_new_address());
                 block->set_size(be->get_size());

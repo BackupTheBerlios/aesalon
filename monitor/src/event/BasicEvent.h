@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "Types.h"
+
 namespace Event {
 
 /** Event class. Note that until overloaded, this base class is rather
@@ -27,7 +29,7 @@ public:
     */
     event_type_e get_type() const { return type; }
     
-    virtual std::string serialize();
+    virtual Block *serialize();
 };
 
 } // namespace Event

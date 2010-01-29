@@ -24,7 +24,7 @@ public:
     void remove_invalid_sockets();
     void disconnect_all();
     
-    void send_data(std::string data);
+    void send_data(Block *data);
     void send_data(Event::Queue *data);
     
     int get_port() const;

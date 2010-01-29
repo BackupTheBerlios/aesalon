@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "Types.h"
+
 namespace TCP {
 
 class Socket {
@@ -14,8 +16,7 @@ public:
     Socket(int socket_fd) : socket_fd(socket_fd), valid(true) {}
     virtual ~Socket();
     
-    void send_data(std::string data);
-    std::string get_data();
+    void send_data(Block *data);
     
     void disconnect();
     

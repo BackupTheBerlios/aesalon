@@ -24,6 +24,7 @@ public slots:
 signals:
     void connected();
     void disconnected();
+    void received_data(QByteArray data);
 };
 
 
