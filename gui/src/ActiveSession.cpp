@@ -12,6 +12,8 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     this->setTabPosition(West);
     overview = new ActiveSessionOverview(session);
     this->addTab(overview, tr("&Overview"));
+    block_view = new ActiveSessionBlockView(this);
+    this->addTab(block_view, tr("Current &blocks"));
     
     status = WAITING_FOR_CONNECTION;
     connect(this, SIGNAL(status_changed(QString)), overview, SLOT(update_status(QString)));
@@ -21,6 +23,7 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     connect(close_tab, SIGNAL(activated()), this, SLOT(terminate_session()));
     
     memory = new ActiveSessionMemory(this);
+    connect(memory, SIGNAL(diff_processed(ActiveSessionMemoryBlockDiff*)), block_view, SLOT(process_diff(ActiveSessionMemoryBlockDiff*)));
 }
 
 ActiveSession::~ActiveSession() {

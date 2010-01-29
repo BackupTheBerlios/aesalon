@@ -46,11 +46,14 @@ public:
 class ActiveSessionMemory : public QObject { Q_OBJECT
 private:
     QByteArray unprocessed;
+    quint64 pop_uint64();
 public:
     ActiveSessionMemory(QObject *parent = NULL);
     virtual ~ActiveSessionMemory() {}
 public slots:
     void process_data(QByteArray data);
+signals:
+    void diff_processed(ActiveSessionMemoryBlockDiff *);
 };
 
 #endif

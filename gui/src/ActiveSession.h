@@ -7,6 +7,7 @@
 #include "Session.h"
 #include "ActiveSessionSocket.h"
 #include "ActiveSessionOverview.h"
+#include "ActiveSessionBlockView.h"
 #include "ActiveSessionMemory.h"
 
 class ActiveSession : public QTabWidget { Q_OBJECT
@@ -22,6 +23,7 @@ private:
     
     ActiveSessionSocket *socket;
     ActiveSessionOverview *overview;
+    ActiveSessionBlockView *block_view;
     ActiveSessionMemory *memory;
     
     status_e status;
