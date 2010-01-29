@@ -3,8 +3,7 @@
 
 #include "Types.h"
 
-
-
+namespace Tracker {
 
 /** A representation of a block of allocated memory. */
 class MemoryBlock {
@@ -38,7 +37,6 @@ public:
     void set_size(Word new_size) { size = new_size; }
 };
 
-
-
+} // namespace Tracker
 
 #endif

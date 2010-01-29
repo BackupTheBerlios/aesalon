@@ -6,7 +6,6 @@
 #include "elf/Parser.h"
 #include "elf/Symbol.h"
 #include "InstructionList.h"
-#include "BidirectionalPipe.h"
 
 namespace ASM {
 
@@ -18,7 +17,7 @@ private:
     
     symbol_to_il_t symbol_to_il;
     
-    BidirectionalPipe *bi_pipe;
+    int pipe_fd;
     
     void parse_objdump_output();
 public:

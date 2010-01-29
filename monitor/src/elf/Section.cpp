@@ -6,10 +6,9 @@
 #include "Section.h"
 #include "Parser.h"
 #include <iostream>
+#include "misc/StreamAsString.h"
 
-
-
-
+namespace ELF {
 
 Section::Section(int file_fd) : file_fd(file_fd) {
     std::size_t bytes = read(file_fd, &data, sizeof(data));
@@ -29,6 +28,4 @@ void Section::read_content() {
     content = new Block(byte_content, bytes);
 }    
 
-
-
-
+} // namespace ELF

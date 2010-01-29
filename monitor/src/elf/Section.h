@@ -3,13 +3,11 @@
 
 #include <linux/elf.h>
 
+#include <string>
+
 #include "Types.h"
 
-#
-
-
-
-
+namespace ELF {
 
 class Section {
 private:
@@ -34,7 +32,7 @@ public:
     
     void read_content();
     Block *get_content() {
-        if(!content.is_valid()) read_content();
+        if(content == NULL) read_content();
         return content;
     }
     
@@ -49,8 +47,6 @@ public:
     bool is_string_table() const { return data.sh_type == SHT_STRTAB; }
 };
 
-
-
-
+} // namespace ELF
 
 #endif

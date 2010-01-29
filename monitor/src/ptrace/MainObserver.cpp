@@ -1,16 +1,11 @@
 #include "MainObserver.h"
 #include "Initializer.h"
-#include "BreakpointReference.h"
 
+namespace PTrace {
 
-
-
-
-void MainObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
+void MainObserver::handle_breakpoint(Breakpoint *breakpoint) {
     Initializer::get_instance()->get_program_manager()->place_initial_breakpoints();
     breakpoint->remove_observer(this);
 }
 
-
-
-
+} // namespace PTrace

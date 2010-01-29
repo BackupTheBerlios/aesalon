@@ -5,9 +5,7 @@
 
 #include "Symbol.h"
 
-
-
-
+namespace ELF {
 
 class Parser;
 
@@ -28,8 +26,6 @@ public:
     void dump_symbols() const;
 };
 
-
-
-
+} // namespace ELF
 
 #endif

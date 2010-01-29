@@ -6,9 +6,6 @@
 #include "event/Queue.h"
 #include "ProgramManager.h"
 
-
-
-
 /** Initializer class. Basically handles initialization of the Monitor namespace. */
 class Initializer : public Misc::Singleton<Initializer> {
 private:
@@ -53,8 +50,5 @@ public:
     int get_return_value() const { return return_value; }
     void set_return_value(int new_return_value) { return_value = new_return_value; }
 };
-
-
-
 
 #endif

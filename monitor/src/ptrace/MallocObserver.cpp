@@ -1,13 +1,10 @@
 #include "MallocObserver.h"
 #include "Initializer.h"
-#include "misc/BlockEvent.h"
-#include "BreakpointReference.h"
+#include "event/Block.h"
 
+namespace PTrace {
 
-
-
-
-void MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
+void MallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     std::cout << "MallocObserver::handle_breakpoint(): asked to handle breakpoint ID #" << breakpoint->get_id() << std::endl;
     ELF::Symbol *malloc_symbol = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc");
     Portal *portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
@@ -19,7 +16,7 @@ void MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
             << std::hex << portal->get_register(ASM::Register::RAX) << std::endl;
         breakpoint->remove_observer(this);
         Initializer::get_instance()->get_event_queue()->push_event(
-            new Misc::BlockEvent(Misc::BlockEvent::ALLOC_EVENT,
+            new Event::Block(Event::Block::ALLOC_EVENT,
             portal->get_register(ASM::Register::RAX), last_size));
         return;
     }
@@ -37,6 +34,4 @@ void MallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     return;
 }
 
-
-
-
+} // namespace PTrace

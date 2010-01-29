@@ -5,12 +5,10 @@
 #include <set>
 
 #include "MemoryBlock.h"
-#include "misc/Event.h"
-#
+#include "event/BasicEvent.h"
 #include "Types.h"
 
-
-
+namespace Tracker {
 
 /** Stores the memory associated with a program. */
 class Memory {
@@ -38,10 +36,9 @@ public:
     /** Handle an event as a "diff", and apply it to the current memory representation.
         @param event The event to handle.
     */
-    void handle_event(Misc::Event *event);
+    void handle_event(Event::BasicEvent *event);
 };
 
-
-
+} // namespace Tracker
 
 #endif

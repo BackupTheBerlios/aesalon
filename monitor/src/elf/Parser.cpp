@@ -6,9 +6,7 @@
 
 #include "Parser.h"
 
-
-
-
+namespace ELF {
 
 Parser::Parser(std::string filename) : filename(filename) {
     std::cout << "ELF::Parser::Parser(): filename is \"" << filename << "\"\n";
@@ -56,6 +54,4 @@ Symbol *Parser::get_symbol(std::string name) const {
     return symbol_parser->get_symbol(name);
 }
 
-
-
-
+} // namespace ELF

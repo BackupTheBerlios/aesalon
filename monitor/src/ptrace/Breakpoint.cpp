@@ -1,9 +1,6 @@
 #include "Breakpoint.h"
-#include "BreakpointReference.h"
 
-
-
-
+namespace PTrace {
 
 Breakpoint::Breakpoint(Word address, Byte original)
     : address(address), original(original), 
@@ -12,8 +9,8 @@ Breakpoint::Breakpoint(Word address, Byte original)
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86_64
         BREAKPOINT_CHARACTER(0xcc),
 #endif
-    valid(true)
-{
+    valid(true) {
+    
     static std::size_t last_id = 0;
     id = ++last_id;
     
@@ -28,11 +25,9 @@ void Breakpoint::notify() {
     for(int x = 0; x < last_size && observer_list.size(); x ++) {
         observer_list_t::iterator i = observer_list.begin();
         for(int y = 0; y < x; y ++) i ++;
-        if((*i).is_valid()) (*i)->handle_breakpoint(BreakpointReference(this));
+        if(*i) (*i)->handle_breakpoint(this);
         if((unsigned)last_size != observer_list.size()) x --;
     }
 }
 
-
-
-
+} // namespace PTrace

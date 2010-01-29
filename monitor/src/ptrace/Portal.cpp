@@ -22,25 +22,22 @@
 #include "FreeObserver.h"
 #include "ReallocObserver.h"
 #include "MainObserver.h"
-#include "BreakpointReference.h"
 
 #include "misc/String.h"
 
-#include "Message.h"
+#include "misc/Message.h"
 
-
-
-
+namespace PTrace {
 
 Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
     std::cout << "Portal::Portal(): called, initialization begun . . . \n";
     pid = fork();
     if(pid == -1)
-        throw PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
     else if(pid == 0) {
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
         if(execv(argument_list->get_argument(0).c_str(), argument_list->get_as_argv()) == -1) {
-            throw PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
+            throw Exception::PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
         }
     }
     
@@ -73,7 +70,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
 Word Portal::get_register(ASM::Register which) const {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
-        throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
@@ -94,14 +91,14 @@ Word Portal::get_register(ASM::Register which) const {
             return registers.rsp;
 #endif
         default:
-            throw PTraceException("Value of invalid register requested");
+            throw Exception::PTraceException("Value of invalid register requested");
     }
 }
 
 void Portal::set_register(ASM::Register which, Word new_value) {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
-        throw PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
@@ -110,10 +107,10 @@ void Portal::set_register(ASM::Register which, Word new_value) {
             break;
 #endif
         default:
-            throw PTraceException("Asked to set value of invalid register");
+            throw Exception::PTraceException("Asked to set value of invalid register");
     }
     if(ptrace(PTRACE_SETREGS, pid, NULL, &registers) == -1)
-        throw PTraceException(Misc::StreamAsString() << "Couldn't set register values: " << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't set register values: " << strerror(errno));
 }
 
 Word Portal::read_memory(Word address) const {
@@ -121,14 +118,14 @@ Word Portal::read_memory(Word address) const {
     std::cout << "\tReading address " << std::hex << address << std::endl;
     Word return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
     if(return_value == Word(-1) && errno != 0)
-        throw PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
     return return_value;
 }
 
 void Portal::write_memory(Word address, Word value) {
     std::cout << "Portal::write_memory(address, Word) called . . ." << std::endl;
     if(ptrace(PTRACE_POKEDATA, pid, address, value) == -1) 
-        throw PTraceException(Misc::StreamAsString() << "Couldn't write memory: " << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't write memory: " << strerror(errno));
 }
 
 void Portal::write_memory(Word address, Byte value) {
@@ -155,7 +152,7 @@ std::size_t Portal::place_breakpoint(Word address, BreakpointObserver *observer)
     std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
     std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
     Breakpoint *bp = get_breakpoint_by_address(address);
-    if(!bp.is_valid()) {
+    if(!bp) {
         Byte original = read_memory(address) & 0xff;
         bp = new Breakpoint(address, original);
         add_breakpoint(bp);
@@ -171,7 +168,7 @@ void Portal::remove_breakpoint(Word address) {
     std::cout << "\tRemoving breakpoint at " << std::hex << address << std::dec << std::endl;
     
     Breakpoint *bp = get_breakpoint_by_address(address);
-    if(!bp.is_valid()) {
+    if(!bp) {
         std::cout << "\tAsked to remove non-existent breakpoint!" << std::endl;
         return;
     }
@@ -206,7 +203,7 @@ void Portal::handle_signal() {
     if(!WIFEXITED(status) && WIFSTOPPED(status)) {
         siginfo_t signal_info;
         if(ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info) == -1) {
-            throw PTraceException(Misc::StreamAsString() << "Failed to get signal information: " << strerror(errno));
+            throw Exception::PTraceException(Misc::StreamAsString() << "Failed to get signal information: " << strerror(errno));
         }
         signal = signal_info.si_signo;
     }
@@ -225,7 +222,7 @@ void Portal::handle_signal() {
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
     }
-    Message::Message(Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Caught unknown signal " << signal << ", resuming execution with signal");
+    Misc::Message::Message(Misc::Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Caught unknown signal " << signal << ", resuming execution with signal");
     /* Default action: continue */
     continue_execution(signal);
 }
@@ -233,14 +230,14 @@ void Portal::handle_signal() {
 void Portal::continue_execution(int signal) {
     std::cout << "Portal::continue_execution() called . . ." << std::endl;
     if(ptrace(PTRACE_CONT, pid, NULL, NULL) == -1)
-        throw PTraceException(Misc::StreamAsString() << "Couldn't continue program execution: " << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't continue program execution: " << strerror(errno));
     std::cout << "\tExecution continued." << std::endl;
 }
 
 void Portal::single_step() {
     std::cout << "Portal::single_step() called . . ." << std::endl;
     if(ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL) == -1)
-        throw PTraceException(Misc::StreamAsString() << "Couldn't single-step program:" << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't single-step program:" << strerror(errno));
     wait_for_signal(); /* ptrace(PTRACE_SINGLESTEP throws a SIGTRAP when it's done, so wait for it. */
     std::cout << "\tSingle-step successful. " << std::endl;
 }
@@ -248,7 +245,7 @@ void Portal::single_step() {
 int Portal::wait_for_signal() {
     std::cout << "Portal::wait_for_signal() called . . ." << std::endl;
     int status;
-    if(waitpid(pid, &status, 0) == -1) throw PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
+    if(waitpid(pid, &status, 0) == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
     std::cout << "\tGot signal." << std::endl;
     return status;
 }
@@ -266,11 +263,11 @@ void Portal::handle_breakpoint() {
     ip --;
     Breakpoint *breakpoint = get_breakpoint_by_address(ip);
     std::cout << "\tIP: " << std::hex << ip << std::dec << std::endl;
-    if(!breakpoint.is_valid()) {
+    if(!breakpoint) {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
     }
-    Message(Message::DEBUG_MESSAGE, "handle_breakpoint() found a breakpoint . . .");
+    Misc::Message(Misc::Message::DEBUG_MESSAGE, "handle_breakpoint() found a breakpoint . . .");
     
     /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
     set_register(ASM::Register::RIP, ip);
@@ -299,7 +296,7 @@ Word Portal::get_libc_offset() {
     std::string map_file;
     map_file = Misc::StreamAsString() << "/proc/" << pid << "/maps";
     std::ifstream map_stream(map_file.c_str());
-    if(!map_stream.is_open()) throw PTraceException(Misc::StreamAsString() << "Couldn't open " << map_file << ", perhaps permissions are screwy?");
+    if(!map_stream.is_open()) throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't open " << map_file << ", perhaps permissions are screwy?");
     
     /*std::cout << "Memory map: " << std::endl;*/
     
@@ -347,6 +344,4 @@ Word Portal::get_libc_offset() {
     return libc_offset;
 }
 
-
-
-
+} // namespace PTrace

@@ -5,9 +5,7 @@
 
 #include "Types.h"
 
-
-
-
+namespace ELF {
 
 class Symbol {
 private:
@@ -23,8 +21,6 @@ public:
     Word get_size() const { return size; }
 };
 
-
-
-
+} // namespace ELF
 
 #endif

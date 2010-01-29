@@ -1,8 +1,8 @@
 #include "Memory.h"
-#include "misc/BlockEvent.h"
+#include "event/Block.h"
+#include "misc/To.h"
 
-
-
+namespace Tracker {
 
 MemoryBlock *Memory::get_block(Word address) const {
     for(block_set_t::const_iterator i = block_set.begin(); i != block_set.end(); i ++) {
@@ -19,17 +19,17 @@ void Memory::remove_block(MemoryBlock *block) {
     }
 }
 
-void Memory::handle_event(Misc::Event *event) {
-    if(event->get_type() == Misc::Event::BLOCK_EVENT) {
-        Misc::BlockEvent *be = event.to<Misc::BlockEvent>();
+void Memory::handle_event(Event::BasicEvent *event) {
+    if(event->get_type() == Event::BasicEvent::BLOCK_EVENT) {
+        Event::Block *be = dynamic_cast<Event::Block *>(event);
         switch(be->get_block_type()) {
-            case Misc::BlockEvent::ALLOC_EVENT:
+            case Event::Block::ALLOC_EVENT:
                 add_block(new MemoryBlock(be->get_address(), be->get_size()));
                 break;
-            case Misc::BlockEvent::FREE_EVENT:
+            case Event::Block::FREE_EVENT:
                 remove_block(get_block(be->get_address()));
                 break;
-            case Misc::BlockEvent::REALLOC_EVENT:
+            case Event::Block::REALLOC_EVENT:
                 MemoryBlock *block = get_block(be->get_address());
                 block->set_address(be->get_new_address());
                 block->set_size(be->get_size());
@@ -38,5 +38,4 @@ void Memory::handle_event(Misc::Event *event) {
     }
 }
 
-
-
+} // namespace Tracker

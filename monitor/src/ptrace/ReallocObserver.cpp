@@ -1,14 +1,11 @@
 #include <iostream>
 #include "ReallocObserver.h"
-#include "BreakpointReference.h"
-#include "misc/BlockEvent.h"
+#include "event/Block.h"
 #include "Initializer.h"
 
+namespace PTrace {
 
-
-
-
-void ReallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
+void ReallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     Portal *portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
     
     static Word last_size = 0;
@@ -17,7 +14,7 @@ void ReallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     if(breakpoint->get_id() != Initializer::get_instance()->get_program_manager()->get_realloc_breakpoint_id()) {
         breakpoint->remove_observer(this);
         Initializer::get_instance()->get_event_queue()->push_event(
-            new Misc::BlockEvent(Misc::BlockEvent::REALLOC_EVENT,
+            new Event::Block(Event::Block::REALLOC_EVENT,
             last_address, last_size, portal->get_register(ASM::Register::RAX)));
         return;
     }
@@ -31,6 +28,4 @@ void ReallocObserver::handle_breakpoint(const BreakpointReference &breakpoint) {
     return;
 }
 
-
-
-
+} // namesapce PTrace

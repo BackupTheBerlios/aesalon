@@ -7,9 +7,7 @@
 #include "Types.h"
 #include "BreakpointObserver.h"
 
-
-
-
+namespace PTrace {
 
 class Breakpoint {
 protected:
@@ -45,8 +43,6 @@ public:
     void notify();
 };
 
-
-
-
+} // namespace PTrace
 
 #endif

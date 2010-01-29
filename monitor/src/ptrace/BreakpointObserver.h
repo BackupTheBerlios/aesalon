@@ -1,22 +1,18 @@
 #ifndef AESALON_MONITOR_PTRACE_BREAKPOINT_OBSERVER_H
 #define AESALON_MONITOR_PTRACE_BREAKPOINT_OBSERVER_H
 
+namespace PTrace {
 
-
-
-
-class BreakpointReference;
+class Breakpoint;
 
 class BreakpointObserver {
 public:
     BreakpointObserver() {}
     virtual ~BreakpointObserver() {}
     
-    virtual void handle_breakpoint(const BreakpointReference &breakpoint) = 0;
+    virtual void handle_breakpoint(Breakpoint *breakpoint) = 0;
 };
 
-
-
-
+} // namespace PTrace
 
 #endif

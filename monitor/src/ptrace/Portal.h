@@ -11,13 +11,10 @@
 #include "SignalObserver.h"
 #include "BreakpointObserver.h"
 #include "misc/ArgumentList.h"
-#
-#include "PTraceException.h"
+#include "exception/PTraceException.h"
 #include "asm/Register.h"
 
-
-
-
+namespace PTrace {
 
 class Portal {
 protected:
@@ -134,8 +131,6 @@ public:
     Word get_libc_offset();
 };
 
-
-
-
+} // namespace PTrace
 
 #endif

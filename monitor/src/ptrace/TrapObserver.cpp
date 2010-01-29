@@ -3,11 +3,8 @@
 
 #include "TrapObserver.h"
 #include "Initializer.h"
-#include "PTraceException.h"
 
-
-
-
+namespace PTrace {
 
 bool TrapObserver::handle_signal(int signal, int status) {
     if(signal != SIGTRAP) return false;
@@ -20,6 +17,4 @@ bool TrapObserver::handle_signal(int signal, int status) {
     return true;
 }
 
-
-
-
+} // namespace PTrace

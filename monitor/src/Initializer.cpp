@@ -2,11 +2,10 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
-#include "misc/ArgumentParser.h"
-#include "misc/ReferenceCounter.h"
+/*#include "misc/ArgumentParser.h"*/
 #include "misc/StreamAsString.h"
 #include "misc/String.h"
-#include "Message.h"
+#include "misc/Message.h"
 
 #include "Initializer.h"
 
@@ -17,8 +16,6 @@
 #ifndef LIBC_PATH
     #define LIBC_PATH "/lib/libc.so.6"
 #endif
-
-
 
 
 template<> Initializer *Misc::Singleton<Initializer>::instance = 0;
@@ -32,8 +29,7 @@ Initializer::~Initializer() {
 }
 
 void Initializer::initialize() {
-    new Misc::ReferenceCounter();
-    Misc::ArgumentParser *ap = new Misc::ArgumentParser();
+    /*Misc::ArgumentParser *ap = new Misc::ArgumentParser();
     
     ap->add_argument("usage", new Misc::BooleanArgument("--usage", 'h', "", 0, false));
     ap->add_argument("logfile", new Misc::StringArgument("--log-file", 'l', ""));
@@ -42,37 +38,32 @@ void Initializer::initialize() {
     ap->add_argument("wait for", new Misc::StringArgument("--wait-for", 0, "1"));
     ap->add_argument("libc path", new Misc::StringArgument("--libc-path", 0, LIBC_PATH));
     
-    ap->parse_argv(argv);
+    ap->parse_argv(argv);*/
     
-    if(ap->get_argument("usage").to<Misc::BooleanArgument>()->get_status()) {
+    /*if(ap->get_argument("usage").to<Misc::BooleanArgument>()->get_status()) {
         usage();
         return;
-    }
+    }*/
     
-    if(ap->get_files()) {
+    /*if(ap->get_files()) {
         int port;
         Misc::String::to<int>(ap->get_argument("tcp port").to<Misc::StringArgument>()->get_value(), port);
         server_socket = new TCPServerSocket(port);
         
         Misc::ArgumentList *al = new Misc::ArgumentList();
-        /*al->add_argument(ap->get_file(0)->get_filename());*/
         for(std::size_t x = 0; x < ap->get_files(); x ++) {
             al->add_argument(ap->get_file(x)->get_filename());
         }
         program_manager = new ProgramManager(al);
     }
-    else {
+    else {*/
         usage();
         return;
-    }
+    /*}*/
     
-    event_queue = new Misc::EventQueue();
+    event_queue = new Event::Queue();
     
-    /*symbol_manager = new Platform::SymbolManager();*/
-    
-    /*symbol_manager->parse_from_executable(ap->get_file(0)->get_filename());*/
-    
-    if(ap->get_argument("wait").to<Misc::BooleanArgument>()->get_status()) {
+    /*if(ap->get_argument("wait").to<Misc::BooleanArgument>()->get_status()) {
         int number;
         Misc::String::to<int>(
             ap->get_argument("wait for").to<Misc::StringArgument>()->get_value(), number);
@@ -81,7 +72,7 @@ void Initializer::initialize() {
         for(int x = 0; x < number; x ++) {
             server_socket->wait_for_connection();
         }
-    }
+    }*/
     
     run();
     
@@ -90,14 +81,8 @@ void Initializer::initialize() {
 
 void Initializer::deinitialize() {
     if(program_manager) delete program_manager;
-    /*if(symbol_manager) delete symbol_manager;*/
     if(server_socket) delete server_socket;
     if(event_queue) delete event_queue;
-    
-    Misc::ArgumentParser::lock_mutex();
-    delete Misc::ArgumentParser::get_instance();
-    Misc::ReferenceCounter::lock_mutex();
-    delete Misc::ReferenceCounter::get_instance();
 }
 
 void Initializer::usage() {
@@ -115,7 +100,7 @@ void Initializer::run() {
     program_manager->execute();
     while(program_manager->is_running()) {
         program_manager->wait();
-        if(event_queue->peek_event().is_valid()) {
+        if(event_queue->peek_event()) {
             std::cout << "Sending data from event queue . . ." << std::endl;
             get_socket()->send_data(event_queue);
         }

@@ -3,17 +3,13 @@
 
 #include "BreakpointObserver.h"
 
-
-
-
+namespace PTrace {
 
 class ReallocObserver : public BreakpointObserver {
 public:
-    virtual void handle_breakpoint(const BreakpointReference &breakpoint);
+    virtual void handle_breakpoint(Breakpoint *breakpoint);
 };
 
-
-
-
+} // namespace PTrace
 
 #endif

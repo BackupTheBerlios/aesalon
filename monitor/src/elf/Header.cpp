@@ -5,9 +5,7 @@
 #include "Header.h"
 #include "Parser.h"
 
-
-
-
+namespace ELF {
 
 Header::Header(int file_fd) {
     std::size_t bytes = read(file_fd, &data, sizeof(data));
@@ -33,6 +31,4 @@ Header::Header(int file_fd) {
 #endif
 }
 
-
-
-
+} // namespace ELF

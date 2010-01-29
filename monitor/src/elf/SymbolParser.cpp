@@ -4,15 +4,13 @@
 #include "SymbolParser.h"
 #include "Parser.h"
 
-
-
-
+namespace ELF {
 
 SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
     std::cout << std::hex;
     /* Start off with the static symbols . . . */
     Section *symbol_table = elf_parser->get_section(".symtab");
-    if(symbol_table.is_valid()) { /* Only try to parse the symbols if the .symtab section exists */
+    if(symbol_table) { /* Only try to parse the symbols if the .symtab section exists */
         Block *symbol_block = symbol_table->get_content();
         while(symbol_block->get_size()) {
             Elf64_Sym sym;
@@ -23,7 +21,7 @@ SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
         }
     }
     symbol_table = elf_parser->get_section(".rela.plt");
-    if(symbol_table.is_valid()) {
+    if(symbol_table) {
         symbol_table->read_content();
         /*Block *address_table = elf_parser->get_section(".rela.plt")->get_content();
         while(address_table->get_size()) {
@@ -75,6 +73,4 @@ void SymbolParser::dump_symbols() const {
     }
 }
 
-
-
-
+} // namespace ELF

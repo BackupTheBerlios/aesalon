@@ -1,9 +1,11 @@
+#include <fcntl.h>
+#include <stdlib.h>
 #include <iostream>
 #include "Disassembler.h"
-#include "platform/BidirectionalPipe.h"
+#include "elf/Symbol.h"
 #include "misc/ArgumentList.h"
 #include "misc/String.h"
-#include "Message.h"
+#include "misc/Message.h"
 
 namespace ASM {
 
@@ -14,19 +16,34 @@ Disassembler::Disassembler(ELF::Parser *elf_parser) : elf_parser(elf_parser) {
     al.add_argument("--section=.text");
     al.add_argument(elf_parser->get_filename());
     
-    bi_pipe = new Platform::BidirectionalPipe(al, true);
+    int pipe_fds[2];
+    pipe(pipe_fds);
     
-    Message::Message(Message::DEBUG_MESSAGE, "Beginning disassembly of target");
+    pid_t pid = fork();
+    if(pid == 0) {
+        close(pipe_fds[0]);
+        fcntl(pipe_fds[1], F_SETFL, fcntl(pipe_fds[1], F_GETFL) & ~O_NONBLOCK);
+        dup2(pipe_fds[1], STDOUT_FILENO);
+        execv(al.get_argument(0).c_str(), al.get_as_argv());
+        exit(1);
+    }
+    pipe_fd = pipe_fds[0];
+    close(pipe_fds[1]);
+    
+    Misc::Message::Message(Misc::Message::DEBUG_MESSAGE, "Beginning disassembly of target");
     parse_objdump_output();
-    Message::Message(Message::DEBUG_MESSAGE, "Disassembly of target completed");
-    bi_pipe = NULL;
+    Misc::Message::Message(Misc::Message::DEBUG_MESSAGE, "Disassembly of target completed");
+    close(pipe_fd);
 }
 
 void Disassembler::parse_objdump_output() {
     std::string line;
     ELF::Symbol *symbol = NULL;
-    while(bi_pipe->is_open()) {
-        line = bi_pipe->get_string();
+    
+    char buffer[1024];
+    
+    while(read(pipe_fd, buffer, sizeof(buffer))) {
+        line = buffer;
         if(line == "") continue;
         
         /*std::cout << "parsing objdump line \"" << line << "\"\n";*/
@@ -50,7 +67,7 @@ void Disassembler::parse_objdump_output() {
             continue;
         }
         /* it's an instruction . . . */
-        if(!symbol.is_valid()) continue; /* Continue if there's no resolved symbol ATM . . . */
+        if(!symbol) continue; /* Continue if there's no resolved symbol ATM . . . */
         if(line.find("<") != std::string::npos) line.erase(line.find("<"));
         bool finished = false;
         while(!finished) {
@@ -66,7 +83,7 @@ void Disassembler::parse_objdump_output() {
         if(line == "") continue;
         /*std::cout << "Assembly instruction is \"" << line << "\"\n";*/
         /* Now parse the instruction and push it onto the InstructionList for the symbol . . . */
-        if(!symbol_to_il[symbol->get_symbol_name()].is_valid())
+        if(!symbol_to_il[symbol->get_symbol_name()])
             symbol_to_il[symbol->get_symbol_name()] = new InstructionList(symbol->get_address());
         
         symbol_to_il[symbol->get_symbol_name()]->add_instruction(new Instruction(line, address));
