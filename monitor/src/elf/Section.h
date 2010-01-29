@@ -28,7 +28,7 @@ private:
     std::size_t get_content_size() const { return data.sh_size; }
 public:
     Section(int file_fd);
-    virtual ~Section() {}
+    virtual ~Section();
     
     void read_content();
     Block *get_content() {

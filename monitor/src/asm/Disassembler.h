@@ -22,7 +22,7 @@ private:
     void parse_objdump_output();
 public:
     Disassembler(ELF::Parser *elf_parser);
-    virtual ~Disassembler() {}
+    virtual ~Disassembler();
     
     InstructionList *get_symbol_il(std::string symbol_name)
         { return symbol_to_il[symbol_name]; }

@@ -10,9 +10,13 @@
 
 namespace ELF {
 
-Section::Section(int file_fd) : file_fd(file_fd) {
+Section::Section(int file_fd) : file_fd(file_fd), content(NULL) {
     std::size_t bytes = read(file_fd, &data, sizeof(data));
     if(bytes != sizeof(data)) throw ParserException("Section entry truncated");
+}
+
+Section::~Section() {
+    if(content) delete content;
 }
 
 void Section::read_content() {
@@ -26,6 +30,7 @@ void Section::read_content() {
     }
     
     content = new Block(byte_content, bytes);
+    delete[] byte_content; /* Block(Byte *, std::size_t) creates a copy of the memory passed. */
 }    
 
 } // namespace ELF

@@ -17,7 +17,7 @@ private:
     void handle_opcode(std::string opcode, std::string operands);
 public:
     Instruction(std::string instruction, Word address);
-    virtual ~Instruction() {}
+    virtual ~Instruction();
     
     bool changes_memory() const { return memory_change; }
     

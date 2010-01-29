@@ -19,7 +19,7 @@ private:
     dynamic_offsets_t dynamic_offsets;
 public:
     SymbolParser(Parser *elf_parser);
-    virtual ~SymbolParser() {}
+    virtual ~SymbolParser();
     
     Symbol *get_symbol(std::string name) const;
     

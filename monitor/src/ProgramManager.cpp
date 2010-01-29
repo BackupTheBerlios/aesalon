@@ -3,7 +3,7 @@
 #include "ProgramManager.h"
 
 ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
-    : argument_list(argument_list), running(false) {
+    : argument_list(argument_list), running(false), ptrace_portal(NULL) {
     
     elf_parser = new ELF::Parser(argument_list->get_argument(0));
     /*std::string libc_path = Misc::ArgumentParser::get_instance()->get_argument("libc path").to<Misc::StringArgument>()->get_value();*/
@@ -12,6 +12,14 @@ ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
     disassembler = new ASM::Disassembler(elf_parser);
     
     disassembler->get_symbol_il("main");
+}
+
+ProgramManager::~ProgramManager() {
+    if(ptrace_portal) delete ptrace_portal;
+    delete elf_parser;
+    delete libc_parser;
+    delete disassembler;
+    delete argument_list;
 }
 
 void ProgramManager::execute() {

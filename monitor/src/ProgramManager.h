@@ -22,7 +22,7 @@ private:
     std::size_t realloc_breakpoint_id;
 public:
     ProgramManager(Misc::ArgumentList *argument_list);
-    virtual ~ProgramManager() {}
+    virtual ~ProgramManager();
     
     void execute();
     void wait();

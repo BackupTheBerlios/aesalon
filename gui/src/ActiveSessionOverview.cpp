@@ -3,9 +3,6 @@
 #include "ActiveSessionOverview.h"
 #include "ActiveSessionOverview.moc"
 
-
-
-
 ActiveSessionOverview::ActiveSessionOverview(Session *session, QWidget *parent) : session(session), allocations(0), deallocations(0) {
     info_form = new QFormLayout();
     
@@ -28,6 +25,3 @@ ActiveSessionOverview::ActiveSessionOverview(Session *session, QWidget *parent) 
 void ActiveSessionOverview::update_status(QString new_status) {
     status->setText(new_status);
 }
-
-
-

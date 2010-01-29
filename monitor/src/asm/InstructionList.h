@@ -15,7 +15,7 @@ private:
     instruction_list_t instruction_list;
 public:
     InstructionList(Word offset = 0) : offset(offset) {}
-    virtual ~InstructionList() {}
+    virtual ~InstructionList();
     
     void add_instruction(Instruction *new_instruction)
         { instruction_list.push_back(new_instruction); }

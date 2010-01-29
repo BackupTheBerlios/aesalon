@@ -1,9 +1,6 @@
 #include <iostream>
 #include "Types.h"
 
-
-
-
 Block::Block(Byte *data, std::size_t data_size) {
     this->data.reserve(data_size);
     

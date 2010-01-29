@@ -2,6 +2,12 @@
 
 namespace ASM {
 
+InstructionList::~InstructionList() {
+    for(instruction_list_t::const_iterator i = instruction_list.begin(); i != instruction_list.end(); i ++) {
+        delete *i;
+    }
+}
+
 std::size_t InstructionList::get_instruction_count() const {
     std::size_t count = 0;
     for(instruction_list_t::const_iterator i = instruction_list.begin(); i != instruction_list.end(); i ++) {

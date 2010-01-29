@@ -4,7 +4,7 @@
 
 namespace ASM {
 
-Instruction::Instruction(std::string instruction, Word address) : address(address) {
+Instruction::Instruction(std::string instruction, Word address) : source(NULL), destination(NULL), address(address) {
     std::string opcode;
     bool has_operands = false;
     if(instruction.find(" ") == std::string::npos) opcode = instruction;
@@ -19,6 +19,10 @@ Instruction::Instruction(std::string instruction, Word address) : address(addres
     handle_opcode(opcode, Misc::String::strip_whitespace(instruction));
 }
 
+Instruction::~Instruction() {
+    if(source != NULL) delete source;
+    if(destination != NULL) delete destination;
+}
 
 void Instruction::handle_opcode(std::string opcode, std::string operands) {
     std::vector<std::string> operand;

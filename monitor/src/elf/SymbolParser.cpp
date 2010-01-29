@@ -59,6 +59,12 @@ SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
     std::cout << std::dec;
 }
 
+SymbolParser::~SymbolParser() {
+    for(symbol_vector_t::iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
+        delete *i;
+    }
+}
+
 Symbol *SymbolParser::get_symbol(std::string name) const {
     for(symbol_vector_t::const_iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
         if((*i)->get_symbol_name() == name) return *i;

@@ -50,8 +50,8 @@ public:
         @param argument_list The arguments to spawn the child with.
     */
     Portal(Misc::ArgumentList *argument_list);
-    /** Virtual destructor, does nothing. */
-    virtual ~Portal() {}
+    /** Virtual destructor. */
+    virtual ~Portal();
     
     /** Retrieve the value of a specific register.
         @param which The register to get the value of.

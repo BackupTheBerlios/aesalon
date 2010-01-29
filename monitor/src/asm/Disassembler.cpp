@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <iostream>
+#include <cstring>
 #include "Disassembler.h"
 #include "elf/Symbol.h"
 #include "misc/ArgumentList.h"
@@ -36,14 +37,25 @@ Disassembler::Disassembler(ELF::Parser *elf_parser) : elf_parser(elf_parser) {
     close(pipe_fd);
 }
 
+Disassembler::~Disassembler() {
+    for(symbol_to_il_t::iterator i = symbol_to_il.begin(); i != symbol_to_il.end(); i ++) {
+        delete i->second;
+    }
+}
+
 void Disassembler::parse_objdump_output() {
-    std::string line;
+    std::string line = "";
     ELF::Symbol *symbol = NULL;
     
-    char buffer[1024];
+    char *buffer = new char[1024];
+    /* Clear the buffer to avoid some nasty uninitialised value errors. */
+    for(int x = 0; x < 1024; x ++) {
+        buffer[x] = 0;
+    }
     
-    while(read(pipe_fd, buffer, sizeof(buffer))) {
-        line = buffer;
+    while(read(pipe_fd, buffer, sizeof(1024))) {
+        if(!std::strlen(buffer)) continue;
+        line.assign(buffer);
         if(line == "") continue;
         
         /*std::cout << "parsing objdump line \"" << line << "\"\n";*/
@@ -87,7 +99,10 @@ void Disassembler::parse_objdump_output() {
             symbol_to_il[symbol->get_symbol_name()] = new InstructionList(symbol->get_address());
         
         symbol_to_il[symbol->get_symbol_name()]->add_instruction(new Instruction(line, address));
+        
+        buffer[0] = 0;
     }
+    delete[] buffer;
 }
 
 } // namespace ASM

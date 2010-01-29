@@ -9,9 +9,6 @@
 
 #include "Session.h"
 
-
-
-
 class ActiveSessionOverview : public QWidget { Q_OBJECT
 private:
     Session *session;
@@ -26,8 +23,5 @@ public:
 public slots:
     void update_status(QString new_status);
 };
-
-
-
 
 #endif

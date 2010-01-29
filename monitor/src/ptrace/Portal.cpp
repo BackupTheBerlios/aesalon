@@ -67,6 +67,19 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
     continue_execution();
 }
 
+Portal::~Portal() {
+    delete realloc_observer;
+    delete free_observer;
+    delete malloc_observer;
+    delete initial_observer;
+    for(breakpoint_list_t::iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
+        delete *i;
+    }
+    for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
+        delete *i;
+    }
+}
+
 Word Portal::get_register(ASM::Register which) const {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
@@ -180,6 +193,7 @@ void Portal::remove_breakpoint(Word address) {
             break;
         }
     }
+    delete bp;
 }
 
 Breakpoint *Portal::get_breakpoint_by_id(std::size_t which) const {

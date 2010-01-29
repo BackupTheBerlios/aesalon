@@ -27,6 +27,12 @@ Initializer::~Initializer() {
 }
 
 void Initializer::initialize() {
+    /* set these to NULL so that the usage() function doesn't cause errors . . . */
+    program_manager = NULL;
+    server_socket = NULL;
+    event_queue = NULL;
+    return_value = 0;
+    
     argument_parser = new Misc::ArgumentParser(argv);
     
     argument_parser->add_argument(new Misc::Argument("usage", 'h', Misc::Argument::NO_ARGUMENT, ""));
@@ -76,6 +82,7 @@ void Initializer::initialize() {
 }
 
 void Initializer::deinitialize() {
+    if(argument_parser) delete argument_parser;
     if(program_manager) delete program_manager;
     if(server_socket) delete server_socket;
     if(event_queue) delete event_queue;

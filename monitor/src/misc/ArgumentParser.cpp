@@ -73,7 +73,7 @@ void ArgumentParser::parse() {
     
     for(int x = optind; argv[x]; x ++) postargs.push_back(argv[x]);
     
-    delete option_list;
+    delete[] option_list;
 }
 
 } // namespace Misc

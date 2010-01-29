@@ -40,6 +40,11 @@ Parser::Parser(std::string filename) : filename(filename) {
 }
 
 Parser::~Parser() {
+    delete header;
+    delete symbol_parser;
+    for(section_list_t::iterator i = section_list.begin(); i != section_list.end(); i ++) {
+        delete *i;
+    }
     close(file_fd);
 }
 
