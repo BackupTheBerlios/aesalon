@@ -2,8 +2,8 @@
 #include "SessionEditor.h"
 #include "SessionEditor.moc"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 QString SessionEditor::last_directory = getenv("HOME");
 
@@ -124,5 +124,5 @@ void SessionEditor::change_session_type(Session::session_type_e new_type) {
     }
 }
 
-} // namespace GUI
-} // namespace Aesalon
+
+

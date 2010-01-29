@@ -8,9 +8,6 @@
 #include "ActiveSessionSocket.h"
 #include "ActiveSessionOverview.h"
 
-namespace Aesalon {
-namespace GUI {
-
 class ActiveSession : public QTabWidget { Q_OBJECT
 public:
     enum status_e {
@@ -49,8 +46,5 @@ signals:
     void close_session(ActiveSession *session);
     void status_changed(QString new_status);
 };
-
-} // namespace GUI
-} // namespace Aesalon
 
 #endif

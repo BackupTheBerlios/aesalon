@@ -6,8 +6,8 @@
 #include <QMenu>
 #include <QMenuBar>
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 class MainWindow : public QMainWindow { Q_OBJECT
 private:
@@ -21,7 +21,7 @@ public slots:
     void open_configuration();
 };
 
-} // namespace GUI
-} // namespace Aesalon
+
+
 
 #endif

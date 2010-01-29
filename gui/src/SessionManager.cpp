@@ -6,9 +6,6 @@
 #include "ActiveSession.h"
 #include "MainArea.h"
 
-namespace Aesalon {
-namespace GUI {
-
 SessionManager::SessionManager(QWidget *parent) {
     QSettings settings;
     
@@ -117,6 +114,3 @@ void SessionManager::delete_session(QListWidgetItem *session_item) {
 void SessionManager::close_active_session(ActiveSession *session) {
     emit remove_tab_request(session);
 }
-
-} // namespace GUI
-} // namespace Aesalon

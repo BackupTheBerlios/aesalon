@@ -3,8 +3,8 @@
 #include "ActiveSessionOverview.h"
 #include "ActiveSessionOverview.moc"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 ActiveSessionOverview::ActiveSessionOverview(Session *session, QWidget *parent) : session(session), allocations(0), deallocations(0) {
     info_form = new QFormLayout();
@@ -29,5 +29,5 @@ void ActiveSessionOverview::update_status(QString new_status) {
     status->setText(new_status);
 }
 
-} // namespace GUI
-} // namespace Aesalon
+
+

@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("aesalon");
     QCoreApplication::setApplicationName("gui");
     
-    Aesalon::GUI::MainWindow mw;
+    MainWindow mw;
     mw.show();
     return app.exec();
 }

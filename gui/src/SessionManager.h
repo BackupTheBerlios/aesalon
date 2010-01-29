@@ -11,9 +11,6 @@
 #include "SessionListWidget.h"
 #include "ActiveSession.h"
 
-namespace Aesalon {
-namespace GUI {
-
 class SessionManager : public QWidget { Q_OBJECT
 private:
     QList<Session *> session_list;
@@ -43,8 +40,5 @@ signals:
     void new_tab_request(QWidget *new_tab, QString name);
     void remove_tab_request(QWidget *tab);
 };
-
-} // namespace GUI
-} // namespace Aesalon
 
 #endif

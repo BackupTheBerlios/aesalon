@@ -9,8 +9,8 @@
 
 #include "Session.h"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 class ActiveSessionOverview : public QWidget { Q_OBJECT
 private:
@@ -27,7 +27,7 @@ public slots:
     void update_status(QString new_status);
 };
 
-} // namespace GUI
-} // namespace Aesalon
+
+
 
 #endif

@@ -1,14 +1,12 @@
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstring>
 
 #include <QSettings>
 #include <QShortcut>
 
 #include "ActiveSession.h"
 #include "ActiveSession.moc"
-
-namespace Aesalon {
-namespace GUI {
 
 ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(parent), session(session), status(INITIALIZING) {
     this->setTabPosition(West);
@@ -28,23 +26,43 @@ ActiveSession::~ActiveSession() {
 
 void ActiveSession::execute() {
     QSettings settings;
-    /* NOTE: reimplement this function */\
-#if 0
-    al.add_argument(settings.value("xterm-path").toString().toStdString());
-    al.add_argument("-e");
-    al.add_argument(settings.value("aesalon-path").toString().toStdString());
-    al.add_argument("--wait");
-    al.add_argument("--use-port");
-    al.add_argument(QString().setNum(session->get_port()).toStdString());
-    al.add_argument(session->get_executable_path().toStdString());
-    /* TODO: handle arguments in here . . . */
+    QString command = "";
+    /* NOTE: reimplement this function */
+
+    command += settings.value("xterm-path").toString();
+    command += " -e ";
+    command += settings.value("aesalon-path").toString();
+    command += " --wait --tcp-port ";
+    command += QString().setNum(session->get_port());
+    command += " ";
+    command += session->get_executable_path();
+    command += " ";
+    command += session->get_arguments();
+    
+    int argc = command.count(' ') + 1;
+    char **argv = new char*[argc];
+    
+    argv[argc] = 0;
+    
+    for(int x = 0; x < argc; x ++) {
+        QString arg = command.left(command.indexOf(' '));
+        command.remove(0, command.indexOf(' ')+1);
+        argv[x] = new char[arg.size()+1];
+        std::strcpy(argv[x], arg.toStdString().c_str());
+    }
+    
     pid_t pid = fork();
-    if(pid == -1) return;
-    else if(pid == 0) {
-        execv(al.get_argument(0).c_str(), al.get_as_argv());
+    if(pid == 0) {
+        execv(argv[0], argv);
+        qDebug("Couldn't execute file \"%s\"", argv[0]);
         exit(1);
     }
-#endif
+    
+    for(int x = 0; x < argc; x ++) {
+        delete argv[x];
+    }
+    delete argv;
+    
     connect_to("localhost", session->get_port());
 }
 
@@ -76,6 +94,3 @@ QString ActiveSession::get_status_as_string() const {
     qDebug("Invalid ActiveSession status!");
     return tr("Invalid ActiveSession status!");
 }
-
-} // namespace GUI
-} // namespace Aesalon

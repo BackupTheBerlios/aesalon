@@ -6,8 +6,8 @@
 
 #include "Session.h"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 class SessionListWidget : public QListWidget { Q_OBJECT
 private:
@@ -30,7 +30,7 @@ signals:
     void delete_request(QListWidgetItem *item);
 };
 
-} // namespace GUI
-} // namespace Aesalon
+
+
 
 #endif

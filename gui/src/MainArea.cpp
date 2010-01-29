@@ -3,9 +3,6 @@
 #include "MainArea.moc"
 #include "SessionManager.h"
 
-namespace Aesalon {
-namespace GUI {
-
 MainArea::MainArea(QWidget *parent) {
     SessionManager *manager = new SessionManager;
     this->addTab(manager, tr("&Session Manager"));
@@ -29,6 +26,3 @@ void MainArea::tab_close_requested(int index) {
     if(index == 0) return;
     this->widget(index)->deleteLater();
 }
-
-} // namespace GUI
-} // namespace Aesalon

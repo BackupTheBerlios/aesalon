@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QTcpSocket>
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 class ActiveSessionSocket : public QObject { Q_OBJECT
 private:
@@ -26,7 +26,7 @@ signals:
     void disconnected();
 };
 
-} // namespace GUI
-} // namespace Aesalon
+
+
 
 #endif

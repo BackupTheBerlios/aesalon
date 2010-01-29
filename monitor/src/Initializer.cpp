@@ -86,8 +86,7 @@ void Initializer::usage() {
     std::cout << ", copyright (C) 2009-2010 strange <kawk256@gmail.com>" << std::endl;
     std::cout << "usage: " << argv[0] << " [arguments] executable [executable arguments]" << std::endl;
     std::cout << "\t--usage, -h\t\tPrint this usage message." << std::endl;
-    std::cout << "\t--log-file, -l\t\tSet the file to log memory events to, for future reconstruction." << std::endl;
-    std::cout << "\t--use-port\t\tSet the port to listen on for connections. Defaults to " << DEFAULT_PORT << "." << std::endl;
+    std::cout << "\t--tcp-port, -p\t\tSet the port to listen on for connections. Defaults to " << DEFAULT_PORT << "." << std::endl;
     std::cout << "\t--wait, -w\t\tWait for a TCP connection before executing. Defaults to false." << std::endl;
     std::cout << "\t--libc-path\t\tThe path to the current version of libc being used. Defaults to " << LIBC_PATH << "." << std::endl;
 }

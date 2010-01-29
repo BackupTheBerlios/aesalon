@@ -3,8 +3,8 @@
 #include "ActiveSessionSocket.h"
 #include "ActiveSessionSocket.moc"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 ActiveSessionSocket::ActiveSessionSocket(QString host, int port) :host(host), port(port) {
     socket = new QTcpSocket();
@@ -22,7 +22,7 @@ ActiveSessionSocket::~ActiveSessionSocket() {
 void ActiveSessionSocket::handle_data() {
     QByteArray data = socket->readAll();
     QString str = data;
-    qDebug("Received data from monitor: \"%s\"", str.toStdString().c_str());
+    /*qDebug("Received data from monitor: \"%s\"", str.toStdString().c_str());*/
 }
 
 void ActiveSessionSocket::error_caught(QAbstractSocket::SocketError error) {
@@ -39,5 +39,5 @@ void ActiveSessionSocket::try_connecting() {
     socket->connectToHost(host, port);
 }
 
-} // namespace GUI
-} // namespace Aesalon
+
+

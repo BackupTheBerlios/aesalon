@@ -5,8 +5,8 @@
 #include "MainArea.h"
 #include "Configuration.h"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 MainWindow::MainWindow(QWidget *parent) {
     QSettings settings;
@@ -28,5 +28,5 @@ void MainWindow::open_configuration() {
     config->exec();
 }
 
-} // namespace GUI
-} // namespace Aesalon
+
+

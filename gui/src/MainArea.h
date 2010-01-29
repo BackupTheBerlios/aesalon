@@ -4,8 +4,8 @@
 #include <QWidget>
 #include <QTabWidget>
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 class MainArea : public QTabWidget { Q_OBJECT
 public:
@@ -18,7 +18,7 @@ public slots:
     void tab_close_requested(int index);
 };
 
-} // namespace GUI
-} // namespace Aesalon
+
+
 
 #endif

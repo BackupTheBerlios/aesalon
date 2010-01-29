@@ -3,8 +3,8 @@
 
 #include <QString>
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 class Session {
 public:
@@ -38,7 +38,7 @@ public:
     void set_port(int new_port) { port = new_port; }
 };
 
-} // namespace GUI
-} // namespace Aesalon
+
+
 
 #endif

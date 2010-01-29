@@ -17,8 +17,8 @@
 
 #include "Session.h"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 class SessionEditor : public QDialog { Q_OBJECT
 private:
@@ -62,7 +62,7 @@ public slots:
     }
 };
 
-} // namespace GUI
-} // namespace Aesalon
+
+
 
 #endif

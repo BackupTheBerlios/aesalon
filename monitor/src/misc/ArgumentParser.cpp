@@ -56,7 +56,7 @@ void ArgumentParser::parse() {
             Argument *arg = argument_map[option_list[index].name];
             arg->set_found(true);
             if(optarg) arg->set_data(optarg);
-            else if(arg->get_argument_type() != Argument::NO_ARGUMENT)
+            else if(arg->get_argument_type() == Argument::REQUIRED_ARGUMENT)
                 throw Exception::ArgumentException(Misc::StreamAsString() << "Option " << found << " expected argument");
             continue;
         }
@@ -64,7 +64,7 @@ void ArgumentParser::parse() {
             if(i->second->get_short_form() == found) {
                 i->second->set_found(true);
                 if(optarg) i->second->set_data(optarg);
-                else if(i->second->get_argument_type() != Argument::NO_ARGUMENT) {
+                else if(i->second->get_argument_type() == Argument::REQUIRED_ARGUMENT) {
                     throw Exception::ArgumentException(Misc::StreamAsString() << "Option " << found << " expected argument");
                 }
             }

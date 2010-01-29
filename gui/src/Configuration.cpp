@@ -2,8 +2,8 @@
 #include "Configuration.h"
 #include "Configuration.moc"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 Configuration::Configuration(QWidget *parent) : QDialog(parent) {
     QSizePolicy expanding;
@@ -70,5 +70,5 @@ void Configuration::accept() {
     QDialog::accept();
 }
 
-} // namespace GUI
-} // namespace Aesalon
+
+

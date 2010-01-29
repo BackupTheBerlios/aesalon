@@ -1,8 +1,8 @@
 #include "SessionListWidget.h"
 #include "SessionListWidget.moc"
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 SessionListWidget::SessionListWidget(QWidget *parent) {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -39,5 +39,5 @@ void SessionListWidget::display_context_menu(const QPoint &pos) {
     else new_context_menu->popup(mapToGlobal(pos));
 }
 
-} // namespace GUI
-} // namespace Aesalon
+
+

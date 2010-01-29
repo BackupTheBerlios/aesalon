@@ -9,8 +9,8 @@
 #include <QFileDialog>
 #include <QPushButton>
 
-namespace Aesalon {
-namespace GUI {
+
+
 
 class Configuration : public QDialog { Q_OBJECT
 private:
@@ -40,7 +40,7 @@ public slots:
     void accept();
 };
 
-} // namespace GUI
-} // namespace Aesalon
+
+
 
 #endif
