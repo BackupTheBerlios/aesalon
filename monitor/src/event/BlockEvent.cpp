@@ -14,7 +14,7 @@ namespace Event {
 Block *BlockEvent::serialize() {
     Block *serialized = BasicEvent::serialize();
     
-    serialized->get_data()[0] |= (block_type << 2) & 0x06;
+    serialized->get_data()[0] |= (block_type << 1) & 0x06;
     
     serialized->push_word(get_address());
 
