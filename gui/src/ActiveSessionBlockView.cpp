@@ -23,7 +23,8 @@ void ActiveSessionBlockView::process_diff(ActiveSessionMemoryBlockDiff *diff) {
         this->setItem(this->rowCount()-1, 1, item);
         this->resizeRowToContents(this->rowCount()-1);
     }
-    else if(diff->get_type() == ActiveSessionMemoryBlockDiff::FREE_DIFF) {
+    else if(diff->get_type() == ActiveSessionMemoryBlockDiff::FREE_DIFF ||
+        diff->get_type() == ActiveSessionMemoryBlockDiff::REALLOC_DIFF && diff->get_size() == 0) {
         QList<QTableWidgetItem *> items = this->findItems("0x" + QString().setNum(diff->get_address(), 16), Qt::MatchExactly);
         if(items.size()) this->removeRow(items[0]->row());
     }

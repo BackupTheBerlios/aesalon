@@ -30,7 +30,6 @@
 namespace PTrace {
 
 Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
-    std::cout << "Portal::Portal(): called, initialization begun . . . \n";
     pid = fork();
     if(pid == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
@@ -54,15 +53,12 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
     free_observer = new FreeObserver();
     realloc_observer = new ReallocObserver();
     
-    std::cout << "Portal::Portal(): waiting for SIGTRAP call from child . . ." << std::endl;
     /* Wait for the SIGTRAP that indicates a exec() call . . . */
     wait_for_signal();
-    std::cout << "Portal::Portal(): got SIGTRAP call, placing breakpoint on main . . ." << std::endl;
     /* place a breakpoint at main, for intialization purposes. */
     Word main_address = Initializer::get_instance()->get_program_manager()->get_elf_parser()->get_symbol("main")->get_address();
     place_breakpoint(main_address, initial_observer);
     
-    std::cout << "Portal::Portal(): continuing execution until breakpoint on main . . ." << std::endl;
     /* Now continue until main(). */
     continue_execution();
 }
@@ -111,7 +107,7 @@ Word Portal::get_register(ASM::Register which) const {
 void Portal::set_register(ASM::Register which, Word new_value) {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
-        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't set register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
@@ -127,8 +123,6 @@ void Portal::set_register(ASM::Register which, Word new_value) {
 }
 
 Word Portal::read_memory(Word address) const {
-    std::cout << "Portal::read_memory() called . . ." << std::endl;
-    std::cout << "\tReading address " << std::hex << address << std::endl;
     Word return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
     if(return_value == Word(-1) && errno != 0)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
@@ -136,14 +130,11 @@ Word Portal::read_memory(Word address) const {
 }
 
 void Portal::write_memory(Word address, Word value) {
-    std::cout << "Portal::write_memory(address, Word) called . . ." << std::endl;
     if(ptrace(PTRACE_POKEDATA, pid, address, value) == -1) 
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't write memory: " << strerror(errno));
 }
 
 void Portal::write_memory(Word address, Byte value) {
-    std::cout << "Portal::write_memory(address, Byte) called . . ." << std::endl;
-    std::cout << "\tWriting 0x" << std::hex << (int)value << " to " << address << std::endl;
     Word word_offset = 0;
     word_offset = address & 0x07;
     Word current_value = read_memory(address - word_offset);
@@ -162,8 +153,6 @@ void Portal::detach() {
 }
 
 std::size_t Portal::place_breakpoint(Word address, BreakpointObserver *observer) {
-    std::cout << "Portal::place_breakpoint() called . . ." << std::endl;
-    std::cout << "\tPlacing breakpoint at " << std::hex << address << std::dec << std::endl;
     Breakpoint *bp = get_breakpoint_by_address(address);
     if(!bp) {
         Byte original = read_memory(address) & 0xff;
@@ -172,17 +161,12 @@ std::size_t Portal::place_breakpoint(Word address, BreakpointObserver *observer)
         write_memory(address, bp->get_breakpoint_character());
     }
     bp->add_observer(observer);
-    std::cout << "\tplaced breakpoint #" << bp->get_id() << std::endl;
     return bp->get_id();
 }
 
 void Portal::remove_breakpoint(Word address) {
-    std::cout << "Portal::remove_breakpoint() called . . ." << std::endl;
-    std::cout << "\tRemoving breakpoint at " << std::hex << address << std::dec << std::endl;
-    
     Breakpoint *bp = get_breakpoint_by_address(address);
     if(!bp) {
-        std::cout << "\tAsked to remove non-existent breakpoint!" << std::endl;
         return;
     }
     Byte original = bp->get_original();
@@ -223,16 +207,6 @@ void Portal::handle_signal() {
     }
     else signal = -1;
     
-    std::cout << std::dec;
-    
-    std::cout << "Portal::handle_signal(): status: (" << status << "): ";
-    
-    for(int mask = 1 << 20; mask > 0; mask >>= 1) {
-        std::cout << ((status & mask)?"1":"0");
-    }
-    
-    std::cout << ", signal: " << signal << std::endl;
-    
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
     }
@@ -242,30 +216,23 @@ void Portal::handle_signal() {
 }
 
 void Portal::continue_execution(int signal) {
-    std::cout << "Portal::continue_execution() called . . ." << std::endl;
     if(ptrace(PTRACE_CONT, pid, NULL, NULL) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't continue program execution: " << strerror(errno));
-    std::cout << "\tExecution continued." << std::endl;
 }
 
 void Portal::single_step() {
-    std::cout << "Portal::single_step() called . . ." << std::endl;
     if(ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't single-step program:" << strerror(errno));
     wait_for_signal(); /* ptrace(PTRACE_SINGLESTEP throws a SIGTRAP when it's done, so wait for it. */
-    std::cout << "\tSingle-step successful. " << std::endl;
 }
 
 int Portal::wait_for_signal() {
-    std::cout << "Portal::wait_for_signal() called . . ." << std::endl;
     int status;
     if(waitpid(pid, &status, 0) == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
-    std::cout << "\tGot signal." << std::endl;
     return status;
 }
 
 void Portal::handle_breakpoint() {
-    std::cout << "Portal::handle_breakpoint() called . . ." << std::endl;
     Word ip = get_register(
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
     ASM::Register::RIP
@@ -276,13 +243,10 @@ void Portal::handle_breakpoint() {
     /* Subtract one from the IP, since the 0xcc SIGTRAP instruction was executed . . . */
     ip --;
     Breakpoint *breakpoint = get_breakpoint_by_address(ip);
-    std::cout << "\tIP: " << std::hex << ip << std::dec << std::endl;
     if(!breakpoint) {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
     }
-    Misc::Message(Misc::Message::DEBUG_MESSAGE, "handle_breakpoint() found a breakpoint . . .");
-    
     /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
     set_register(ASM::Register::RIP, ip);
     
@@ -311,8 +275,6 @@ Word Portal::get_libc_offset() {
     map_file = Misc::StreamAsString() << "/proc/" << pid << "/maps";
     std::ifstream map_stream(map_file.c_str());
     if(!map_stream.is_open()) throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't open " << map_file << ", perhaps permissions are screwy?");
-    
-    /*std::cout << "Memory map: " << std::endl;*/
     
     /* Example memory map excerpt (from bash):
         00400000-004d5000 r-xp 00000000 08:06 71555                              /bin/bash
@@ -344,10 +306,6 @@ Word Portal::get_libc_offset() {
         line_stream >> device;
         line_stream >> inode;
         line_stream >> path;
-        /*std::cout << "\tLibrary path is \"" << path << "\"\n";
-        std::cout << "\tAddress range is: 0x" << std::hex << from << " to 0x" << to << " (size 0x" << to-from << ")" << std::endl;
-        std::cout << "\tMap mode is: \"" << mode << "\"\n";
-        std::cout << std::dec << std::endl;*/
         if(Misc::String::begins_with(path, "/lib/libc")) {
             if(mode == "r-xp") libc_offset = from;
         }
