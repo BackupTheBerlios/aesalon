@@ -13,7 +13,7 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     overview = new ActiveSessionOverview(session);
     this->addTab(overview, tr("&Overview"));
     block_view = new ActiveSessionBlockView(this);
-    this->addTab(block_view, tr("Current &blocks"));
+    this->addTab(block_view, tr("&Flat block view"));
     
     status = WAITING_FOR_CONNECTION;
     connect(this, SIGNAL(status_changed(QString)), overview, SLOT(update_status(QString)));
@@ -27,7 +27,8 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     memory = new ActiveSessionMemory(this);
     
     connect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), overview, SLOT(memory_changed(ActiveSessionMemorySnapshot*)));
-    connect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), block_view, SLOT(update_content(ActiveSessionMemorySnapshot*)));
+    connect(block_view, SIGNAL(request_realtime(bool)), this, SLOT(change_block_view_update(bool)));
+    change_block_view_update(true);
 }
 
 ActiveSession::~ActiveSession() {
@@ -37,7 +38,6 @@ void ActiveSession::execute() {
     QSettings settings;
     
     QString command = "";
-    /* NOTE: reimplement this function */
 
     command += settings.value("xterm-path").toString();
     command += " -e ";
@@ -81,6 +81,14 @@ void ActiveSession::connect_to(QString host, int port) {
     connect(socket, SIGNAL(connected()), this, SLOT(socket_connection()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(socket_disconnection()));
     connect(socket, SIGNAL(received_data(QByteArray)), memory, SLOT(process_data(QByteArray)));
+}
+
+void ActiveSession::change_block_view_update(bool on) {
+    if(on) {
+        connect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), block_view, SLOT(update_content(ActiveSessionMemorySnapshot*)));
+        block_view->update_content(memory->get_current_snapshot());
+    }
+    else disconnect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), block_view, SLOT(update_content(ActiveSessionMemorySnapshot*)));
 }
 
 void ActiveSession::socket_connection() {

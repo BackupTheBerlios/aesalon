@@ -47,6 +47,8 @@ public:
     QDateTime get_start_time() const { return start_time; }
     
     void connect_to(QString host, int port);
+private slots:
+    void change_block_view_update(bool on);
 public slots:
     void terminate_session() { emit close_session(this); }
     void socket_connection();

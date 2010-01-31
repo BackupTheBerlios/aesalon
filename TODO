@@ -1,6 +1,8 @@
 Monitor:
 - Fix Breakpoint's method of storing observers to be more efficient
 - Implement proper taint-tracking so references can be calculated
+- Record location a block is allocated?
 GUI:
 - Embed Konsole inside ActiveSession?
 - Add "temporary sessions", e.g. sessions that aren't saved
+

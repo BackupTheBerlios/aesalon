@@ -31,4 +31,3 @@ void ActiveSessionOverview::memory_changed(ActiveSessionMemorySnapshot *snapshot
         + QString().setNum(snapshot->get_deallocations()) + "/" + QString().setNum(snapshot->get_reallocations()));
     active_blocks->setText(QString().setNum(snapshot->get_blocks()));
 }
-

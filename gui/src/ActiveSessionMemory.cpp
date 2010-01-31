@@ -58,14 +58,9 @@ ActiveSessionMemorySnapshot *ActiveSessionMemorySnapshot::find_changed(ActiveSes
 ActiveSessionMemorySnapshot *ActiveSessionMemorySnapshot::find_removed(ActiveSessionMemorySnapshot *from) {
     ActiveSessionMemorySnapshot *ret = new ActiveSessionMemorySnapshot();
     
-    qDebug("find_removed(): this size is %i, from size is %i", get_blocks(), from->get_blocks());
-    
     for(block_list_t::const_iterator i = from->block_list.begin(); i != from->block_list.end(); i ++) {
-        qDebug("checking address %x . . .", (*i)->get_address());
         if(get_block((*i)->get_address()) == NULL) ret->add_block(*i);
-        else qDebug("found in both, continuing . . .");
     }
-    qDebug("Returning from find_removed(), ret->get_blocks() is %i", ret->get_blocks());
     return ret;
 }
 
@@ -135,5 +130,34 @@ void ActiveSessionMemory::process_data(QByteArray data) {
         /* And push it onto the current-event queue. */
         current_queue.enqueue(command);
     }
+    /* If it's more than 1000 events on the queue, then push the current snapshot onto the snapshot queue and clear the event queue . . . */
+    if(current_queue.size() > 1000) {
+        snapshot_queue.enqueue(get_current_snapshot()->clone());
+        current_queue.clear();
+    }
+    /* Store a maximum of 10 snapshots on the snapshot queue . . . */
+    if(snapshot_queue.size() >= 10) {
+        ActiveSessionMemorySnapshot *snapshot = new ActiveSessionMemorySnapshot();
+        snapshot_queue[snapshot_queue.size()-1]->apply_to(snapshot);
+        snapshot_queue.clear();
+        unbounded_snapshot_queue.enqueue(snapshot);
+    }
     emit memory_changed(get_current_snapshot());
+}
+
+ActiveSessionMemorySnapshot *ActiveSessionMemory::get_snapshot_for(QDateTime time) const {
+    ActiveSessionMemoryCommand *command = NULL;
+    for(int x = 0; x < snapshot_queue.size(); x ++) {
+        if(time <= snapshot_queue[x]->get_associated_time()) command = snapshot_queue[x];
+        else break;
+    }
+    if(command) return (dynamic_cast<ActiveSessionMemorySnapshot *>(command))->clone();
+    
+    ActiveSessionMemorySnapshot *snapshot = new ActiveSessionMemorySnapshot();
+    for(int x = 0; x < current_queue.size(); x ++) {
+        if(time <= current_queue[x]->get_associated_time()) current_queue[x]->apply_to(snapshot);
+        else break;
+    }
+    
+    return snapshot;
 }

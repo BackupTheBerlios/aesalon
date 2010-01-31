@@ -5,14 +5,14 @@
 #include "MainArea.h"
 #include "Configuration.h"
 
-
-
-
 MainWindow::MainWindow(QWidget *parent) {
     QSettings settings;
     setup_menus();
     setCentralWidget(new MainArea());
-    this->showMaximized();
+    /*this->showMaximized();*/
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setMinimumSize(400, 200);
+    setGeometry(0, 0, 800, 300);
 }
 
 void MainWindow::setup_menus() {

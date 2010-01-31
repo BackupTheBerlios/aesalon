@@ -82,6 +82,12 @@ public:
     virtual ~ActiveSessionMemory() {}
     
     ActiveSessionMemorySnapshot *get_current_snapshot() const { return current_snapshot; }
+    /** Returns a snapshot of all of the events up until a given time.
+        @param time The time to search for.
+        @return A new snapshot, consisting of the memory at the given time. The caller
+            is required to free this object.
+    */
+    ActiveSessionMemorySnapshot *get_snapshot_for(QDateTime time) const;
 public slots:
     void process_data(QByteArray data);
 signals:
