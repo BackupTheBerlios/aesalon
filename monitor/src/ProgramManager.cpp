@@ -1,14 +1,13 @@
 #include <iostream>
 #include <signal.h>
 #include "ProgramManager.h"
+#include "Initializer.h"
 
 ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
     : argument_list(argument_list), running(false), ptrace_portal(NULL) {
     
     elf_parser = new ELF::Parser(argument_list->get_argument(0));
-    /*std::string libc_path = Misc::ArgumentParser::get_instance()->get_argument("libc path").to<Misc::StringArgument>()->get_value();*/
-    std::string libc_path = LIBC_PATH;
-    libc_parser = new ELF::Parser(libc_path);
+    libc_parser = new ELF::Parser(Initializer::get_instance()->get_argument_parser()->get_argument("libc-path")->get_data());
     disassembler = new ASM::Disassembler(elf_parser);
     
     disassembler->get_symbol_il("main");
