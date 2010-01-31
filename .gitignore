@@ -5,6 +5,7 @@
 *.so
 .gdb_history
 core
+vgcore.*
 *.sr.orig
 
 # Buildsystem (CMake) ignores

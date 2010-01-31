@@ -8,6 +8,7 @@
 #include <QTimer>
 
 #include "Session.h"
+#include "ActiveSessionMemory.h"
 
 class ActiveSessionOverview : public QWidget { Q_OBJECT
 private:
@@ -16,12 +17,12 @@ private:
     QLabel *status;
     QLabel *allocation_info;
     QLabel *active_blocks;
-    quint32 allocations, deallocations;
 public:
     ActiveSessionOverview(Session *session, QWidget *parent = 0);
     virtual ~ActiveSessionOverview() {}
 public slots:
     void update_status(QString new_status);
+    void memory_changed(ActiveSessionMemorySnapshot *snapshot);
 };
 
 #endif

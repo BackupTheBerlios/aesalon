@@ -23,7 +23,8 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     connect(close_tab, SIGNAL(activated()), this, SLOT(terminate_session()));
     
     memory = new ActiveSessionMemory(this);
-    connect(memory, SIGNAL(diff_processed(ActiveSessionMemoryBlockDiff*)), block_view, SLOT(process_diff(ActiveSessionMemoryBlockDiff*)));
+    
+    connect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), overview, SLOT(memory_changed(ActiveSessionMemorySnapshot*)));
 }
 
 ActiveSession::~ActiveSession() {
@@ -67,7 +68,7 @@ void ActiveSession::execute() {
     for(int x = 0; x < argc; x ++) {
         delete argv[x];
     }
-    delete argv;
+    delete[] argv;
     
     connect_to("localhost", session->get_port());
 }

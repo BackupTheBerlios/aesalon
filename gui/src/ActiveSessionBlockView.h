@@ -11,7 +11,6 @@ public:
     ActiveSessionBlockView(QWidget* parent = 0);
     virtual ~ActiveSessionBlockView() {}
 public slots:
-    void process_diff(ActiveSessionMemoryBlockDiff *);
 };
 
 #endif

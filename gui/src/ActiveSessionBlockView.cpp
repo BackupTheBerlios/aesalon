@@ -14,7 +14,7 @@ ActiveSessionBlockView::ActiveSessionBlockView(QWidget *parent) : QTableWidget(p
     this->setSelectionMode(SingleSelection);
 }
 
-void ActiveSessionBlockView::process_diff(ActiveSessionMemoryBlockDiff *diff) {
+/*void ActiveSessionBlockView::process_diff(ActiveSessionMemoryBlockDiff *diff) {
     if(diff->get_type() == ActiveSessionMemoryBlockDiff::ALLOC_DIFF) {
         this->setRowCount(this->rowCount()+1);
         QTableWidgetItem *item = new QTableWidgetItem("0x" + QString().setNum(diff->get_address(), 16));
@@ -35,4 +35,4 @@ void ActiveSessionBlockView::process_diff(ActiveSessionMemoryBlockDiff *diff) {
             item(items[0]->row(), 1)->setText(QString().setNum(diff->get_size()));
         }
     }
-}
+}*/
