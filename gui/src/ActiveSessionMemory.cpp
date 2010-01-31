@@ -3,6 +3,15 @@
 #include "ActiveSessionMemory.h"
 #include "ActiveSessionMemory.moc"
 
+ActiveSessionMemorySnapshot *ActiveSessionMemorySnapshot::clone() const {
+    ActiveSessionMemorySnapshot *ret = new ActiveSessionMemorySnapshot();
+    for(block_list_t::const_iterator i = block_list.begin(); i != block_list.end(); i ++) {
+        ret->add_block(new ActiveSessionMemoryBlock((*i)->get_address(), (*i)->get_size()));
+    }
+    ret->set_associated_time(get_associated_time());
+    return ret;
+}
+
 void ActiveSessionMemorySnapshot::add_block(ActiveSessionMemoryBlock *block) {
     block_list.append(block);
 }
@@ -34,6 +43,30 @@ void ActiveSessionMemorySnapshot::apply_to(ActiveSessionMemorySnapshot *memory) 
 
 void ActiveSessionMemorySnapshot::unapply_from(ActiveSessionMemorySnapshot *memory) {
     qWarning("Warning: Asked to unapply snapshot from snapshot");
+}
+
+ActiveSessionMemorySnapshot *ActiveSessionMemorySnapshot::find_changed(ActiveSessionMemorySnapshot *from) {
+    ActiveSessionMemorySnapshot *ret = new ActiveSessionMemorySnapshot();
+    
+    for(block_list_t::const_iterator i = block_list.begin(); i != block_list.end(); i ++) {
+        ActiveSessionMemoryBlock *block = from->get_block((*i)->get_address());
+        if(!block || block->get_size() != (*i)->get_size()) ret->add_block(*i);
+    }
+    return ret;
+}
+
+ActiveSessionMemorySnapshot *ActiveSessionMemorySnapshot::find_removed(ActiveSessionMemorySnapshot *from) {
+    ActiveSessionMemorySnapshot *ret = new ActiveSessionMemorySnapshot();
+    
+    qDebug("find_removed(): this size is %i, from size is %i", get_blocks(), from->get_blocks());
+    
+    for(block_list_t::const_iterator i = from->block_list.begin(); i != from->block_list.end(); i ++) {
+        qDebug("checking address %x . . .", (*i)->get_address());
+        if(get_block((*i)->get_address()) == NULL) ret->add_block(*i);
+        else qDebug("found in both, continuing . . .");
+    }
+    qDebug("Returning from find_removed(), ret->get_blocks() is %i", ret->get_blocks());
+    return ret;
 }
 
 ActiveSessionMemory::ActiveSessionMemory(QObject *parent) : QObject(parent), current_snapshot(NULL) {

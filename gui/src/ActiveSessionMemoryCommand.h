@@ -10,10 +10,10 @@ class ActiveSessionMemoryCommand {
 private:
     QDateTime associated_time;
 public:
-    enum command_type_e {
+    /*enum command_type_e {
         SNAPSHOT,
         BLOCK
-    };
+    };*/
     ActiveSessionMemoryCommand(QDateTime associated_time = QDateTime::currentDateTime())
         : associated_time(associated_time) {}
     virtual ~ActiveSessionMemoryCommand() {}

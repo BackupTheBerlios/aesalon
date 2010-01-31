@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTabWidget>
+#include <QDateTime>
 
 #include "Session.h"
 #include "ActiveSessionSocket.h"
@@ -26,6 +27,8 @@ private:
     ActiveSessionBlockView *block_view;
     ActiveSessionMemory *memory;
     
+    QDateTime start_time;
+    
     status_e status;
     void set_status(status_e new_status) {
         if(new_status == status) return;
@@ -40,6 +43,8 @@ public:
     
     status_e get_status() const { return status; }
     QString get_status_as_string() const;
+    
+    QDateTime get_start_time() const { return start_time; }
     
     void connect_to(QString host, int port);
 public slots:
