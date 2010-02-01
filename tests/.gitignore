@@ -3,4 +3,4 @@ sleep_test
 sleep_malloc
 interactive_malloc_test
 realloc_test
-
+fib_benchmark
