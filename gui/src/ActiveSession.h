@@ -28,6 +28,7 @@ private:
     ActiveSessionMemory *memory;
     
     QDateTime start_time;
+    QDateTime finish_time;
     
     status_e status;
     void set_status(status_e new_status) {
@@ -49,6 +50,7 @@ public:
     void connect_to(QString host, int port);
 private slots:
     void change_block_view_update(bool on);
+    void block_view_time_data_requested(QDateTime time);
 public slots:
     void terminate_session() { emit close_session(this); }
     void socket_connection();
@@ -56,6 +58,8 @@ public slots:
 signals:
     void close_session(ActiveSession *session);
     void status_changed(QString new_status);
+    void started(QDateTime time);
+    void finished(QDateTime time);
 };
 
 #endif

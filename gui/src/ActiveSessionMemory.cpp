@@ -148,14 +148,16 @@ void ActiveSessionMemory::process_data(QByteArray data) {
 ActiveSessionMemorySnapshot *ActiveSessionMemory::get_snapshot_for(QDateTime time) const {
     ActiveSessionMemoryCommand *command = NULL;
     for(int x = 0; x < snapshot_queue.size(); x ++) {
-        if(time <= snapshot_queue[x]->get_associated_time()) command = snapshot_queue[x];
+        if(snapshot_queue[x]->get_associated_time() <= time) command = snapshot_queue[x];
         else break;
     }
     if(command) return (dynamic_cast<ActiveSessionMemorySnapshot *>(command))->clone();
     
     ActiveSessionMemorySnapshot *snapshot = new ActiveSessionMemorySnapshot();
     for(int x = 0; x < current_queue.size(); x ++) {
-        if(time <= current_queue[x]->get_associated_time()) current_queue[x]->apply_to(snapshot);
+        if(current_queue[x]->get_associated_time() <= time) {
+            current_queue[x]->apply_to(snapshot);
+        }
         else break;
     }
     

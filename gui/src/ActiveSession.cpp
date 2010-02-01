@@ -22,13 +22,16 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     QShortcut *close_tab = new QShortcut(Qt::Key_W + Qt::CTRL, this);
     connect(close_tab, SIGNAL(activated()), this, SLOT(terminate_session()));
     
-    start_time = QDateTime::currentDateTime();
-    
     memory = new ActiveSessionMemory(this);
     
     connect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), overview, SLOT(memory_changed(ActiveSessionMemorySnapshot*)));
     connect(block_view, SIGNAL(request_realtime(bool)), this, SLOT(change_block_view_update(bool)));
+    connect(block_view, SIGNAL(request_time_data(QDateTime)), this, SLOT(block_view_time_data_requested(QDateTime)));
     change_block_view_update(true);
+    
+    connect(this, SIGNAL(started(QDateTime)), block_view, SLOT(started(QDateTime)));
+    connect(this, SIGNAL(finished(QDateTime)), block_view, SLOT(finished(QDateTime)));
+    connect(this, SIGNAL(started(QDateTime)), overview, SLOT(set_start_time(QDateTime)));
 }
 
 ActiveSession::~ActiveSession() {
@@ -91,12 +94,20 @@ void ActiveSession::change_block_view_update(bool on) {
     else disconnect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), block_view, SLOT(update_content(ActiveSessionMemorySnapshot*)));
 }
 
+void ActiveSession::block_view_time_data_requested(QDateTime time) {
+    block_view->update_content(memory->get_snapshot_for(time));
+}
+
 void ActiveSession::socket_connection() {
     set_status(CONNECTED);
+    start_time = QDateTime::currentDateTime();
+    emit started(start_time);
 }
 
 void ActiveSession::socket_disconnection() {
     set_status(CONNECTION_CLOSED);
+    finish_time = QDateTime::currentDateTime();
+    emit finished(finish_time);
 }
 
 QString ActiveSession::get_status_as_string() const {

@@ -17,12 +17,15 @@ private:
     QLabel *status;
     QLabel *allocation_info;
     QLabel *active_blocks;
+    QDateTime start_time, finish_time;
 public:
     ActiveSessionOverview(Session *session, QWidget *parent = 0);
     virtual ~ActiveSessionOverview() {}
 public slots:
     void update_status(QString new_status);
     void memory_changed(ActiveSessionMemorySnapshot *snapshot);
+    void set_start_time(QDateTime time) { start_time = time; }
+    void set_finish_time(QDateTime time) { finish_time = time; }
 };
 
 #endif
