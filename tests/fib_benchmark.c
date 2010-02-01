@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     for(; x < MAX; x ++) {
         fib_numbers = realloc(fib_numbers, sizeof(struct number_t) * (x+3));
         fib_numbers[x+2] = add_numbers(fib_numbers[x], fib_numbers[x+1]);
-        if(!(x%1000)) printf("Calculated %dth fibonacci . . .\n", x+3);
+        if(!(x%100)) printf("Calculated %dth fibonacci . . .\n", x+3);
     }
 
     printf("%ith fibonacci number is %s.\n", x, print_number(fib_numbers[x-1]));

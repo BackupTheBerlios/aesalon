@@ -2,6 +2,7 @@ Monitor:
 - Fix Breakpoint's method of storing observers to be more efficient
 - Implement proper taint-tracking so references can be calculated
 - Record location a block is allocated?
+- Figure out why select() in ServerSocket::accept_connections mistakenly detects a connection
 GUI:
 - Embed Konsole inside ActiveSession?
 - Add "temporary sessions", e.g. sessions that aren't saved

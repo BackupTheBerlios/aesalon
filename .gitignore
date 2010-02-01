@@ -23,3 +23,6 @@ install_manifest.txt
 # Valgrind file ignores
 valgrind.*
 
+# gprof ignores
+gmon.out
+profile.*

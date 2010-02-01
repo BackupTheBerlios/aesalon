@@ -2,6 +2,10 @@ add_definitions(-std=c++0x -W -Wall -ansi -pedantic -Wno-unused-parameter -Wno-l
 add_definitions(-DAESALON_MAJOR_VERSION="${AESALON_MAJOR_VERSION}" -DAESALON_MINOR_VERSION="${AESALON_MINOR_VERSION}" -DAESALON_PATCHLEVEL="${AESALON_PATCHLEVEL}" -DAESALON_PLATFORM=${AESALON_PLATFORM})
 add_definitions(-DAESALON_PLATFORM_x86=0 -DAESALON_PLATFORM_x86_64=1)
 
+if(PROFILE_BUILD)
+    add_definitions(-pg)
+endif(PROFILE_BUILD)
+
 if(DEVELOPMENT_BUILD)
     add_definitions(-DAESALON_DEV_BUILD)
 endif(DEVELOPMENT_BUILD)
@@ -33,3 +37,7 @@ set(SOURCES
 )
 
 add_executable(aesalon ${SOURCES})
+
+if(PROFILE_BUILD)
+    set_target_properties(aesalon PROPERTIES LINK_FLAGS -pg)
+endif(PROFILE_BUILD)

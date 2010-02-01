@@ -81,10 +81,13 @@ void ServerSocket::accept_connections() {
     
     while(select(socket_fd+1, &read_set, NULL, NULL, &tv)) {
         if(FD_ISSET(socket_fd, &read_set)) {
+            std::cout << "Socket wants a connection!" << std::endl;
             s_fd = accept(socket_fd, NULL, 0);
             socket_list.push_back(new Socket(s_fd));
         }
         read_set = listen_set;
+        tv.tv_sec = 0;
+        tv.tv_usec = 0;
     }
 }
 

@@ -188,24 +188,25 @@ Breakpoint *Portal::get_breakpoint_by_id(std::size_t which) const {
 }
 
 Breakpoint *Portal::get_breakpoint_by_address(Word address) const {
-    for(breakpoint_list_t::const_iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
-        if((*i)->get_address() == address) return *i;
+    Breakpoint * const *bp = &breakpoint_list[0];
+    for(std::size_t x = 0; x < breakpoint_list.size(); x ++) {
+        if(bp[x]->get_address() == address) return bp[x];
     }
+    /*for(breakpoint_list_t::const_iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
+        if((*i)->get_address() == address) return *i;
+    }*/
     return NULL;
 }
 
 
 void Portal::handle_signal() {
-    int signal;
     int status = wait_for_signal();
-    if(!WIFEXITED(status) && WIFSTOPPED(status)) {
-        siginfo_t signal_info;
-        if(ptrace(PTRACE_GETSIGINFO, pid, NULL, &signal_info) == -1) {
-            throw Exception::PTraceException(Misc::StreamAsString() << "Failed to get signal information: " << strerror(errno));
-        }
-        signal = signal_info.si_signo;
+    int signal;
+    if(WIFSTOPPED(status)) {
+        signal = WSTOPSIG(status);
     }
-    else signal = -1;
+    else if(WIFSIGNALED(status)) signal = WTERMSIG(status);
+    else if(WIFEXITED(status)) signal = -1;
     
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;

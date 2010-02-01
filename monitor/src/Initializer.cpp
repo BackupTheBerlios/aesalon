@@ -106,6 +106,6 @@ void Initializer::run() {
         if(event_queue->peek_event()) {
             get_socket()->send_data(event_queue);
         }
-        server_socket->accept_connections();
+        /*server_socket->accept_connections();*/
     }
 }

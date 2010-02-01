@@ -33,7 +33,7 @@ public:
         @param offset How many bytes to ignore when determining the address.
         @return The block data, @a offset bytes in.
     */
-    Byte *get_data(std::size_t offset = 0) { return &data[offset]; }
+    Byte *get_data() { return &data[0]; }
     
     /** Retrieves the size of the current data.
         @return The current size of the referenced data.

@@ -16,7 +16,7 @@ SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
             Elf64_Sym sym;
             symbol_block->read(&sym, sizeof(sym));
             
-            char *name = (char *)elf_parser->get_section(".strtab")->get_content()->get_data(sym.st_name);
+            char *name = (char *)(elf_parser->get_section(".strtab")->get_content()->get_data() + sym.st_name);
             if(sym.st_value) symbol_vector.push_back(new Symbol(name, sym.st_value, sym.st_size));
         }
     }
@@ -44,7 +44,7 @@ SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
             Elf64_Sym sym;
             symbol_block->read(&sym, sizeof(sym));
             
-            char *name = (char *)elf_parser->get_section(".dynstr")->get_content()->get_data(sym.st_name);
+            char *name = (char *)&elf_parser->get_section(".dynstr")->get_content()->get_data()[sym.st_name];
             /*if(!std::strcmp(name, "malloc")) {
                 std::cout << "malloc symbol:" << std::endl;
                 std::cout << "\tdynamic_offset is: " << dynamic_offsets[index] << std::endl;
