@@ -63,7 +63,7 @@ public:
     void hexdump();
     
     void resize(std::size_t new_size) {
-        data.resize(new_size, 0);
+        data.resize(new_size);
     }
     
     void push_word(Word data);

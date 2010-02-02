@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <errno.h>
 #include <signal.h>
+#include <fcntl.h>
+
 #include <cstring>
 #include <iostream>
 #include <fstream>
@@ -39,6 +41,9 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
             throw Exception::PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
         }
     }
+    /*std::string mem_filename = Misc::StreamAsString() << "/proc/" << pid << "/mem";
+    read_fd = open(mem_filename.c_str(), O_RDONLY);
+    if(read_fd == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Failed to open " << mem_filename << ":" << strerror(errno));*/
     
     /*ptrace(PTRACE_SETOPTIONS, pid, 0, PTRACE_O_TRACESYSGOOD);*/
     
@@ -64,6 +69,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
 }
 
 Portal::~Portal() {
+    /*close(read_fd);*/
     delete realloc_observer;
     delete free_observer;
     delete malloc_observer;
@@ -126,6 +132,10 @@ Word Portal::read_memory(Word address) const {
     Word return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
     if(return_value == Word(-1) && errno != 0)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
+    /*Word return_value;
+    lseek(read_fd, address, SEEK_SET);
+    if(read(read_fd, &return_value, sizeof(return_value)) == -1)
+        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));*/
     return return_value;
 }
 

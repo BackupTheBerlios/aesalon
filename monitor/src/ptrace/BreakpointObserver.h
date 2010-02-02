@@ -9,8 +9,12 @@ class BreakpointObserver {
 public:
     BreakpointObserver() {}
     virtual ~BreakpointObserver() {}
-    
-    virtual void handle_breakpoint(Breakpoint *breakpoint) = 0;
+
+    /** Process a breakpoint event.
+        @param breakpoint The breakpoint that triggered itself.
+        @return True if the observer is still valid.
+    */
+    virtual bool handle_breakpoint(Breakpoint *breakpoint) = 0;
 };
 
 } // namespace PTrace

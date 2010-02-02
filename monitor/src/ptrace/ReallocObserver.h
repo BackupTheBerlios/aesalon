@@ -7,7 +7,7 @@ namespace PTrace {
 
 class ReallocObserver : public BreakpointObserver {
 public:
-    virtual void handle_breakpoint(Breakpoint *breakpoint);
+    virtual bool handle_breakpoint(Breakpoint *breakpoint);
 };
 
 } // namespace PTrace

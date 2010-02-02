@@ -5,7 +5,7 @@
 
 namespace PTrace {
 
-void ReallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
+bool ReallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     Portal *portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
     
     static Word last_size = 0;
@@ -16,7 +16,7 @@ void ReallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
         Initializer::get_instance()->get_event_queue()->push_event(
             new Event::BlockEvent(Event::BlockEvent::REALLOC_EVENT,
             last_address, last_size, portal->get_register(ASM::Register::RAX)));
-        return;
+        return false;
     }
     Word rsp = portal->get_register(ASM::Register::RSP);
     Word return_address = portal->read_memory(rsp);
@@ -25,7 +25,7 @@ void ReallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     portal->place_breakpoint(return_address, this);
     last_size = portal->get_register(ASM::Register::RSI);
     last_address = portal->get_register(ASM::Register::RDI);
-    return;
+    return true;
 }
 
 } // namesapce PTrace

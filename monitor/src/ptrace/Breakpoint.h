@@ -1,7 +1,6 @@
 #ifndef AESALON_MONITOR_BREAKPOINT_H
 #define AESALON_MONITOR_BREAKPOINT_H
 
-#include <set>
 #include <vector>
 
 #include "Types.h"
@@ -11,7 +10,7 @@ namespace PTrace {
 
 class Breakpoint {
 protected:
-    typedef std::set<BreakpointObserver *> observer_list_t;
+    typedef std::vector<BreakpointObserver *> observer_list_t;
 private:
     Word address;
     Byte original;
@@ -33,12 +32,8 @@ public:
     void set_valid(bool new_validity) { valid = new_validity; }
     
     void add_observer(BreakpointObserver *observer)
-        { observer_list.insert(observer); this->set_valid(true); }
-    void remove_observer(BreakpointObserver *observer) {
-        observer_list_t::iterator i = observer_list.find(observer);
-        if(i != observer_list.end()) observer_list.erase(i);
-        if(observer_list.size() == 0) this->set_valid(false);
-    }
+        { observer_list.push_back(observer); set_valid(true); }
+    void remove_observer(BreakpointObserver *observer);
     
     void notify();
 };
