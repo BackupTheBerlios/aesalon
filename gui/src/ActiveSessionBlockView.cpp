@@ -4,7 +4,6 @@
 ActiveSessionBlockView::ActiveSessionBlockView(QWidget *parent) : QWidget(parent) {
     finish_time.setTime_t(0);
     start_time.setTime_t(0);
-    displayed_memory = new ActiveSessionMemorySnapshot();
     
     main_layout = new QVBoxLayout();
     

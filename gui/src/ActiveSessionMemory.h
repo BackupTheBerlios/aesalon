@@ -5,22 +5,55 @@
 #include <QDateTime>
 
 #include <QList>
+#include <QSet>
 
 #include "ActiveSessionMemoryStorage.h"
 
+class ActiveSessionMemoryBlock {
+private:
+    StorageOffset offset;
+    quint64 address, size;
+public:
+    ActiveSessionMemoryBlock(StorageOffset offset, quint64 address, quint64 size)
+        : offset(offset), address(address), size(size) {}
+    ~ActiveSessionMemoryBlock() {}
+    
+    StorageOffset get_offset() const { return offset; }
+    quint64 get_address() const { return address; }
+    quint64 get_size() const { return size; }
+};
+
 class ActiveSessionMemorySnapshot {
 private:
+    ActiveSessionMemoryStorage *storage;
+    StorageOffset offset;
+    QSet<StorageOffset> content;
     quint64 allocations, deallocations, reallocations;
+    QDateTime timestamp;
 public:
-    ActiveSessionMemorySnapshot() : allocations(0), deallocations(0), reallocations(0) {}
+    ActiveSessionMemorySnapshot(ActiveSessionMemoryStorage *storage, StorageOffset offset, QDateTime timestamp)
+        : storage(storage), offset(offset), allocations(0), deallocations(0), reallocations(0), timestamp(timestamp) {}
     ~ActiveSessionMemorySnapshot() {}
+    
+    StorageOffset get_offset() const { return offset; }
+    
+    QDateTime get_timestamp() const { return timestamp; }
+    void set_timestamp(QDateTime new_timestamp) { timestamp = new_timestamp; }
+    
+    void add_block(quint64 address, quint64 size);
+    void add_block(ActiveSessionMemoryBlock *block);
+    ActiveSessionMemoryBlock *get_block(StorageOffset offset);
+    void remove_block(ActiveSessionMemoryBlock *block);
     
     quint64 get_allocations() const { return allocations; }
     void set_allocations(quint64 new_allocations) { allocations = new_allocations; }
+    void inc_allocations() { allocations ++; }
     quint64 get_deallocations() const { return deallocations; }
     void set_deallocations(quint64 new_deallocations) { deallocations = new_deallocations; }
+    void inc_deallocations() { deallocations ++; }
     quint64 get_reallocations() const { return reallocations; }
     void set_reallocations(quint64 new_reallocations) { reallocations = new_reallocations; }
+    void inc_reallocations() { reallocations ++; }
 };
 
 class ActiveSessionMemory : public QObject { Q_OBJECT
@@ -38,6 +71,8 @@ private:
 public:
     ActiveSessionMemory(QObject *parent = NULL);
     virtual ~ActiveSessionMemory();
+    
+    ActiveSessionMemoryStorage *get_storage() const { return storage; }
     
     ActiveSessionMemorySnapshot *get_current_memory() const { return current_memory; }
     /** Returns a snapshot of all of the events up until a given time.

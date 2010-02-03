@@ -3,11 +3,28 @@
 #include "ActiveSessionMemory.h"
 #include "ActiveSessionMemory.moc"
 
+void ActiveSessionMemorySnapshot::add_block(quint64 address, quint64 size) {
+    content.insert(storage->alloc_new_block(address, size)->get_offset());
+}
+
+void ActiveSessionMemorySnapshot::add_block(ActiveSessionMemoryBlock *block) {
+    content.insert(block->get_offset());
+}
+
+ActiveSessionMemoryBlock *ActiveSessionMemorySnapshot::get_block(StorageOffset offset) {
+    return storage->get_block_at(offset);
+}
+
+void ActiveSessionMemorySnapshot::remove_block(ActiveSessionMemoryBlock *block) {
+    if(block == NULL) return;
+    content.remove(block->get_offset());
+}
+
 ActiveSessionMemory::ActiveSessionMemory(QObject *parent) : QObject(parent), storage(NULL), current_memory(NULL), current_changes(NULL) {
     storage = new ActiveSessionMemoryStorage(ActiveSessionMemoryStorage::ALLOC_MODE_1M);
     
-    current_memory = new ActiveSessionMemorySnapshot();
-    current_changes = NULL;
+    current_memory = new ActiveSessionMemorySnapshot(storage, -1, QDateTime::currentDateTime());
+    current_changes = storage->alloc_new_snapshot();
 }
 
 ActiveSessionMemory::~ActiveSessionMemory() {
