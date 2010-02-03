@@ -2,9 +2,6 @@
 #include "Configuration.h"
 #include "Configuration.moc"
 
-
-
-
 Configuration::Configuration(QWidget *parent) : QDialog(parent) {
     QSizePolicy expanding;
     expanding.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -16,6 +13,7 @@ Configuration::Configuration(QWidget *parent) : QDialog(parent) {
     QSettings settings;
     main_layout = new QVBoxLayout();
     form_layout = new QFormLayout();
+    form_layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     
     aesalon_path_layout = new QHBoxLayout();
     aesalon_path = new QLineEdit();
@@ -49,6 +47,23 @@ Configuration::Configuration(QWidget *parent) : QDialog(parent) {
     
     form_layout->addRow("X terminal to use:", xterm_path_layout);
     
+    default_snapshot_interval = new QSpinBox();
+    default_snapshot_interval->setAlignment(Qt::AlignRight);
+    default_snapshot_interval->setMinimum(50);
+    default_snapshot_interval->setMaximum(60000);
+    default_snapshot_interval->setSuffix(tr("ms"));
+    default_snapshot_interval->setValue(settings.value("default-snapshot-interval", 1000).toInt());
+    form_layout->addRow("Default snapshot interval:", default_snapshot_interval);
+    
+    default_full_snapshot_interval = new QSpinBox();
+    default_full_snapshot_interval->setAlignment(Qt::AlignRight);
+    default_full_snapshot_interval->setMinimum(1);
+    default_full_snapshot_interval->setMaximum(1000);
+    default_full_snapshot_interval->setPrefix(tr("Every "));
+    default_full_snapshot_interval->setSuffix(tr(" snapshot(s)"));
+    default_full_snapshot_interval->setValue(settings.value("default-full-snapshot-interval", 100).toInt());
+    form_layout->addRow(tr("Default full snapshot interval:"), default_full_snapshot_interval);
+    
     main_layout->addLayout(form_layout);
     
     button_box = new QDialogButtonBox();
@@ -67,8 +82,7 @@ void Configuration::accept() {
     QSettings settings;
     settings.setValue("aesalon-path", aesalon_path->text());
     settings.setValue("xterm-path", xterm_path->text());
+    settings.setValue("default-snapshot-interval", default_snapshot_interval->value());
+    settings.setValue("default-full-snapshot-interval", default_full_snapshot_interval->value());
     QDialog::accept();
 }
-
-
-

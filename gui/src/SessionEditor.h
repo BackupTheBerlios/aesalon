@@ -44,6 +44,7 @@ private:
     
     QWidget *advanced_widget;
     QSpinBox *snapshot_interval;
+    QSpinBox *full_snapshot_interval;
 
     QDialogButtonBox *button_box;
     

@@ -1,4 +1,7 @@
 #include <stdlib.h>
+
+#include <QSettings>
+
 #include "SessionEditor.h"
 #include "SessionEditor.moc"
 
@@ -19,12 +22,14 @@ SessionEditor::SessionEditor(QWidget *parent, Session *session) : QDialog(parent
 }
 
 void SessionEditor::create_widgets() {
+    QSettings settings;
     layout = new QVBoxLayout();
     
     tab_bar = new QTabWidget();
     layout->addWidget(tab_bar);
     
     basic_form_layout = new QFormLayout();
+    basic_form_layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     
     session_name = new QLineEdit(session->get_session_name());
     basic_form_layout->addRow(tr("Session name:"), session_name);
@@ -60,10 +65,11 @@ void SessionEditor::create_widgets() {
     basic_form_layout->addRow(arguments_label, arguments);
     
     port = new QSpinBox();
+    port->setAlignment(Qt::AlignRight);
     port->setMinimum(1025);
     port->setMaximum(65535);
     if(session->get_port()) port->setValue(session->get_port());
-    else port->setValue(DEFAULT_PORT);
+    else port->setValue(settings.value("default-port", DEFAULT_PORT).toInt());
     basic_form_layout->addRow(tr("Port:"), port);
     
     basic_widget = new QWidget();
@@ -71,14 +77,26 @@ void SessionEditor::create_widgets() {
     tab_bar->addTab(basic_widget, tr("&Basic"));
     
     advanced_form_layout = new QFormLayout();
+    advanced_form_layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     
     snapshot_interval = new QSpinBox();
+    snapshot_interval->setAlignment(Qt::AlignRight);
     snapshot_interval->setMinimum(50);
     snapshot_interval->setMaximum(60000);
     snapshot_interval->setSuffix(tr("ms"));
     if(session->get_snapshot_interval()) snapshot_interval->setValue(session->get_snapshot_interval());
-    else snapshot_interval->setValue(1000);
+    else snapshot_interval->setValue(settings.value("default-snapshot-interval", 1000).toInt());
     advanced_form_layout->addRow(tr("Snapshot interval:"), snapshot_interval);
+    
+    full_snapshot_interval = new QSpinBox();
+    full_snapshot_interval->setAlignment(Qt::AlignRight);
+    full_snapshot_interval->setMinimum(1);
+    full_snapshot_interval->setMaximum(1000);
+    full_snapshot_interval->setPrefix(tr("Every "));
+    full_snapshot_interval->setSuffix(tr(" snapshot(s)"));
+    if(session->get_full_snapshot_interval()) full_snapshot_interval->setValue(session->get_full_snapshot_interval());
+    else full_snapshot_interval->setValue(settings.value("default-full-snapshot-interval", 100).toInt());
+    advanced_form_layout->addRow(tr("Full snapshot interval:"), full_snapshot_interval);
     
     advanced_widget = new QWidget();
     advanced_widget->setLayout(advanced_form_layout);
@@ -113,6 +131,7 @@ void SessionEditor::accept() {
     if(launch_session_type->isChecked()) session->set_session_type(Session::LAUNCH_SESSION);
     else session->set_session_type(Session::CONNECT_SESSION);
     session->set_snapshot_interval(snapshot_interval->value());
+    session->set_full_snapshot_interval(full_snapshot_interval->value());
     QDialog::accept();
 }
 

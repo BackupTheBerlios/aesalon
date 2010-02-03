@@ -54,12 +54,24 @@ ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::alloc_new_snapshot() {
     return snapshot;
 }
 
+ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::copy_snapshot(StorageOffset offset) {
+    while((data_size - unused_offset) < sizeof(ActiveSessionMemorySnapshot)) reserve_more_memory();
+    /* Utilize the default copy-constructor here . . . all data should be copied. */
+    ActiveSessionMemorySnapshot *snapshot = new(data + unused_offset) ActiveSessionMemorySnapshot(this, unused_offset, QDateTime::currentDateTime());
+    unused_offset += sizeof(ActiveSessionMemorySnapshot);
+    get_snapshot_at(offset)->copy_into(snapshot);
+    return snapshot;
+}
+
 ActiveSessionMemoryBlock *ActiveSessionMemoryStorage::get_block_at(StorageOffset offset) {
     if(data_types[offset] != BLOCK_DATA) return NULL;
     return reinterpret_cast<ActiveSessionMemoryBlock *>(data + offset);
 }
 
 ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::get_snapshot_at(StorageOffset offset) { 
-    if(data_types[offset] != SNAPSHOT_DATA) return NULL;
+    if(data_types[offset] != SNAPSHOT_DATA) {
+        qCritical("Asked to retrieve invalid snapshot!");
+        return NULL;
+    }
     return reinterpret_cast<ActiveSessionMemorySnapshot *>(data + offset);
 }

@@ -47,7 +47,7 @@ public:
     void add_block(quint64 address, quint64 size);
     void add_block(ActiveSessionMemoryBlock *block);
     void add_block(StorageOffset offset);
-    ActiveSessionMemoryBlock *get_block(StorageOffset offset);
+    ActiveSessionMemoryBlock *get_block(StorageOffset offset) const;
     void remove_block(ActiveSessionMemoryBlock *block);
     
     quint64 get_allocations() const { return allocations; }
@@ -59,6 +59,8 @@ public:
     quint64 get_reallocations() const { return reallocations; }
     void set_reallocations(quint64 new_reallocations) { reallocations = new_reallocations; }
     void inc_reallocations() { reallocations ++; }
+    
+    void copy_into(ActiveSessionMemorySnapshot *snapshot) const;
 };
 
 class ActiveSessionMemory : public QObject { Q_OBJECT

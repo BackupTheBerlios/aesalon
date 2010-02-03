@@ -46,6 +46,8 @@ public:
     ActiveSessionMemoryBlock *alloc_new_block(quint64 address, quint64 size);
     ActiveSessionMemorySnapshot *alloc_new_snapshot();
     
+    ActiveSessionMemorySnapshot *copy_snapshot(StorageOffset offset);
+    
     /** Returns the block at @a offset data offset.
         @param offset The offset to look for a block at.
         @return The block at @a offset, or NULL otherwise.

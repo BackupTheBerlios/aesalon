@@ -18,6 +18,7 @@ SessionManager::SessionManager(QWidget *parent) {
         session->set_arguments(settings.value("arguments").toString());
         session->set_port(settings.value("port").toInt());
         session->set_snapshot_interval(settings.value("snapshot-interval").toInt());
+        session->set_snapshot_interval(settings.value("full-snapshot-interval").toInt());
         session->set_session_type(Session::session_type_e(settings.value("session-type").toInt()));
         session_list.append(session);
     }
@@ -66,6 +67,7 @@ void SessionManager::save_sessions() {
         settings.setValue("arguments", session_list[i]->get_arguments());
         settings.setValue("port", session_list[i]->get_port());
         settings.setValue("snapshot-interval", session_list[i]->get_snapshot_interval());
+        settings.setValue("full-snapshot-interval", session_list[i]->get_full_snapshot_interval());
         settings.setValue("session-type", session_list[i]->get_session_type());
     }
     settings.endArray();

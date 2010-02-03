@@ -8,9 +8,7 @@
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QPushButton>
-
-
-
+#include <QSpinBox>
 
 class Configuration : public QDialog { Q_OBJECT
 private:
@@ -25,7 +23,8 @@ private:
     QPushButton *xterm_path_select_dialog;
     QFileDialog *xterm_path_file_selector;
     QDialogButtonBox *button_box;
-    
+    QSpinBox *default_snapshot_interval;
+    QSpinBox *default_full_snapshot_interval;
 public:
     Configuration(QWidget *parent = 0);
     virtual ~Configuration() {}    
@@ -39,8 +38,5 @@ private slots:
 public slots:
     void accept();
 };
-
-
-
 
 #endif
