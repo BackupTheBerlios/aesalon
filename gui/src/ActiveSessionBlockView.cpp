@@ -83,6 +83,7 @@ void ActiveSessionBlockView::slider_released() {
 }
 
 void ActiveSessionBlockView::update_content(ActiveSessionMemorySnapshot *memory) {
+#if 0
     ActiveSessionMemorySnapshot *change_difference = NULL;
     ActiveSessionMemorySnapshot *remove_difference = NULL;
     change_difference = memory->find_changed(displayed_memory);
@@ -116,6 +117,7 @@ void ActiveSessionBlockView::update_content(ActiveSessionMemorySnapshot *memory)
     delete change_difference;
     delete displayed_memory;
     displayed_memory = memory->clone();
+#endif
 }
 
 void ActiveSessionBlockView::started(QDateTime time) {

@@ -29,5 +29,5 @@ void ActiveSessionOverview::update_status(QString new_status) {
 void ActiveSessionOverview::memory_changed(ActiveSessionMemorySnapshot *snapshot) {
     allocation_info->setText(QString().setNum(snapshot->get_allocations()) + "/"
         + QString().setNum(snapshot->get_deallocations()) + "/" + QString().setNum(snapshot->get_reallocations()));
-    active_blocks->setText(QString().setNum(snapshot->get_blocks()));
+    /*active_blocks->setText(QString().setNum(snapshot->get_blocks()));*/
 }

@@ -89,7 +89,7 @@ void ActiveSession::connect_to(QString host, int port) {
 void ActiveSession::change_block_view_update(bool on) {
     if(on) {
         connect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), block_view, SLOT(update_content(ActiveSessionMemorySnapshot*)));
-        block_view->update_content(memory->get_current_snapshot());
+        block_view->update_content(memory->get_current_memory());
     }
     else disconnect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), block_view, SLOT(update_content(ActiveSessionMemorySnapshot*)));
 }

@@ -3,69 +3,16 @@
 #include "ActiveSessionMemory.h"
 #include "ActiveSessionMemory.moc"
 
-ActiveSessionMemorySnapshot *ActiveSessionMemorySnapshot::clone() const {
-    ActiveSessionMemorySnapshot *ret = new ActiveSessionMemorySnapshot();
-    for(block_list_t::const_iterator i = block_list.begin(); i != block_list.end(); i ++) {
-        ret->add_block(new ActiveSessionMemoryBlock((*i)->get_address(), (*i)->get_size()));
-    }
-    ret->set_associated_time(get_associated_time());
-    return ret;
-}
-
-void ActiveSessionMemorySnapshot::add_block(ActiveSessionMemoryBlock *block) {
-    block_list.append(block);
-}
-
-ActiveSessionMemoryBlock *ActiveSessionMemorySnapshot::get_block(quint64 address) const {
-    for(block_list_t::const_iterator i = block_list.begin(); i != block_list.end(); i ++) {
-        if((*i)->get_address() == address) return *i;
-    }
-    return NULL;
-}
-
-void ActiveSessionMemorySnapshot::remove_block(quint64 address) {
-    for(block_list_t::const_iterator i = block_list.begin(); i != block_list.end(); i ++) {
-        if((*i)->get_address() == address) {
-            block_list.removeOne(*i);
-            return;
-        }
-    }
-    qWarning("Warning: Asked to remove unknown block (address is %ul) from snapshot, block list size is %i", address, block_list.size());
-}
-
-void ActiveSessionMemorySnapshot::apply_to(ActiveSessionMemorySnapshot *memory) {
-    memory->block_list.clear();
-    for(block_list_t::const_iterator i = block_list.begin(); i != block_list.end(); i ++) {
-        memory->add_block(new ActiveSessionMemoryBlock((*i)->get_address(), (*i)->get_size()));
-    }
-    memory->set_associated_time(get_associated_time());
-}
-
-void ActiveSessionMemorySnapshot::unapply_from(ActiveSessionMemorySnapshot *memory) {
-    qWarning("Warning: Asked to unapply snapshot from snapshot");
-}
-
-ActiveSessionMemorySnapshot *ActiveSessionMemorySnapshot::find_changed(ActiveSessionMemorySnapshot *from) {
-    ActiveSessionMemorySnapshot *ret = new ActiveSessionMemorySnapshot();
+ActiveSessionMemory::ActiveSessionMemory(QObject *parent) : QObject(parent), storage(NULL), current_memory(NULL), current_changes(NULL) {
+    storage = new ActiveSessionMemoryStorage(ActiveSessionMemoryStorage::ALLOC_MODE_1M);
     
-    for(block_list_t::const_iterator i = block_list.begin(); i != block_list.end(); i ++) {
-        ActiveSessionMemoryBlock *block = from->get_block((*i)->get_address());
-        if(!block || block->get_size() != (*i)->get_size()) ret->add_block(*i);
-    }
-    return ret;
+    current_memory = new ActiveSessionMemorySnapshot();
+    current_changes = NULL;
 }
 
-ActiveSessionMemorySnapshot *ActiveSessionMemorySnapshot::find_removed(ActiveSessionMemorySnapshot *from) {
-    ActiveSessionMemorySnapshot *ret = new ActiveSessionMemorySnapshot();
-    
-    for(block_list_t::const_iterator i = from->block_list.begin(); i != from->block_list.end(); i ++) {
-        if(get_block((*i)->get_address()) == NULL) ret->add_block(*i);
-    }
-    return ret;
-}
-
-ActiveSessionMemory::ActiveSessionMemory(QObject *parent) : QObject(parent), current_snapshot(NULL) {
-    current_snapshot = new ActiveSessionMemorySnapshot();
+ActiveSessionMemory::~ActiveSessionMemory() {
+    delete storage;
+    delete current_memory;
 }
 
 quint64 ActiveSessionMemory::pop_uint64() {
@@ -93,6 +40,7 @@ quint64 ActiveSessionMemory::pop_uint64() {
 }
 
 void ActiveSessionMemory::process_data(QByteArray data) {
+#if 0
     unprocessed += data;
     while(unprocessed.size()) {
         ActiveSessionMemoryCommand *command = NULL;
@@ -143,23 +91,5 @@ void ActiveSessionMemory::process_data(QByteArray data) {
         unbounded_snapshot_queue.enqueue(snapshot);
     }
     emit memory_changed(get_current_snapshot());
-}
-
-ActiveSessionMemorySnapshot *ActiveSessionMemory::get_snapshot_for(QDateTime time) const {
-    ActiveSessionMemoryCommand *command = NULL;
-    for(int x = 0; x < snapshot_queue.size(); x ++) {
-        if(snapshot_queue[x]->get_associated_time() <= time) command = snapshot_queue[x];
-        else break;
-    }
-    if(command) return (dynamic_cast<ActiveSessionMemorySnapshot *>(command))->clone();
-    
-    ActiveSessionMemorySnapshot *snapshot = new ActiveSessionMemorySnapshot();
-    for(int x = 0; x < current_queue.size(); x ++) {
-        if(current_queue[x]->get_associated_time() <= time) {
-            current_queue[x]->apply_to(snapshot);
-        }
-        else break;
-    }
-    
-    return snapshot;
+#endif
 }
