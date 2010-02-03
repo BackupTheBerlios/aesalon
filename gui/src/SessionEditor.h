@@ -14,20 +14,21 @@
 #include <QSpinBox>
 #include <QButtonGroup>
 #include <QRadioButton>
+#include <QTabWidget>
 
 #include "Session.h"
-
-
-
 
 class SessionEditor : public QDialog { Q_OBJECT
 private:
     Session *session;
     
+    QTabWidget *tab_bar;
+    
     QVBoxLayout *layout;
-    QFormLayout *form_layout;
+    QFormLayout *basic_form_layout, *advanced_form_layout;
     QLineEdit *session_name;
     
+    QWidget *basic_widget;
     QHBoxLayout *session_type_layout;
     QButtonGroup *session_type_group;
     QRadioButton *launch_session_type;
@@ -40,6 +41,9 @@ private:
     QLabel *arguments_label;
     QLineEdit *arguments;
     QSpinBox *port;
+    
+    QWidget *advanced_widget;
+    QSpinBox *snapshot_interval;
 
     QDialogButtonBox *button_box;
     
@@ -61,8 +65,5 @@ public slots:
         else change_session_type(Session::CONNECT_SESSION);
     }
 };
-
-
-
 
 #endif

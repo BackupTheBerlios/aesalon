@@ -3,9 +3,6 @@
 
 #include <QString>
 
-
-
-
 class Session {
 public:
     enum session_type_e {
@@ -17,9 +14,10 @@ private:
     QString executable_path;
     QString arguments;
     int port;
+    int snapshot_interval;
     session_type_e session_type;
 public:
-    Session() : session_name(""), executable_path(""), arguments(""), port(0), session_type(LAUNCH_SESSION) {}
+    Session() : session_name(""), executable_path(""), arguments(""), port(0), snapshot_interval(0), session_type(LAUNCH_SESSION) {}
     virtual ~Session() {}
     
     QString get_session_name() const { return session_name; }
@@ -31,14 +29,14 @@ public:
     QString get_arguments() const { return arguments; }
     void set_arguments(const QString &new_arguments) { arguments = new_arguments; }
     
+    int get_snapshot_interval() const { return snapshot_interval; }
+    void set_snapshot_interval(int new_interval) { snapshot_interval = new_interval; }
+    
     session_type_e get_session_type() const { return session_type; }
     void set_session_type(session_type_e new_session_type) { session_type = new_session_type; }
     
     int get_port() const { return port; }
     void set_port(int new_port) { port = new_port; }
 };
-
-
-
 
 #endif

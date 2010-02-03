@@ -22,7 +22,7 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     QShortcut *close_tab = new QShortcut(Qt::Key_W + Qt::CTRL, this);
     connect(close_tab, SIGNAL(activated()), this, SLOT(terminate_session()));
     
-    memory = new ActiveSessionMemory(this);
+    memory = new ActiveSessionMemory(this, session);
     
     connect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), overview, SLOT(memory_changed(ActiveSessionMemorySnapshot*)));
     connect(block_view, SIGNAL(request_realtime(bool)), this, SLOT(change_block_view_update(bool)));
@@ -32,6 +32,8 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     connect(this, SIGNAL(started(QDateTime)), block_view, SLOT(started(QDateTime)));
     connect(this, SIGNAL(finished(QDateTime)), block_view, SLOT(finished(QDateTime)));
     connect(this, SIGNAL(started(QDateTime)), overview, SLOT(set_start_time(QDateTime)));
+    connect(this, SIGNAL(started(QDateTime)), memory, SLOT(started(QDateTime)));
+    connect(this, SIGNAL(finished(QDateTime)), memory, SLOT(finished(QDateTime)));
 }
 
 ActiveSession::~ActiveSession() {

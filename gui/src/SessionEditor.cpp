@@ -2,9 +2,6 @@
 #include "SessionEditor.h"
 #include "SessionEditor.moc"
 
-
-
-
 QString SessionEditor::last_directory = getenv("HOME");
 
 SessionEditor::SessionEditor(QWidget *parent, Session *session) : QDialog(parent), session(session) {
@@ -24,10 +21,13 @@ SessionEditor::SessionEditor(QWidget *parent, Session *session) : QDialog(parent
 void SessionEditor::create_widgets() {
     layout = new QVBoxLayout();
     
-    form_layout = new QFormLayout();
+    tab_bar = new QTabWidget();
+    layout->addWidget(tab_bar);
+    
+    basic_form_layout = new QFormLayout();
     
     session_name = new QLineEdit(session->get_session_name());
-    form_layout->addRow(tr("Session name:"), session_name);
+    basic_form_layout->addRow(tr("Session name:"), session_name);
     
     session_type_layout = new QHBoxLayout();
     session_type_group = new QButtonGroup();
@@ -44,7 +44,7 @@ void SessionEditor::create_widgets() {
     
     session_type_layout->addWidget(launch_session_type);
     session_type_layout->addWidget(connect_session_type);
-    form_layout->addRow(tr("Session type:"), session_type_layout);
+    basic_form_layout->addRow(tr("Session type:"), session_type_layout);
     
     executable_path_layout = new QHBoxLayout();
     executable_path = new QLineEdit(session->get_executable_path());
@@ -53,20 +53,36 @@ void SessionEditor::create_widgets() {
     connect(file_select_dialog, SIGNAL(pressed()), this, SLOT(show_file_select_dialog()));
     executable_path_layout->addWidget(file_select_dialog);
     executable_path_label = new QLabel(tr("Executable path:"));
-    form_layout->addRow(executable_path_label, executable_path_layout);
+    basic_form_layout->addRow(executable_path_label, executable_path_layout);
     
     arguments = new QLineEdit(session->get_arguments());
     arguments_label = new QLabel(tr("Arguments:"));
-    form_layout->addRow(arguments_label, arguments);
+    basic_form_layout->addRow(arguments_label, arguments);
     
     port = new QSpinBox();
     port->setMinimum(1025);
     port->setMaximum(65535);
     if(session->get_port()) port->setValue(session->get_port());
     else port->setValue(DEFAULT_PORT);
-    form_layout->addRow(tr("Port:"), port);
+    basic_form_layout->addRow(tr("Port:"), port);
     
-    layout->addLayout(form_layout);
+    basic_widget = new QWidget();
+    basic_widget->setLayout(basic_form_layout);
+    tab_bar->addTab(basic_widget, tr("&Basic"));
+    
+    advanced_form_layout = new QFormLayout();
+    
+    snapshot_interval = new QSpinBox();
+    snapshot_interval->setMinimum(50);
+    snapshot_interval->setMaximum(60000);
+    snapshot_interval->setSuffix(tr("ms"));
+    if(session->get_snapshot_interval()) snapshot_interval->setValue(session->get_snapshot_interval());
+    else snapshot_interval->setValue(1000);
+    advanced_form_layout->addRow(tr("Snapshot interval:"), snapshot_interval);
+    
+    advanced_widget = new QWidget();
+    advanced_widget->setLayout(advanced_form_layout);
+    tab_bar->addTab(advanced_widget, tr("&Advanced"));
     
     button_box = new QDialogButtonBox();
     button_box->addButton(QDialogButtonBox::Save);
@@ -96,6 +112,7 @@ void SessionEditor::accept() {
     session->set_port(port->value());
     if(launch_session_type->isChecked()) session->set_session_type(Session::LAUNCH_SESSION);
     else session->set_session_type(Session::CONNECT_SESSION);
+    session->set_snapshot_interval(snapshot_interval->value());
     QDialog::accept();
 }
 
@@ -123,6 +140,3 @@ void SessionEditor::change_session_type(Session::session_type_e new_type) {
         arguments_label->hide();
     }
 }
-
-
-

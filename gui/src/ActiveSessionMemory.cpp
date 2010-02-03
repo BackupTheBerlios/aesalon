@@ -11,6 +11,10 @@ void ActiveSessionMemorySnapshot::add_block(ActiveSessionMemoryBlock *block) {
     content.insert(block->get_offset());
 }
 
+void ActiveSessionMemorySnapshot::add_block(StorageOffset offset) {
+    content.insert(offset);
+}
+
 ActiveSessionMemoryBlock *ActiveSessionMemorySnapshot::get_block(StorageOffset offset) {
     return storage->get_block_at(offset);
 }
@@ -20,11 +24,16 @@ void ActiveSessionMemorySnapshot::remove_block(ActiveSessionMemoryBlock *block) 
     content.remove(block->get_offset());
 }
 
-ActiveSessionMemory::ActiveSessionMemory(QObject *parent) : QObject(parent), storage(NULL), current_memory(NULL), current_changes(NULL) {
+ActiveSessionMemory::ActiveSessionMemory(QObject *parent, Session *session)
+    : QObject(parent), session(session), storage(NULL), current_memory(NULL), current_changes(NULL) {
     storage = new ActiveSessionMemoryStorage(ActiveSessionMemoryStorage::ALLOC_MODE_1M);
     
     current_memory = new ActiveSessionMemorySnapshot(storage, -1, QDateTime::currentDateTime());
     current_changes = storage->alloc_new_snapshot();
+    
+    snapshot_timer = new QTimer(this);
+    connect(snapshot_timer, SIGNAL(timeout()), this, SLOT(save_snapshot()));
+    snapshot_timer->start(session->get_snapshot_interval());
 }
 
 ActiveSessionMemory::~ActiveSessionMemory() {
@@ -56,11 +65,33 @@ quint64 ActiveSessionMemory::pop_uint64() {
     return value;
 }
 
+void ActiveSessionMemory::save_snapshot() {
+    qDebug("Saving snapshot . . .");
+    /* In order to "save" the current snapshot, all that is required is to just
+        allocate a new "changed" snapshot. The old one's already stored. */
+    current_changes = storage->alloc_new_snapshot();
+}
+
+void ActiveSessionMemory::started(QDateTime time) {
+    snapshot_timer->start(session->get_snapshot_interval());
+}
+
+void ActiveSessionMemory::finished(QDateTime time) {
+    snapshot_timer->stop();
+    save_snapshot();
+}
+
 void ActiveSessionMemory::process_data(QByteArray data) {
-#if 0
+    enum {
+        /* block type is zero for allocations */
+        BLOCK_EVENT_ALLOC = 0,
+        /* block type is one for reallocations */
+        BLOCK_EVENT_REALLOC,
+        /* block type is two for deallocations */
+        BLOCK_EVENT_FREE
+    };
     unprocessed += data;
     while(unprocessed.size()) {
-        ActiveSessionMemoryCommand *command = NULL;
         char type = unprocessed[0];
         unprocessed.remove(0, 1);
         if(type & 0x01) {
@@ -68,45 +99,33 @@ void ActiveSessionMemory::process_data(QByteArray data) {
             quint64 address = 0;
             int block_type = (type & 0x06) >> 1;
             address = pop_uint64();
-            /* block type is zero for allocations */
-            if(block_type == 0) {
+            if(block_type == BLOCK_EVENT_ALLOC) {
                 quint64 size = pop_uint64();
-                command = new ActiveSessionMemoryBlockAllocation(QDateTime::currentDateTime(), address, size);
+                ActiveSessionMemoryBlock *block = storage->alloc_new_block(address, size);
+                current_memory->add_block(block);
+                current_changes->add_block(block);
             }
-            /* block type is one for reallocations */
-            else if(block_type == 1) {
+            else if(block_type == BLOCK_EVENT_REALLOC) {
                 quint64 new_size = pop_uint64();
                 quint64 new_address = pop_uint64();
-                ActiveSessionMemoryBlock *block = get_current_snapshot()->get_block(address);
+                ActiveSessionMemoryBlock *block = current_memory->get_block(address);
                 if(!block) continue;
-                command = new ActiveSessionMemoryBlockReallocation(QDateTime::currentDateTime(), address, new_address, block->get_size(), new_size);
+                current_memory->remove_block(block);
+                current_changes->add_block(-block->get_offset());
+                block = storage->alloc_new_block(new_address, new_size);
+                current_memory->add_block(block);
+                current_changes->add_block(block);
             }
-            /* block type is two for deallocations */
-            else if(block_type == 2) {
-                ActiveSessionMemoryBlock *block = get_current_snapshot()->get_block(address);
+            else if(block_type == BLOCK_EVENT_FREE) {
+                ActiveSessionMemoryBlock *block = current_memory->get_block(address);
                 if(!block) continue;
-                command = new ActiveSessionMemoryBlockDeallocation(QDateTime::currentDateTime(), address, block->get_size());
+                current_memory->remove_block(block);
+                current_changes->add_block(-block->get_offset());
             }
-            /* block type three is unused, also known as an error . . . */
+            /* block type three is unused, and is also known as an error . . . */
+            current_memory->set_timestamp(QDateTime::currentDateTime());
         }
-        if(command == NULL) continue;
-        /* Now, apply it to the current snapshot . . . */
-        command->apply_to(get_current_snapshot());
-        /* And push it onto the current-event queue. */
-        current_queue.enqueue(command);
     }
-    /* If it's more than 1000 events on the queue, then push the current snapshot onto the snapshot queue and clear the event queue . . . */
-    if(current_queue.size() > 1000) {
-        snapshot_queue.enqueue(get_current_snapshot()->clone());
-        current_queue.clear();
-    }
-    /* Store a maximum of 10 snapshots on the snapshot queue . . . */
-    if(snapshot_queue.size() >= 10) {
-        ActiveSessionMemorySnapshot *snapshot = new ActiveSessionMemorySnapshot();
-        snapshot_queue[snapshot_queue.size()-1]->apply_to(snapshot);
-        snapshot_queue.clear();
-        unbounded_snapshot_queue.enqueue(snapshot);
-    }
-    emit memory_changed(get_current_snapshot());
-#endif
+    
+    emit memory_changed(get_current_memory());
 }

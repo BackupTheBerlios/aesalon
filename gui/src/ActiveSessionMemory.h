@@ -3,10 +3,12 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QTimer>
 
 #include <QList>
 #include <QSet>
 
+#include "Session.h"
 #include "ActiveSessionMemoryStorage.h"
 
 class ActiveSessionMemoryBlock {
@@ -35,6 +37,8 @@ public:
         : storage(storage), offset(offset), allocations(0), deallocations(0), reallocations(0), timestamp(timestamp) {}
     ~ActiveSessionMemorySnapshot() {}
     
+    ActiveSessionMemoryStorage *get_storage() const { return storage; }
+    
     StorageOffset get_offset() const { return offset; }
     
     QDateTime get_timestamp() const { return timestamp; }
@@ -42,6 +46,7 @@ public:
     
     void add_block(quint64 address, quint64 size);
     void add_block(ActiveSessionMemoryBlock *block);
+    void add_block(StorageOffset offset);
     ActiveSessionMemoryBlock *get_block(StorageOffset offset);
     void remove_block(ActiveSessionMemoryBlock *block);
     
@@ -58,6 +63,7 @@ public:
 
 class ActiveSessionMemory : public QObject { Q_OBJECT
 private:
+    Session *session;
     QByteArray unprocessed;
     quint64 pop_uint64();
     
@@ -68,8 +74,11 @@ private:
     ActiveSessionMemorySnapshot *current_memory;
     /** The differences since the last pushed snapshot. */
     ActiveSessionMemorySnapshot *current_changes;
+    
+    QTimer *snapshot_timer;
+    QList<StorageOffset> snapshot_list;
 public:
-    ActiveSessionMemory(QObject *parent = NULL);
+    ActiveSessionMemory(QObject *parent, Session *session);
     virtual ~ActiveSessionMemory();
     
     ActiveSessionMemoryStorage *get_storage() const { return storage; }
@@ -81,8 +90,12 @@ public:
             is required to free this object.
     */
     ActiveSessionMemorySnapshot *get_snapshot_for(QDateTime time) const { return NULL; }
+private slots:
+    void save_snapshot();
 public slots:
     void process_data(QByteArray data);
+    void started(QDateTime time);
+    void finished(QDateTime time);
 signals:
     void memory_changed(ActiveSessionMemorySnapshot *current_snapshot);
 };
