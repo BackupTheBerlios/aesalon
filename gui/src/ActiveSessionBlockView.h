@@ -11,9 +11,11 @@
 #include <QTimer>
 
 #include "ActiveSessionMemory.h"
+#include "ActiveSessionMemoryStorage.h"
 
 class ActiveSessionBlockView : public QWidget { Q_OBJECT
 private:
+    ActiveSessionMemoryStorage *storage;
     ActiveSessionMemorySnapshot *displayed_memory;
     QTableWidget *block_table;
     QVBoxLayout *main_layout;
@@ -25,7 +27,7 @@ private:
     QDateTime finish_time;
     QTimer *update_timer;
 public:
-    ActiveSessionBlockView(QWidget* parent = 0);
+    ActiveSessionBlockView(QWidget* parent, ActiveSessionMemoryStorage *storage);
     virtual ~ActiveSessionBlockView() {}
 private slots:
     void realtime_checkbox_toggled(bool new_state);

@@ -15,8 +15,17 @@ void ActiveSessionMemorySnapshot::add_block(StorageOffset offset) {
     content.insert(offset);
 }
 
-ActiveSessionMemoryBlock *ActiveSessionMemorySnapshot::get_block(StorageOffset offset) const {
-    return storage->get_block_at(offset);
+ActiveSessionMemoryBlock *ActiveSessionMemorySnapshot::get_block(quint64 address) const {
+    foreach(StorageOffset offset, content) {
+        if(storage->get_offset_data_type(offset) == ActiveSessionMemoryStorage::BLOCK_DATA) {
+            if(storage->get_block_at(offset)->get_address() == address) return storage->get_block_at(offset);
+        }
+        else if(storage->get_offset_data_type(offset) == ActiveSessionMemoryStorage::SNAPSHOT_DATA) {
+            ActiveSessionMemoryBlock *block = storage->get_snapshot_at(offset)->get_block(address);
+            if(block) return block;
+        }
+    }
+    return NULL;
 }
 
 void ActiveSessionMemorySnapshot::remove_block(ActiveSessionMemoryBlock *block) {
@@ -30,6 +39,21 @@ void ActiveSessionMemorySnapshot::copy_into(ActiveSessionMemorySnapshot *snapsho
     snapshot->reallocations = reallocations;
     snapshot->deallocations = deallocations;
     snapshot->timestamp = timestamp;
+}
+
+void ActiveSessionMemorySnapshot::assemble_from(ActiveSessionMemorySnapshot *snapshot, bool remove) {
+    foreach(StorageOffset offset, snapshot->content) {
+        ActiveSessionMemoryStorage::data_type_e data_type = storage->get_offset_data_type(qAbs<StorageOffset>(offset));
+        if(data_type == ActiveSessionMemoryStorage::SNAPSHOT_DATA) {
+            qDebug("Chaining on to snapshot at offset %llu . . .", qAbs<StorageOffset>(offset));
+            assemble_from(storage->get_snapshot_at(qAbs<StorageOffset>(offset)), (offset<0 || remove));
+        }
+        else if(data_type == ActiveSessionMemoryStorage::BLOCK_DATA) {
+            qDebug("Inserting content offset %i . . .", offset * (remove?-1:1));
+            content.insert(offset * (remove?-1:1));
+        }
+        else qDebug("Unknown data type encountered for offset %i . . .", offset);
+    }
 }
 
 ActiveSessionMemory::ActiveSessionMemory(QObject *parent, Session *session)
@@ -47,7 +71,6 @@ ActiveSessionMemory::ActiveSessionMemory(QObject *parent, Session *session)
 
 ActiveSessionMemory::~ActiveSessionMemory() {
     delete storage;
-    delete current_memory;
 }
 
 quint64 ActiveSessionMemory::pop_uint64() {
@@ -75,7 +98,6 @@ quint64 ActiveSessionMemory::pop_uint64() {
 }
 
 void ActiveSessionMemory::save_snapshot() {
-    qDebug("Saving snapshot . . .");
     /* In order to "save" the current snapshot, all that is required is to just
         allocate a new "changed" snapshot. The old one's already stored. However,
         store a "full" snapshot once every max_partial_snapshots . . . */
@@ -83,6 +105,8 @@ void ActiveSessionMemory::save_snapshot() {
     if(!(snapshot_list.size() % session->get_full_snapshot_interval())) {
         last_snapshot = storage->copy_snapshot(current_memory->get_offset())->get_offset();
     }
+    current_changes->set_timestamp(QDateTime::currentDateTime());
+    snapshot_list.append(current_changes->get_offset());
     current_changes = storage->alloc_new_snapshot();
     current_changes->add_block(last_snapshot);
 }
@@ -149,4 +173,24 @@ void ActiveSessionMemory::process_data(QByteArray data) {
     }
     
     emit memory_changed(get_current_memory());
+}
+
+ActiveSessionMemorySnapshot *ActiveSessionMemory::get_snapshot_for(QDateTime time) const {
+    qDebug("Assembling snapshot for date/time %s . . .", time.toString().toStdString().c_str());
+    ActiveSessionMemorySnapshot *snapshot = storage->alloc_new_snapshot();
+    ActiveSessionMemorySnapshot *last_snapshot = NULL;
+    
+    qDebug("snapshot_list.size(): %i", snapshot_list.size());
+    
+    int i;
+    for(i = snapshot_list.size()-1; i > 0; i --) {
+        last_snapshot = storage->get_snapshot_at(snapshot_list[i]);
+        if(last_snapshot->get_timestamp().secsTo(time) >= 0) break;
+        qDebug("Passing over %s . . .", last_snapshot->get_timestamp().toString().toStdString().c_str());
+    }
+    if(i == -1) return snapshot;
+    qDebug("Assembling from snapshot at %s.", last_snapshot->get_timestamp().toString().toStdString().c_str());
+    snapshot->assemble_from(last_snapshot);
+    
+    return snapshot;
 }

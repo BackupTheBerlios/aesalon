@@ -48,6 +48,8 @@ void Initializer::initialize() {
         return;
     }
     
+    storage_manager = new StorageManager();
+    
     if(argument_parser->get_postargs()) {
         int port;
         Misc::String::to<int>(argument_parser->get_argument("tcp-port")->get_data(), port);
@@ -76,8 +78,6 @@ void Initializer::initialize() {
             server_socket->wait_for_connection();
         }
     }
-    
-    storage_manager = new StorageManager();
     
     run();
     

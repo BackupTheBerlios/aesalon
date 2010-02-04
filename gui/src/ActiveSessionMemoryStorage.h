@@ -17,13 +17,12 @@ public:
         ALLOC_MODE_1M,
         ALLOC_MODE_DOUBLE
     };
-private:
     enum data_type_e {
         INVALID_DATA,
         BLOCK_DATA,
         SNAPSHOT_DATA
     };
-
+private:
     quint8 *data;
     StorageOffset data_size;
     StorageOffset unused_offset;
@@ -42,6 +41,8 @@ public:
     virtual ~ActiveSessionMemoryStorage();
     
     StorageOffset get_data_size() const { return data_size; }
+    
+    data_type_e get_offset_data_type(StorageOffset offset) const { return data_types[offset]; }
     
     ActiveSessionMemoryBlock *alloc_new_block(quint64 address, quint64 size);
     ActiveSessionMemorySnapshot *alloc_new_snapshot();

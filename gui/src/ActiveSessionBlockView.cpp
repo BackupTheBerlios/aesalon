@@ -1,7 +1,8 @@
 #include "ActiveSessionBlockView.h"
 #include "ActiveSessionBlockView.moc"
+#include "ActiveSessionMemoryStorage.h"
 
-ActiveSessionBlockView::ActiveSessionBlockView(QWidget *parent) : QWidget(parent) {
+ActiveSessionBlockView::ActiveSessionBlockView(QWidget *parent, ActiveSessionMemoryStorage *storage) : QWidget(parent), storage(storage) {
     finish_time.setTime_t(0);
     start_time.setTime_t(0);
     
@@ -82,6 +83,28 @@ void ActiveSessionBlockView::slider_released() {
 }
 
 void ActiveSessionBlockView::update_content(ActiveSessionMemorySnapshot *memory) {
+    QSet<StorageOffset> blocks = memory->get_content();
+    
+    block_table->setSortingEnabled(false);
+    
+    foreach(StorageOffset offset, blocks) {
+        ActiveSessionMemoryBlock *block = storage->get_block_at(qAbs<StorageOffset>(offset));
+        QString address_string = "0x" + QString().setNum(block->get_address(), 16);
+        if(offset >= 0) {
+            QTableWidgetItem *item = new QTableWidgetItem(address_string);
+            block_table->setRowCount(block_table->rowCount()+1);
+            block_table->setItem(block_table->rowCount()-1, 0, item);
+            item = new QTableWidgetItem(QString().setNum(block->get_size()));
+            block_table->setItem(block_table->rowCount()-1, 1, item);
+            block_table->resizeRowToContents(block_table->rowCount()-1);
+        }
+        else {
+            QList<QTableWidgetItem *> items = block_table->findItems(address_string, Qt::MatchExactly);
+            foreach(QTableWidgetItem *item, items) block_table->removeRow(item->row());
+        }
+    }
+    
+    block_table->setSortingEnabled(true);
 #if 0
     ActiveSessionMemorySnapshot *change_difference = NULL;
     ActiveSessionMemorySnapshot *remove_difference = NULL;

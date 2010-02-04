@@ -47,8 +47,10 @@ public:
     void add_block(quint64 address, quint64 size);
     void add_block(ActiveSessionMemoryBlock *block);
     void add_block(StorageOffset offset);
-    ActiveSessionMemoryBlock *get_block(StorageOffset offset) const;
+    ActiveSessionMemoryBlock *get_block(quint64 address) const;
     void remove_block(ActiveSessionMemoryBlock *block);
+    
+    QSet<StorageOffset> get_content() const { return content; }
     
     quint64 get_allocations() const { return allocations; }
     void set_allocations(quint64 new_allocations) { allocations = new_allocations; }
@@ -61,6 +63,7 @@ public:
     void inc_reallocations() { reallocations ++; }
     
     void copy_into(ActiveSessionMemorySnapshot *snapshot) const;
+    void assemble_from(ActiveSessionMemorySnapshot *snapshot, bool remove = false);
 };
 
 class ActiveSessionMemory : public QObject { Q_OBJECT
@@ -91,7 +94,7 @@ public:
         @return A new snapshot, consisting of the memory at the given time. The caller
             is required to free this object.
     */
-    ActiveSessionMemorySnapshot *get_snapshot_for(QDateTime time) const { return NULL; }
+    ActiveSessionMemorySnapshot *get_snapshot_for(QDateTime time) const;
 private slots:
     void save_snapshot();
 public slots:

@@ -22,7 +22,8 @@ StorageManager::~StorageManager() {
 
 void StorageManager::alloc_more() {
     /* Allocate another megabyte . . . */
-    data = static_cast<Byte *>(mremap(data, data_size, data_size += 1048576, MREMAP_MAYMOVE));
+    data = static_cast<Byte *>(mremap(data, data_size, data_size + 1048576, MREMAP_MAYMOVE));
+    data_size += 1048576;
 }
 
 ASM::Operand *StorageManager::new_operand(std::string operand_string) {

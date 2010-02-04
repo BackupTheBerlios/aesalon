@@ -43,6 +43,7 @@ void ActiveSessionMemoryStorage::reserve_more_memory() {
 ActiveSessionMemoryBlock *ActiveSessionMemoryStorage::alloc_new_block(quint64 address, quint64 size) {
     while((data_size - unused_offset) < sizeof(ActiveSessionMemoryBlock)) reserve_more_memory();
     ActiveSessionMemoryBlock *block = new(data + unused_offset) ActiveSessionMemoryBlock(unused_offset, address, size);
+    data_types[unused_offset] = BLOCK_DATA;
     unused_offset += sizeof(ActiveSessionMemoryBlock);
     return block;
 }
@@ -50,6 +51,7 @@ ActiveSessionMemoryBlock *ActiveSessionMemoryStorage::alloc_new_block(quint64 ad
 ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::alloc_new_snapshot() {
     while((data_size - unused_offset) < sizeof(ActiveSessionMemorySnapshot)) reserve_more_memory();
     ActiveSessionMemorySnapshot *snapshot = new(data + unused_offset) ActiveSessionMemorySnapshot(this, unused_offset, QDateTime::currentDateTime());
+    data_types[unused_offset] = SNAPSHOT_DATA;
     unused_offset += sizeof(ActiveSessionMemorySnapshot);
     return snapshot;
 }
@@ -57,6 +59,7 @@ ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::alloc_new_snapshot() {
 ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::copy_snapshot(StorageOffset offset) {
     while((data_size - unused_offset) < sizeof(ActiveSessionMemorySnapshot)) reserve_more_memory();
     ActiveSessionMemorySnapshot *snapshot = new(data + unused_offset) ActiveSessionMemorySnapshot(this, unused_offset, QDateTime::currentDateTime());
+    data_types[unused_offset] = SNAPSHOT_DATA;
     unused_offset += sizeof(ActiveSessionMemorySnapshot);
     get_snapshot_at(offset)->copy_into(snapshot);
     return snapshot;
@@ -69,7 +72,7 @@ ActiveSessionMemoryBlock *ActiveSessionMemoryStorage::get_block_at(StorageOffset
 
 ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::get_snapshot_at(StorageOffset offset) { 
     if(data_types[offset] != SNAPSHOT_DATA) {
-        qCritical("Asked to retrieve invalid snapshot!");
+        qCritical("Asked to retrieve invalid snapshot! (offset is %llu)", offset);
         return NULL;
     }
     return reinterpret_cast<ActiveSessionMemorySnapshot *>(data + offset);

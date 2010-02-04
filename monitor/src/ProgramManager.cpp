@@ -10,7 +10,7 @@ ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
     libc_parser = new ELF::Parser(Initializer::get_instance()->get_argument_parser()->get_argument("libc-path")->get_data());
     disassembler = new ASM::Disassembler(elf_parser);
     
-    disassembler->get_symbol_il("main");
+    /*disassembler->get_symbol_il("main");*/
 }
 
 ProgramManager::~ProgramManager() {

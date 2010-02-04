@@ -9,10 +9,12 @@
 #include "ActiveSession.moc"
 
 ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(parent), session(session), status(INITIALIZING) {
+    memory = new ActiveSessionMemory(this, session);
+    
     this->setTabPosition(West);
     overview = new ActiveSessionOverview(session);
     this->addTab(overview, tr("&Overview"));
-    block_view = new ActiveSessionBlockView(this);
+    block_view = new ActiveSessionBlockView(this, memory->get_storage());
     this->addTab(block_view, tr("&Flat block view"));
     
     status = WAITING_FOR_CONNECTION;
@@ -21,8 +23,6 @@ ActiveSession::ActiveSession(Session *session, QWidget *parent) : QTabWidget(par
     
     QShortcut *close_tab = new QShortcut(Qt::Key_W + Qt::CTRL, this);
     connect(close_tab, SIGNAL(activated()), this, SLOT(terminate_session()));
-    
-    memory = new ActiveSessionMemory(this, session);
     
     connect(memory, SIGNAL(memory_changed(ActiveSessionMemorySnapshot*)), overview, SLOT(memory_changed(ActiveSessionMemorySnapshot*)));
     connect(block_view, SIGNAL(request_realtime(bool)), this, SLOT(change_block_view_update(bool)));
