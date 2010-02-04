@@ -6,12 +6,13 @@
 #include "elf/Parser.h"
 #include "elf/Symbol.h"
 #include "InstructionList.h"
+#include "StorageOffset.h"
 
 namespace ASM {
 
 class Disassembler {
 public:
-    typedef std::map<std::string, InstructionList *> symbol_to_il_t;
+    typedef std::map<std::string, StorageOffset> symbol_to_il_t;
 private:
     ELF::Parser *elf_parser;
     
@@ -24,8 +25,7 @@ public:
     Disassembler(ELF::Parser *elf_parser);
     virtual ~Disassembler();
     
-    InstructionList *get_symbol_il(std::string symbol_name)
-        { return symbol_to_il[symbol_name]; }
+    StorageOffset get_symbol_il(std::string symbol_name) { return symbol_to_il[symbol_name]; }
 };
 
 } // namespace ASM

@@ -5,7 +5,8 @@
 
 namespace ASM {
 
-Instruction::Instruction(std::string instruction, Word address) : source(NULL), destination(NULL), address(address) {
+Instruction::Instruction(StorageOffset storage_offset, std::string instruction, Word address)
+    : storage_offset(storage_offset), source(NULL), destination(NULL), address(address) {
     std::string opcode;
     bool has_operands = false;
     if(instruction.find(" ") == std::string::npos) opcode = instruction;

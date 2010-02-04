@@ -9,6 +9,7 @@ namespace ASM {
 
 class Instruction {
 private:
+    StorageOffset storage_offset;
     bool memory_change;
     StorageOffset source;
     StorageOffset destination;
@@ -17,8 +18,10 @@ private:
     
     void handle_opcode(std::string opcode, std::string operands);
 public:
-    Instruction(std::string instruction, Word address);
+    Instruction(StorageOffset storage_offset, std::string instruction, Word address);
     virtual ~Instruction();
+    
+    StorageOffset get_storage_offset() const { return storage_offset; }
     
     bool changes_memory() const { return memory_change; }
     

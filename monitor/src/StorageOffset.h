@@ -3,6 +3,8 @@
 
 #include "Types.h"
 
-typedef Word StorageOffset;
+/** Defines a storage offset, used by StorageManager. This type is
+    signed, since -1 is used as an error code by some functions. */
+typedef SWord StorageOffset;
 
 #endif

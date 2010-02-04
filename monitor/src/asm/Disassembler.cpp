@@ -7,6 +7,7 @@
 #include "misc/ArgumentList.h"
 #include "misc/String.h"
 #include "misc/Message.h"
+#include "Initializer.h"
 
 namespace ASM {
 
@@ -38,14 +39,12 @@ Disassembler::Disassembler(ELF::Parser *elf_parser) : elf_parser(elf_parser) {
 }
 
 Disassembler::~Disassembler() {
-    for(symbol_to_il_t::iterator i = symbol_to_il.begin(); i != symbol_to_il.end(); i ++) {
-        delete i->second;
-    }
 }
 
 void Disassembler::parse_objdump_output() {
     std::string line = "";
     ELF::Symbol *symbol = NULL;
+    StorageManager *storage_manager = Initializer::get_instance()->get_storage_manager();
     
     char *buffer = new char[1024];
     /* Clear the buffer to avoid some nasty uninitialised value errors. */
@@ -96,9 +95,9 @@ void Disassembler::parse_objdump_output() {
         /*std::cout << "Assembly instruction is \"" << line << "\"\n";*/
         /* Now parse the instruction and push it onto the InstructionList for the symbol . . . */
         if(!symbol_to_il[symbol->get_symbol_name()])
-            symbol_to_il[symbol->get_symbol_name()] = new InstructionList(symbol->get_address());
+            symbol_to_il[symbol->get_symbol_name()] = storage_manager->new_instruction_list(symbol->get_address())->get_storage_offset();
         
-        symbol_to_il[symbol->get_symbol_name()]->add_instruction(new Instruction(line, address));
+        storage_manager->get_instruction_list(symbol_to_il[symbol->get_symbol_name()])->add_instruction(storage_manager->new_instruction(line, address)->get_storage_offset());
         
         buffer[0] = 0;
     }
