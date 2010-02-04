@@ -3,14 +3,15 @@
 
 #include "Types.h"
 #include "Operand.h"
+#include "StorageManager.h"
 
 namespace ASM {
 
 class Instruction {
 private:
     bool memory_change;
-    Operand *source;
-    Operand *destination;
+    StorageOffset source;
+    StorageOffset destination;
     
     Word address;
     
@@ -21,8 +22,8 @@ public:
     
     bool changes_memory() const { return memory_change; }
     
-    Operand *get_source() const { return source; }
-    Operand *get_destination() const { return destination; }
+    StorageOffset get_source() const { return source; }
+    StorageOffset get_destination() const { return destination; }
     
     Word get_address() const { return address; }
 };

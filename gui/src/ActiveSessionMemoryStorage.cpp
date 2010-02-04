@@ -56,7 +56,6 @@ ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::alloc_new_snapshot() {
 
 ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::copy_snapshot(StorageOffset offset) {
     while((data_size - unused_offset) < sizeof(ActiveSessionMemorySnapshot)) reserve_more_memory();
-    /* Utilize the default copy-constructor here . . . all data should be copied. */
     ActiveSessionMemorySnapshot *snapshot = new(data + unused_offset) ActiveSessionMemorySnapshot(this, unused_offset, QDateTime::currentDateTime());
     unused_offset += sizeof(ActiveSessionMemorySnapshot);
     get_snapshot_at(offset)->copy_into(snapshot);

@@ -32,6 +32,7 @@ void Initializer::initialize() {
     server_socket = NULL;
     event_queue = NULL;
     return_value = 0;
+    storage_manager = NULL;
     
     argument_parser = new Misc::ArgumentParser(argv);
     
@@ -76,12 +77,15 @@ void Initializer::initialize() {
         }
     }
     
+    storage_manager = new StorageManager();
+    
     run();
     
     server_socket->disconnect_all();
 }
 
 void Initializer::deinitialize() {
+    if(storage_manager) delete storage_manager;
     if(argument_parser) delete argument_parser;
     if(program_manager) delete program_manager;
     if(server_socket) delete server_socket;

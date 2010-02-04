@@ -6,6 +6,7 @@
 #include "event/Queue.h"
 #include "ProgramManager.h"
 #include "misc/ArgumentParser.h"
+#include "StorageManager.h"
 
 /** Initializer class. Basically, handles initialization of the Monitor. */
 class Initializer : public Misc::Singleton<Initializer> {
@@ -20,6 +21,8 @@ private:
     ProgramManager *program_manager;
     
     Misc::ArgumentParser *argument_parser;
+    
+    StorageManager *storage_manager;
     
     /** Initialize the aesalon monitor. */
     void initialize();
@@ -50,6 +53,7 @@ public:
     ProgramManager *get_program_manager() const { return program_manager; }
     Event::Queue *get_event_queue() const { return event_queue; }
     Misc::ArgumentParser *get_argument_parser() const { return argument_parser; }
+    StorageManager *get_storage_manager() const { return storage_manager; }
     
     int get_return_value() const { return return_value; }
     void set_return_value(int new_return_value) { return_value = new_return_value; }

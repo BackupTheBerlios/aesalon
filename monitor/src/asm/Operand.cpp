@@ -4,7 +4,7 @@
 
 namespace ASM {
 
-Operand::Operand(std::string operand_string) {
+Operand::Operand(StorageOffset storage_offset, std::string operand_string) : storage_offset(storage_offset) {
     Register reg = Register::from_string(operand_string);
     if(reg != Register::INVALID) {
         operand_type = REGISTER;

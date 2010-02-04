@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Instruction.h"
 #include "misc/String.h"
+#include "Initializer.h"
 
 namespace ASM {
 
@@ -20,11 +21,10 @@ Instruction::Instruction(std::string instruction, Word address) : source(NULL), 
 }
 
 Instruction::~Instruction() {
-    if(source != NULL) delete source;
-    if(destination != NULL) delete destination;
 }
 
 void Instruction::handle_opcode(std::string opcode, std::string operands) {
+    StorageManager *storage_manager = Initializer::get_instance()->get_storage_manager();
     std::vector<std::string> operand;
     if(operands.find("#") != std::string::npos) operands.erase(operands.find("#"));
     while(operands.length()) {
@@ -34,12 +34,12 @@ void Instruction::handle_opcode(std::string opcode, std::string operands) {
     }
     
     if(Misc::String::begins_with(opcode, "mov")) {
-        source = new Operand(operand[0]);
-        destination = new Operand(operand[1]);
+        source = storage_manager->new_operand(operand[0])->get_storage_offset();
+        destination = storage_manager->new_operand(operand[1])->get_storage_offset();
     }
     else if(Misc::String::begins_with(opcode, "add")) {
-        source = new Operand(operand[0]);
-        destination = new Operand(ASM::Operand::REGISTER, 0, Register::RAX);
+        source = storage_manager->new_operand(operand[0])->get_storage_offset();
+        destination = storage_manager->new_operand(ASM::Operand::REGISTER, 0, Register::RAX)->get_storage_offset();
     }
 }
 
