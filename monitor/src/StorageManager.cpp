@@ -12,6 +12,11 @@ StorageManager::StorageManager() : data(NULL), data_size(0), unused_data_offset(
 }
 
 StorageManager::~StorageManager() {
+    for(type_map_t::iterator i = type_map.begin(); i != type_map.end(); i ++) {
+        if(i->second == OPERAND_DATA) get_operand(i->first)->~Operand();
+        else if(i->second == INSTRUCTION_DATA) get_instruction(i->first)->~Instruction();
+        else if(i->second == INSTRUCTION_LIST_DATA) get_instruction_list(i->first)->~InstructionList();
+    }
     munmap(data, data_size);
 }
 
@@ -38,7 +43,7 @@ ASM::Operand *StorageManager::new_operand(ASM::Operand::operand_type_e type, Wor
 ASM::Instruction *StorageManager::new_instruction(std::string instruction, Word address) {
     while(unsigned(data_size - unused_data_offset) < sizeof(ASM::Instruction)) alloc_more();
     ASM::Instruction *ins = new(data + unused_data_offset) ASM::Instruction(unused_data_offset, instruction, address);
-    unused_data_offset += sizeof(ASM::Operand);
+    unused_data_offset += sizeof(ASM::Instruction);
     type_map[ins->get_storage_offset()] = INSTRUCTION_DATA;
     return ins;
 }
@@ -46,9 +51,17 @@ ASM::Instruction *StorageManager::new_instruction(std::string instruction, Word 
 ASM::InstructionList *StorageManager::new_instruction_list(Word offset) {
     while(unsigned(data_size - unused_data_offset) < sizeof(ASM::InstructionList)) alloc_more();
     ASM::InstructionList *il = new(data + unused_data_offset) ASM::InstructionList(unused_data_offset, offset);
-    unused_data_offset += sizeof(ASM::Operand);
+    unused_data_offset += sizeof(ASM::InstructionList);
     type_map[il->get_storage_offset()] = INSTRUCTION_LIST_DATA;
     return il;
+}
+
+ELF::Symbol *StorageManager::new_symbol(std::string symbol_name, Word address, Word size) {
+    while(unsigned(data_size - unused_data_offset) < sizeof(ELF::Symbol)) alloc_more();
+    ELF::Symbol *symbol = new(data + unused_data_offset) ELF::Symbol(unused_data_offset, symbol_name, address, size);
+    unused_data_offset += sizeof(ELF::Symbol);
+    type_map[symbol->get_storage_offset()] = SYMBOL_DATA;
+    return symbol;
 }
 
 ASM::Operand *StorageManager::get_operand(StorageOffset storage_offset) const {
@@ -64,4 +77,9 @@ ASM::Instruction *StorageManager::get_instruction(StorageOffset storage_offset) 
 ASM::InstructionList *StorageManager::get_instruction_list(StorageOffset storage_offset) const {
     if(type_map.at(storage_offset) != INSTRUCTION_LIST_DATA) return 0;
     return reinterpret_cast<ASM::InstructionList *>(data + storage_offset);
+}
+
+ELF::Symbol *StorageManager::get_symbol(StorageOffset storage_offset) const {
+    if(type_map.at(storage_offset) != SYMBOL_DATA) return 0;
+    return reinterpret_cast<ELF::Symbol *>(data + storage_offset);
 }

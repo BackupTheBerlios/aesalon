@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Symbol.h"
+#include "StorageManager.h"
 
 namespace ELF {
 
@@ -11,7 +12,7 @@ class Parser;
 
 class SymbolParser {
 protected:
-    typedef std::vector<Symbol *> symbol_vector_t;
+    typedef std::vector<StorageOffset> symbol_vector_t;
     typedef std::vector<Word> dynamic_offsets_t;
 private:
     Parser *elf_parser;

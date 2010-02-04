@@ -25,7 +25,7 @@ public:
     Disassembler(ELF::Parser *elf_parser);
     virtual ~Disassembler();
     
-    StorageOffset get_symbol_il(std::string symbol_name) { return symbol_to_il[symbol_name]; }
+    StorageOffset get_symbol_il(std::string symbol_name) const { return symbol_to_il.at(symbol_name); }
 };
 
 } // namespace ASM

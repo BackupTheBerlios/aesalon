@@ -3,10 +3,12 @@
 
 #include "SymbolParser.h"
 #include "Parser.h"
+#include "Initializer.h"
 
 namespace ELF {
 
 SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
+    StorageManager *storage_manager = Initializer::get_instance()->get_storage_manager();
     std::cout << std::hex;
     /* Start off with the static symbols . . . */
     Section *symbol_table = elf_parser->get_section(".symtab");
@@ -17,7 +19,7 @@ SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
             symbol_block->read(&sym, sizeof(sym));
             
             char *name = (char *)(elf_parser->get_section(".strtab")->get_content()->get_data() + sym.st_name);
-            if(sym.st_value) symbol_vector.push_back(new Symbol(name, sym.st_value, sym.st_size));
+            if(sym.st_value) symbol_vector.push_back(storage_manager->new_symbol(name, sym.st_value, sym.st_size)->get_storage_offset());
         }
     }
     symbol_table = elf_parser->get_section(".rela.plt");
@@ -52,7 +54,7 @@ SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
             }*/
             /*std::cout << "Dynamic symbol: name is \"" << name << "\", address is " << sym.st_value << std::endl;
             std::cout << "Dynamic offset for this symbol is: " << dynamic_offsets[index] << std::endl;*/
-            if(sym.st_name) symbol_vector.push_back(new Symbol(name, sym.st_value/* + dynamic_offsets[index]*/, sym.st_size));
+            if(sym.st_name) symbol_vector.push_back(storage_manager->new_symbol(name, sym.st_value/* + dynamic_offsets[index]*/, sym.st_size)->get_storage_offset());
             index ++;
         }
     }
@@ -60,14 +62,12 @@ SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
 }
 
 SymbolParser::~SymbolParser() {
-    for(symbol_vector_t::iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
-        delete *i;
-    }
 }
 
 Symbol *SymbolParser::get_symbol(std::string name) const {
+    StorageManager *storage_manager = Initializer::get_instance()->get_storage_manager();
     for(symbol_vector_t::const_iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
-        if((*i)->get_symbol_name() == name) return *i;
+        if(storage_manager->get_symbol(*i)->get_symbol_name() == name) return storage_manager->get_symbol(*i);
     }
     return NULL;
 }
@@ -75,7 +75,7 @@ Symbol *SymbolParser::get_symbol(std::string name) const {
 void SymbolParser::dump_symbols() const {
     std::cout << "Symbol dump: \n";
     for(symbol_vector_t::const_iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
-        std::cout << "\tSymbol: name is \"" << (*i)->get_symbol_name() << "\", address is 0x" << std::hex << (*i)->get_address() << std::dec << std::endl;
+        /*std::cout << "\tSymbol: name is \"" << (*i)->get_symbol_name() << "\", address is 0x" << std::hex << (*i)->get_address() << std::dec << std::endl;*/
     }
 }
 
