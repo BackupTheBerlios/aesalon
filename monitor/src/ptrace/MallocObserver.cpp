@@ -15,6 +15,7 @@ bool MallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     if(breakpoint->get_id() != Initializer::get_instance()->get_program_manager()->get_malloc_breakpoint_id()) {
         breakpoint->remove_observer(this);
         if(!called) { called = true; return false; }
+        std::cout << "Creating new allocation event . . ." << std::endl;
         Initializer::get_instance()->get_event_queue()->push_event(
             new Event::BlockEvent(Event::BlockEvent::ALLOC_EVENT,
             portal->get_register(ASM::Register::RAX), last_size));

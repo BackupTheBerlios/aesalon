@@ -72,7 +72,7 @@ ActiveSessionMemoryBlock *ActiveSessionMemoryStorage::get_block_at(StorageOffset
 
 ActiveSessionMemorySnapshot *ActiveSessionMemoryStorage::get_snapshot_at(StorageOffset offset) { 
     if(data_types[offset] != SNAPSHOT_DATA) {
-        qCritical("Asked to retrieve invalid snapshot! (offset is %llu)", offset);
+        qCritical("Asked to retrieve invalid snapshot! (offset is %li)", offset);
         return NULL;
     }
     return reinterpret_cast<ActiveSessionMemorySnapshot *>(data + offset);

@@ -83,7 +83,9 @@ void ActiveSessionBlockView::slider_released() {
 }
 
 void ActiveSessionBlockView::update_content(ActiveSessionMemorySnapshot *memory) {
-    QSet<StorageOffset> blocks = memory->get_content();
+    block_table->clear();
+    block_table->setRowCount(0);
+    QList<StorageOffset> blocks = memory->get_content();
     
     block_table->setSortingEnabled(false);
     

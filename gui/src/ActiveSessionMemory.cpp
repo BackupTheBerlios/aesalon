@@ -4,15 +4,18 @@
 #include "ActiveSessionMemory.moc"
 
 void ActiveSessionMemorySnapshot::add_block(quint64 address, quint64 size) {
-    content.insert(storage->alloc_new_block(address, size)->get_offset());
+    qDebug("Adding block with address %llu, size %llu", address, size);
+    content.append(storage->alloc_new_block(address, size)->get_offset());
 }
 
 void ActiveSessionMemorySnapshot::add_block(ActiveSessionMemoryBlock *block) {
-    content.insert(block->get_offset());
+    qDebug("Adding block at %p -- offset is %li", block, block->get_offset());
+    content.append(block->get_offset());
 }
 
 void ActiveSessionMemorySnapshot::add_block(StorageOffset offset) {
-    content.insert(offset);
+    qDebug("Adding block with offset %li", offset);
+    content.append(offset);
 }
 
 ActiveSessionMemoryBlock *ActiveSessionMemorySnapshot::get_block(quint64 address) const {
@@ -30,7 +33,7 @@ ActiveSessionMemoryBlock *ActiveSessionMemorySnapshot::get_block(quint64 address
 
 void ActiveSessionMemorySnapshot::remove_block(ActiveSessionMemoryBlock *block) {
     if(block == NULL) return;
-    content.remove(block->get_offset());
+    content.removeAt(content.indexOf(block->get_offset()));
 }
 
 void ActiveSessionMemorySnapshot::copy_into(ActiveSessionMemorySnapshot *snapshot) const {
@@ -50,9 +53,23 @@ void ActiveSessionMemorySnapshot::assemble_from(ActiveSessionMemorySnapshot *sna
         }
         else if(data_type == ActiveSessionMemoryStorage::BLOCK_DATA) {
             qDebug("Inserting content offset %i . . .", offset * (remove?-1:1));
-            content.insert(offset * (remove?-1:1));
+            content.append(offset * (remove?-1:1));
         }
         else qDebug("Unknown data type encountered for offset %i . . .", offset);
+    }
+}
+
+void ActiveSessionMemorySnapshot::dump_content() {
+    qDebug("Dumping content of offset at %li . . .", get_offset());
+    foreach(StorageOffset offset, content) {
+        switch(storage->get_offset_data_type(qAbs<StorageOffset>(offset))) {
+            case ActiveSessionMemoryStorage::BLOCK_DATA:
+                qDebug("\tStored block at %li", offset);
+                break;
+            case ActiveSessionMemoryStorage::SNAPSHOT_DATA:
+                qDebug("\tStored snapshot at %li", offset);
+                break;
+        }
     }
 }
 
@@ -105,7 +122,9 @@ void ActiveSessionMemory::save_snapshot() {
     if(!(snapshot_list.size() % session->get_full_snapshot_interval())) {
         last_snapshot = storage->copy_snapshot(current_memory->get_offset())->get_offset();
     }
+    qDebug("dumping current_changes . . .");
     current_changes->set_timestamp(QDateTime::currentDateTime());
+    current_changes->dump_content();
     snapshot_list.append(current_changes->get_offset());
     current_changes = storage->alloc_new_snapshot();
     current_changes->add_block(last_snapshot);
@@ -163,6 +182,7 @@ void ActiveSessionMemory::process_data(QByteArray data) {
                 ActiveSessionMemoryBlock *block = current_memory->get_block(address);
                 if(!block) continue;
                 current_memory->remove_block(block);
+                qDebug("Adding remove offset %li to current_changes . . .", -block->get_offset());
                 current_changes->add_block(-block->get_offset());
                 current_memory->inc_deallocations();
                 current_changes->inc_deallocations();

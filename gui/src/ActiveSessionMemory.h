@@ -29,7 +29,7 @@ class ActiveSessionMemorySnapshot {
 private:
     ActiveSessionMemoryStorage *storage;
     StorageOffset offset;
-    QSet<StorageOffset> content;
+    QList<StorageOffset> content;
     quint64 allocations, deallocations, reallocations;
     QDateTime timestamp;
 public:
@@ -50,7 +50,7 @@ public:
     ActiveSessionMemoryBlock *get_block(quint64 address) const;
     void remove_block(ActiveSessionMemoryBlock *block);
     
-    QSet<StorageOffset> get_content() const { return content; }
+    QList<StorageOffset> get_content() const { return content; }
     
     quint64 get_allocations() const { return allocations; }
     void set_allocations(quint64 new_allocations) { allocations = new_allocations; }
@@ -64,6 +64,8 @@ public:
     
     void copy_into(ActiveSessionMemorySnapshot *snapshot) const;
     void assemble_from(ActiveSessionMemorySnapshot *snapshot, bool remove = false);
+    
+    void dump_content();
 };
 
 class ActiveSessionMemory : public QObject { Q_OBJECT
