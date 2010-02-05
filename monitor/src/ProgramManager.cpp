@@ -34,7 +34,7 @@ void ProgramManager::wait() {
 
 void ProgramManager::place_initial_breakpoints() {
     std::cout << std::hex;
-    Word libc_offset = get_ptrace_portal()->get_libc_offset();
+    /*Word libc_offset = get_ptrace_portal()->get_libc_offset();
     Word malloc_address = libc_offset + get_libc_parser()->get_symbol("malloc")->get_address();
     malloc_breakpoint_id = get_ptrace_portal()->place_breakpoint(malloc_address, get_ptrace_portal()->get_malloc_observer());
     
@@ -42,7 +42,26 @@ void ProgramManager::place_initial_breakpoints() {
     free_breakpoint_id = get_ptrace_portal()->place_breakpoint(free_address, get_ptrace_portal()->get_free_observer());
     
     Word realloc_address = libc_offset + get_libc_parser()->get_symbol("realloc")->get_address();
-    realloc_breakpoint_id = get_ptrace_portal()->place_breakpoint(realloc_address, get_ptrace_portal()->get_realloc_observer());
+    realloc_breakpoint_id = get_ptrace_portal()->place_breakpoint(realloc_address, get_ptrace_portal()->get_realloc_observer());*/
+    
+    std::string overload_path = Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data();
+    overload_parser = new ELF::Parser(overload_path);
+    if(overload_parser == NULL) return;
+    Word overload_offset = get_ptrace_portal()->get_lib_offset(overload_path);
+    
+    /* TODO: find a better way than adding hard-coded values to get the offset of the int3 instruction . . . */
+    std::cout << "overload_offset: " << overload_offset << std::endl;
+    PTrace::Breakpoint *bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_malloc_hook")->get_address()+69, 0xcc);
+    get_ptrace_portal()->add_breakpoint(bp);
+    bp->add_observer(get_ptrace_portal()->get_malloc_observer());
+    
+    bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_realloc_hook")->get_address()+80, 0xcc);
+    get_ptrace_portal()->add_breakpoint(bp);
+    bp->add_observer(get_ptrace_portal()->get_realloc_observer());
+    
+    bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_free_hook")->get_address()+65, 0xcc);
+    get_ptrace_portal()->add_breakpoint(bp);
+    bp->add_observer(get_ptrace_portal()->get_free_observer());
     
     /* Remove the breakpoint on main(), it's not required any more. */
     /*get_ptrace_portal()->get_breakpoint_by_address(get_elf_parser()->get_symbol("main")->get_address())->set_valid(false);*/

@@ -40,6 +40,7 @@ void Initializer::initialize() {
     argument_parser->add_argument(new Misc::Argument("tcp-port", 'p', Misc::Argument::REQUIRED_ARGUMENT, "6321"));
     argument_parser->add_argument(new Misc::Argument("wait", 'w', Misc::Argument::OPTIONAL_ARGUMENT, "1"));
     argument_parser->add_argument(new Misc::Argument("libc-path", 0, Misc::Argument::REQUIRED_ARGUMENT, LIBC_PATH));
+    argument_parser->add_argument(new Misc::Argument("overload-path", 'o', Misc::Argument::REQUIRED_ARGUMENT, "./overload.so"));
 
     argument_parser->parse();
 

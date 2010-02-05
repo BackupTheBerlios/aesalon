@@ -46,9 +46,9 @@ void *aesalon_realloc_hook(void *ptr, size_t size, const void *caller) {
 }
 
 void aesalon_free_hook(void *ptr, const void *caller) {
-    __realloc_hook = aesalon_old_realloc_hook;
+    __free_hook = aesalon_old_free_hook;
     free(ptr);
-    __realloc_hook = aesalon_realloc_hook;
+    __free_hook = aesalon_free_hook;
     
     asm("int3");
 }

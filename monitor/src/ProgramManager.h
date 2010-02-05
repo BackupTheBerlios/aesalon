@@ -14,7 +14,7 @@ private:
     
     PTrace::Portal *ptrace_portal;
     
-    ELF::Parser *elf_parser, *libc_parser;
+    ELF::Parser *elf_parser, *libc_parser, *overload_parser;
     ASM::Disassembler *disassembler;
     
     std::size_t malloc_breakpoint_id;

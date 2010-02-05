@@ -28,17 +28,8 @@ private:
     /** The vector of breakpoints. */
     breakpoint_list_t breakpoint_list;
     
-    /** Adds a breakpoint onto the list.
-        @param breakpoint The breakpoint to add.
-    */
-    void add_breakpoint(Breakpoint *breakpoint) {
-        breakpoint_list.push_back(breakpoint);
-    }
-    
     signal_observer_list_t signal_observer_list;
         
-    Word libc_offset;
-    
     int wait_for_signal();
     
     BreakpointObserver *initial_observer;
@@ -81,6 +72,14 @@ public:
     void attach();
     /** Detaches from running program. */
     void detach();
+    
+    /** Adds a breakpoint onto the list.
+        @note Do not use this function speicially unless you know what you are doing.
+        @param breakpoint The breakpoint to add.
+    */
+    void add_breakpoint(Breakpoint *breakpoint) {
+        breakpoint_list.push_back(breakpoint);
+    }
     
     /** Places a breakpoint at a specified address.
         @param address The address to place the breakpoint at.
@@ -125,10 +124,12 @@ public:
     BreakpointObserver *get_free_observer() const { return free_observer; }
     BreakpointObserver *get_realloc_observer() const { return realloc_observer; }
     
-    /** Reads the memory map in /proc for the child process to determine the address libc is lodaded into.
-        @return The address of libc, or 0 if libc is not currently loaded.
+    /** Reads the memory map in /proc for the child process to determine the address a library is lodaded into.
+        @note This function is expensive, do not overuse it.
+        @param unique_identifier A string that uniquely identifies the library, such as its path.
+        @return The address of the library, or 0 if no such library was found.
     */
-    Word get_libc_offset();
+    Word get_lib_offset(std::string unique_identifer);
 };
 
 } // namespace PTrace

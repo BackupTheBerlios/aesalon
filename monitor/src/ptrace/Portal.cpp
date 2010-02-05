@@ -7,8 +7,9 @@
 #include <errno.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -31,12 +32,14 @@
 
 namespace PTrace {
 
-Portal::Portal(Misc::ArgumentList *argument_list) : pid(0), libc_offset(0) {
+Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     pid = fork();
     if(pid == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
     else if(pid == 0) {
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+        /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
+        setenv("LD_PRELOAD", Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data().c_str(), 1);
         if(execv(argument_list->get_argument(0).c_str(), argument_list->get_as_argv()) == -1) {
             throw Exception::PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
         }
@@ -258,30 +261,32 @@ void Portal::handle_breakpoint() {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
     }
-    /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
-    set_register(ASM::Register::RIP, ip);
+    if(breakpoint->get_original() != 0xcc) {
+        /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
+        set_register(ASM::Register::RIP, ip);
+    }
     
     breakpoint->notify();
     
-    /* Write out the original instruction . . . */
-    write_memory(breakpoint->get_address(), breakpoint->get_original());
-    /* Single-step over that instruction . . . */
-    single_step();
-    /* Only re-write out the trap instruction if the breakpoint is still valid. */
-    if(breakpoint->is_valid()) {
-        /* Re-write out the trap instruction . . . */
-        write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());
-    }
-    else {
-        remove_breakpoint(breakpoint->get_address());
+    if(breakpoint->get_original() != 0xcc) {
+        /* Write out the original instruction . . . */
+        write_memory(breakpoint->get_address(), breakpoint->get_original());
+        /* Single-step over that instruction . . . */
+        single_step();
+        /* Only re-write out the trap instruction if the breakpoint is still valid. */
+        if(breakpoint->is_valid()) {
+            /* Re-write out the trap instruction . . . */
+            write_memory(breakpoint->get_address(), breakpoint->get_breakpoint_character());
+        }
+        else {
+            remove_breakpoint(breakpoint->get_address());
+        }
     }
     /* And then TrapObserver will call continue_execution(). */
 }
 
-Word Portal::get_libc_offset() {
-    if(libc_offset != 0) return libc_offset;
-    libc_offset = 0;
-    
+Word Portal::get_lib_offset(std::string unique_identifer) {
+    Word lib_offset = 0;
     std::string map_file;
     map_file = Misc::StreamAsString() << "/proc/" << pid << "/maps";
     std::ifstream map_stream(map_file.c_str());
@@ -301,7 +306,7 @@ Word Portal::get_libc_offset() {
     /* Get one line at a time, for EOF detection purposes. */
     
     char buffer[1024];
-    while(!map_stream.eof() && map_stream.getline(buffer, 1024, '\n') && std::strlen(buffer)) {
+    while(!map_stream.eof() && map_stream.getline(buffer, 1024, '\n') && strlen(buffer)) {
         Word from, to;
         char spacer;
         Word offset;
@@ -317,14 +322,14 @@ Word Portal::get_libc_offset() {
         line_stream >> device;
         line_stream >> inode;
         line_stream >> path;
-        if(Misc::String::begins_with(path, "/lib/libc")) {
-            if(mode == "r-xp") libc_offset = from;
+        if(path.find(unique_identifer) != std::string::npos) {
+            if(mode == "r-xp") lib_offset = from;
         }
     }
     
     map_stream.close();
     
-    return libc_offset;
+    return lib_offset;
 }
 
 } // namespace PTrace
