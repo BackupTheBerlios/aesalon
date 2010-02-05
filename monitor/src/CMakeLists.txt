@@ -41,3 +41,5 @@ add_executable(aesalon ${SOURCES})
 if(PROFILE_BUILD)
     set_target_properties(aesalon PROPERTIES LINK_FLAGS -pg)
 endif(PROFILE_BUILD)
+
+add_subdirectory(overload)
