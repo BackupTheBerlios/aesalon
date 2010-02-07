@@ -6,9 +6,6 @@
 #include <QMenu>
 #include <QMenuBar>
 
-
-
-
 class MainWindow : public QMainWindow { Q_OBJECT
 private:
     void setup_menus();
@@ -20,8 +17,5 @@ public:
 public slots:
     void open_configuration();
 };
-
-
-
 
 #endif

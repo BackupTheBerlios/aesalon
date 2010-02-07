@@ -47,7 +47,7 @@ void ProgramManager::place_initial_breakpoints() {
     std::string overload_path = Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data();
     overload_parser = new ELF::Parser(overload_path);
     if(overload_parser == NULL) return;
-    Word overload_offset = get_ptrace_portal()->get_lib_offset(overload_path);
+    Word overload_offset = get_ptrace_portal()->get_lib_offset("overload.so");
     
     /* TODO: find a better way than adding hard-coded values to get the offset of the int3 instruction . . . */
     std::cout << "overload_offset: " << overload_offset << std::endl;
@@ -62,7 +62,4 @@ void ProgramManager::place_initial_breakpoints() {
     bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_free_hook")->get_address()+65, 0xcc);
     get_ptrace_portal()->add_breakpoint(bp);
     bp->add_observer(get_ptrace_portal()->get_free_observer());
-    
-    /* Remove the breakpoint on main(), it's not required any more. */
-    /*get_ptrace_portal()->get_breakpoint_by_address(get_elf_parser()->get_symbol("main")->get_address())->set_valid(false);*/
 }

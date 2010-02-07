@@ -1,13 +1,8 @@
 #include <iostream>
 #include "MainArea.h"
 #include "MainArea.moc"
-#include "SessionManager.h"
 
 MainArea::MainArea(QWidget *parent) {
-    SessionManager *manager = new SessionManager;
-    this->addTab(manager, tr("&Session Manager"));
-    connect(manager, SIGNAL(new_tab_request(QWidget*, QString)), this, SLOT(add_tab(QWidget*, QString)));
-    connect(manager, SIGNAL(remove_tab_request(QWidget*)), this, SLOT(remove_tab(QWidget*)));
     this->setTabsClosable(true);
     
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(tab_close_requested(int)));
