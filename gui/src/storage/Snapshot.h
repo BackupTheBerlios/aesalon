@@ -12,7 +12,10 @@ public:
     Snapshot(SnapshotID snapshot_id);
     virtual ~Snapshot();
     
-    BlockTreeNode *get_head_node() const;
+    SnapshotID get_snapshot_id() const { return snapshot_id; }
+    
+    BlockTreeNode *get_head_node() const { return head_node; }
+    void set_head_node(BlockTreeNode *new_head) { head_node = new_head; }
 };
 
 #endif
