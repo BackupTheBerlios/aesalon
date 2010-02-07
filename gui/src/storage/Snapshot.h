@@ -2,11 +2,11 @@
 #define AESALON_GUI_STORAGE_SNAPSHOT_H
 
 #include "SnapshotID.h"
-#include "BlockTreeNode.h"
+#include "BiTreeNode.h"
 
 class Snapshot {
 private:
-    BlockTreeNode *head_node;
+    BiTreeNode *head_node;
     SnapshotID snapshot_id;
 public:
     Snapshot(SnapshotID snapshot_id);
@@ -14,8 +14,8 @@ public:
     
     SnapshotID get_snapshot_id() const { return snapshot_id; }
     
-    BlockTreeNode *get_head_node() const { return head_node; }
-    void set_head_node(BlockTreeNode *new_head) { head_node = new_head; }
+    BiTreeNode *get_head_node() const { return head_node; }
+    void set_head_node(BiTreeNode *new_head) { head_node = new_head; }
 };
 
 #endif

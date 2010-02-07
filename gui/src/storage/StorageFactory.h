@@ -4,7 +4,7 @@
 #include <QMutex>
 #include "Snapshot.h"
 #include "SnapshotID.h"
-#include "BlockTreeNode.h"
+#include "BiTreeNode.h"
 
 class StorageFactory {
 public:
@@ -14,8 +14,8 @@ public:
         QMutexLocker locker(&snapshot_id_mutex);
         return new Snapshot(++last_snapshot_id);
     }
-    static BlockTreeNode *new_node(SnapshotID snapshot_id) {
-        return new BlockTreeNode(snapshot_id);
+    static BiTreeNode *new_node(SnapshotID snapshot_id, MemoryAddress address) {
+        return new BiTreeNode(snapshot_id, address);
     }
 };
 
