@@ -4,12 +4,14 @@ aux_source_directory(. DOT_SOURCES)
 aux_source_directory(data DATA_SOURCES)
 aux_source_directory(main MAIN_SOURCES)
 aux_source_directory(session SESSION_SOURCES)
+aux_source_directory(storage STORAGE_SOURCES)
 
 set(SOURCES
     ${DOT_SOURCES}
     ${DATA_SOURCES}
     ${MAIN_SOURCES}
     ${SESSION_SOURCES}
+    ${STORAGE_SOURCES}
 )
 
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
