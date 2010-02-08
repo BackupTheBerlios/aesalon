@@ -47,7 +47,7 @@ void ProgramManager::place_initial_breakpoints() {
     std::string overload_path = Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data();
     overload_parser = new ELF::Parser(overload_path);
     if(overload_parser == NULL) return;
-    Word overload_offset = get_ptrace_portal()->get_lib_offset("overload.so");
+    Word overload_offset = get_ptrace_portal()->get_lib_offset(overload_path.substr(overload_path.find_last_of('/')));
     
     /* TODO: find a better way than adding hard-coded values to get the offset of the int3 instruction . . . */
     std::cout << "overload_offset: " << overload_offset << std::endl;

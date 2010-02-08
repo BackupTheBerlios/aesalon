@@ -5,6 +5,7 @@
 #include "Snapshot.h"
 #include "SnapshotID.h"
 #include "BiTreeNode.h"
+#include "Block.h"
 
 class StorageFactory {
 public:
@@ -16,6 +17,9 @@ public:
     }
     static BiTreeNode *new_node(SnapshotID snapshot_id, MemoryAddress address) {
         return new BiTreeNode(snapshot_id, address);
+    }
+    static Block *new_block(MemoryAddress address, MemorySize size) {
+        return new Block(address, size);
     }
 };
 
