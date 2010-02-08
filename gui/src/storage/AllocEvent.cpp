@@ -21,7 +21,6 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
         node->set_left(StorageFactory::new_node(snapshot->get_snapshot_id(), node->get_address()/2));
         node->mark_changed(snapshot->get_snapshot_id());
         node->set_end(false);
-        node->get_left()->get_block_list();
         node->get_left()->add_block(new Block(address, size));
     }
     else if(address >= node->get_address()) {
