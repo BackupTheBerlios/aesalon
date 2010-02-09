@@ -3,11 +3,13 @@
 
 #include "SnapshotID.h"
 #include "BiTreeNode.h"
+#include "EventList.h"
 
 class Snapshot {
 private:
     BiTreeNode *head_node;
     SnapshotID snapshot_id;
+    EventList event_list;
 public:
     Snapshot(SnapshotID snapshot_id);
     virtual ~Snapshot();
@@ -16,6 +18,8 @@ public:
     
     BiTreeNode *get_head_node() const { return head_node; }
     void set_head_node(BiTreeNode *new_head) { head_node = new_head; }
+    
+    void add_event(Event *event) { event_list.add_event(event); }
 };
 
 #endif

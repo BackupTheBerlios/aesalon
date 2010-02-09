@@ -2,8 +2,15 @@
 #include "MainArea.h"
 #include "MainArea.moc"
 
+#include "DataSourceManager.h"
+#include "data/NetworkSource.h"
+
 MainArea::MainArea(QWidget *parent) {
     this->setTabsClosable(true);
+    
+    DataSourceManager *manager = new DataSourceManager(this);
+    
+    this->add_tab(manager, "&Data source manager");
     
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(tab_close_requested(int)));
 }

@@ -10,12 +10,12 @@ private:
     QString name;
 public:
     DataSource(QString name) : name(name) {}
-    virtual ~DataSource();
+    virtual ~DataSource() {}
     
     const QString &get_name() const { return name; }
     void set_name(const QString &new_name) { name = new_name; }
     
-    virtual DataReceiver *new_receiver() = 0;
+    virtual DataReceiver *spawn_receiver() const = 0;
 };
 
 #endif
