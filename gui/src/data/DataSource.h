@@ -2,6 +2,7 @@
 #define AESALON_GUI_DATA_SOURCE_H
 
 #include <QString>
+#include <QSettings>
 
 #include "DataReceiver.h"
 
@@ -16,6 +17,8 @@ public:
     void set_name(const QString &new_name) { name = new_name; }
     
     virtual DataReceiver *spawn_receiver() const = 0;
+    
+    virtual void save_to(QSettings *settings) = 0;
 };
 
 #endif

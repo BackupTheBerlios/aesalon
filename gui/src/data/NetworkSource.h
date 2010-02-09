@@ -13,6 +13,7 @@ public:
     virtual ~NetworkSource() {}
     
     virtual DataReceiver *spawn_receiver() const { new NetworkReceiver(host, port); }
+    virtual void save_to(QSettings *settings);
 };
 
 #endif

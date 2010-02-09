@@ -14,6 +14,11 @@ private:
     QList<DataSource *> data_source_list;
 public:
     DataSourceManager(QWidget *parent);
+    virtual ~DataSourceManager();
+private slots:
+    void load_from_config();
+    void save_to_config();
+    void update_list();
 public slots:
     void add_new_data_source(DataSource *data_source);
     void data_source_changed(DataSource *data_source);
