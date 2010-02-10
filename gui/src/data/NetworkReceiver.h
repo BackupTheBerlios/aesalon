@@ -7,10 +7,12 @@
 
 class NetworkReceiver : public DataReceiver { Q_OBJECT
 private:
+    QString host;
+    quint16 port;
     QTcpSocket *tcp_socket;
     QByteArray unprocessed;
 public:
-    NetworkReceiver(QString host, quint16 port);
+    NetworkReceiver(QObject *parent, QString host, quint16 port);
     virtual ~NetworkReceiver();
 protected:
     virtual void run();

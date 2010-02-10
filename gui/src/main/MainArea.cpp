@@ -9,7 +9,7 @@ MainArea::MainArea(QWidget *parent) {
     this->setTabsClosable(true);
     
     DataSourceManager *manager = new DataSourceManager(this);
-    
+    connect(manager, SIGNAL(tab_request(QWidget*,QString)), SLOT(add_tab(QWidget*,QString)));
     this->add_tab(manager, "&Data source manager");
     
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(tab_close_requested(int)));

@@ -1,11 +1,7 @@
 #include "NetworkReceiver.h"
 #include "NetworkReceiver.moc"
 
-NetworkReceiver::NetworkReceiver(QString host, quint16 port) {
-    tcp_socket = new QTcpSocket();
-    tcp_socket->connectToHost(host, port);
-    connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));
-    connect(tcp_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+NetworkReceiver::NetworkReceiver(QObject* parent, QString host, quint16 port) : DataReceiver(parent), host(host), port(port) {
 }
 
 NetworkReceiver::~NetworkReceiver() {
@@ -13,9 +9,11 @@ NetworkReceiver::~NetworkReceiver() {
 }
 
 void NetworkReceiver::run() {
-    while(true) {
-        sleep(60);
-    }
+    tcp_socket = new QTcpSocket(NULL);
+    tcp_socket->connectToHost(host, port);
+    connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));
+    connect(tcp_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    exec();
 }
 
 void NetworkReceiver::data_received() {
@@ -27,6 +25,7 @@ void NetworkReceiver::data_received() {
         unprocessed.chop(0);
     }
 }
+
 
 void NetworkReceiver::disconnected() {
     this->exit(0);

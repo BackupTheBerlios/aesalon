@@ -3,13 +3,13 @@
 #include "storage/StorageFactory.h"
 
 Session::Session(QWidget *parent, DataSource *data_source) : QWidget(parent), data_source(data_source) {
-    data_receiver = data_source->spawn_receiver();
+    data_receiver = data_source->spawn_receiver(this);
     data_receiver->start();
     current_memory = snapshot_list.append_snapshot();
 }
 
 Session::~Session() {
-    data_receiver->terminate();
+    data_receiver->quit();
 }
 
 void Session::handle_event(Event *event) {

@@ -6,6 +6,7 @@
 
 class DataReceiver : public QThread { Q_OBJECT
 public:
+    DataReceiver(QObject *parent) : QThread(parent) {}
     virtual ~DataReceiver() {}
 protected:
     virtual void run() = 0;
