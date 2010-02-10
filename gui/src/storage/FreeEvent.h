@@ -9,7 +9,7 @@ private:
     MemoryAddress address;
 public:
     FreeEvent(MemoryAddress address) : Event(), address(address) {}
-    virtual ~FreeEvent();
+    virtual ~FreeEvent() {}
     
     virtual void apply_to(Snapshot *snapshot);  
 };

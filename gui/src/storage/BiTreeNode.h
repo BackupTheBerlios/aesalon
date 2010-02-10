@@ -17,7 +17,7 @@ private:
     
     QList<Block *> block_list;
 public:
-    BiTreeNode(SnapshotID snapshot_id, MemoryAddress address) : snapshot_id(snapshot_id), address(address), end(true) {}
+    BiTreeNode(SnapshotID snapshot_id, MemoryAddress address) : end(true), address(address), snapshot_id(snapshot_id) {}
     virtual ~BiTreeNode() {}
     
     MemoryAddress get_address() const { return address; }

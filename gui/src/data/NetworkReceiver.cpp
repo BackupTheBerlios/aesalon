@@ -1,8 +1,9 @@
 #include "NetworkReceiver.h"
 #include "NetworkReceiver.moc"
+#include "storage/AllocEvent.h"
+#include "storage/FreeEvent.h"
 
 NetworkReceiver::NetworkReceiver(QObject* parent, QString host, quint16 port) : DataReceiver(parent), host(host), port(port) {
-    qDebug("NetworkReceiver::NetworkReceiver(): called . . .");
 }
 
 NetworkReceiver::~NetworkReceiver() {
@@ -18,13 +19,41 @@ void NetworkReceiver::run() {
     exec();
 }
 
+quint64 NetworkReceiver::pop_quint64() {
+    quint64 ret = 0;
+    /* Reserve space for one 64-bit integer . . . */
+    ret |= quint64(unprocessed.at(7)) >> 56;
+    ret |= quint64(unprocessed.at(6)) >> 48;
+    ret |= quint64(unprocessed.at(5)) >> 40;
+    ret |= quint64(unprocessed.at(4)) >> 32;
+    ret |= quint64(unprocessed.at(3)) >> 24;
+    ret |= quint64(unprocessed.at(2)) >> 16;
+    ret |= quint64(unprocessed.at(1)) >> 8;
+    ret |= unprocessed.at(0);
+    unprocessed.remove(0, 8);
+    return ret;
+}
+
 void NetworkReceiver::data_received() {
-    qDebug("NetworkReceiver: Received data from monitor . . .");
     QByteArray received = tcp_socket->readAll();
     unprocessed += received;
     while(unprocessed.size()) {
-        /* TODO: actually process event */
+        quint8 type_byte = unprocessed.at(0);
         unprocessed.remove(0, 1);
+        /* If the first bit is set, then it's a block event . . . */
+        if(type_byte & 0x01) {
+            quint64 address = pop_quint64();
+            if((type_byte & 0x06) == 0) {
+                emit event_received(new AllocEvent(address, pop_quint64()));
+            }
+            else if((type_byte & 0x06) == 1) {
+                emit event_received(new FreeEvent(address));
+                emit event_received(new AllocEvent(pop_quint64(), pop_quint64()));
+            }
+            else if((type_byte & 0x06) == 2) {
+                emit event_received(new FreeEvent(address));
+            }
+        }
     }
 }
 

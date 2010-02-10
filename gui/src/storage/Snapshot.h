@@ -7,8 +7,8 @@
 
 class Snapshot {
 private:
-    BiTreeNode *head_node;
     SnapshotID snapshot_id;
+    BiTreeNode *head_node;
     EventList event_list;
 public:
     Snapshot(SnapshotID snapshot_id);

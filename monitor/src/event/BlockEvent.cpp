@@ -23,8 +23,9 @@ Block *BlockEvent::serialize() {
             serialized->push_word(get_size());
             break;
         case REALLOC_EVENT:
-            serialized->push_word(get_size());
+            /* NOTE: the new address first makes it easier to deserialize later */
             serialized->push_word(get_new_address());
+            serialized->push_word(get_size());
             break;
         case FREE_EVENT: break;
         default:

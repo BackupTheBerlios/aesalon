@@ -6,7 +6,8 @@
 .gdb_history
 core
 vgcore.*
-*.sr.orig
+*.sr.orig 
+.*.swp
 
 # Buildsystem (CMake) ignores
 CMakeFiles

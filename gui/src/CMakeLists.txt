@@ -1,4 +1,5 @@
 add_definitions(-DDEFAULT_PORT=${DEFAULT_PORT})
+add_definitions(-W -Wall -pedantic -Wno-long-long)
 
 aux_source_directory(. DOT_SOURCES)
 aux_source_directory(data DATA_SOURCES)

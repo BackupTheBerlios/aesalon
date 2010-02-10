@@ -14,7 +14,7 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
             node = StorageFactory::new_node(snapshot->get_snapshot_id(), node->get_address() / 2);
             snapshot->get_head_node()->set_left(node);
         }
-        else if(get_address() > node->get_address()) {
+        else if(get_address() >= node->get_address()) {
             node = StorageFactory::new_node(snapshot->get_snapshot_id(), node->get_address() + (node->get_address() / 2));
             snapshot->get_head_node()->set_right(node);
         }
@@ -30,7 +30,7 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
     while(true) {
         if(node->get_left() && get_address() < node->get_address())
             node = node->get_left();
-        else if(node->get_right() && get_address() > node->get_address())
+        else if(node->get_right() && get_address() >= node->get_address())
             node = node->get_right();
         else if(get_address() == node->get_address()) {
             /* Special case: print warning and exit for now . . . */
