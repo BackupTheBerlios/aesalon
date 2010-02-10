@@ -12,7 +12,7 @@ public:
     NetworkSource(QString name, QString host, quint16 port) : DataSource(name), host(host), port(port) {}
     virtual ~NetworkSource() {}
     
-    virtual DataReceiver *spawn_receiver(QObject *parent) const { new NetworkReceiver(parent, host, port); }
+    virtual DataReceiver *spawn_receiver(QObject *parent) const { return new NetworkReceiver(parent, host, port); }
     virtual void save_to(QSettings *settings);
 };
 
