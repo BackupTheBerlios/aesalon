@@ -8,3 +8,4 @@ Graph::Graph(QWidget *parent) : QWidget(parent) {
 Graph::~Graph() {
 
 }
+
