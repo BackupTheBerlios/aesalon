@@ -15,8 +15,8 @@ public:
         QMutexLocker locker(&snapshot_id_mutex);
         return new Snapshot(++last_snapshot_id);
     }
-    static BiTreeNode *new_node(SnapshotID snapshot_id, MemoryAddress address) {
-        return new BiTreeNode(snapshot_id, address);
+    static BiTreeNode *new_node(SnapshotID snapshot_id) {
+        return new BiTreeNode(snapshot_id);
     }
     static Block *new_block(MemoryAddress address, MemorySize size) {
         return new Block(address, size);

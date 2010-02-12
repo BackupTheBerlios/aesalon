@@ -41,15 +41,16 @@ void NetworkReceiver::data_received() {
         unprocessed.remove(0, 1);
         /* If the first bit is set, then it's a block event . . . */
         if(type_byte & 0x01) {
+            quint8 block_type = (type_byte & 0x06) >> 1;
             quint64 address = pop_quint64();
-            if((type_byte & 0x06) == 0) {
+            if(block_type == 0) {
                 emit event_received(new AllocEvent(address, pop_quint64()));
             }
-            else if((type_byte & 0x06) == 1) {
+            else if(block_type == 1) {
                 emit event_received(new FreeEvent(address));
                 emit event_received(new AllocEvent(pop_quint64(), pop_quint64()));
             }
-            else if((type_byte & 0x06) == 2) {
+            else if(block_type == 2) {
                 emit event_received(new FreeEvent(address));
             }
         }

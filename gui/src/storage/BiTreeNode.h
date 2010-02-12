@@ -10,7 +10,6 @@
 class BiTreeNode {
 private:
     bool end;
-    MemoryAddress address;
     SnapshotID snapshot_id;
     
     /** The left node in the tree, e.g. the node that stores the blocks with
@@ -25,10 +24,11 @@ private:
     
     QList<Block *> block_list;
 public:
-    BiTreeNode(SnapshotID snapshot_id, MemoryAddress address) : end(true), address(address), snapshot_id(snapshot_id) {}
+    BiTreeNode(SnapshotID snapshot_id) : end(true), snapshot_id(snapshot_id), left(NULL), right(NULL), parent(NULL) {}
     virtual ~BiTreeNode() {}
     
-    MemoryAddress get_address() const { return address; }
+    SnapshotID get_snapshot_id() const { return snapshot_id; }
+    
     BiTreeNode *get_left() const { return left; }
     void set_left(BiTreeNode *new_left) { left = new_left; if(left) new_left->set_parent(this); }
     BiTreeNode *get_right() const { return right; }
