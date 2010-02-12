@@ -37,7 +37,7 @@ public:
     bool is_end() const { return end; }
     void set_end(bool new_end) { end = new_end; }
     
-    void mark_changed(SnapshotID by_snapshot);
+    BiTreeNode *mark_changed(SnapshotID by_snapshot);
 };
 
 #endif

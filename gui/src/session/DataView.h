@@ -1,0 +1,6 @@
+#ifndef AESALON_GUI_SESSION_DATA_VIEW_H
+#define AESALON_GUI_SESSION_DATA_VIEW_H
+
+
+
+#endif

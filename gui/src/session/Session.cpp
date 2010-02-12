@@ -10,6 +10,7 @@ Session::Session(QWidget *parent, DataSource *data_source) : QWidget(parent), da
 
 Session::~Session() {
     data_receiver->quit();
+    data_receiver->wait();
 }
 
 void Session::handle_event(Event *event) {
