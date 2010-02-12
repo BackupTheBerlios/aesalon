@@ -21,15 +21,14 @@ void NetworkReceiver::run() {
 
 quint64 NetworkReceiver::pop_quint64() {
     quint64 ret = 0;
-    /* Reserve space for one 64-bit integer . . . */
-    ret |= quint64(unprocessed.at(7)) >> 56;
-    ret |= quint64(unprocessed.at(6)) >> 48;
-    ret |= quint64(unprocessed.at(5)) >> 40;
-    ret |= quint64(unprocessed.at(4)) >> 32;
-    ret |= quint64(unprocessed.at(3)) >> 24;
-    ret |= quint64(unprocessed.at(2)) >> 16;
-    ret |= quint64(unprocessed.at(1)) >> 8;
     ret |= unprocessed.at(0);
+    ret |= quint64(quint8(unprocessed.at(1))) << 8;
+    ret |= quint64(quint8(unprocessed.at(2))) << 16;
+    ret |= quint64(quint8(unprocessed.at(3))) << 24;
+    ret |= quint64(quint8(unprocessed.at(4))) << 32;
+    ret |= quint64(quint8(unprocessed.at(5))) << 40;
+    ret |= quint64(quint8(unprocessed.at(6))) << 48;
+    ret |= quint64(quint8(unprocessed.at(7))) << 56;
     unprocessed.remove(0, 8);
     return ret;
 }

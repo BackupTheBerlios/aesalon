@@ -20,6 +20,8 @@ Block *BlockEvent::serialize() {
 
     switch(get_block_type()) {
         case ALLOC_EVENT:
+            std::cout << "first byte of address is " << std::hex << (address & 0xff) << std::endl;
+            std::cout << "second byte of address is " << std::hex << ((address & 0xff00) >> 8) << std::endl;
             serialized->push_word(get_size());
             break;
         case REALLOC_EVENT:

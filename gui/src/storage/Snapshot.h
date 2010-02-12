@@ -10,6 +10,7 @@ private:
     SnapshotID snapshot_id;
     BiTreeNode *head_node;
     EventList event_list;
+    quint8 max_tree_depth;
 public:
     Snapshot(SnapshotID snapshot_id);
     virtual ~Snapshot();
@@ -20,6 +21,8 @@ public:
     void set_head_node(BiTreeNode *new_head) { head_node = new_head; }
     
     void add_event(Event *event) { event_list.add_event(event); }
+    
+    quint8 get_max_tree_depth() { return max_tree_depth; }
 };
 
 #endif

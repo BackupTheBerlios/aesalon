@@ -13,7 +13,15 @@ private:
     MemoryAddress address;
     SnapshotID snapshot_id;
     
-    BiTreeNode *left, *right, *parent;
+    /** The left node in the tree, e.g. the node that stores the blocks with
+        lower addresses than @a address */
+    BiTreeNode *left;
+    /** The right node in the tree, e.g. the node that stores the blocks with
+        higher addresses than @a address */
+    BiTreeNode *right;
+    /** The immediate parent in the tree. In this case, this is hijacked to
+        reference the most recent version of the parent. */
+    BiTreeNode *parent;
     
     QList<Block *> block_list;
 public:
