@@ -8,9 +8,8 @@ SnapshotList::~SnapshotList() {
 
 }
 
-Snapshot *SnapshotList::get_snapshot_by_id(SnapshotID snapshot_id) const {
-    foreach(Snapshot *snapshot, internal_list) {
-        if(snapshot->get_snapshot_id() == snapshot_id) return snapshot;
-    }
-    return NULL;
+Snapshot *SnapshotList::append_snapshot() {
+    Snapshot *s = new Snapshot(++last_id);
+    internal_list.append(s);
+    return s;
 }

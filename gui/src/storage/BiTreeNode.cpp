@@ -1,6 +1,5 @@
 #include "BiTreeNode.h"
 #include "Snapshot.h"
-#include "StorageFactory.h"
 
 Block *BiTreeNode::get_block(MemoryAddress address) const {
     foreach(Block *block, block_list) {
@@ -11,7 +10,7 @@ Block *BiTreeNode::get_block(MemoryAddress address) const {
 
 BiTreeNode *BiTreeNode::mark_changed(SnapshotID by_snapshot) {
     if(snapshot_id == by_snapshot) return this;
-    BiTreeNode *new_node = StorageFactory::new_node(by_snapshot);
+    BiTreeNode *new_node = new BiTreeNode(by_snapshot);
     new_node->left = left;
     if(left) left->parent = new_node;
     new_node->right = right;

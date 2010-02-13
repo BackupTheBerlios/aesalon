@@ -16,8 +16,6 @@ public:
     virtual ~NetworkReceiver();
 private:
     quint64 pop_quint64();
-protected:
-    virtual void run();
 private slots:
     void data_received();
     void disconnected();

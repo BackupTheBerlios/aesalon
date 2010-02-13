@@ -4,19 +4,13 @@
 #include "storage/FreeEvent.h"
 
 NetworkReceiver::NetworkReceiver(QObject* parent, QString host, quint16 port) : DataReceiver(parent), host(host), port(port) {
-}
-
-NetworkReceiver::~NetworkReceiver() {
-}
-
-void NetworkReceiver::run() {
-    QTcpSocket socket(NULL);
-    tcp_socket = &socket;
+    tcp_socket = new QTcpSocket(this);
     tcp_socket->connectToHost(host, port);
     connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));
     connect(tcp_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    /* Start the event loop . . . */
-    exec();
+}
+
+NetworkReceiver::~NetworkReceiver() {
 }
 
 quint64 NetworkReceiver::pop_quint64() {
@@ -59,5 +53,4 @@ void NetworkReceiver::data_received() {
 
 void NetworkReceiver::disconnected() {
     emit no_more_data();
-    quit();
 }

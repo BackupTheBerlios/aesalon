@@ -4,9 +4,9 @@
 #include <QThread>
 #include "storage/Event.h"
 
-class DataReceiver : public QThread { Q_OBJECT
+class DataReceiver : public QObject { Q_OBJECT
 public:
-    DataReceiver(QObject *parent) : QThread(parent) {}
+    DataReceiver(QObject *parent) : QObject(parent) {}
     virtual ~DataReceiver() {}
 signals:
     void event_received(Event *event);

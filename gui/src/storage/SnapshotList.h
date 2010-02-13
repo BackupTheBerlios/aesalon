@@ -5,19 +5,20 @@
 
 #include "SnapshotID.h"
 #include "Snapshot.h"
-#include "StorageFactory.h"
 
 class SnapshotList {
 private:
+    SnapshotID last_id;
     QList<Snapshot *> internal_list;
 public:
     SnapshotList();
     virtual ~SnapshotList();
     
-    Snapshot *append_snapshot() { Snapshot *s = StorageFactory::new_snapshot(); internal_list.append(s); return s; }
-    Snapshot *get_snapshot(int index) const { return internal_list[index]; }
+    SnapshotID get_last_id() const { return last_id; }
+    
+    Snapshot *append_snapshot();
+    Snapshot *get_snapshot(SnapshotID id) const { return internal_list[id]; }
     int get_snapshot_count() const { return internal_list.size(); }
-    Snapshot *get_snapshot_by_id(SnapshotID snapshot_id) const;
 };
 
 #endif

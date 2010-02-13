@@ -1,11 +1,10 @@
 #include "AllocEvent.h"
-#include "StorageFactory.h"
 
 void AllocEvent::apply_to(Snapshot *snapshot) {
     qDebug("Asked to apply AllocEvent to snapshot #%li . . .", (long int)snapshot->get_snapshot_id());
     /* Create the head node if it doesn't exist . . . */
     if(snapshot->get_head_node() == NULL) {
-        snapshot->set_head_node(StorageFactory::new_node(snapshot->get_snapshot_id()));
+        snapshot->set_head_node(new BiTreeNode(snapshot->get_snapshot_id()));
     }
     
     BiTreeNode *node = snapshot->get_head_node();
@@ -17,21 +16,21 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
         if(!(MemoryAddress(address << depth) & 0x01)) {
             if(node->get_left() == NULL) {
                 node = node->mark_changed(snapshot->get_snapshot_id());
-                node->set_left(StorageFactory::new_node(snapshot->get_snapshot_id()));
+                node->set_left(new BiTreeNode(snapshot->get_snapshot_id()));
             }
             node = node->get_left();
         }
         else {
             if(node->get_right() == NULL) {
                 node = node->mark_changed(snapshot->get_snapshot_id());
-                node->set_right(StorageFactory::new_node(snapshot->get_snapshot_id()));
+                node->set_right(new BiTreeNode(snapshot->get_snapshot_id()));
             }
             node = node->get_right();
         }
     }
     
     /* Well, we're at the correct node to add the block into (hopefully, anyhow) . . . */
-    node->add_block(StorageFactory::new_block(address, size));
+    node->add_block(new Block(address, size));
     
     /* Now, set the snapshot's new head node . . . */
     if(snapshot->get_head_node()->get_snapshot_id() != snapshot->get_snapshot_id()) {
