@@ -7,4 +7,4 @@ GUI:
 - Embed Konsole inside ActiveSession?
 - Add "temporary sessions", e.g. sessions that aren't saved
 - Find a way to store the snapshot intervals -- perhaps in DataSource?
-
+- Store the maximum tree depth inside the DataSource

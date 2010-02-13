@@ -25,7 +25,7 @@ include(version_info)
 
 # Set up a few options, depending on the build type
 if(DEVELOPMENT_BUILD)
-#    set(CMAKE_INSTALL_PREFIX "install/")
+    set(CMAKE_INSTALL_PREFIX "install/")
     set(CMAKE_BUILD_TYPE Debug)
 else(DEVELOPMENT_BUILD)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)

@@ -3,5 +3,6 @@
 #add_custom_command(OUTPUT overload.o COMMAND echo "hello" >> overload.o DEPENDS overload.asm WORKING_DIRECTORY src/monitor/overload)
 #add_custom_command(OUTPUT overload.so COMMAND cp overload.o overload.so DEPENDS overload.o WORKING_DIRECTORY src/monitor/overload)
 #add_custom_target(Overload /usr/bin/nasm -f elf64 overload.asm -o overload.o COMMAND gcc -shared overload.o -o overload.so)
-add_custom_command(OUTPUT overload.so COMMAND /usr/bin/gcc -fPIC -shared overload.c -o overload.so -ldl DEPENDS overload.c)
-add_custom_target("overload library" ALL DEPENDS overload.so)
+add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -shared overload.c -o aesalon_overload.so -ldl DEPENDS overload.c)
+add_custom_target("overload library" ALL DEPENDS aesalon_overload.so)
+install(FILES aesalon_overload.so DESTINATION lib/)

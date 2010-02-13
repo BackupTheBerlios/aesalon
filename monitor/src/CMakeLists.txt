@@ -38,6 +38,8 @@ set(SOURCES
 
 add_executable(aesalon ${SOURCES})
 
+install(TARGETS aesalon RUNTIME DESTINATION bin)
+
 if(PROFILE_BUILD)
     set_target_properties(aesalon PROPERTIES LINK_FLAGS -pg)
 endif(PROFILE_BUILD)

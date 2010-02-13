@@ -1,6 +1,6 @@
 #include "SnapshotList.h"
 
-SnapshotList::SnapshotList() {
+SnapshotList::SnapshotList() : last_id(0) {
 
 }
 
