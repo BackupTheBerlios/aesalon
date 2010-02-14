@@ -1,5 +1,7 @@
 #include "DataThread.h"
 #include "DataThread.moc"
+#include "DataRequest.h"
+#include "GraphDataEngine.h"
 
 DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(parent), data_source(data_source) {
 }
@@ -33,10 +35,4 @@ void DataThread::create_new_snapshot() {
 
 void DataThread::no_more_data() {
     snapshot_timer->stop();
-}
-
-void DataThread::data_requested(DataRequest *request) {
-    
-
-    delete request;
 }

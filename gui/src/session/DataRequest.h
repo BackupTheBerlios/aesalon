@@ -3,19 +3,20 @@
 
 #include <QObject>
 
-class Snapshot;
+class SnapshotList;
+class GraphDataEngine;
 
 class DataRequest {
 private:
-    QObject *object;
+    GraphDataEngine *requester;
 public:
-    DataRequest(QObject *by_object) : object(by_object) {}
+    DataRequest(GraphDataEngine *data_engine) : requester(data_engine) {}
     virtual ~DataRequest() {}
     
-    QObject *get_object() const { return object; }
+    GraphDataEngine *get_requester() const { return requester; }
     
-    /* NOTE: this function's definition will change . . . */
-    virtual void get_response(Snapshot *snapshot) = NULL;
+    virtual void construct_response(SnapshotList *snapshot_list) = 0;
+    virtual void process_response() = 0;
 };
 
 #endif
