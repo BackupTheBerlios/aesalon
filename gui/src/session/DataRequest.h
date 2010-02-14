@@ -15,7 +15,9 @@ public:
     
     GraphDataEngine *get_requester() const { return requester; }
     
+    /* NOTE: this method is called from within the data storage thread. */
     virtual void construct_response(SnapshotList *snapshot_list) = 0;
+    /* NOTE: this method is called from the rendering thread. */
     virtual void process_response() = 0;
 };
 

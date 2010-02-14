@@ -20,7 +20,7 @@ public:
     DataThread(QObject *parent, DataSource *data_source);
     virtual ~DataThread();
     
-    void push_request();
+    void push_request(DataRequest *request);
 private slots:
     void event_received(Event *event);
     void create_new_snapshot();

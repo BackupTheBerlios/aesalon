@@ -4,6 +4,7 @@
 #include "SnapshotID.h"
 #include "BiTreeNode.h"
 #include "EventList.h"
+#include "Timestamp.h"
 
 class Snapshot {
 private:
@@ -11,6 +12,8 @@ private:
     BiTreeNode *head_node;
     EventList event_list;
     quint8 max_tree_depth;
+    quint64 active_blocks;
+    Timestamp timestamp;
 public:
     Snapshot(SnapshotID snapshot_id);
     virtual ~Snapshot();
@@ -23,6 +26,9 @@ public:
     void add_event(Event *event) { event_list.add_event(event); }
     
     quint8 get_max_tree_depth() { return max_tree_depth; }
+    
+    const Timestamp &get_timestamp() const { return timestamp; }
+    void update_timestamp() { timestamp = Timestamp(); }
 };
 
 #endif

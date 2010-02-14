@@ -5,6 +5,7 @@
 
 #include "SnapshotID.h"
 #include "Snapshot.h"
+#include "Timestamp.h"
 
 class SnapshotList {
 private:
@@ -18,6 +19,7 @@ public:
     
     Snapshot *append_snapshot();
     Snapshot *get_snapshot(SnapshotID id) const { return internal_list[id]; }
+    Snapshot *get_snapshot_for(const Timestamp &timestamp) const;
     int get_snapshot_count() const { return internal_list.size(); }
 };
 

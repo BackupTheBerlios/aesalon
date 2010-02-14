@@ -38,4 +38,6 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
         while(head_node->get_parent()) head_node = head_node->get_parent();
         snapshot->set_head_node(head_node);
     }
+    /* And update the snapshot's timestamp. */
+    snapshot->update_timestamp();
 }

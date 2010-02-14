@@ -24,6 +24,10 @@ void DataThread::run() {
     delete snapshot_timer;
 }
 
+void DataThread::push_request(DataRequest *request) {
+    
+}
+
 void DataThread::event_received(Event *event) {
     event->apply_to(current_snapshot);
     current_snapshot->add_event(event);
@@ -35,4 +39,5 @@ void DataThread::create_new_snapshot() {
 
 void DataThread::no_more_data() {
     snapshot_timer->stop();
+    /*current_snapshot = snapshot_list.append_snapshot();*/
 }
