@@ -10,7 +10,7 @@ private:
     Timestamp timestamp;
     int count;
 public:
-    ActiveBlocksRequest(GraphDataEngine *data_engine, Timestamp timestamp);
+    ActiveBlocksRequest(GraphDataEngine *data_engine, const Timestamp &timestamp);
     virtual ~ActiveBlocksRequest();
     
     virtual void construct_response(SnapshotList *snapshot_list);

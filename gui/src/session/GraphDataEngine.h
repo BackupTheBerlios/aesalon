@@ -9,6 +9,8 @@
 #include "GraphData.h"
 #include "DataThread.h"
 
+class RenderThread;
+
 class GraphDataEngine : public QObject { Q_OBJECT
 private:
     QMutex queue_mutex;
@@ -37,7 +39,7 @@ public:
         graph_data.append(data);
     }
     
-    void get_data(const Timestamp &timestamp);
+    void request_data(RenderThread *thread, const Timestamp &timestamp);
     
     void handle_requests();
 };

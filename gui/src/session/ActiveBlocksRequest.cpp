@@ -4,7 +4,7 @@
 #include "GraphDataEngine.h"
 #include "GraphData.h"
 
-ActiveBlocksRequest::ActiveBlocksRequest(GraphDataEngine *data_engine, Timestamp timestamp)
+ActiveBlocksRequest::ActiveBlocksRequest(GraphDataEngine *data_engine, const Timestamp &timestamp)
     : DataRequest(data_engine), timestamp(timestamp) {
 }
 
