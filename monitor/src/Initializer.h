@@ -7,6 +7,7 @@
 #include "ProgramManager.h"
 #include "misc/ArgumentParser.h"
 #include "StorageManager.h"
+#include "misc/ConfigParser.h"
 
 /** Initializer class. Basically, handles initialization of the Monitor. */
 class Initializer : public Misc::Singleton<Initializer> {
@@ -21,6 +22,8 @@ private:
     ProgramManager *program_manager;
     
     Misc::ArgumentParser *argument_parser;
+    
+    Misc::ConfigParser *config_parser;
     
     StorageManager *storage_manager;
     

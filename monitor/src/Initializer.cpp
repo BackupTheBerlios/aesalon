@@ -34,13 +34,22 @@ void Initializer::initialize() {
     return_value = 0;
     storage_manager = NULL;
     
+    config_parser = new Misc::ConfigParser();
+    
     argument_parser = new Misc::ArgumentParser(argv);
     
     argument_parser->add_argument(new Misc::Argument("help", 'h', Misc::Argument::NO_ARGUMENT, ""));
-    argument_parser->add_argument(new Misc::Argument("tcp-port", 'p', Misc::Argument::REQUIRED_ARGUMENT, "6321"));
-    argument_parser->add_argument(new Misc::Argument("wait", 'w', Misc::Argument::OPTIONAL_ARGUMENT, "1"));
-    argument_parser->add_argument(new Misc::Argument("libc-path", 0, Misc::Argument::REQUIRED_ARGUMENT, LIBC_PATH));
-    argument_parser->add_argument(new Misc::Argument("overload-path", 'o', Misc::Argument::REQUIRED_ARGUMENT, "./aesalon_overload.so"));
+    std::string port = config_parser->get_config_item("tcp-port");
+    if(port == "") port = Misc::StreamAsString() << DEFAULT_PORT;
+    argument_parser->add_argument(new Misc::Argument("tcp-port", 'p', Misc::Argument::REQUIRED_ARGUMENT, port));
+    std::string wait = config_parser->get_config_item("wait");
+    if(wait == "") wait = "1";
+    argument_parser->add_argument(new Misc::Argument("wait", 'w', Misc::Argument::OPTIONAL_ARGUMENT, wait));
+    std::string libc_path = config_parser->get_config_item("libc-path");
+    if(libc_path == "") libc_path = LIBC_PATH;
+    argument_parser->add_argument(new Misc::Argument("libc-path", 0, Misc::Argument::REQUIRED_ARGUMENT, libc_path));
+    std::string overload_path = config_parser->get_config_item("overload-path");
+    argument_parser->add_argument(new Misc::Argument("overload-path", 'o', Misc::Argument::REQUIRED_ARGUMENT, overload_path));
 
     argument_parser->parse();
 
@@ -48,6 +57,9 @@ void Initializer::initialize() {
         usage();
         return;
     }
+    
+    if(argument_parser->get_argument("overload-path")->get_data() == "")
+        throw Exception::BasicException("No overload-path specified.");
     
     storage_manager = new StorageManager();
     
@@ -98,10 +110,11 @@ void Initializer::usage() {
     std::cout << ", copyright (C) 2009-2010 strange <kawk256@gmail.com>" << std::endl;
     std::cout << "usage: " << argv[0] << " [arguments] executable [executable arguments]" << std::endl;
     std::cout << "\t--help, -h\t\tPrint this usage message." << std::endl;
-    std::cout << "\t--tcp-port, -p\t\tSet the port to listen on for connections. Defaults to " << DEFAULT_PORT << "." << std::endl;
-    std::cout << "\t--wait, -w\t\tWait for a TCP connection before executing. Defaults to false." << std::endl;
-    std::cout << "\t--libc-path\t\tThe path to the current version of libc being used. Defaults to " << LIBC_PATH << "." << std::endl;
-    std::cout << "\t--\t\t\tDenotes the end of the argument list." << std::endl;
+    std::cout << "\t--tcp-port, -p\t\tSet the port to listen on for connections. Currently is " << argument_parser->get_argument("tcp-port")->get_data() << "." << std::endl;
+    std::cout << "\t--wait, -w\t\tNumber of TCP connections to accept before executing. Defaults to 0." << std::endl;
+    std::cout << "\t--libc-path\t\tThe path to the current version of libc being used. Currently is " << LIBC_PATH << "." << std::endl;
+    std::cout << "\t--overload-path\t\tThe path to the aesalon overload library. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
+    std::cout << "\t--\t\t\tOptional, denotes the end of the argument list." << std::endl;
 }
 
 void Initializer::run() {
