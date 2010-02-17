@@ -98,6 +98,7 @@ void Initializer::initialize() {
 }
 
 void Initializer::deinitialize() {
+    if(config_parser) delete config_parser;
     if(storage_manager) delete storage_manager;
     if(argument_parser) delete argument_parser;
     if(program_manager) delete program_manager;

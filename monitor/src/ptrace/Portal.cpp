@@ -224,8 +224,7 @@ void Portal::handle_signal() {
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
     }
-    Misc::Message::Message(Misc::Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Caught unknown signal " << signal << ", resuming execution with signal");
-    /* Default action: continue */
+    /* If the signal wasn't caught by one of the signal handlers, then we're not interested in it. Continue execution. */
     continue_execution(signal);
 }
 

@@ -6,8 +6,8 @@
 
 class ActiveBlocksEngine : public GraphDataEngine { Q_OBJECT
 protected:
-    DataRequest *spawn_new_request(const Timestamp &timestamp) const
-        { return NULL; /*new ActiveBlocksRequest(this, timestamp);*/ }
+    DataRequest *spawn_new_request(const Timestamp &timestamp)
+        { return new ActiveBlocksRequest(this, timestamp); }
 public:
     ActiveBlocksEngine(QObject *parent, DataThread *data_thread);
     virtual ~ActiveBlocksEngine();

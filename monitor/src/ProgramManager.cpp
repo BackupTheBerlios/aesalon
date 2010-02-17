@@ -50,7 +50,6 @@ void ProgramManager::place_initial_breakpoints() {
     Word overload_offset = get_ptrace_portal()->get_lib_offset(overload_path.substr(overload_path.find_last_of('/')));
     
     /* TODO: find a better way than adding hard-coded values to get the offset of the int3 instruction . . . */
-    std::cout << "overload_offset: " << overload_offset << std::endl;
     PTrace::Breakpoint *bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_malloc_hook")->get_address()+69, 0xcc);
     get_ptrace_portal()->add_breakpoint(bp);
     bp->add_observer(get_ptrace_portal()->get_malloc_observer());
