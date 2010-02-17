@@ -1,3 +1,3 @@
 #include "DataRequest.h"
-#include "storage/Snapshot.h"
-#include "GraphDataEngine.h"
+#include "DataThread.h"
+#include "VisualizationThread.h"

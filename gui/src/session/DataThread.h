@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QTimer>
+#include <QQueue>
 
 #include "storage/SnapshotList.h"
 #include "data/DataSource.h"
@@ -16,11 +17,10 @@ private:
     SnapshotList snapshot_list;
     Snapshot *current_snapshot;
     QTimer *snapshot_timer;
+    QQueue<DataRequest *> request_list;
 public:
     DataThread(QObject *parent, DataSource *data_source);
     virtual ~DataThread();
-    
-    void push_request(DataRequest *request);
 private slots:
     void event_received(Event *event);
     void create_new_snapshot();

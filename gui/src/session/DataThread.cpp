@@ -1,7 +1,5 @@
 #include "DataThread.h"
 #include "DataThread.moc"
-#include "DataRequest.h"
-#include "GraphDataEngine.h"
 
 DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(parent), data_source(data_source) {
 }
@@ -22,10 +20,6 @@ void DataThread::run() {
     exec();
     delete data_receiver;
     delete snapshot_timer;
-}
-
-void DataThread::push_request(DataRequest *request) {
-    
 }
 
 void DataThread::event_received(Event *event) {
