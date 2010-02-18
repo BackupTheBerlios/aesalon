@@ -5,11 +5,13 @@
 #include <QImage>
 
 #include "VisualizationThread.h"
+#include "VisualizationRequest.h"
 
 class Visualization : public QWidget { Q_OBJECT
 private:
     VisualizationThread *v_thread;
     QImage *current_image;
+    VisualizationRequest *current_request;
 protected:
     virtual VisualizationThread *create_v_thread(DataThread *data_thread)
         { data_thread = data_thread; return NULL; }
@@ -20,6 +22,8 @@ protected:
     virtual void paintEvent(QPaintEvent *event);
 private slots:
     void update_image(QImage *image);
+signals:
+    void visualization_request(VisualizationRequest *request);
 };
 
 #endif

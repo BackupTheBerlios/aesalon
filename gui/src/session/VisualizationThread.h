@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QImage>
 
+#include "VisualizationRequest.h"
 #include "DataRequestQueue.h"
 #include "storage/Timestamp.h"
 
@@ -13,6 +14,7 @@ private:
     DataThread *data_thread;
     DataRequestQueue *request_queue;
     QList<VisualizationData *> v_data;
+    VisualizationRequest *current_request;
 public:
     VisualizationThread(DataThread *data_thread, QObject *parent = 0);
     virtual ~VisualizationThread();
@@ -22,7 +24,7 @@ protected:
     virtual void run();
     void send_request(DataRequest *request);
 public slots:
-    void render(const Timestamp &from, const Timestamp &to);
+    void update_request(VisualizationRequest *new_request);
 signals:
     void replace_image(QImage *new_image);
 };

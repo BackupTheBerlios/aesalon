@@ -18,6 +18,7 @@ void VisualizationThread::run() {
             DataRequest *request = get_request_queue()->pop_request();
             VisualizationData *data = request->create_data();
             v_data.append(data);
+            if(!current_request || data->is_within(current_request)) { /* then draw the data. */ }
         }
         msleep(50);
     }
@@ -27,6 +28,7 @@ void VisualizationThread::send_request(DataRequest *request) {
     data_thread->get_request_queue()->push_request(request);
 }
 
-void VisualizationThread::render(const Timestamp &from, const Timestamp &to) {
-    
+void VisualizationThread::update_request(VisualizationRequest *new_request) {
+    current_request = new_request;
+    /* TODO: actually request the data in here . . . */
 }
