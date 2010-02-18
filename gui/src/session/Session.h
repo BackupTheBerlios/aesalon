@@ -17,6 +17,7 @@ class Session : public QWidget { Q_OBJECT
 private:
     DataSource *data_source;
     DataThread *data_thread;
+    QTabWidget *tab_widget;
 public:
     Session(QWidget *parent, DataSource *data_source);
     virtual ~Session();

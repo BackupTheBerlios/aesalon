@@ -2,6 +2,7 @@
 #define AESALON_GUI_SESSION_DATA_REQUEST_H
 
 class DataThread;
+class VisualizationData;
 class VisualizationThread;
 
 class DataRequest {
@@ -12,7 +13,7 @@ public:
     virtual ~DataRequest() {}
     
     virtual void gather_data(DataThread *data_thread) = 0;
-    virtual void apply_data() = 0;
+    virtual VisualizationData *create_data() = 0;
 };
 
 #endif

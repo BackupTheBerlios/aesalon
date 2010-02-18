@@ -2,8 +2,8 @@
 #include "Visualization.h"
 #include "Visualization.moc"
 
-Visualization::Visualization(QWidget *parent) : QWidget(parent), current_image(NULL) {
-    v_thread = create_v_thread();
+Visualization::Visualization(DataThread *data_thread, QWidget *parent) : QWidget(parent), current_image(NULL) {
+    v_thread = create_v_thread(data_thread);
     if(v_thread == NULL) {
         this->deleteLater();
         return;
@@ -13,7 +13,8 @@ Visualization::Visualization(QWidget *parent) : QWidget(parent), current_image(N
 }
 
 Visualization::~Visualization() {
-    
+    v_thread->quit();
+    v_thread->wait();
 }
 
 void Visualization::paintEvent(QPaintEvent *event) {

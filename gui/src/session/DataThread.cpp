@@ -2,6 +2,7 @@
 #include "DataThread.moc"
 
 DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(parent), data_source(data_source) {
+    request_queue = new DataRequestQueue();
 }
 
 DataThread::~DataThread() {
