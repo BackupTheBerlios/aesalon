@@ -62,6 +62,9 @@ SymbolParser::SymbolParser(Parser *elf_parser) : elf_parser(elf_parser) {
 }
 
 SymbolParser::~SymbolParser() {
+    for(symbol_vector_t::iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
+        Initializer::get_instance()->get_storage_manager()->get_symbol(*i)->~Symbol();
+    }
 }
 
 Symbol *SymbolParser::get_symbol(std::string name) const {

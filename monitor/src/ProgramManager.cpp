@@ -61,4 +61,6 @@ void ProgramManager::place_initial_breakpoints() {
     bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_free_hook")->get_address()+65, 0xcc);
     get_ptrace_portal()->add_breakpoint(bp);
     bp->add_observer(get_ptrace_portal()->get_free_observer());
+    
+    delete overload_parser;
 }
