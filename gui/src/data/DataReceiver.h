@@ -4,13 +4,19 @@
 #include <QThread>
 #include "storage/Event.h"
 
+class DataThread;
+
 class DataReceiver : public QObject { Q_OBJECT
+private:
+    DataThread *data_thread;
 public:
-    DataReceiver(QObject *parent) : QObject(parent) {}
+    DataReceiver(DataThread *data_thread) : QObject(NULL), data_thread(data_thread) {}
     virtual ~DataReceiver() {}
-signals:
+    
     void event_received(Event *event);
-    void no_more_data();
+signals:
+    void begun();
+    void finished();
 };
 
 #endif

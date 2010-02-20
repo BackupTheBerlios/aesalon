@@ -12,12 +12,13 @@ private:
     QTcpSocket *tcp_socket;
     QByteArray unprocessed;
 public:
-    NetworkReceiver(QObject *parent, QString host, quint16 port);
+    NetworkReceiver(DataThread *data_thread, QString host, quint16 port);
     virtual ~NetworkReceiver();
 private:
     quint64 pop_quint64();
 private slots:
     void data_received();
+    void connected();
     void disconnected();
 };
 

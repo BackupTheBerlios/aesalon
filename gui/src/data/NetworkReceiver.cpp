@@ -1,13 +1,15 @@
+
 #include "NetworkReceiver.h"
 #include "NetworkReceiver.moc"
 #include "storage/AllocEvent.h"
 #include "storage/FreeEvent.h"
 
-NetworkReceiver::NetworkReceiver(QObject* parent, QString host, quint16 port) : DataReceiver(parent), host(host), port(port) {
+NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 port) : DataReceiver(data_thread), host(host), port(port) {
     tcp_socket = new QTcpSocket(this);
     tcp_socket->connectToHost(host, port);
     connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));
     connect(tcp_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(tcp_socket, SIGNAL(connected()), SLOT(connected()));
 }
 
 NetworkReceiver::~NetworkReceiver() {
@@ -51,6 +53,10 @@ void NetworkReceiver::data_received() {
     }
 }
 
+void NetworkReceiver::connected() {
+    emit begun();
+}
+
 void NetworkReceiver::disconnected() {
-    emit no_more_data();
+    emit finished();
 }

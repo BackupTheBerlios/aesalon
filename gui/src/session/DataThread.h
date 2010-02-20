@@ -24,10 +24,11 @@ public:
     virtual ~DataThread();
     
     DataRequestQueue *get_request_queue() const { return request_queue; }
-private slots:
     void event_received(Event *event);
+private slots:
     void create_new_snapshot();
-    void no_more_data();
+    void begun();
+    void finished();
 protected:
     virtual void run();
 };

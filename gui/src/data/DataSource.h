@@ -16,7 +16,7 @@ public:
     const QString &get_name() const { return name; }
     void set_name(const QString &new_name) { name = new_name; }
     
-    virtual DataReceiver *spawn_receiver(QObject *parent) const = 0;
+    virtual DataReceiver *spawn_receiver(DataThread *data_thread) const = 0;
     
     virtual void save_to(QSettings *settings) = 0;
 };
