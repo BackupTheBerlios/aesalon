@@ -12,6 +12,7 @@
 #include "data/DataReceiver.h"
 #include "storage/SnapshotList.h"
 #include "DataThread.h"
+#include "Visualization.h"
 
 class Session : public QWidget { Q_OBJECT
 private:
@@ -21,6 +22,8 @@ private:
 public:
     Session(QWidget *parent, DataSource *data_source);
     virtual ~Session();
+private slots:
+    void new_visualization(Visualization *visualization);
 };
 
 #endif

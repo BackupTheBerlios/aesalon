@@ -3,6 +3,7 @@
 
 DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(parent), data_source(data_source) {
     request_queue = new DataRequestQueue();
+    current_snapshot = snapshot_list.append_snapshot();
 }
 
 DataThread::~DataThread() {
@@ -10,10 +11,9 @@ DataThread::~DataThread() {
 }
 
 void DataThread::run() {
-    data_receiver = data_source->spawn_receiver(NULL);
+    data_receiver = data_source->spawn_receiver(this);
     connect(data_receiver, SIGNAL(begun()), SLOT(begun()));
     connect(data_receiver, SIGNAL(finished()), SLOT(finished()));
-    current_snapshot = snapshot_list.append_snapshot();
     snapshot_timer = new QTimer();
     connect(snapshot_timer, SIGNAL(timeout()), this, SLOT(create_new_snapshot()));
     exec();

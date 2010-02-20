@@ -2,19 +2,26 @@
 #include "Visualization.h"
 #include "Visualization.moc"
 
-Visualization::Visualization(DataThread *data_thread, QWidget *parent) : QWidget(parent), current_image(NULL) {
+Visualization::Visualization(DataThread *data_thread, QWidget *parent)
+    : QWidget(parent), v_thread(NULL), data_thread(data_thread), current_image(NULL) {
+}
+
+Visualization::~Visualization() {
+    if(v_thread) {
+        v_thread->get_request_queue()->push_request(NULL);
+        v_thread->wait();
+    }
+}
+
+void Visualization::initialize() {
     v_thread = create_v_thread(data_thread);
     if(v_thread == NULL) {
+        qDebug("Failed to create v_thread!");
         this->deleteLater();
         return;
     }
     connect(v_thread, SIGNAL(replace_image(QImage*)), SLOT(update_image(QImage*)));
     v_thread->start();
-}
-
-Visualization::~Visualization() {
-    v_thread->quit();
-    v_thread->wait();
 }
 
 void Visualization::paintEvent(QPaintEvent *event) {

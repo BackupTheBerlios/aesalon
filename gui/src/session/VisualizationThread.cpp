@@ -13,9 +13,14 @@ VisualizationThread::~VisualizationThread() {
 }
 
 void VisualizationThread::run() {
-    while(true) {
+    bool finished = false;
+    while(!finished) {
         while(get_request_queue()->current_requests() > 0) {
             DataRequest *request = get_request_queue()->pop_request();
+            if(request == NULL) {
+                finished = true;
+                break;
+            }
             VisualizationData *data = request->create_data();
             v_data.append(data);
             if(!current_request || data->is_within(current_request)) { /* then draw the data. */ }

@@ -10,6 +10,10 @@ public:
     ActiveBlocksVisualization(DataThread *data_thread);
     virtual ~ActiveBlocksVisualization();
     
+    static QString get_title() {
+        return tr("Active Blocks");
+    }
+    
 };
 
 #endif

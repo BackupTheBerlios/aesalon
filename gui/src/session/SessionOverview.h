@@ -6,6 +6,7 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include "storage/Timestamp.h"
+#include "VisualizationList.h"
 
 class SessionOverview : public QWidget { Q_OBJECT
 private:
@@ -16,12 +17,14 @@ private:
     } status;
     Timestamp start_timestamp;
     Timestamp finish_timestamp;
+    DataThread *data_thread;
     
     QFormLayout *main_layout;
     QLabel *time_running_label;
     QPushButton *new_visualization_button;
+    VisualizationList *v_list;
 public:
-    SessionOverview(QWidget* parent = 0);
+    SessionOverview(DataThread *data_thread);
     ~SessionOverview();
 private slots:
     void update_time_running();
@@ -29,6 +32,8 @@ private slots:
 public slots:
     void started();
     void finished();
+signals:
+    void new_visualization(Visualization *visualization);
 };
 
 #endif
