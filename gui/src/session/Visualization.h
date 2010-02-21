@@ -3,10 +3,12 @@
 
 #include <QWidget>
 #include <QImage>
+#include <QVBoxLayout>
 
 #include "VisualizationThread.h"
 #include "VisualizationRequest.h"
 #include "DataThread.h"
+#include "TimeSlider.h"
 
 class Visualization : public QWidget { Q_OBJECT
 private:
@@ -14,6 +16,8 @@ private:
     DataThread *data_thread;
     QImage *current_image;
     VisualizationRequest *current_request;
+    QVBoxLayout *main_layout;
+    TimeSlider *test_slider;
 protected:
     virtual VisualizationThread *create_v_thread(DataThread *data_thread)
         { data_thread = data_thread; return NULL; }
@@ -23,7 +27,10 @@ public:
     
     virtual void initialize();
     
-    static QString get_title() {
+    static QString get_static_title() {
+        return "ERROR!";
+    }
+    virtual QString get_title() const {
         return "ERROR!";
     }
 protected:
