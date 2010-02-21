@@ -12,7 +12,7 @@ DataThread::~DataThread() {
 
 void DataThread::run() {
     data_receiver = data_source->spawn_receiver(this);
-    connect(data_receiver, SIGNAL(begun()), SLOT(begun()));
+    connect(data_receiver, SIGNAL(started()), SLOT(started()));
     connect(data_receiver, SIGNAL(finished()), SLOT(finished()));
     snapshot_timer = new QTimer();
     connect(snapshot_timer, SIGNAL(timeout()), this, SLOT(create_new_snapshot()));
@@ -30,7 +30,7 @@ void DataThread::create_new_snapshot() {
     current_snapshot = snapshot_list.append_snapshot();
 }
 
-void DataThread::begun() {
+void DataThread::started() {
     /* NOTE: get this from somewhere else . . . hardcoding it is a bad idea. */
     snapshot_timer->start(5000);
 }

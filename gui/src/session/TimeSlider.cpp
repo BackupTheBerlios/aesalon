@@ -38,7 +38,6 @@ int TimeSlider::valueFromText(const QString& text) const {
         stream >> sep;
     }
     stream >> milliseconds;
-    qDebug("Turned string \"%s\" into %i . . .", text.toStdString().c_str(), ((minutes * 60) + seconds)*1000 + milliseconds);
     return ((minutes * 60) + seconds)*1000 + milliseconds;
 }
 
@@ -47,7 +46,6 @@ QValidator::State TimeSlider::validate(QString& input, int& pos) const {
     int position = 0;
     bool read = false;
     if(input.indexOf(':') != -1) {
-        qDebug("Reading minutes . . .");
         read = true;
         for(; position < input.indexOf(':'); position ++) {
             if(!isdigit(bytes[position])) return QValidator::Invalid;
@@ -55,7 +53,6 @@ QValidator::State TimeSlider::validate(QString& input, int& pos) const {
         position ++;
     }
     if(input.indexOf('.') != -1) {
-        qDebug("Reading seconds . . .");
         read = true;
         int i = 0;
         for(; position < input.indexOf('.'); position ++) {
@@ -72,7 +69,6 @@ QValidator::State TimeSlider::validate(QString& input, int& pos) const {
         }
     }
     if(read) {
-        qDebug() << "Accepted string" << input << " . . .";
         return QValidator::Acceptable;
     }
     return QValidator::Invalid;
@@ -83,7 +79,6 @@ void TimeSlider::stepBy(int steps) {
 }
 
 void TimeSlider::fixup(QString& input) const {
-    qDebug() << "Asked to fix-up " << input.toStdString().c_str() << " . . .";
     QTextStream stream(&input);
     double value = -0.1;
     stream >> value;

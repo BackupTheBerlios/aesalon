@@ -5,15 +5,16 @@
 
 class Timestamp {
 private:
-    QDateTime time;
+    QDateTime internal_time;
 public:
-    Timestamp() : time(QDateTime::currentDateTime()) {}
-    Timestamp(const Timestamp &other) : time(other.time) {}
+    Timestamp() : internal_time(QDateTime::currentDateTime()) {}
+    Timestamp(const Timestamp &other) : internal_time(other.internal_time) {}
     bool operator<(const Timestamp &other) const;
     bool operator>(const Timestamp &other) const;
     bool operator==(const Timestamp &other) const;
     Timestamp &operator=(const Timestamp &other);
     qint64 seconds_until(const Timestamp &other);
+    qint64 ms_until(const Timestamp &other);
 };
 
 #endif

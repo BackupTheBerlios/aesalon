@@ -27,7 +27,7 @@ public:
     void event_received(Event *event);
 private slots:
     void create_new_snapshot();
-    void begun();
+    void started();
     void finished();
 protected:
     virtual void run();

@@ -15,7 +15,7 @@ public:
     
     void event_received(Event *event);
 signals:
-    void begun();
+    void started();
     void finished();
 };
 
