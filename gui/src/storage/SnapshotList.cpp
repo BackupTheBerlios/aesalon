@@ -19,10 +19,12 @@ Snapshot *SnapshotList::get_snapshot_for(const Timestamp &timestamp) const {
     /* NOTE: speed this up via a binary-style search through the list: try size/2, size/2+size/4 or size/2-size/4 . . . */
     int i;
     for(i = 0; i < internal_list.size(); i ++) {
-        if(internal_list[i]->get_timestamp() > timestamp) break;
+        if(internal_list[i]->get_timestamp() >= timestamp) break;
     }
-    if(i == internal_list.size()) return NULL;
-    i --;
+    if(i == internal_list.size()) {
+        qDebug("Couldn't find snapshot for requested time: %s", timestamp.to_string().toStdString().c_str());
+        return NULL;
+    }
     s->set_head_node(internal_list[i]->get_head_node());
     return s;
 }

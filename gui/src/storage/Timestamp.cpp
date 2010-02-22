@@ -4,8 +4,16 @@ bool Timestamp::operator<(const Timestamp &other) const {
     return internal_time < other.internal_time;
 }
 
+bool Timestamp::operator<=(const Timestamp &other) const {
+    return internal_time <= other.internal_time;
+}
+
 bool Timestamp::operator>(const Timestamp &other) const {
     return internal_time > other.internal_time;
+}
+
+bool Timestamp::operator>=(const Timestamp &other) const {
+    return internal_time >= other.internal_time;
 }
 
 bool Timestamp::operator==(const Timestamp &other) const {
@@ -39,4 +47,8 @@ qint64 Timestamp::ms_until(const Timestamp& other) const {
 
 void Timestamp::add_ms(qint64 ms) {
     internal_time = internal_time.addMSecs(ms);
+}
+
+QString Timestamp::to_string() const {
+    return internal_time.toString();
 }

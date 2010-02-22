@@ -14,6 +14,8 @@ public:
     
     virtual void gather_data(DataThread *data_thread) = 0;
     virtual VisualizationData *create_data() = 0;
+    
+    VisualizationThread *get_v_thread() const { return v_thread; }
 };
 
 #endif

@@ -3,20 +3,32 @@
 
 #include <QWidget>
 #include <QImage>
-#include <QVBoxLayout>
+#include <QFormLayout>
 
 #include "VisualizationThread.h"
 #include "VisualizationRequest.h"
 #include "DataThread.h"
 #include "TimeSlider.h"
 
+class VisualizationCanvas : public QWidget { Q_OBJECT
+private:
+    QImage *image;
+public:
+    VisualizationCanvas() : image(NULL) {}
+    virtual ~VisualizationCanvas() {}
+protected:
+    virtual void paintEvent(QPaintEvent *event);
+public slots:
+    void update_image(QImage *image);
+};
+
 class Visualization : public QWidget { Q_OBJECT
 private:
     VisualizationThread *v_thread;
     DataThread *data_thread;
-    QImage *current_image;
     VisualizationRequest *current_request;
-    QVBoxLayout *main_layout;
+    VisualizationCanvas *canvas;
+    QFormLayout *main_layout;
     TimeSlider *from_slider;
     TimeSlider *to_slider;
 protected:
@@ -34,10 +46,8 @@ public:
     virtual QString get_title() const {
         return "ERROR!";
     }
-protected:
-    virtual void paintEvent(QPaintEvent *event);
 private slots:
-    void update_image(QImage *image);
+    void update_slider_ranges();
     void handle_slider_change_from(Timestamp time);
     void handle_slider_change_to(Timestamp time);
 signals:

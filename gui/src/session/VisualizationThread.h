@@ -15,6 +15,7 @@ private:
     DataRequestQueue *request_queue;
     QList<VisualizationData *> v_data;
     VisualizationRequest *current_request;
+    QImage *current_image;
 public:
     VisualizationThread(DataThread *data_thread, QObject *parent = 0);
     virtual ~VisualizationThread();
@@ -23,6 +24,7 @@ public:
 protected:
     virtual void run();
     void send_request(DataRequest *request);
+    virtual void generate_requests(VisualizationRequest *current_request) = 0;
 public slots:
     void update_request(VisualizationRequest *new_request);
 signals:

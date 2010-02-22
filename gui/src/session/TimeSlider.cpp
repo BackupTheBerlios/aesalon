@@ -17,7 +17,7 @@ TimeSlider::TimeSlider(QWidget* parent) : QWidget(parent) {
     slider->setInvertedControls(true);
     slider->setSingleStep(100);
     slider->setPageStep(5000);
-    slider->setMaximum(1000);
+    slider->setMaximum(0);
     connect(slider, SIGNAL(valueChanged(int)), SLOT(update_display(int)));
     connect(slider, SIGNAL(sliderReleased()), SLOT(emit_changed()));
     layout()->addWidget(slider);

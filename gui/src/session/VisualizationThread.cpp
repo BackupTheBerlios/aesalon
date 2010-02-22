@@ -23,7 +23,10 @@ void VisualizationThread::run() {
             }
             VisualizationData *data = request->create_data();
             v_data.append(data);
-            if(!current_request || data->is_within(current_request)) { /* then draw the data. */ }
+            if(current_request && data->is_within(current_request)) {
+                /* then draw the data. */
+                if(data->render_onto(current_image, current_request)) emit replace_image(current_image);
+            }
         }
         msleep(50);
     }
@@ -35,5 +38,6 @@ void VisualizationThread::send_request(DataRequest *request) {
 
 void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request = new_request;
-    /* TODO: actually request the data in here . . . */
+    generate_requests(current_request);
+    current_image = new QImage();
 }

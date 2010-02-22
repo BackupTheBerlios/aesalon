@@ -19,6 +19,9 @@ private:
     Snapshot *current_snapshot;
     QTimer *snapshot_timer;
     DataRequestQueue *request_queue;
+    QTimer *request_queue_timer;
+    
+    Timestamp *start_time, *finish_time;
 public:
     DataThread(QObject *parent, DataSource *data_source);
     virtual ~DataThread();
@@ -26,11 +29,15 @@ public:
     DataRequestQueue *get_request_queue() const { return request_queue; }
     void event_received(Event *event);
     
+    const Timestamp *get_start_time() const { return start_time; }
+    const Timestamp *get_finish_time() const { return finish_time; }
+    
     SnapshotList *get_snapshot_list() { return &snapshot_list; }
 private slots:
     void create_new_snapshot();
     void started();
     void finished();
+    void process_request_queue();
 protected:
     virtual void run();
 signals:
