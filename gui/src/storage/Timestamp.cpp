@@ -17,11 +17,11 @@ Timestamp &Timestamp::operator=(const Timestamp &other) {
     return *this;
 }
 
-qint64 Timestamp::seconds_until(const Timestamp& other) {
+qint64 Timestamp::seconds_until(const Timestamp& other) const {
     return internal_time.secsTo(other.internal_time);
 }
 
-qint64 Timestamp::ms_until(const Timestamp& other) {
+qint64 Timestamp::ms_until(const Timestamp& other) const {
     qint64 seconds = seconds_until(other);
     QTime t = internal_time.time();
     QTime t2 = other.internal_time.time();

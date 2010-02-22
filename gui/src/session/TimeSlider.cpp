@@ -4,86 +4,82 @@
 #include "TimeSlider.h"
 #include "TimeSlider.moc"
 
-TimeSlider::TimeSlider(QWidget* parent) : QSpinBox(parent) {
-    setMinimum(0.0);
-    setMaximum(6000000.0);
+TimeSlider::TimeSlider(QWidget* parent) : QWidget(parent) {
+    setLayout(new QHBoxLayout());
+    display = new QLineEdit("00:00.000");
+    display->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    connect(display, SIGNAL(returnPressed()), SLOT(update_slider()));
+    layout()->addWidget(display);
+    
+    slider = new QSlider();
+    slider->setOrientation(Qt::Horizontal);
+    slider->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+    slider->setInvertedControls(true);
+    slider->setSingleStep(100);
+    slider->setPageStep(5000);
+    slider->setMaximum(1000);
+    connect(slider, SIGNAL(valueChanged(int)), SLOT(update_display(int)));
+    layout()->addWidget(slider);
 }
 
 TimeSlider::~TimeSlider() {
 
 }
 
-QString TimeSlider::textFromValue(int value) const {
-    int minutes = int(value/1000) / 60;
-    int seconds = int(value/1000) % 60;
-    int milliseconds = value % 1000;
-    QString text;
-    text = text.sprintf("%02i:%02i.%03i", minutes, seconds, milliseconds);
-    return text;
+void TimeSlider::set_range(const Timestamp& from, const Timestamp& to) {
+    slider->setMaximum(from.ms_until(to));
 }
 
-int TimeSlider::valueFromText(const QString& text) const {
-    int minutes = 0;
-    int seconds = 0, milliseconds = 0;
-    char sep;
-    QString string = text;
-    QTextStream stream(&string);
-    stream >> minutes;
-    stream >> sep;
-    stream >> sep;
-    seconds += (sep - '0') * 10;
-    stream >> sep;
-    if(sep != '.') {
-        seconds += (sep - '0');
-        stream >> sep;
-    }
-    stream >> milliseconds;
-    return ((minutes * 60) + seconds)*1000 + milliseconds;
+void TimeSlider::update_display(int new_value) {
+    if(new_value < 0) return;
+    QString string;
+    string.sprintf("%02i:%02i.%03i", (new_value / 1000) / 60, (new_value / 1000) % 60, new_value % 1000);
+    display->setText(string);
 }
 
-QValidator::State TimeSlider::validate(QString& input, int& pos) const {
-    QByteArray bytes = input.toAscii();
-    int position = 0;
-    bool read = false;
-    if(input.indexOf(':') != -1) {
-        read = true;
-        for(; position < input.indexOf(':'); position ++) {
-            if(!isdigit(bytes[position])) return QValidator::Invalid;
+void TimeSlider::update_slider() {
+    QString string = display->text();
+    QByteArray input = string.toAscii();
+    int i = 0;
+    QString minutes, seconds, milliseconds;
+    for(; i < string.size(); i ++) {
+        if(isdigit(input[i])) {
+            minutes += input[i];
+            continue;
         }
-        position ++;
+        else if(input[i] == ':') break;
+        return;
     }
-    if(input.indexOf('.') != -1) {
-        read = true;
-        int i = 0;
-        for(; position < input.indexOf('.'); position ++) {
-            if(!isdigit(bytes[position])) return QValidator::Invalid;
-            i++;
+    if(input[i] != ':') return;
+    i ++;
+    for(; i < string.size(); i ++) {
+        if(isdigit(input[i])) {
+            seconds += input[i];
+            continue;
         }
-        if(i > 2) return QValidator::Invalid;
-        position ++;
+        else if(input[i] == '.') break;
+        return;
     }
-    if(position < input.size()) {
-        for(; position < input.size(); position ++) {
-            if(!isdigit(bytes[position])) return QValidator::Invalid;
-            read = true;
+    if(i != string.size()) {
+        if(input[i] != '.') return;
+        i ++;
+        for(; i < string.size(); i ++) {
+            if(isdigit(input[i])) {
+                milliseconds += input[i];
+                continue;
+            }
+            return;
         }
     }
-    if(read) {
-        return QValidator::Acceptable;
-    }
-    return QValidator::Invalid;
-}
-
-void TimeSlider::stepBy(int steps) {
-    setValue(value() + (steps*100));
-}
-
-void TimeSlider::fixup(QString& input) const {
-    QTextStream stream(&input);
-    double value = -0.1;
-    stream >> value;
-    input.setNum(int(value));
-    input += ':';
-    qDebug() << value;
-    input += QString().setNum(fmod(value, 1.0) * 60);
+    int value;
+    QTextStream stream(&milliseconds);
+    stream >> i;
+    value = i;
+    stream.setString(&seconds);
+    stream >> i;
+    value += i * 1000;
+    stream.setString(&minutes);
+    stream >> i;
+    value += i * 60000;
+    slider->setValue(value);
 }

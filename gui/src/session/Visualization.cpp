@@ -1,4 +1,5 @@
 #include <QPainter>
+#include <QLabel>
 #include "Visualization.h"
 #include "Visualization.moc"
 
@@ -7,9 +8,10 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     
     main_layout = new QVBoxLayout();
     
-    test_slider = new TimeSlider();
-    main_layout->addWidget(test_slider);
-    
+    from_slider = new TimeSlider();
+    to_slider = new TimeSlider();
+    main_layout->addWidget(new QLabel(tr("From:")));
+    main_layout->addWidget(from_slider);
     setLayout(main_layout);
 }
 

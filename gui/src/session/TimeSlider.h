@@ -1,18 +1,24 @@
 #ifndef AESALON_GUI_SESSION_TIME_SLIDER_H
 #define AESALON_GUI_SESSION_TIME_SLIDER_H
 
-#include <QDoubleSpinBox>
+#include <QWidget>
+#include <QSlider>
+#include <QHBoxLayout>
+#include <QLineEdit>
 
-class TimeSlider : public QSpinBox { Q_OBJECT
+#include "storage/Timestamp.h"
+
+class TimeSlider : public QWidget { Q_OBJECT
+private:
+    QLineEdit *display;
+    QSlider *slider;
 public:
     TimeSlider(QWidget *parent = NULL);
     virtual ~TimeSlider();
-    
-    virtual QString textFromValue(int value) const;
-    virtual int valueFromText(const QString &text) const;
-    virtual QValidator::State validate(QString &input, int &pos) const;
-    virtual void stepBy(int steps);
-    virtual void fixup(QString &input) const;
+    void set_range(const Timestamp &from, const Timestamp &to);
+private slots:
+    void update_display(int new_value);
+    void update_slider();
 };
 
 #endif

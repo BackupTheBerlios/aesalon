@@ -17,7 +17,8 @@ private:
     QImage *current_image;
     VisualizationRequest *current_request;
     QVBoxLayout *main_layout;
-    TimeSlider *test_slider;
+    TimeSlider *from_slider;
+    TimeSlider *to_slider;
 protected:
     virtual VisualizationThread *create_v_thread(DataThread *data_thread)
         { data_thread = data_thread; return NULL; }
