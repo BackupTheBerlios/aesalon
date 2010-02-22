@@ -1,3 +1,4 @@
+#include <QColor>
 #include "VisualizationThread.h"
 #include "VisualizationThread.moc"
 #include "VisualizationData.h"
@@ -40,4 +41,5 @@ void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request = new_request;
     generate_requests(current_request);
     current_image = new QImage(1000, 1000, QImage::Format_RGB32);
+    current_image->fill(QColor(255, 255, 255).rgb());
 }

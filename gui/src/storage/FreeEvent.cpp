@@ -8,9 +8,10 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
     quint8 max_depth = snapshot->get_max_tree_depth();
     /* First, traverse the tree to find the right spot. Do not create any
         nodes required to get there -- this is a removal, not an addition! */
-    for(quint8 depth = 0; depth < max_depth; depth ++) {
-        bool bit = MemoryAddress(address << depth) & 0x01;
-        if(!bit) {
+    for(quint8 depth = 63; depth > 64 - max_depth; depth --) {
+        quint64 mask = 0x01;
+        mask <<= depth;
+        if((address & mask) == 0) {
             if(node->get_left() != NULL) node = node->get_left();
             else return;
         }
@@ -20,5 +21,16 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
         }
     }
     Block *block = node->get_block(address);
-    if(block) node->remove_block(block);
+    if(block) {
+        node = node->mark_changed(snapshot->get_snapshot_id());
+        node->remove_block(block);
+        
+        if(snapshot->get_head_node()->get_snapshot_id() != snapshot->get_snapshot_id()) {
+            qDebug("FreeEvent: setting new head node for snapshot %i . . .", (int)snapshot->get_snapshot_id());
+            BiTreeNode *head_node = node;
+            while(head_node->get_parent()) head_node = head_node->get_parent();
+            qDebug("New head node address is %p", (const void *)head_node);
+            snapshot->set_head_node(head_node);
+        }
+    }
 }

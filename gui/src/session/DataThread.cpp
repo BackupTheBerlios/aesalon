@@ -46,7 +46,7 @@ void DataThread::started() {
 
 void DataThread::finished() {
     snapshot_timer->stop();
-    /*current_snapshot = snapshot_list.append_snapshot();*/
+    current_snapshot = snapshot_list.append_snapshot();
     finish_time = new Timestamp();
     emit data_finished();
 }

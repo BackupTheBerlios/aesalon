@@ -14,7 +14,7 @@ class VisualizationCanvas : public QWidget { Q_OBJECT
 private:
     QImage *image;
 public:
-    VisualizationCanvas() : image(NULL) {}
+    VisualizationCanvas() : QWidget(NULL), image(NULL) {}
     virtual ~VisualizationCanvas() {}
 protected:
     virtual void paintEvent(QPaintEvent *event);

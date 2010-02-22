@@ -51,10 +51,10 @@ void ActiveBlocksRequest::gather_data(DataThread* data_thread) {
 }
 
 int ActiveBlocksRequest::count_blocks(BiTreeNode* node) {
-    int blocks = 0;
+    int count = 0;
     if(node == NULL) return 0;
-    blocks += node->get_block_list_size();
-    if(node->get_left()) blocks += count_blocks(node->get_left());
-    if(node->get_right()) blocks += count_blocks(node->get_right());
-    return blocks;
+    count += node->get_block_list_size();
+    if(node->get_left()) count += count_blocks(node->get_left());
+    if(node->get_right()) count += count_blocks(node->get_right());
+    return count;
 }

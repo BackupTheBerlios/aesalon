@@ -4,15 +4,20 @@
 #include "Visualization.moc"
 
 void VisualizationCanvas::paintEvent(QPaintEvent *event) {
-    QWidget::paintEvent(event);
-    if(!image) return;
+    if(!image) {
+        qDebug("Returning because of NULL image . . .");
+        return;
+    }
     QPainter painter(this);
     painter.scale(qreal(geometry().width()) / image->width(), qreal(geometry().height()) / image->height());
+    qDebug("Drawing image . . .");
     painter.drawImage(0, 0, *image);
 }
 
 void VisualizationCanvas::update_image(QImage *image) {
+    qDebug("VisualizationCanvas: Replacing image . . .");
     this->image = image;
+    this->repaint();
 }
 
 
@@ -80,6 +85,7 @@ void Visualization::handle_slider_change_from(Timestamp time) {
         time.add_ms(1);
         to_slider->set_value(time);
     }
+    /* NOTE: deleting this will crash the program if data is being visualized! */
     if(current_request) delete current_request;
     current_request = new VisualizationRequest(from_slider->current_value(), to_slider->current_value());
     qDebug("Emitting visualization_request(%p) . . .", (const void *)current_request);
@@ -92,6 +98,7 @@ void Visualization::handle_slider_change_to(Timestamp time) {
         time.add_ms(20);
         to_slider->set_value(time);
     }
+    /* NOTE: deleting this will crash the program if data is being visualized! */
     if(current_request) delete current_request;
     current_request = new VisualizationRequest(from_slider->current_value(), to_slider->current_value());
     qDebug("Emitting visualization_request(%p) . . .", (const void *)current_request);

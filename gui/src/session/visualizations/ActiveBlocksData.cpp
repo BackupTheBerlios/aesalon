@@ -20,10 +20,17 @@ bool ActiveBlocksData::render_onto(QImage* image, VisualizationRequest* request)
     
     QSize image_size = image->size();
     QPainter painter(image);
-    painter.drawLine(image_size.width() * percentage, 0, image_size.width() * percentage, image_size.height() - value);
+    QBrush brush;
+    brush.setColor(Qt::black);
+    painter.setBrush(brush);
+    painter.drawLine(image_size.width() * percentage, 0, image_size.width() * percentage, image_size.height() - (value*20));
     
-    /*qint64 diff = timestamp.ms_until(request->get_to());
-    if(qAbs<qint64>(diff) < 20) return true;*/
+    qint64 diff = timestamp.ms_until(request->get_to());
+    qDebug("Difference is %lli . . .", diff);
+    if(qAbs<qint64>(diff) < 500) {
+        qDebug("Returning true!");
+        return true;
+    }
     return false;
 }
 
