@@ -17,6 +17,10 @@ BiTreeNode *BiTreeNode::mark_changed(SnapshotID by_snapshot) {
     if(right) right->parent = new_node;
     new_node->end = end;
     new_node->block_list = block_list;
-    if(parent) new_node->parent = parent->mark_changed(by_snapshot);
+    if(parent) {
+        new_node->parent = parent->mark_changed(by_snapshot);
+        if(parent->get_left() == this) new_node->parent->left = new_node;
+        else if(parent->get_right() == this) new_node->parent->right = new_node;
+    }
     return new_node;
 }

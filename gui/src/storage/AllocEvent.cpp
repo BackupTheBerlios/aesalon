@@ -45,10 +45,14 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
         }
     }
     
-    qDebug("AllocEvent: adding block to node . . . current size is %i.", node->get_block_list_size());
-    /* Well, we're at the correct node to add the block into (hopefully, anyhow) . . . */
+    qDebug("Found correct node, original snapshot ID is %lli", node->get_snapshot_id());
+    
+    /* Well, we're at the correct node to add the block into (hopefully, anyhow) . . . so mark it as changed. */
     node = node->mark_changed(snapshot->get_snapshot_id());
+    qDebug("AllocEvent: adding block to node . . . current size is %i.", node->get_block_list_size());
+    /* Then add the block to the new, "changed" node. */
     node->add_block(new Block(address, size));
+    qDebug("Added block to snapshot ID %lli.", node->get_snapshot_id());
     
     /* Now, set the snapshot's new head node . . . */
     if(snapshot->get_head_node()->get_snapshot_id() != snapshot->get_snapshot_id()) {
@@ -57,6 +61,7 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
         while(head_node->get_parent()) head_node = head_node->get_parent();
         qDebug("New head node address is %p", (const void *)head_node);
         snapshot->set_head_node(head_node);
+        qDebug("Snapshot %lli's new head node has an ID of %lli . . .", snapshot->get_snapshot_id(), head_node->get_snapshot_id());
     }
     /* And update the snapshot's timestamp. */
     snapshot->update_timestamp();
