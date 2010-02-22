@@ -10,6 +10,7 @@ SnapshotList::~SnapshotList() {
 
 Snapshot *SnapshotList::append_snapshot() {
     Snapshot *s = new Snapshot(++last_id);
+    if(internal_list.size()) s->set_head_node(internal_list.back()->get_head_node());
     internal_list.append(s);
     return s;
 }

@@ -1,6 +1,7 @@
 #include "FreeEvent.h"
 
 void FreeEvent::apply_to(Snapshot *snapshot) {
+    qDebug("Asked to apply FreeEvent to snapshot #%li . . .", (long int)snapshot->get_snapshot_id());
     BiTreeNode *node = snapshot->get_head_node();
     if(!node) return;
     

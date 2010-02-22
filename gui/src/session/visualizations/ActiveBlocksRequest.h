@@ -3,6 +3,7 @@
 
 #include "../DataRequest.h"
 #include "storage/Timestamp.h"
+#include "storage/BiTreeNode.h"
 
 class ActiveBlocksRequest : public DataRequest {
 private:
@@ -14,6 +15,8 @@ public:
     
     virtual VisualizationData* create_data();
     virtual void gather_data(DataThread* data_thread);
+private:
+    int count_blocks(BiTreeNode *node);
 };
 
 #endif

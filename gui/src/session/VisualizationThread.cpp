@@ -39,5 +39,5 @@ void VisualizationThread::send_request(DataRequest *request) {
 void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request = new_request;
     generate_requests(current_request);
-    current_image = new QImage();
+    current_image = new QImage(1000, 1000, QImage::Format_RGB32);
 }

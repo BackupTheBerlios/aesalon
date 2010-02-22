@@ -19,8 +19,8 @@ bool ActiveBlocksData::render_onto(QImage* image, VisualizationRequest* request)
     qDebug("Trying to render ActiveBlocksData: timestamp is %s, value is %i . . .", timestamp.to_string().toStdString().c_str(), value);
     
     QSize image_size = image->size();
-    /*QPainter painter(image);
-    painter.drawLine(image_size.width() * percentage, 0, image_size.width() * percentage, image_size.height() - value);*/
+    QPainter painter(image);
+    painter.drawLine(image_size.width() * percentage, 0, image_size.width() * percentage, image_size.height() - value);
     
     /*qint64 diff = timestamp.ms_until(request->get_to());
     if(qAbs<qint64>(diff) < 20) return true;*/

@@ -30,17 +30,17 @@ qint64 Timestamp::seconds_until(const Timestamp& other) const {
 }
 
 qint64 Timestamp::ms_until(const Timestamp& other) const {
-    qint64 seconds = seconds_until(other);
-    QTime t = internal_time.time();
-    QTime t2 = other.internal_time.time();
+    /*qint64 seconds = seconds_until(other);*/
+    QTime this_time = internal_time.time();
+    QTime other_time = other.internal_time.time();
     
     if(*this < other) {
-        if(t < t2) return t.msecsTo(t2);
-        else qCritical("NOTE: comparision between different-day QTimes NYI!");
+        if(this_time <= other_time) return this_time.msecsTo(other_time);
+        else qCritical("NOTE: comparision between different-day QTimes NYI! (1)");
     }
-    else {
-        if(t > t2) return t.msecsTo(t2);
-        else qCritical("NOTE: comparision between different-day QTimes NYI!");
+    else if(*this >= other) {
+        if(this_time >= other_time) return -other_time.msecsTo(this_time);
+        else qCritical("NOTE: comparision between different-day QTimes NYI! (2)");
     }
     return -1;
 }

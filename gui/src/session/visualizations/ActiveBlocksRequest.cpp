@@ -23,6 +23,8 @@ void ActiveBlocksRequest::gather_data(DataThread* data_thread) {
         blocks = 0;
         return;
     }
+    blocks = count_blocks(snapshot->get_head_node());
+#if 0
     /* NOTE: optimize this later . . . */
     BiTreeNode *node = snapshot->get_head_node();
     if(!node) {
@@ -44,5 +46,15 @@ void ActiveBlocksRequest::gather_data(DataThread* data_thread) {
             node_stack.push_back(node->get_right());
         }
     }
+#endif
     
+}
+
+int ActiveBlocksRequest::count_blocks(BiTreeNode* node) {
+    int blocks = 0;
+    if(node == NULL) return 0;
+    blocks += node->get_block_list_size();
+    if(node->get_left()) blocks += count_blocks(node->get_left());
+    if(node->get_right()) blocks += count_blocks(node->get_right());
+    return blocks;
 }

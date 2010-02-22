@@ -4,6 +4,7 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
     qDebug("Asked to apply AllocEvent to snapshot #%li . . .", (long int)snapshot->get_snapshot_id());
     /* Create the head node if it doesn't exist . . . */
     if(snapshot->get_head_node() == NULL) {
+        qDebug("Creating new head node . . .");
         snapshot->set_head_node(new BiTreeNode(snapshot->get_snapshot_id()));
     }
     
@@ -16,6 +17,7 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
         if(!(MemoryAddress(address << depth) & 0x01)) {
             if(node->get_left() == NULL) {
                 node = node->mark_changed(snapshot->get_snapshot_id());
+                qDebug("Creating new left node . . .");
                 node->set_left(new BiTreeNode(snapshot->get_snapshot_id()));
             }
             node = node->get_left();
@@ -23,17 +25,21 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
         else {
             if(node->get_right() == NULL) {
                 node = node->mark_changed(snapshot->get_snapshot_id());
+                qDebug("Creating new right node . . .");
                 node->set_right(new BiTreeNode(snapshot->get_snapshot_id()));
             }
             node = node->get_right();
         }
     }
     
+    qDebug("AllocEvent: adding block to node . . . current size is %i.", node->get_block_list_size());
     /* Well, we're at the correct node to add the block into (hopefully, anyhow) . . . */
     node->add_block(new Block(address, size));
+    node = node->mark_changed(snapshot->get_snapshot_id());
     
     /* Now, set the snapshot's new head node . . . */
     if(snapshot->get_head_node()->get_snapshot_id() != snapshot->get_snapshot_id()) {
+        qDebug("AllocEvent: setting new head node for snapshot %i . . .", (int)snapshot->get_snapshot_id());
         BiTreeNode *head_node = node;
         while(head_node->get_parent()) head_node = head_node->get_parent();
         snapshot->set_head_node(head_node);
