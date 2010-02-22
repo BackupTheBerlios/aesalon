@@ -19,6 +19,7 @@ TimeSlider::TimeSlider(QWidget* parent) : QWidget(parent) {
     slider->setPageStep(5000);
     slider->setMaximum(1000);
     connect(slider, SIGNAL(valueChanged(int)), SLOT(update_display(int)));
+    connect(slider, SIGNAL(sliderReleased()), SLOT(emit_changed()));
     layout()->addWidget(slider);
 }
 
@@ -28,7 +29,19 @@ TimeSlider::~TimeSlider() {
 
 void TimeSlider::set_range(const Timestamp& from, const Timestamp& to) {
     slider->setMaximum(from.ms_until(to));
+    this->from = from;
 }
+
+Timestamp TimeSlider::current_value() const {
+    Timestamp time = from;
+    time.add_ms(slider->value());
+    return time;
+}
+
+void TimeSlider::set_value(const Timestamp& time) {
+    slider->setValue(from.ms_until(time));
+}
+
 
 void TimeSlider::update_display(int new_value) {
     if(new_value < 0) return;
@@ -82,4 +95,11 @@ void TimeSlider::update_slider() {
     stream >> i;
     value += i * 60000;
     slider->setValue(value);
+    emit_changed();
+}
+
+void TimeSlider::emit_changed() {
+    Timestamp time = from;
+    time.add_ms(slider->value());
+    emit changed(time);
 }

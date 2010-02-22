@@ -45,7 +45,6 @@ void SessionOverview::new_visualization() {
 }
 
 void SessionOverview::started() {
-    qDebug("SessionOverview::started() called . . .");
     start_timestamp = Timestamp();
     status = RUNNING;
 }

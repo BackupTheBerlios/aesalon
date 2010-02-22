@@ -36,3 +36,7 @@ qint64 Timestamp::ms_until(const Timestamp& other) const {
     }
     return -1;
 }
+
+void Timestamp::add_ms(qint64 ms) {
+    internal_time = internal_time.addMSecs(ms);
+}

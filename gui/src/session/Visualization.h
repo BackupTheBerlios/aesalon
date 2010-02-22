@@ -38,6 +38,8 @@ protected:
     virtual void paintEvent(QPaintEvent *event);
 private slots:
     void update_image(QImage *image);
+    void handle_slider_change_from(Timestamp time);
+    void handle_slider_change_to(Timestamp time);
 signals:
     void visualization_request(VisualizationRequest *request);
 };

@@ -25,12 +25,17 @@ public:
     
     DataRequestQueue *get_request_queue() const { return request_queue; }
     void event_received(Event *event);
+    
+    SnapshotList *get_snapshot_list() { return &snapshot_list; }
 private slots:
     void create_new_snapshot();
     void started();
     void finished();
 protected:
     virtual void run();
+signals:
+    void data_started();
+    void data_finished();
 };
 
 #endif

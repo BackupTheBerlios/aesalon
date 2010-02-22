@@ -31,11 +31,14 @@ void DataThread::create_new_snapshot() {
 }
 
 void DataThread::started() {
+    qDebug("DataThread::started() . . .");
     /* NOTE: get this from somewhere else . . . hardcoding it is a bad idea. */
     snapshot_timer->start(5000);
+    emit data_started();
 }
 
 void DataThread::finished() {
     snapshot_timer->stop();
     /*current_snapshot = snapshot_list.append_snapshot();*/
+    emit data_finished();
 }

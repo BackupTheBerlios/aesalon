@@ -13,8 +13,8 @@ Session::Session(QWidget *parent, DataSource *data_source) : QWidget(parent), da
     setLayout(layout);
     
     SessionOverview *overview = new SessionOverview(data_thread);
-    connect(data_thread, SIGNAL(started()), overview, SLOT(started()));
-    connect(data_thread, SIGNAL(finished()), overview, SLOT(finished()));
+    connect(data_thread, SIGNAL(data_started()), overview, SLOT(started()));
+    connect(data_thread, SIGNAL(data_finished()), overview, SLOT(finished()));
     connect(overview, SIGNAL(new_visualization(Visualization*)), SLOT(new_visualization(Visualization*)));
     tab_widget->addTab(overview, tr("&Overview"));
 }
