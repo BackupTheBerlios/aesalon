@@ -11,6 +11,8 @@ public:
     Event() : timestamp() {}
     virtual ~Event() {}
     
+    const Timestamp &get_timestamp() const { return timestamp; }
+    
     virtual void apply_to(Snapshot *snapshot) = 0;
 };
 

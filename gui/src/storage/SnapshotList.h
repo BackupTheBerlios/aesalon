@@ -10,6 +10,7 @@
 class SnapshotList {
 private:
     SnapshotID last_id;
+    SnapshotID last_temporary_id;
     QList<Snapshot *> internal_list;
 public:
     SnapshotList();
@@ -19,7 +20,7 @@ public:
     
     Snapshot *append_snapshot();
     Snapshot *get_snapshot(SnapshotID id) const { return internal_list[id]; }
-    Snapshot *get_snapshot_for(const Timestamp &timestamp) const;
+    Snapshot *get_snapshot_for(const Timestamp &timestamp);
     int get_snapshot_count() const { return internal_list.size(); }
 };
 

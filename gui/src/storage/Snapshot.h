@@ -24,6 +24,7 @@ public:
     void set_head_node(BiTreeNode *new_head) { head_node = new_head; }
     
     void add_event(Event *event) { event_list.add_event(event); }
+    EventList *get_event_list() { return &event_list; }
     
     quint8 get_max_tree_depth() { return max_tree_depth; }
     
