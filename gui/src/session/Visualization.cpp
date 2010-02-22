@@ -17,7 +17,7 @@ void VisualizationCanvas::paintEvent(QPaintEvent *event) {
 void VisualizationCanvas::update_image(QImage *image) {
     qDebug("VisualizationCanvas: Replacing image . . .");
     this->image = image;
-    this->repaint();
+    this->update();
 }
 
 

@@ -23,7 +23,12 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
     Block *block = node->get_block(address);
     if(block) {
         node = node->mark_changed(snapshot->get_snapshot_id());
+        int blocks = node->get_block_list_size();
         node->remove_block(block);
+        if(blocks == node->get_block_list_size()) {
+            qDebug("Failed to remove block!");
+        }
+        else qDebug("Successfully removed block . . .");
         
         if(snapshot->get_head_node()->get_snapshot_id() != snapshot->get_snapshot_id()) {
             qDebug("FreeEvent: setting new head node for snapshot %i . . .", (int)snapshot->get_snapshot_id());
