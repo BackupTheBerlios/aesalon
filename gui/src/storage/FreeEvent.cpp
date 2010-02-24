@@ -48,6 +48,5 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
         if(last_node->get_left() == old_node) last_node->set_left(node);
         else if(last_node->get_right() == old_node) last_node->set_right(node);
         node->remove_block(block);
-        qDebug("Successfully removed block . . .");
     }
 }

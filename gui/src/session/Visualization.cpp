@@ -4,6 +4,7 @@
 #include "Visualization.moc"
 
 void VisualizationCanvas::paintEvent(QPaintEvent *event) {
+    qDebug("VisualizationCanvas::paintEvent() . . .");
     if(!image) {
         qDebug("Returning because of NULL image . . .");
         return;
@@ -86,7 +87,7 @@ void Visualization::handle_slider_change_from(Timestamp time) {
         to_slider->set_value(time);
     }
     /* NOTE: deleting this will crash the program if data is being visualized! */
-    if(current_request) delete current_request;
+    /*if(current_request) delete current_request;*/
     current_request = new VisualizationRequest(from_slider->current_value(), to_slider->current_value());
     qDebug("Emitting visualization_request(%p) . . .", (const void *)current_request);
     emit visualization_request(current_request);
@@ -99,7 +100,7 @@ void Visualization::handle_slider_change_to(Timestamp time) {
         to_slider->set_value(time);
     }
     /* NOTE: deleting this will crash the program if data is being visualized! */
-    if(current_request) delete current_request;
+    /*if(current_request) delete current_request;*/
     current_request = new VisualizationRequest(from_slider->current_value(), to_slider->current_value());
     qDebug("Emitting visualization_request(%p) . . .", (const void *)current_request);
     qDebug("\tFrom %s to %s . . .", current_request->get_from().to_string().toStdString().c_str(), current_request->get_to().to_string().toStdString().c_str());

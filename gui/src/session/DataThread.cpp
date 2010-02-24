@@ -22,7 +22,7 @@ void DataThread::run() {
     connect(snapshot_timer, SIGNAL(timeout()), this, SLOT(create_new_snapshot()));
     request_queue_timer = new QTimer();
     connect(request_queue_timer, SIGNAL(timeout()), this, SLOT(process_request_queue()));
-    request_queue_timer->start(50);
+    request_queue_timer->start(500);
     exec();
     delete data_receiver;
     delete snapshot_timer;
@@ -53,6 +53,7 @@ void DataThread::finished() {
 
 void DataThread::process_request_queue() {
     request_queue_timer->stop();
+    qDebug("DataThread: processing request queue . . .");
     
     while(request_queue->current_requests()) {
         DataRequest *request = request_queue->pop_request();
@@ -60,5 +61,6 @@ void DataThread::process_request_queue() {
         request->get_v_thread()->get_request_queue()->push_request(request);
     }
     
+    qDebug("DataThread: restarting request queue timer . . .");
     request_queue_timer->start();
 }

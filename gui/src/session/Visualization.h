@@ -16,6 +16,8 @@ private:
 public:
     VisualizationCanvas() : QWidget(NULL), image(NULL) {}
     virtual ~VisualizationCanvas() {}
+    
+    QImage *get_image() const { return image; }
 protected:
     virtual void paintEvent(QPaintEvent *event);
 public slots:

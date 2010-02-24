@@ -25,6 +25,7 @@ protected:
     virtual void run();
     void send_request(DataRequest *request);
     virtual void generate_requests(VisualizationRequest *current_request) = 0;
+    DataThread *get_data_thread() const { return data_thread; }
 public slots:
     void update_request(VisualizationRequest *new_request);
 signals:
