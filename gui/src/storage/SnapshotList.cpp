@@ -33,16 +33,16 @@ Snapshot *SnapshotList::get_snapshot_for(const Timestamp &timestamp) {
     qDebug("Snapshot %lli will serve.", list_shot->get_snapshot_id());
     s->set_head_node(list_shot->get_head_node());
     /* Now apply the events to get the exact representation . . . */
-    /*qDebug("Applying events to temporary snapshot %lli . . .", last_temporary_id);
+    qDebug("Applying events to temporary snapshot %lli . . .", last_temporary_id);
     EventList *el = list_shot->get_event_list();
     QList<Event *> event_list = el->get_event_list();
-    qDebug("Event list size is %lli", event_list.size());
+    qDebug("Event list size is %i", event_list.size());
     for(i = 0; i < event_list.size(); i ++) {
         Event *event = event_list[i];
         if(event->get_timestamp() > timestamp) break;
         qDebug("Applying event . . .");
         event->apply_to(s);
         s->add_event(event);
-    }*/
+    }
     return s;
 }
