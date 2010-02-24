@@ -18,23 +18,18 @@ private:
     /** The right node in the tree, e.g. the node that stores the blocks with
         higher addresses than @a address */
     BiTreeNode *right;
-    /** The immediate parent in the tree. In this case, this is hijacked to
-        reference the most recent version of the parent. */
-    BiTreeNode *parent;
     
     QList<Block *> block_list;
 public:
-    BiTreeNode(SnapshotID snapshot_id) : end(true), snapshot_id(snapshot_id), left(NULL), right(NULL), parent(NULL) {}
+    BiTreeNode(SnapshotID snapshot_id) : end(true), snapshot_id(snapshot_id), left(NULL), right(NULL) {}
     virtual ~BiTreeNode() {}
     
     SnapshotID get_snapshot_id() const { return snapshot_id; }
     
     BiTreeNode *get_left() const { return left; }
-    void set_left(BiTreeNode *new_left) { left = new_left; if(left) new_left->set_parent(this); }
+    void set_left(BiTreeNode *new_left) { left = new_left; }
     BiTreeNode *get_right() const { return right; }
-    void set_right(BiTreeNode *new_right) { right = new_right; if(right) right->set_parent(this); }
-    BiTreeNode *get_parent() const { return parent; }
-    void set_parent(BiTreeNode *new_parent) { parent = new_parent; }
+    void set_right(BiTreeNode *new_right) { right = new_right; }
     
     void add_block(Block *new_block) { block_list.append(new_block); }
     void remove_block(Block *block) { block_list.removeOne(block); }

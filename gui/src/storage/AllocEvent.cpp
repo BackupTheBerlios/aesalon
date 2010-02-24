@@ -8,37 +8,35 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
         snapshot->set_head_node(new BiTreeNode(snapshot->get_snapshot_id()));
     }
     
+    snapshot->set_head_node(snapshot->get_head_node()->mark_changed(snapshot->get_snapshot_id()));
+    
     BiTreeNode *node = snapshot->get_head_node();
     
     quint8 max_depth = snapshot->get_max_tree_depth();
-    /* First, traverse the tree to find the right spot. Create any nodes required to get there,
-        and mark the created nodes' parents as changed, of course. */
+    /* First, traverse the tree to find the right spot. Create any nodes required to get there. */
     
-    qDebug("Starting at the head of the tree . . .");
-    
-    /*          1010101010101010101010101010101010101010101010101010101010101010
-        mask:   1000000000000000000000000000000000000000000000000000000000000000
-        mask:   0100000000000000000000000000000000000000000000000000000000000000
-        mask:   0010000000000000000000000000000000000000000000000000000000000000
-        mask:   0001000000000000000000000000000000000000000000000000000000000000
-        mask:   0000100000000000000000000000000000000000000000000000000000000000
-        ....
-        0x01 << depth;
-        */
+    BiTreeNode *last_node = snapshot->get_head_node();
     for(quint8 depth = 63; depth > 64 - max_depth; depth --) {
         quint64 mask = 0x01;
         mask <<= depth;
-        /*if(!(MemoryAddress(address << depth) & 0x01)) {*/
+        
+        /* Mark it as we're traversing the tree downwards (save the trouble later) . . . */
+        
+        qDebug("AllocEvent: traversing tree onto node with SSID %lli", node->get_snapshot_id());
+        BiTreeNode *old_node = node;
+        node = node->mark_changed(snapshot->get_snapshot_id());
+        if(last_node->get_left() == old_node) last_node->set_left(node);
+        else if(last_node->get_right() == old_node) last_node->set_right(node);
+        last_node = node;
+        qDebug("AllocEvent: marked node as being changed, new SSID is %lli", node->get_snapshot_id());
         if((address & mask) == 0) {
             if(node->get_left() == NULL) {
-                node = node->mark_changed(snapshot->get_snapshot_id());
                 node->set_left(new BiTreeNode(snapshot->get_snapshot_id()));
             }
             node = node->get_left();
         }
         else {
             if(node->get_right() == NULL) {
-                node = node->mark_changed(snapshot->get_snapshot_id());
                 node->set_right(new BiTreeNode(snapshot->get_snapshot_id()));
             }
             node = node->get_right();
@@ -46,23 +44,14 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
     }
     
     qDebug("Found correct node, original snapshot ID is %lli", node->get_snapshot_id());
-    
+
     /* Well, we're at the correct node to add the block into (hopefully, anyhow) . . . so mark it as changed. */
+    BiTreeNode *old_node = node;
     node = node->mark_changed(snapshot->get_snapshot_id());
+    if(last_node->get_left() == old_node) last_node->set_left(node);
+    else if(last_node->get_right() == old_node) last_node->set_right(node);
     qDebug("AllocEvent: adding block to node . . . current size is %i.", node->get_block_list_size());
     /* Then add the block to the new, "changed" node. */
     node->add_block(new Block(address, size));
     qDebug("Added block to snapshot ID %lli.", node->get_snapshot_id());
-    
-    /* Now, set the snapshot's new head node . . . */
-    if(snapshot->get_head_node()->get_snapshot_id() != snapshot->get_snapshot_id()) {
-        qDebug("AllocEvent: setting new head node for snapshot %i . . .", (int)snapshot->get_snapshot_id());
-        BiTreeNode *head_node = node;
-        while(head_node->get_parent()) head_node = head_node->get_parent();
-        qDebug("New head node address is %p", (const void *)head_node);
-        snapshot->set_head_node(head_node);
-        qDebug("Snapshot %lli's new head node has an ID of %lli . . .", snapshot->get_snapshot_id(), head_node->get_snapshot_id());
-    }
-    /* And update the snapshot's timestamp. */
-    snapshot->update_timestamp();
 }
