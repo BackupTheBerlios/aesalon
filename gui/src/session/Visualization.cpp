@@ -3,24 +3,26 @@
 #include "Visualization.h"
 #include "Visualization.moc"
 
+VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QWidget(parent), image(NULL) {
+    update_timer = new QTimer(this);
+    connect(update_timer, SIGNAL(timeout()), this, SLOT(update()));
+    update_timer->start(1000);
+    
+    setMinimumSize(200, 200);
+}
+
 void VisualizationCanvas::paintEvent(QPaintEvent *event) {
-    qDebug("VisualizationCanvas::paintEvent() . . .");
-    if(!image) {
-        qDebug("Returning because of NULL image . . .");
-        return;
-    }
+    if(!image) return;
     QPainter painter(this);
     painter.scale(qreal(geometry().width()) / image->width(), qreal(geometry().height()) / image->height());
-    qDebug("Drawing image . . .");
     painter.drawImage(0, 0, *image);
 }
 
 void VisualizationCanvas::update_image(QImage *image) {
-    qDebug("VisualizationCanvas: Replacing image . . .");
+    delete this->image;
     this->image = image;
     this->update();
 }
-
 
 Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     : QWidget(parent), v_thread(NULL), data_thread(data_thread) {
@@ -34,7 +36,7 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     main_layout->addRow(tr("From:"), from_slider);
     main_layout->addRow(tr("To:"), to_slider);
     
-    canvas = new VisualizationCanvas();
+    canvas = new VisualizationCanvas(this);
     canvas->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     main_layout->addWidget(canvas);
     

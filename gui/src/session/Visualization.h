@@ -13,13 +13,14 @@
 class VisualizationCanvas : public QWidget { Q_OBJECT
 private:
     QImage *image;
+    QTimer *update_timer;
 public:
-    VisualizationCanvas() : QWidget(NULL), image(NULL) {}
+    VisualizationCanvas(QWidget *parent);
     virtual ~VisualizationCanvas() {}
     
     QImage *get_image() const { return image; }
 protected:
-    virtual void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event);
 public slots:
     void update_image(QImage *image);
 };

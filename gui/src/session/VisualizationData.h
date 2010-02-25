@@ -10,7 +10,7 @@ public:
     VisualizationData();
     virtual ~VisualizationData();
     
-    virtual bool render_onto(QImage *image, VisualizationRequest *request) const = 0;
+    virtual void render_onto(QImage *image, VisualizationRequest *request) const = 0;
     
     virtual bool is_within(VisualizationRequest *request) const = 0;
 };

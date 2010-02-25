@@ -26,10 +26,7 @@ void VisualizationThread::run() {
             v_data.append(data);
             if(current_request && data->is_within(current_request)) {
                 /* then draw the data. */
-                if(data->render_onto(current_image, current_request)) {
-                    qDebug("Emitting replace_image signal . . .");
-                    emit replace_image(current_image);
-                }
+                data->render_onto(current_image, current_request);
             }
         }
         msleep(50);
@@ -42,9 +39,9 @@ void VisualizationThread::send_request(DataRequest *request) {
 }
 
 void VisualizationThread::update_request(VisualizationRequest *new_request) {
-    qDebug("update_request() called . . .");
     current_request = new_request;
-    current_image = new QImage(1000, 1000, QImage::Format_RGB32);
+    current_image = new QImage(200, 100, QImage::Format_RGB32);
     current_image->fill(QColor(255, 255, 255).rgb());
+    emit replace_image(current_image);
     generate_requests(current_request);
 }

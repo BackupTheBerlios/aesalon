@@ -53,13 +53,9 @@ void DataThread::finished() {
 }
 
 void DataThread::process_request_queue() {
-    qDebug("DataThread: processing request queue . . .");
-    
     while(request_queue->current_requests()) {
         DataRequest *request = request_queue->pop_request();
         request->gather_data(this);
         request->get_v_thread()->get_request_queue()->push_request(request);
     }
-    
-    qDebug("DataThread: restarting request queue timer . . .");
 }
