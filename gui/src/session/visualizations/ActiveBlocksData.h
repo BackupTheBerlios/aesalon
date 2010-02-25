@@ -16,6 +16,7 @@ public:
     virtual void render_onto(QImage *image, VisualizationRequest *request) const;
     
     virtual bool is_within(VisualizationRequest* request) const;
+    virtual bool is_cachable() const { return true; }
 };
 
 #endif
