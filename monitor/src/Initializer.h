@@ -32,6 +32,8 @@ private:
     /** Deinitialize the aesalon monitor. */
     void deinitialize();
     
+    /** Print version information .*/
+    void version();
     /** Print usage information about aesalon, including a list of all flags. */
     void usage();
     

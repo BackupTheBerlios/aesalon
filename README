@@ -25,11 +25,12 @@ a Linux-based operating system, g++ (tested with 4.4, but 4.3 or earlier
 should also work), and a non-ancient version of libstdc++.
 
 The GUI is written using Qt, so any platform that supports Qt will also
-support the monitor (in theory -- some Qt extensions are used that may not be
+support the GUI (in theory -- some Qt extensions are used that may not be
 available on some platforms, such as OpenGL rendering, etc.)
 
 CMake is used as the buildsystem for both the monitor and the GUI (tested with
-2.6 and 2.8).
+2.6 and 2.8), so the buildsystem should be portable across most major
+platforms.
 
 -- How to compile aesalon
 First, edit the build.config file to change what is built, and what is not
@@ -42,6 +43,26 @@ generate the Makefiles required to actually build aesalon. Once that is done,
 run 'make', and that should be all that is required. The two symlinks in the
 project root directory (aesalon and aesalon_gui) should get you started.
 
+-- Configuration
+Since you'll probably get annoyed at passing --overload-path to aesalon every
+time you use it, you'll probably want to create a configuration file or two.
+The system-wide configuration file is located at /etc/aesalon.conf; the user-
+specific config file is located at ~/.config/aesalon/aesalon.conf (both these
+paths are changable at compile-time, take a look at build.config). The format
+used is very simple: take the long version of an argument you're tired of
+passing to aesalon (--overload-path for example), and add a line such as:
+
+overload-path=/home/strange/c/aesalon/aesalon_overload.so
+
+The format is "argument-long-form=default-value". Note that you can use this
+without fear for arguments with optional arguments (adding "wait=3" will not
+always make aesalon wait for three TCP connections, but when --wait is passed
+to Aesalon, without an argument, it will default to that value). At the
+moment, however, the only thing the configuration files are really useful for
+is setting the path to the overload library . . . but that will probably
+change in the future.
+
+
 Good luck, and happy hacking!
 
- -- strange <kawk256@gmail.com>, Fri Feb 12 18:10:09 MST 2010
+ -- strange <kawk256@gmail.com>, Sun Feb 28 12:36:13 MST 2010

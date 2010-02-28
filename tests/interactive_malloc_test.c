@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
         sscanf(buffer, "%i", &size);
         if(!size) break;
         data = malloc(size);
-        printf("**** Memory allocated -- enter 'y' to leak, anything else frees.\n");
+        printf("**** Memory allocated (%p, size %i) -- enter 'y' to leak, anything else frees.\n", data, size);
         fgets(buffer, sizeof(buffer), stdin);
         if(buffer[0] != 'y') {
             free(data);

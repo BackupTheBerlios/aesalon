@@ -23,7 +23,7 @@ void ConfigParser::parse_config_file(std::string filename) {
     std::ifstream stream(filename.c_str());
     
     if(!stream.is_open()) {
-        Message::Message(Message::WARNING_MESSAGE, Misc::StreamAsString() << "Couldn't open configuration file \"" << filename << "\"");
+        /*Message::Message(Message::WARNING_MESSAGE, Misc::StreamAsString() << "Couldn't open configuration file \"" << filename << "\"");*/
         return;
     }
     

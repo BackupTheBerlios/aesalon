@@ -39,6 +39,7 @@ void Initializer::initialize() {
     argument_parser = new Misc::ArgumentParser(argv);
     
     argument_parser->add_argument(new Misc::Argument("help", 'h', Misc::Argument::NO_ARGUMENT, ""));
+    argument_parser->add_argument(new Misc::Argument("version", 'v', Misc::Argument::NO_ARGUMENT, ""));
     std::string port = config_parser->get_config_item("tcp-port");
     if(port == "") port = Misc::StreamAsString() << DEFAULT_PORT;
     argument_parser->add_argument(new Misc::Argument("tcp-port", 'p', Misc::Argument::REQUIRED_ARGUMENT, port));
@@ -55,6 +56,10 @@ void Initializer::initialize() {
 
     if(argument_parser->get_argument("help")->is_found()) {
         usage();
+        return;
+    }
+    else if(argument_parser->get_argument("version")->is_found()) {
+        version();
         return;
     }
     
@@ -106,10 +111,15 @@ void Initializer::deinitialize() {
     if(event_queue) delete event_queue;
 }
 
-void Initializer::usage() {
+void Initializer::version() {
     std::cout << "aesalon program monitor, version " << AESALON_MAJOR_VERSION << "." << AESALON_MINOR_VERSION << "." << AESALON_PATCHLEVEL;
     std::cout << ", copyright (C) 2009-2010 strange <kawk256@gmail.com>" << std::endl;
+}
+
+void Initializer::usage() {
+    version();
     std::cout << "usage: " << argv[0] << " [arguments] executable [executable arguments]" << std::endl;
+    std::cout << "\t--version, -v\t\tPrint version information." << std::endl;
     std::cout << "\t--help, -h\t\tPrint this usage message." << std::endl;
     std::cout << "\t--tcp-port, -p\t\tSet the port to listen on for connections. Currently is " << argument_parser->get_argument("tcp-port")->get_data() << "." << std::endl;
     std::cout << "\t--wait, -w\t\tNumber of TCP connections to accept before executing. Defaults to 0." << std::endl;
@@ -128,3 +138,4 @@ void Initializer::run() {
         /*server_socket->accept_connections();*/
     }
 }
+
