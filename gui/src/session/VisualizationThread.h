@@ -4,6 +4,7 @@
 #include <QList>
 #include <QThread>
 #include <QImage>
+#include <QTimer>
 
 #include "VisualizationRequest.h"
 #include "VisualizationRenderer.h"
@@ -17,6 +18,7 @@ private:
     QList<VisualizationData *> v_data;
     VisualizationRequest *current_request;
     QImage *current_image;
+    QTimer *queue_timer;
 public:
     VisualizationThread(DataThread *data_thread, QObject *parent = 0);
     virtual ~VisualizationThread();
@@ -30,6 +32,8 @@ protected:
     virtual bool is_splittable() const = 0;
 public slots:
     void update_request(VisualizationRequest *new_request);
+private slots:
+    void process_queue();
 signals:
     void replace_image(QImage *new_image);
 };

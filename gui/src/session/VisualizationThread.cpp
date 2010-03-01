@@ -14,23 +14,11 @@ VisualizationThread::~VisualizationThread() {
 }
 
 void VisualizationThread::run() {
-    bool finished = false;
-    while(!finished) {
-        while(get_request_queue()->current_requests() > 0) {
-            DataRequest *request = get_request_queue()->pop_request();
-            if(request == NULL) {
-                finished = true;
-                break;
-            }
-            VisualizationData *data = request->create_data();
-            v_data.append(data);
-            if(current_request && data->is_within(current_request)) {
-                /* then add the data to the current renderer instance . . . */
-                current_request->get_renderer()->add_data(data);
-            }
-        }
-        msleep(50);
-    }
+    queue_timer = new QTimer();
+    connect(queue_timer, SIGNAL(timeout()), SLOT(process_queue()));
+    queue_timer->start(500);
+    exec();
+    delete queue_timer;
 }
 
 void VisualizationThread::send_request(DataRequest *request) {
@@ -45,4 +33,21 @@ void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request->set_renderer(new VisualizationRenderer(current_image, is_splittable()));
     emit replace_image(current_image);
     generate_requests(current_request);
+}
+
+void VisualizationThread::process_queue() {
+    while(get_request_queue()->current_requests() > 0) {
+        DataRequest *request = get_request_queue()->pop_request();
+        if(request == NULL) {
+            this->quit();
+            return;
+        }
+        VisualizationData *data = request->create_data();
+        v_data.append(data);
+        if(current_request && data->is_within(current_request)) {
+            /* then add the data to the current renderer instance . . . */
+            current_request->get_renderer()->add_data(data);
+        }
+    }
+    if(current_request) current_request->get_renderer()->update();
 }

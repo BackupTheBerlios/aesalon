@@ -4,27 +4,28 @@
 #include <QImage>
 
 #include "VisualizationRenderDataRange.h"
+#include "VisualizationRenderPoint.h"
 #include "VisualizationData.h"
-#include "VisualizationRenderObject.h"
 
 class VisualizationRenderer {
 private:
     QImage *image;
     QList<VisualizationRenderDataRange> ranges;
-    QList<VisualizationRenderObject *> render_object_list;
+    QList<VisualizationData *> data_list;
     bool can_split;
     
     void recalc_ranges();
     void paint_grid();
-    void render_objects();
+    void render_data();
 public:
     VisualizationRenderer(QImage *image, bool can_split);
     virtual ~VisualizationRenderer();
     
     void update();
-    
     void add_data(VisualizationData *data);
-    void add_render_object(VisualizationRenderObject *r_object);
+    
+    /* NOTE: this *need* to be reentrant! */
+    void paint_line(VisualizationRenderPoint from, VisualizationRenderPoint to, QRgb colour);
 };
 
 #endif

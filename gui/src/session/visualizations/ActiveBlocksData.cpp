@@ -10,8 +10,8 @@ ActiveBlocksData::~ActiveBlocksData() {
 
 }
 
-void ActiveBlocksData::create_r_objects(VisualizationRenderer *renderer) const {
-    
+void ActiveBlocksData::paint_onto(VisualizationRenderer *renderer) const {
+    renderer->paint_line(VisualizationRenderPoint(timestamp, 0), VisualizationRenderPoint(timestamp, value), qRgb(0, 0, 0));
 }
 
 
