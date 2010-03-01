@@ -22,3 +22,4 @@ void ActiveBlocksThread::generate_requests(VisualizationRequest* current_request
     }
     qDebug("DataThread request queue size: %i", get_data_thread()->get_request_queue()->current_requests());
 }
+

@@ -6,6 +6,7 @@
 #include <QImage>
 
 #include "VisualizationRequest.h"
+#include "VisualizationRenderer.h"
 #include "DataRequestQueue.h"
 #include "storage/Timestamp.h"
 
@@ -26,6 +27,7 @@ protected:
     void send_request(DataRequest *request);
     virtual void generate_requests(VisualizationRequest *current_request) = 0;
     DataThread *get_data_thread() const { return data_thread; }
+    virtual bool is_splittable() const = 0;
 public slots:
     void update_request(VisualizationRequest *new_request);
 signals:

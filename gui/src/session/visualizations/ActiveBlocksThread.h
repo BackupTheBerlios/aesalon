@@ -10,6 +10,7 @@ public:
     
 protected:
     virtual void generate_requests(VisualizationRequest* current_request);
+    virtual bool is_splittable() const { return false; }
 };
 
 #endif

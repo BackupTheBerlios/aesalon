@@ -13,7 +13,7 @@ public:
     ActiveBlocksData(const Timestamp &timestamp, int value);
     virtual ~ActiveBlocksData();
     
-    virtual void render_onto(QImage *image, VisualizationRequest *request) const;
+    virtual void create_r_objects(VisualizationRenderer* renderer) const;
     
     virtual bool is_within(VisualizationRequest* request) const;
     virtual bool is_cachable() const { return true; }

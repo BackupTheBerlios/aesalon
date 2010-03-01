@@ -3,8 +3,10 @@
 
 #include <QImage>
 
-#include "VisualizationRequest.h"
 #include "VisualizationRenderDataRange.h"
+
+class VisualizationRequest;
+class VisualizationRenderer;
 
 class VisualizationData {
 private:
@@ -13,13 +15,11 @@ public:
     VisualizationData();
     virtual ~VisualizationData();
     
-    virtual void render_onto(QImage *image, VisualizationRequest *request) const = 0;
+    virtual void create_r_objects(VisualizationRenderer *renderer) const = 0;
     
     virtual bool is_within(VisualizationRequest *request) const = 0;
     virtual bool is_cachable() const = 0;
     
-    const VisualizationRenderDataRange &get_data_range() const { return data_range; }
-protected:
     VisualizationRenderDataRange &get_data_range() { return data_range; }
 };
 

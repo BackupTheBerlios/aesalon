@@ -25,8 +25,8 @@ void VisualizationThread::run() {
             VisualizationData *data = request->create_data();
             v_data.append(data);
             if(current_request && data->is_within(current_request)) {
-                /* then draw the data. */
-                data->render_onto(current_image, current_request);
+                /* then add the data to the current renderer instance . . . */
+                current_request->get_renderer()->add_data(data);
             }
         }
         msleep(50);
@@ -42,6 +42,7 @@ void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request = new_request;
     current_image = new QImage(200, 100, QImage::Format_RGB32);
     current_image->fill(QColor(255, 255, 255).rgb());
+    current_request->set_renderer(new VisualizationRenderer(current_image, is_splittable()));
     emit replace_image(current_image);
     generate_requests(current_request);
 }

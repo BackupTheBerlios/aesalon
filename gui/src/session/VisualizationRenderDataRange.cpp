@@ -1,6 +1,8 @@
 #include "VisualizationRenderDataRange.h"
 
-VisualizationRenderDataRange::VisualizationRenderDataRange() {
+VisualizationRenderDataRange::VisualizationRenderDataRange()
+    : lower_time(Timestamp(0)), upper_time(Timestamp(0)),
+    lower_data(-1048576), upper_data(0) {
     
 }
 

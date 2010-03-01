@@ -9,6 +9,8 @@ private:
 public:
     Timestamp() : internal_time(QDateTime::currentDateTime()) {}
     Timestamp(const Timestamp &other) : internal_time(other.internal_time) {}
+    Timestamp(uint seconds) : internal_time(QDateTime::fromTime_t(seconds)) {}
+    
     bool operator<(const Timestamp &other) const;
     bool operator<=(const Timestamp &other) const;
     bool operator>(const Timestamp &other) const;
@@ -19,6 +21,8 @@ public:
     qint64 ms_until(const Timestamp &other) const;
     void add_ms(qint64 ms);
     QString to_string() const;
+    
+    static Timestamp from_seconds(quint64 seconds);
 };
 
 #endif
