@@ -1,27 +1,39 @@
 #include <QPainter>
 #include <QLabel>
+#include <QScrollBar>
+#include <QEvent>
 #include "Visualization.h"
 #include "Visualization.moc"
 
-VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QWidget(parent), image(NULL) {
-    update_timer = new QTimer(this);
-    connect(update_timer, SIGNAL(timeout()), this, SLOT(update()));
-    update_timer->start(1000);
+VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QScrollArea(parent), image(NULL) {
+    image_label = new QLabel();
+    image_label->setMinimumSize(200, 200);
+    image_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setWidget(image_label);
+    setWidgetResizable(true);
+    scale = 1.0;
     
     setMinimumSize(200, 200);
-}
-
-void VisualizationCanvas::paintEvent(QPaintEvent *event) {
-    if(!image) return;
-    QPainter painter(this);
-    painter.scale(qreal(geometry().width()) / image->width(), qreal(geometry().height()) / image->height());
-    painter.drawImage(0, 0, *image);
 }
 
 void VisualizationCanvas::update_image(QImage *image) {
     delete this->image;
     this->image = image;
     this->update();
+}
+
+void VisualizationCanvas::image_updated() {
+    if(image == NULL) return;
+    QPixmap pixmap = QPixmap::fromImage(*image);
+    pixmap = pixmap.scaled(image->width() * scale, image->height() * scale);
+    image_label->setScaledContents(true);
+    image_label->setMinimumSize(image->width() * scale, image->height() * scale);
+    image_label->setPixmap(QPixmap::fromImage(*image));
+}
+
+void VisualizationCanvas::set_scale(qreal new_scale) {
+    scale = new_scale;
 }
 
 Visualization::Visualization(DataThread *data_thread, QWidget *parent)

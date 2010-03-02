@@ -25,6 +25,7 @@ void ActiveBlocksRequest::gather_data(DataThread* data_thread) {
     }
     blocks = count_blocks(snapshot->get_head_node());
     qDebug("ActiveBlocksRequest: found %i blocks for %s . . .", blocks, timestamp.to_string().toStdString().c_str());
+    snapshot->free_tree();
 #if 0
     /* NOTE: optimize this later . . . */
     BiTreeNode *node = snapshot->get_head_node();

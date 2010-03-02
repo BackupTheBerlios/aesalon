@@ -30,6 +30,8 @@ public:
     
     const Timestamp &get_timestamp() const { return timestamp; }
     void update_timestamp(const Timestamp &new_timestamp) { timestamp = new_timestamp; }
+    
+    void free_tree();
 };
 
 #endif

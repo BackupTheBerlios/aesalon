@@ -4,25 +4,29 @@
 #include <QWidget>
 #include <QImage>
 #include <QFormLayout>
+#include <QScrollArea>
+#include <QLabel>
 
 #include "VisualizationThread.h"
 #include "VisualizationRequest.h"
 #include "DataThread.h"
 #include "TimeSlider.h"
 
-class VisualizationCanvas : public QWidget { Q_OBJECT
+class VisualizationCanvas : public QScrollArea { Q_OBJECT
 private:
     QImage *image;
     QTimer *update_timer;
+    QLabel *image_label;
+    qreal scale;
 public:
     VisualizationCanvas(QWidget *parent);
     virtual ~VisualizationCanvas() {}
     
     QImage *get_image() const { return image; }
-protected:
-    void paintEvent(QPaintEvent *event);
 public slots:
     void update_image(QImage *image);
+    void image_updated();
+    void set_scale(qreal new_scale);
 };
 
 class Visualization : public QWidget { Q_OBJECT
