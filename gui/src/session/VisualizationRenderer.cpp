@@ -17,6 +17,8 @@ void VisualizationRenderer::recalc_ranges() {
     if(data_list.size() == 0) return;
     if(can_split == false) {
         VisualizationRenderDataRange range = data_list[0]->get_data_range();
+        /* TODO: find a workaround for this . . . e.g. support rendering from an offset display . . . */
+        range.set_lower_data(0);
         foreach(VisualizationData *data, data_list) {
             if(data->get_data_range().get_lower_time() < range.get_lower_time())
                 range.set_lower_time(data->get_data_range().get_lower_time());
@@ -75,6 +77,7 @@ void VisualizationRenderer::paint_line(VisualizationRenderPoint from, Visualizat
         qreal scale = image->height() / qreal(upper_data - lower_data);
         y1 = from.get_data_element() * scale;
         y2 = to.get_data_element() * scale;
+        /*qDebug("upper_data: %lli, lower_data: %lli, scale: %f, y1: %f, y2: %f", upper_data, lower_data, scale, y1, y2);*/
     }
     else {
         qCritical("Cannot paint lines in split visualizations (NYI)!");

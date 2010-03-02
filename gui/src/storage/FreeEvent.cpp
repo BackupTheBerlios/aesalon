@@ -52,4 +52,5 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
     else {
         qCritical("Asked to remove non-existent block . . .");
     }
+    snapshot->update_timestamp(get_timestamp());
 }

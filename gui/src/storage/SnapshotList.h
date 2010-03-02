@@ -19,7 +19,7 @@ public:
     SnapshotID get_last_id() const { return last_id; }
     
     Snapshot *append_snapshot();
-    Snapshot *get_snapshot(SnapshotID id) const { return internal_list[id]; }
+    Snapshot *get_snapshot(SnapshotID id) const { return internal_list[id-1]; }
     Snapshot *get_snapshot_for(const Timestamp &timestamp);
     int get_snapshot_count() const { return internal_list.size(); }
 };

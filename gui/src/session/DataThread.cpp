@@ -4,7 +4,8 @@
 
 DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(parent), data_source(data_source) {
     request_queue = new DataRequestQueue();
-    snapshot_list.append_snapshot();
+    current_snapshot = snapshot_list.append_snapshot();
+    current_snapshot->set_head_node(new BiTreeNode(current_snapshot->get_snapshot_id()));
     current_snapshot = snapshot_list.append_snapshot();
     start_time = NULL;
     finish_time = NULL;
@@ -31,11 +32,12 @@ void DataThread::run() {
 }
 
 void DataThread::event_received(Event *event) {
+    get_snapshot_list()->get_snapshot(current_snapshot->get_snapshot_id()-1)->add_event(event);
     event->apply_to(current_snapshot);
-    current_snapshot->add_event(event);
 }
 
 void DataThread::create_new_snapshot() {
+    current_snapshot->update_timestamp(Timestamp());
     current_snapshot = snapshot_list.append_snapshot();
 }
 
@@ -48,7 +50,7 @@ void DataThread::started() {
 
 void DataThread::finished() {
     snapshot_timer->stop();
-    current_snapshot = snapshot_list.append_snapshot();
+    /*current_snapshot = snapshot_list.append_snapshot();*/
     finish_time = new Timestamp();
     emit data_finished();
 }

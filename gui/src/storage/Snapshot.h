@@ -29,7 +29,7 @@ public:
     quint8 get_max_tree_depth() { return max_tree_depth; }
     
     const Timestamp &get_timestamp() const { return timestamp; }
-    void update_timestamp() { timestamp = Timestamp(); }
+    void update_timestamp(const Timestamp &new_timestamp) { timestamp = new_timestamp; }
 };
 
 #endif

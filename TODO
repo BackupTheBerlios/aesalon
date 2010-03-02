@@ -10,3 +10,4 @@ GUI:
 - Store the maximum tree depth inside the DataSource
 - Add the ability to create new DataSources
 - Add other DataSources (LaunchSource, etc.)
+- Make the generated QImage size configurable (maybe use QAbstractScrollArea for VCanvas?)
