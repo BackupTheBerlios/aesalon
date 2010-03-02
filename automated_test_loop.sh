@@ -1,5 +1,5 @@
 #!/bin/sh
 while true; do
-    tests/automated_test && sleep 1
+    ./aesalon -w tests/automated_test && sleep 1
 done
 

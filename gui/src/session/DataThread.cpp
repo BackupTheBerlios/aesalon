@@ -4,6 +4,7 @@
 
 DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(parent), data_source(data_source) {
     request_queue = new DataRequestQueue();
+    snapshot_list.append_snapshot();
     current_snapshot = snapshot_list.append_snapshot();
     start_time = NULL;
     finish_time = NULL;
