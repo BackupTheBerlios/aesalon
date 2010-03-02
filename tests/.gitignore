@@ -6,3 +6,4 @@ realloc_test
 fib_benchmark
 calloc_test
 cpp_new_test
+automated_test

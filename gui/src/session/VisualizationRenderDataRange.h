@@ -10,7 +10,6 @@ class VisualizationRenderDataRange {
 private:
     Timestamp lower_time, upper_time;
     qint64 lower_data, upper_data;
-    QRect image_coords;
 public:
     VisualizationRenderDataRange();
     VisualizationRenderDataRange(const Timestamp &lower_time, const Timestamp &upper_time, qint64 lower_data, qint64 upper_data);
@@ -23,9 +22,6 @@ public:
     void set_lower_data(qint64 new_data) { lower_data = new_data; }
     qint64 get_upper_data() const { return upper_data; }
     void set_upper_data(qint64 new_data) { upper_data = new_data; }
-    
-    const QRect &get_image_coords() const { return image_coords; }
-    void set_image_coords(const QRect &new_coords) { image_coords = new_coords; }
 };
 
 #endif

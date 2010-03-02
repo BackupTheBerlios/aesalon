@@ -51,6 +51,7 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
 Visualization::~Visualization() {
     if(v_thread) {
         v_thread->get_request_queue()->push_request(NULL);
+        v_thread->quit();
         v_thread->wait();
     }
 }

@@ -5,8 +5,8 @@
 #include "DataThread.h"
 
 VisualizationThread::VisualizationThread(DataThread *data_thread, QObject *parent) : QThread(parent), data_thread(data_thread) {
-    
     request_queue = new DataRequestQueue();
+    current_request = NULL;
 }
 
 VisualizationThread::~VisualizationThread() {
