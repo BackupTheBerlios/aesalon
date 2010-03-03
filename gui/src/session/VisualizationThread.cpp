@@ -49,5 +49,8 @@ void VisualizationThread::process_queue() {
             current_request->get_renderer()->add_data(data);
         }
     }
-    if(current_request) current_request->get_renderer()->update();
+    if(current_request) {
+        current_request->get_renderer()->update();
+        emit image_updated();
+    }
 }

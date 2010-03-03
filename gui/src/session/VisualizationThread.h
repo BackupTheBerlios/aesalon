@@ -36,6 +36,7 @@ private slots:
     void process_queue();
 signals:
     void replace_image(QImage *new_image);
+    void image_updated();
 };
 
 #endif

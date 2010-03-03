@@ -2,11 +2,12 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QEvent>
+#include <QWheelEvent>
 #include "Visualization.h"
 #include "Visualization.moc"
 
 VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QScrollArea(parent), image(NULL) {
-    image_label = new QLabel();
+    image_label = new QLabel(tr(". . ."));
     image_label->setMinimumSize(200, 200);
     image_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -14,7 +15,28 @@ VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QScrollArea(parent),
     setWidgetResizable(true);
     scale = 1.0;
     
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), SLOT(image_updated()));
+    timer->start(5000);
+    
     setMinimumSize(200, 200);
+}
+
+void VisualizationCanvas::wheelEvent(QWheelEvent* event) {
+    scale *= 1.0 + (event->delta() / 1000.0);
+    QTimer::singleShot(0, this, SLOT(image_updated()));
+}
+
+void VisualizationCanvas::mousePressEvent(QMouseEvent *event) {
+    last_mouse_position = event->globalPos();
+}
+
+void VisualizationCanvas::mouseMoveEvent(QMouseEvent* event) {
+    if(event->buttons() | Qt::LeftButton) {
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (event->pos().x() - last_mouse_position.x()));
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - (event->pos().y() - last_mouse_position.y()));
+        last_mouse_position = event->pos();
+    }
 }
 
 void VisualizationCanvas::update_image(QImage *image) {
@@ -49,7 +71,8 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     main_layout->addRow(tr("To:"), to_slider);
     
     canvas = new VisualizationCanvas(this);
-    canvas->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    canvas->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    canvas->setMinimumSize(200, 200);
     main_layout->addWidget(canvas);
     
     setLayout(main_layout);
@@ -77,6 +100,7 @@ void Visualization::initialize() {
     }
     connect(v_thread, SIGNAL(replace_image(QImage*)), canvas, SLOT(update_image(QImage*)));
     connect(this, SIGNAL(visualization_request(VisualizationRequest*)), v_thread, SLOT(update_request(VisualizationRequest*)));
+    connect(v_thread, SIGNAL(image_updated()), canvas, SLOT(image_updated()));
     v_thread->start();
     if(data_thread->get_start_time()) {
         from_slider->set_range(*data_thread->get_start_time(), Timestamp());

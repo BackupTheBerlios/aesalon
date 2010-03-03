@@ -18,11 +18,16 @@ private:
     QTimer *update_timer;
     QLabel *image_label;
     qreal scale;
+    QPoint last_mouse_position;
 public:
     VisualizationCanvas(QWidget *parent);
     virtual ~VisualizationCanvas() {}
     
     QImage *get_image() const { return image; }
+protected:
+    virtual void wheelEvent(QWheelEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
 public slots:
     void update_image(QImage *image);
     void image_updated();
