@@ -1,14 +1,14 @@
 #include "FreeEvent.h"
 
 void FreeEvent::apply_to(Snapshot *snapshot) {
-    qDebug("Asked to apply FreeEvent to snapshot #%li . . .", (long int)snapshot->get_snapshot_id());
-    BiTreeNode *node = snapshot->get_head_node();
-    if(!node) {
+    qDebug("Asked to apply FreeEvent to snapshot #%li, block to remove is at 0x%x", (long int)snapshot->get_snapshot_id(), address);
+    if(!snapshot->get_head_node()) {
         qCritical("Asked to remove block from non-existent tree . . .");
         return;
     }
     
     snapshot->set_head_node(snapshot->get_head_node()->mark_changed(snapshot->get_snapshot_id()));
+    BiTreeNode *node = snapshot->get_head_node();
     
     quint8 max_depth = snapshot->get_max_tree_depth();
     /* First, traverse the tree to find the right spot. Do not create any
@@ -47,7 +47,9 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
         node = node->mark_changed(snapshot->get_snapshot_id());
         if(last_node->get_left() == old_node) last_node->set_left(node);
         else if(last_node->get_right() == old_node) last_node->set_right(node);
+        qDebug("Changed node %p from %i blocks . . .", node, node->get_block_list_size());
         node->remove_block(block);
+        qDebug(". . . to %i blocks.", node->get_block_list_size());
     }
     else {
         qCritical("Asked to remove non-existent block . . .");

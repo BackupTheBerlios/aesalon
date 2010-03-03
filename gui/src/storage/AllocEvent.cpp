@@ -1,7 +1,7 @@
 #include "AllocEvent.h"
 
 void AllocEvent::apply_to(Snapshot *snapshot) {
-    qDebug("Asked to apply AllocEvent to snapshot #%li . . .", (long int)snapshot->get_snapshot_id());
+    qDebug("Asked to apply AllocEvent to snapshot #%li, new block address is 0x%x", (long int)snapshot->get_snapshot_id(), address);
     /* Create the head node if it doesn't exist . . . */
     if(snapshot->get_head_node() == NULL) {
         snapshot->set_head_node(new BiTreeNode(snapshot->get_snapshot_id()));

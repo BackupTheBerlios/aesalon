@@ -17,14 +17,14 @@ NetworkReceiver::~NetworkReceiver() {
 
 quint64 NetworkReceiver::pop_quint64() {
     quint64 ret = 0;
-    ret |= unprocessed.at(0);
-    ret |= quint64(quint8(unprocessed.at(1))) << 8;
-    ret |= quint64(quint8(unprocessed.at(2))) << 16;
-    ret |= quint64(quint8(unprocessed.at(3))) << 24;
-    ret |= quint64(quint8(unprocessed.at(4))) << 32;
-    ret |= quint64(quint8(unprocessed.at(5))) << 40;
-    ret |= quint64(quint8(unprocessed.at(6))) << 48;
-    ret |= quint64(quint8(unprocessed.at(7))) << 56;
+    ret |= unprocessed.at(0) & 0xff;
+    ret |= quint64(quint8(unprocessed.at(1)) & 0xff) << 8;
+    ret |= quint64(quint8(unprocessed.at(2)) & 0xff) << 16;
+    ret |= quint64(quint8(unprocessed.at(3)) & 0xff) << 24;
+    ret |= quint64(quint8(unprocessed.at(4)) & 0xff) << 32;
+    ret |= quint64(quint8(unprocessed.at(5)) & 0xff) << 40;
+    ret |= quint64(quint8(unprocessed.at(6)) & 0xff) << 48;
+    ret |= quint64(quint8(unprocessed.at(7)) & 0xff) << 56;
     unprocessed.remove(0, 8);
     return ret;
 }
@@ -47,6 +47,7 @@ void NetworkReceiver::data_received() {
                 emit event_received(new AllocEvent(pop_quint64(), pop_quint64()));
             }
             else if(block_type == 2) {
+                qDebug("Constructing new FreeEvent, address is 0x%x . . .", address);
                 emit event_received(new FreeEvent(address));
             }
         }

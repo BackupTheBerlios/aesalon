@@ -16,6 +16,8 @@ bool MallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     size = portal->read_memory(rbp-0x18);
     ret_address = portal->read_memory(rbp-0x20);
     
+    /*std::cout << "Allocation detected: address is 0x" << std::hex << address << ", size is " << std::dec << size << std::endl;*/
+    
     Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::ALLOC_EVENT, address, size));
     
     return true;
