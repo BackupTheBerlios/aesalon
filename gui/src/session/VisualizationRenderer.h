@@ -27,7 +27,8 @@ public:
     void add_data(VisualizationData *data);
     
     /* NOTE: this *need* to be reentrant! */
-    void paint_line(VisualizationRenderPoint from, VisualizationRenderPoint to, QRgb colour);
+    void paint_line(VisualizationRenderPoint from, VisualizationRenderPoint to, QRgb colour, Qt::PenStyle style = Qt::SolidLine);
+    void paint_text(VisualizationRenderPoint point, QString text, int size, QRgb colour);
 };
 
 #endif

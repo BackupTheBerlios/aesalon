@@ -30,6 +30,7 @@ void VisualizationRenderer::recalc_ranges() {
             if(data->get_data_range().get_upper_data() > range.get_upper_data())
                 range.set_upper_data(data->get_data_range().get_upper_data());
         }
+        range.set_upper_data(range.get_upper_data() * 2);
         ranges.append(range);
     }
     else {
@@ -39,7 +40,33 @@ void VisualizationRenderer::recalc_ranges() {
 }
 
 void VisualizationRenderer::paint_grid() {
-    /* Just ignore the grid for now . . . */
+    if(can_split == true) {
+        qCritical("Painting split grids NYI!");
+        return;
+    }
+    
+    qint64 total_time = ranges[0].get_lower_time().ms_until(ranges[0].get_upper_time());
+    qint64 total_data_size = (ranges[0].get_upper_data() - ranges[0].get_lower_data());
+    
+    for(int x = 0; x < 12; x ++) {
+        qint64 value = x * (total_data_size / 12.0);
+        paint_line(VisualizationRenderPoint(ranges[0].get_lower_time(), value),
+            VisualizationRenderPoint(ranges[0].get_upper_time(), value), qRgb(32, 32, 32), Qt::DotLine);
+        QString desc;
+        desc.sprintf("%lli", value);
+        paint_text(VisualizationRenderPoint(ranges[0].get_lower_time(), value), desc, 8, qRgb(0, 0, 0));
+    }
+    
+    for(int y = 0; y < 12; y ++) {
+        Timestamp ts = ranges[0].get_lower_time();
+        ts.add_ms(y * (total_time / 12.0));
+        paint_line(VisualizationRenderPoint(ts, 0), VisualizationRenderPoint(ts, ranges[0].get_upper_data()), qRgb(32, 32, 32), Qt::DotLine);
+        QString desc;
+        qint64 time_diff = ranges[0].get_lower_time().ms_until(ts);
+        desc.sprintf("%02lli:%02lli.%03lli", (time_diff / 1000) / 60, (time_diff / 1000) % 60, time_diff % 1000);
+        paint_text(VisualizationRenderPoint(ts, 0), desc, 8, qRgb(0, 0, 0));
+        /*paint_text(VisualizationRenderPoint(ts, ranges[0].get_upper_data()-1), desc, 8, qRgb(0, 0, 0));*/
+    }
 }
 
 void VisualizationRenderer::render_data() {
@@ -64,7 +91,7 @@ void VisualizationRenderer::add_data(VisualizationData *data) {
     data_list.append(data);
 }
 
-void VisualizationRenderer::paint_line(VisualizationRenderPoint from, VisualizationRenderPoint to, QRgb colour) {
+void VisualizationRenderer::paint_line(VisualizationRenderPoint from, VisualizationRenderPoint to, QRgb colour, Qt::PenStyle style) {
     QLineF line;
     qreal x1, y1, x2, y2;
     if(can_split == false) {
@@ -85,10 +112,22 @@ void VisualizationRenderer::paint_line(VisualizationRenderPoint from, Visualizat
     else {
         qCritical("Cannot paint lines in split visualizations (NYI)!");
     }
-    line.setLine(x1, y1, x2, y2);
+    line.setLine(x1, image->height() - y1, x2, image->height() - y2);
     QPainter painter(image);
-    QBrush brush;
-    brush.setColor(colour);
-    painter.setBrush(brush);
+    QPen pen(style);
+    pen.setColor(colour);
+    painter.setPen(pen);
     painter.drawLine(line);
+}
+
+void VisualizationRenderer::paint_text(VisualizationRenderPoint point, QString text, int size, QRgb colour) {
+    qreal x = qreal(ranges[0].get_lower_time().ms_until(point.get_time_element())) / ranges[0].get_lower_time().ms_until(ranges[0].get_upper_time()) * image->width();
+    qreal y = point.get_data_element() * (image->height() / qreal(ranges[0].get_upper_data() - ranges[0].get_lower_data()));
+    QPainter painter(image);
+    QPen pen(Qt::SolidLine);
+    pen.setColor(colour);
+    painter.setPen(pen);
+    painter.setFont(QFont("DejaVu Sans", size));
+    QPointF pointf(x, image->height() - y);
+    painter.drawText(pointf, text);
 }
