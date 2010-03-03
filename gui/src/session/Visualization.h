@@ -40,7 +40,7 @@ private:
     DataThread *data_thread;
     VisualizationRequest *current_request;
     VisualizationCanvas *canvas;
-    QFormLayout *main_layout;
+    QVBoxLayout *main_layout;
     TimeSlider *from_slider;
     TimeSlider *to_slider;
 protected:

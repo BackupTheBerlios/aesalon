@@ -13,8 +13,9 @@ private:
     QLineEdit *display;
     QSlider *slider;
     Timestamp from;
+    QString prefix;
 public:
-    TimeSlider(QWidget *parent = NULL);
+    TimeSlider(QString prefix, QWidget *parent = NULL);
     virtual ~TimeSlider();
     void set_range(const Timestamp &from, const Timestamp &to);
     

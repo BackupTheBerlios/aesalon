@@ -10,7 +10,7 @@ VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QScrollArea(parent),
     image_label = new QLabel(tr(". . ."));
     image_label->setMinimumSize(200, 200);
     image_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setWidget(image_label);
     setWidgetResizable(true);
     scale = 1.0;
@@ -33,9 +33,9 @@ void VisualizationCanvas::mousePressEvent(QMouseEvent *event) {
 
 void VisualizationCanvas::mouseMoveEvent(QMouseEvent* event) {
     if(event->buttons() | Qt::LeftButton) {
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (event->pos().x() - last_mouse_position.x()));
-        verticalScrollBar()->setValue(verticalScrollBar()->value() - (event->pos().y() - last_mouse_position.y()));
-        last_mouse_position = event->pos();
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (event->globalPos().x() - last_mouse_position.x()));
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - (event->globalPos().y() - last_mouse_position.y()));
+        last_mouse_position = event->globalPos();
     }
 }
 
@@ -61,19 +61,25 @@ void VisualizationCanvas::set_scale(qreal new_scale) {
 Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     : QWidget(parent), v_thread(NULL), data_thread(data_thread) {
     
-    main_layout = new QFormLayout();
+    this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     
-    from_slider = new TimeSlider();
+    main_layout = new QVBoxLayout();
+    
+    from_slider = new TimeSlider(tr("From"));
     connect(from_slider, SIGNAL(changed(Timestamp)), SLOT(handle_slider_change_from(Timestamp)));
-    to_slider = new TimeSlider();
+    main_layout->addWidget(from_slider);
+    to_slider = new TimeSlider(tr("To"));
     connect(to_slider, SIGNAL(changed(Timestamp)), SLOT(handle_slider_change_to(Timestamp)));
-    main_layout->addRow(tr("From:"), from_slider);
-    main_layout->addRow(tr("To:"), to_slider);
+    main_layout->addWidget(to_slider);
+    
+    /*main_layout->addRow(tr("From:"), from_slider);
+    main_layout->addRow(tr("To:"), to_slider);*/
     
     canvas = new VisualizationCanvas(this);
     canvas->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     canvas->setMinimumSize(200, 200);
     main_layout->addWidget(canvas);
+    /*main_layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);*/
     
     setLayout(main_layout);
     current_request = NULL;

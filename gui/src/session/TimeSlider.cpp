@@ -4,9 +4,9 @@
 #include "TimeSlider.h"
 #include "TimeSlider.moc"
 
-TimeSlider::TimeSlider(QWidget* parent) : QWidget(parent) {
+TimeSlider::TimeSlider(QString prefix, QWidget* parent) : QWidget(parent), prefix(prefix) {
     setLayout(new QHBoxLayout());
-    display = new QLineEdit("00:00.000");
+    display = new QLineEdit(prefix + "00:00.000");
     display->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     connect(display, SIGNAL(returnPressed()), SLOT(update_slider()));
     layout()->addWidget(display);
@@ -42,11 +42,10 @@ void TimeSlider::set_value(const Timestamp& time) {
     slider->setValue(from.ms_until(time));
 }
 
-
 void TimeSlider::update_display(int new_value) {
     if(new_value < 0) return;
     QString string;
-    string.sprintf("%02i:%02i.%03i", (new_value / 1000) / 60, (new_value / 1000) % 60, new_value % 1000);
+    string.sprintf("%s %02i:%02i.%03i", prefix.toLocal8Bit().constData(), (new_value / 1000) / 60, (new_value / 1000) % 60, new_value % 1000);
     display->setText(string);
 }
 
@@ -55,6 +54,7 @@ void TimeSlider::update_slider() {
     QByteArray input = string.toAscii();
     int i = 0;
     QString minutes, seconds, milliseconds;
+    string.remove(prefix);
     for(; i < string.size(); i ++) {
         if(isdigit(input[i])) {
             minutes += input[i];
