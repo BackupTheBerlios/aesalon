@@ -2,8 +2,8 @@
 #include <QPainter>
 #include "VisualizationRenderer.h"
 
-VisualizationRenderer::VisualizationRenderer(QImage *image, bool can_split)
-    : image(image), can_split(can_split) {
+VisualizationRenderer::VisualizationRenderer(QPixmap *image, bool can_split, QWidget *canvas)
+    : image(image), can_split(can_split), canvas(canvas) {
     
 }
 
@@ -50,6 +50,9 @@ void VisualizationRenderer::render_data() {
 
 void VisualizationRenderer::update() {
     if(data_list.size() == 0) return;
+    if(canvas->geometry() != image->rect()) {
+        (*image) = image->scaled(canvas->width(), canvas->height());
+    }
     recalc_ranges();
     /* Paint the image white . . . */
     image->fill(qRgb(255, 255, 255));

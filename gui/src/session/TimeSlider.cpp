@@ -6,7 +6,7 @@
 
 TimeSlider::TimeSlider(QString prefix, QWidget* parent) : QWidget(parent), prefix(prefix) {
     setLayout(new QHBoxLayout());
-    display = new QLineEdit(prefix + "00:00.000");
+    display = new QLineEdit(prefix + " 00:00.000");
     display->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     connect(display, SIGNAL(returnPressed()), SLOT(update_slider()));
     layout()->addWidget(display);

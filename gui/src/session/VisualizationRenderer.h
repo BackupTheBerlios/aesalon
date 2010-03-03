@@ -1,7 +1,8 @@
 #ifndef AESALON_GUI_SESSION_VISUALIZATION_RENDERER_H
 #define AESALON_GUI_SESSION_VISUALIZATION_RENDERER_H
 
-#include <QImage>
+#include <QPixmap>
+#include <QWidget>
 
 #include "VisualizationRenderDataRange.h"
 #include "VisualizationRenderPoint.h"
@@ -9,16 +10,17 @@
 
 class VisualizationRenderer {
 private:
-    QImage *image;
+    QPixmap *image;
     QList<VisualizationRenderDataRange> ranges;
     QList<VisualizationData *> data_list;
     bool can_split;
+    QWidget *canvas;
     
     void recalc_ranges();
     void paint_grid();
     void render_data();
 public:
-    VisualizationRenderer(QImage *image, bool can_split);
+    VisualizationRenderer(QPixmap *image, bool can_split, QWidget *canvas);
     virtual ~VisualizationRenderer();
     
     void update();

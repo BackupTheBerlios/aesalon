@@ -3,7 +3,7 @@
 
 #include <QList>
 #include <QThread>
-#include <QImage>
+#include <QPixmap>
 #include <QTimer>
 
 #include "VisualizationRequest.h"
@@ -17,7 +17,7 @@ private:
     DataRequestQueue *request_queue;
     QList<VisualizationData *> v_data;
     VisualizationRequest *current_request;
-    QImage *current_image;
+    QPixmap *current_image;
     QTimer *queue_timer;
 public:
     VisualizationThread(DataThread *data_thread, QObject *parent = 0);
@@ -31,11 +31,11 @@ protected:
     DataThread *get_data_thread() const { return data_thread; }
     virtual bool is_splittable() const = 0;
 public slots:
-    void update_request(VisualizationRequest *new_request);
+    void update_request(VisualizationRequest *new_request, QWidget *canvas);
 private slots:
     void process_queue();
 signals:
-    void replace_image(QImage *new_image);
+    void replace_image(QPixmap *new_image);
     void image_updated();
 };
 

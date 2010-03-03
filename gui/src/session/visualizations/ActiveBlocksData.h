@@ -1,7 +1,7 @@
 #ifndef AESALON_GUI_SESSION_VISUALIZATION_ACTIVE_BLOCKS_DATA_H
 #define AESALON_GUI_SESSION_VISUALIZATION_ACTIVE_BLOCKS_DATA_H
 
-#include <QImage>
+#include <QPixmap>
 
 #include "../VisualizationData.h"
 

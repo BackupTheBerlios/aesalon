@@ -7,6 +7,7 @@ core
 vgcore.*
 *.sr.orig 
 .*.swp
+*.sr.orig
 
 # Buildsystem (CMake) ignores
 CMakeFiles

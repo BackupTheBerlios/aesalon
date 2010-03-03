@@ -26,11 +26,11 @@ void VisualizationThread::send_request(DataRequest *request) {
     data_thread->get_request_queue()->push_request(request);
 }
 
-void VisualizationThread::update_request(VisualizationRequest *new_request) {
+void VisualizationThread::update_request(VisualizationRequest *new_request, QWidget *canvas) {
     current_request = new_request;
-    current_image = new QImage(200, 100, QImage::Format_RGB32);
+    current_image = new QPixmap(200, 100);
     current_image->fill(QColor(255, 255, 255).rgb());
-    current_request->set_renderer(new VisualizationRenderer(current_image, is_splittable()));
+    current_request->set_renderer(new VisualizationRenderer(current_image, is_splittable(), canvas));
     emit replace_image(current_image);
     generate_requests(current_request);
 }
