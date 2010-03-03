@@ -19,8 +19,9 @@ private:
     VisualizationRequest *current_request;
     QPixmap *current_image;
     QTimer *queue_timer;
+    QSize *canvas_size;
 public:
-    VisualizationThread(DataThread *data_thread, QObject *parent = 0);
+    VisualizationThread(DataThread *data_thread, QSize *canvas_size, QObject *parent = 0);
     virtual ~VisualizationThread();
     
     DataRequestQueue *get_request_queue() const { return request_queue; }
@@ -31,7 +32,7 @@ protected:
     DataThread *get_data_thread() const { return data_thread; }
     virtual bool is_splittable() const = 0;
 public slots:
-    void update_request(VisualizationRequest *new_request, QWidget *canvas);
+    void update_request(VisualizationRequest *new_request);
 private slots:
     void process_queue();
 signals:

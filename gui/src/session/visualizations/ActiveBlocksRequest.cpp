@@ -19,12 +19,10 @@ void ActiveBlocksRequest::gather_data(DataThread* data_thread) {
     SnapshotList *snapshot_list = data_thread->get_snapshot_list();
     Snapshot *snapshot = snapshot_list->get_snapshot_for(timestamp);
     if(snapshot == NULL) {
-        qDebug("NULL snapshot!");
         blocks = 0;
         return;
     }
     blocks = count_blocks(snapshot->get_head_node());
-    qDebug("ActiveBlocksRequest: found %i blocks for %s . . .", blocks, timestamp.to_string().toStdString().c_str());
     snapshot->free_tree();
 #if 0
     /* NOTE: optimize this later . . . */
@@ -55,9 +53,6 @@ void ActiveBlocksRequest::gather_data(DataThread* data_thread) {
 int ActiveBlocksRequest::count_blocks(BiTreeNode* node) {
     if(node == NULL) return 0;
     int count = node->get_block_list_size();
-    if(count) {
-        qDebug("count_blocks(): found %i block(s) (snapshot ID is %lli).", count, node->get_snapshot_id());
-    }
     if(node->get_left()) count += count_blocks(node->get_left());
     if(node->get_right()) count += count_blocks(node->get_right());
     return count;

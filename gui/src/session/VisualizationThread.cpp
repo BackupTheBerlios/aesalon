@@ -4,7 +4,7 @@
 #include "VisualizationData.h"
 #include "DataThread.h"
 
-VisualizationThread::VisualizationThread(DataThread *data_thread, QObject *parent) : QThread(parent), data_thread(data_thread) {
+VisualizationThread::VisualizationThread(DataThread *data_thread, QSize *canvas_size, QObject *parent) : QThread(parent), data_thread(data_thread), canvas_size(canvas_size) {
     request_queue = new DataRequestQueue();
     current_request = NULL;
 }
@@ -22,15 +22,14 @@ void VisualizationThread::run() {
 }
 
 void VisualizationThread::send_request(DataRequest *request) {
-    qDebug("VisualizationThread::send_request() called . . .");
     data_thread->get_request_queue()->push_request(request);
 }
 
-void VisualizationThread::update_request(VisualizationRequest *new_request, QWidget *canvas) {
+void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request = new_request;
     current_image = new QPixmap(200, 100);
     current_image->fill(QColor(255, 255, 255).rgb());
-    current_request->set_renderer(new VisualizationRenderer(current_image, is_splittable(), canvas));
+    current_request->set_renderer(new VisualizationRenderer(current_image, is_splittable()));
     emit replace_image(current_image);
     generate_requests(current_request);
 }
@@ -49,8 +48,8 @@ void VisualizationThread::process_queue() {
             current_request->get_renderer()->add_data(data);
         }
     }
-    if(current_request) {
-        current_request->get_renderer()->update();
+    if(current_request && canvas_size) {
+        current_request->get_renderer()->update(*canvas_size);
         emit image_updated();
     }
 }

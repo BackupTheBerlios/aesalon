@@ -15,12 +15,28 @@ VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QScrollArea(parent),
     setWidget(image_label);
     setWidgetResizable(true);
     scale = 1.0;
+    this->setBackgroundRole(QPalette::BrightText);
+    
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(image_updated()));
     timer->start(5000);
     
     setMinimumSize(200, 200);
+}
+
+void VisualizationCanvas::calc_canvas_size() {
+    canvas_size = this->size();
+    /* NOTE: find a better way than adding 4! */
+    canvas_size.setWidth(canvas_size.width() - (verticalScrollBar()->width() + 4));
+    canvas_size.setHeight(canvas_size.height() - (horizontalScrollBar()->height() + 4));
+}
+
+void VisualizationCanvas::resizeEvent(QResizeEvent *event) {
+    QScrollArea::resizeEvent(event);
+    calc_canvas_size();
 }
 
 void VisualizationCanvas::wheelEvent(QWheelEvent* event) {
@@ -97,14 +113,15 @@ Visualization::~Visualization() {
 }
 
 void Visualization::initialize() {
-    v_thread = create_v_thread(data_thread);
+    canvas_size = canvas->get_canvas_size();
+    v_thread = create_v_thread(data_thread, canvas_size);
     if(v_thread == NULL) {
         qDebug("Failed to create v_thread!");
         this->deleteLater();
         return;
     }
     connect(v_thread, SIGNAL(replace_image(QPixmap*)), canvas, SLOT(update_image(QPixmap*)));
-    connect(this, SIGNAL(visualization_request(VisualizationRequest*, QWidget*)), v_thread, SLOT(update_request(VisualizationRequest*, QWidget*)));
+    connect(this, SIGNAL(visualization_request(VisualizationRequest*)), v_thread, SLOT(update_request(VisualizationRequest*)));
     connect(v_thread, SIGNAL(image_updated()), canvas, SLOT(image_updated()));
     v_thread->start();
     if(data_thread->get_start_time()) {
@@ -134,7 +151,7 @@ void Visualization::handle_slider_change_from(Timestamp time) {
     /*if(current_request) delete current_request;*/
     current_request = new VisualizationRequest(from_slider->current_value(), to_slider->current_value());
     qDebug("Emitting visualization_request(%p) . . .", (const void *)current_request);
-    emit visualization_request(current_request, canvas);
+    emit visualization_request(current_request);
 }
 
 void Visualization::handle_slider_change_to(Timestamp time) {
@@ -149,5 +166,5 @@ void Visualization::handle_slider_change_to(Timestamp time) {
     qDebug("Emitting visualization_request(%p) . . .", (const void *)current_request);
     qDebug("\tFrom %s to %s . . .", current_request->get_from().to_string().toStdString().c_str(), current_request->get_to().to_string().toStdString().c_str());
     qDebug("to_slider->current_value(): %s", to_slider->current_value().to_string().toStdString().c_str());
-    emit visualization_request(current_request, canvas);
+    emit visualization_request(current_request);
 }

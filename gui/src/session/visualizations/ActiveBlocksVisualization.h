@@ -5,7 +5,7 @@
 
 class ActiveBlocksVisualization : public Visualization { Q_OBJECT
 protected:
-    virtual VisualizationThread* create_v_thread(DataThread* data_thread);
+    virtual VisualizationThread* create_v_thread(DataThread* data_thread, QSize* canvas_size);
 public:
     ActiveBlocksVisualization(DataThread *data_thread);
     virtual ~ActiveBlocksVisualization();

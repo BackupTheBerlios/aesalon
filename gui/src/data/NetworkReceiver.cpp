@@ -47,7 +47,6 @@ void NetworkReceiver::data_received() {
                 emit event_received(new AllocEvent(pop_quint64(), pop_quint64()));
             }
             else if(block_type == 2) {
-                qDebug("Constructing new FreeEvent, address is 0x%x . . .", address);
                 emit event_received(new FreeEvent(address));
             }
         }

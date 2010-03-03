@@ -8,6 +8,6 @@ ActiveBlocksVisualization::ActiveBlocksVisualization(DataThread* data_thread): V
 ActiveBlocksVisualization::~ActiveBlocksVisualization() {
 }
 
-VisualizationThread* ActiveBlocksVisualization::create_v_thread(DataThread* data_thread) {
-    return new ActiveBlocksThread(data_thread);
+VisualizationThread* ActiveBlocksVisualization::create_v_thread(DataThread *data_thread, QSize *canvas_size) {
+    return new ActiveBlocksThread(data_thread, canvas_size);
 }

@@ -14,16 +14,15 @@ private:
     QList<VisualizationRenderDataRange> ranges;
     QList<VisualizationData *> data_list;
     bool can_split;
-    QWidget *canvas;
     
     void recalc_ranges();
     void paint_grid();
     void render_data();
 public:
-    VisualizationRenderer(QPixmap *image, bool can_split, QWidget *canvas);
+    VisualizationRenderer(QPixmap *image, bool can_split);
     virtual ~VisualizationRenderer();
     
-    void update();
+    void update(const QSize &canvas_size);
     void add_data(VisualizationData *data);
     
     /* NOTE: this *need* to be reentrant! */

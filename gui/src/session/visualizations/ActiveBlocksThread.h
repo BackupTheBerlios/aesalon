@@ -5,7 +5,7 @@
 
 class ActiveBlocksThread : public VisualizationThread {
 public:
-    ActiveBlocksThread(DataThread *data_thread);
+    ActiveBlocksThread(DataThread *data_thread, QSize *canvas_size);
     virtual ~ActiveBlocksThread();
     
 protected:
