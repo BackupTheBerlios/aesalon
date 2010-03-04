@@ -30,18 +30,25 @@ VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QScrollArea(parent),
 void VisualizationCanvas::calc_canvas_size() {
     canvas_size = this->size();
     /* NOTE: find a better way than adding 4! */
-    canvas_size.setWidth(canvas_size.width() - (verticalScrollBar()->width() + 4));
-    canvas_size.setHeight(canvas_size.height() - (horizontalScrollBar()->height() + 4));
+    canvas_size.setWidth(canvas_size.width() - verticalScrollBar()->width() - 8);
+    canvas_size.setHeight(canvas_size.height() - horizontalScrollBar()->height() - 8);
+    
+    /*canvas_size = image_label->size();
+    canvas_size *= scale;
+    scale = 1.0;*/
 }
 
 void VisualizationCanvas::resizeEvent(QResizeEvent *event) {
     QScrollArea::resizeEvent(event);
     calc_canvas_size();
+    emit request_rerender();
 }
 
 void VisualizationCanvas::wheelEvent(QWheelEvent* event) {
     scale *= 1.0 + (event->delta() / 1000.0);
-    QTimer::singleShot(0, this, SLOT(image_updated()));
+    /*QTimer::singleShot(0, this, SLOT(image_updated()));*/
+    calc_canvas_size();
+    emit request_rerender();
 }
 
 void VisualizationCanvas::mousePressEvent(QMouseEvent *event) {
@@ -123,6 +130,7 @@ void Visualization::initialize() {
     connect(v_thread, SIGNAL(replace_image(QPixmap*)), canvas, SLOT(update_image(QPixmap*)));
     connect(this, SIGNAL(visualization_request(VisualizationRequest*)), v_thread, SLOT(update_request(VisualizationRequest*)));
     connect(v_thread, SIGNAL(image_updated()), canvas, SLOT(image_updated()));
+    connect(canvas, SIGNAL(request_rerender()), v_thread, SLOT(update_graph()));
     v_thread->start();
     if(data_thread->get_start_time()) {
         from_slider->set_range(*data_thread->get_start_time(), Timestamp());

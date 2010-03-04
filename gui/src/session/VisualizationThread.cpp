@@ -4,7 +4,8 @@
 #include "VisualizationData.h"
 #include "DataThread.h"
 
-VisualizationThread::VisualizationThread(DataThread *data_thread, QSize *canvas_size, QObject *parent) : QThread(parent), data_thread(data_thread), canvas_size(canvas_size) {
+VisualizationThread::VisualizationThread(DataThread *data_thread, QSize *canvas_size, QObject *parent)
+    : QThread(parent), data_thread(data_thread), canvas_size(canvas_size) {
     request_queue = new DataRequestQueue();
     current_request = NULL;
 }
@@ -16,7 +17,7 @@ VisualizationThread::~VisualizationThread() {
 void VisualizationThread::run() {
     queue_timer = new QTimer();
     connect(queue_timer, SIGNAL(timeout()), SLOT(process_queue()));
-    queue_timer->start(500);
+    queue_timer->start(250);
     exec();
     delete queue_timer;
 }
@@ -32,6 +33,10 @@ void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request->set_renderer(new VisualizationRenderer(current_image, is_splittable()));
     emit replace_image(current_image);
     generate_requests(current_request);
+}
+
+void VisualizationThread::update_graph() {
+    if(current_request) current_request->get_renderer()->update(*canvas_size);
 }
 
 void VisualizationThread::process_queue() {

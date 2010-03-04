@@ -54,7 +54,6 @@ void NetworkReceiver::data_received() {
 }
 
 void NetworkReceiver::connected() {
-    qDebug("NetworkReceiver::connected() . . .");
     emit started();
 }
 

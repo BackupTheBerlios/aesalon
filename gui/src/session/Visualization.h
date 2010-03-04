@@ -22,6 +22,7 @@ private:
     QSize canvas_size;
 private:
     void calc_canvas_size();
+    QPointF resolve_point(const VisualizationRenderPoint &point) const;
 public:
     VisualizationCanvas(QWidget *parent);
     virtual ~VisualizationCanvas() {}
@@ -37,6 +38,8 @@ public slots:
     void update_image(QPixmap *image);
     void image_updated();
     void set_scale(qreal new_scale);
+signals:
+    void request_rerender();
 };
 
 class Visualization : public QWidget { Q_OBJECT
