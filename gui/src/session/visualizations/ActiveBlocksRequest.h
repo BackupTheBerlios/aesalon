@@ -4,19 +4,18 @@
 #include "../DataRequest.h"
 #include "storage/Timestamp.h"
 #include "storage/BiTreeNode.h"
+#include "ActiveBlocksData.h"
 
 class ActiveBlocksRequest : public DataRequest {
 private:
-    Timestamp timestamp;
-    int blocks;
+    Timestamp from, to;
+    QList<ActiveBlocksData *> data_list;
 public:
-    ActiveBlocksRequest(VisualizationThread* v_thread, const Timestamp &timestamp);
+    ActiveBlocksRequest(VisualizationThread* v_thread, const Timestamp &from, const Timestamp &to);
     virtual ~ActiveBlocksRequest();
     
-    virtual VisualizationData* create_data();
+    virtual QList<VisualizationData*> create_data();
     virtual void gather_data(DataThread* data_thread);
-private:
-    int count_blocks(BiTreeNode *node);
 };
 
 #endif

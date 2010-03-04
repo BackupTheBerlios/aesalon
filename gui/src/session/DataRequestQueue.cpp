@@ -30,3 +30,8 @@ int DataRequestQueue::current_requests() {
     list_mutex.unlock();
     return count;
 }
+void DataRequestQueue::clear_queue() {
+    list_mutex.lock();
+    request_list.clear();
+    list_mutex.unlock();
+}

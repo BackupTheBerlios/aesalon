@@ -3,57 +3,32 @@
 #include "ActiveBlocksData.h"
 #include "../DataThread.h"
 
-ActiveBlocksRequest::ActiveBlocksRequest(VisualizationThread* v_thread, const Timestamp &timestamp)
-    : DataRequest(v_thread), timestamp(timestamp) {
+ActiveBlocksRequest::ActiveBlocksRequest(VisualizationThread* v_thread, const Timestamp &from, const Timestamp &to)
+    : DataRequest(v_thread), from(from), to(to) {
 }
 
 ActiveBlocksRequest::~ActiveBlocksRequest() {
     
 }
 
-VisualizationData* ActiveBlocksRequest::create_data() {
-    return new ActiveBlocksData(timestamp, blocks);
+QList<VisualizationData*> ActiveBlocksRequest::create_data() {
+    QList<VisualizationData*> list;
+    foreach(ActiveBlocksData *data, data_list) {
+        list.append(data);
+    }
+    return list;
 }
 
 void ActiveBlocksRequest::gather_data(DataThread* data_thread) {
     SnapshotList *snapshot_list = data_thread->get_snapshot_list();
-    Snapshot *snapshot = snapshot_list->get_snapshot_for(timestamp);
+    Snapshot *snapshot = snapshot_list->get_snapshot_for(from);
     if(snapshot == NULL) {
-        blocks = 0;
         return;
     }
-    blocks = count_blocks(snapshot->get_head_node());
-    snapshot->free_tree();
-#if 0
-    /* NOTE: optimize this later . . . */
-    BiTreeNode *node = snapshot->get_head_node();
-    if(!node) {
-        blocks = 0;
-        return;
+    while(snapshot->get_timestamp() < to) {
+        data_list.append(new ActiveBlocksData(snapshot->get_timestamp(), snapshot->get_block_count()));
+        if(!snapshot_list->move_snapshot_to_next_event(snapshot)) break;
     }
-    QStack<BiTreeNode *> node_stack;
-    node_stack.push_back(node->get_left());
-    node_stack.push_back(node->get_right());
     
-    blocks = 0;
-    
-    while(node_stack.size()) {
-        node = node_stack.pop();
-        if(node == NULL) continue;
-        if(node->get_block_list_size()) blocks += node->get_block_list_size();
-        else {
-            node_stack.push_back(node->get_left());
-            node_stack.push_back(node->get_right());
-        }
-    }
-#endif
-    
-}
-
-int ActiveBlocksRequest::count_blocks(BiTreeNode* node) {
-    if(node == NULL) return 0;
-    int count = node->get_block_list_size();
-    if(node->get_left()) count += count_blocks(node->get_left());
-    if(node->get_right()) count += count_blocks(node->get_right());
-    return count;
+    snapshot->free_tree();    
 }

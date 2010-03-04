@@ -31,7 +31,10 @@ public:
     void add_data(VisualizationData *data);
     
     /* NOTE: this *need* to be reentrant! */
-    void paint_line(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to, QRgb colour, Qt::PenStyle style = Qt::SolidLine);
+    void paint_line(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to,
+        QRgb colour, Qt::PenStyle style = Qt::SolidLine);
+    void paint_box(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to,
+        QRgb line_colour, QRgb fill_colour, Qt::PenStyle line_style = Qt::SolidLine, Qt::BrushStyle fill_style = Qt::SolidPattern);
     void paint_text(const VisualizationRenderPoint &point, QString text, int size, QRgb colour);
     void paint_graph_element(const VisualizationRenderPoint &point, QRgb colour);
 };

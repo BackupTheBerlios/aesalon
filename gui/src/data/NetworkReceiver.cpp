@@ -1,4 +1,3 @@
-
 #include "NetworkReceiver.h"
 #include "NetworkReceiver.moc"
 #include "storage/AllocEvent.h"

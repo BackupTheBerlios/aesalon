@@ -18,6 +18,7 @@ public:
     void push_request(DataRequest *request);
     DataRequest *pop_request();
     int current_requests();
+    void clear_queue();
 };
 
 #endif

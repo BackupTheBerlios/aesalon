@@ -102,6 +102,8 @@ void VisualizationRenderer::add_data(VisualizationData *data) {
 }
 
 void VisualizationRenderer::paint_line(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to, QRgb colour, Qt::PenStyle style) {
+    /*qDebug("Painting line from (%s,%lli) to (%s,%lli) . . .", qPrintable(from.get_time_element().to_string()), from.get_data_element(),
+        qPrintable(to.get_time_element().to_string()), to.get_data_element());*/
     QPointF from_point = resolve_point(from);
     QPointF to_point = resolve_point(to);
     QLineF line(from_point, to_point);
@@ -112,6 +114,23 @@ void VisualizationRenderer::paint_line(const VisualizationRenderPoint &from, con
     pen.setColor(colour);
     painter.setPen(pen);
     painter.drawLine(line);
+}
+
+void VisualizationRenderer::paint_box(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to, QRgb line_colour,
+    QRgb fill_colour, Qt::PenStyle line_style, Qt::BrushStyle fill_style) {
+    
+    QPointF from_point = resolve_point(from);
+    QPointF to_point = resolve_point(to);
+    QRectF rect(from_point, to_point);
+    
+    QPainter painter(image);
+    QPen pen(line_style);
+    pen.setColor(line_colour);
+    painter.setPen(pen);
+    QBrush brush(fill_style);
+    brush.setColor(fill_colour);
+    painter.setBrush(brush);
+    painter.drawRect(rect);
 }
 
 void VisualizationRenderer::paint_text(const VisualizationRenderPoint &point, QString text, int size, QRgb colour) {

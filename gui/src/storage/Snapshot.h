@@ -12,7 +12,7 @@ private:
     BiTreeNode *head_node;
     EventList event_list;
     quint8 max_tree_depth;
-    quint64 active_blocks;
+    quint64 block_count;
     Timestamp timestamp;
 public:
     Snapshot(SnapshotID snapshot_id);
@@ -27,6 +27,11 @@ public:
     EventList *get_event_list() { return &event_list; }
     
     quint8 get_max_tree_depth() { return max_tree_depth; }
+    
+    quint64 get_block_count() const { return block_count; }
+    void inc_block_count() { block_count ++; }
+    void dec_block_count() { block_count --; }
+    void set_block_count(quint64 new_block_count) { block_count = new_block_count; }
     
     const Timestamp &get_timestamp() const { return timestamp; }
     void update_timestamp(const Timestamp &new_timestamp) { timestamp = new_timestamp; }

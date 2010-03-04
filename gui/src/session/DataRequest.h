@@ -1,6 +1,8 @@
 #ifndef AESALON_GUI_SESSION_DATA_REQUEST_H
 #define AESALON_GUI_SESSION_DATA_REQUEST_H
 
+#include <QList>
+
 class DataThread;
 class VisualizationData;
 class VisualizationThread;
@@ -13,7 +15,7 @@ public:
     virtual ~DataRequest() {}
     
     virtual void gather_data(DataThread *data_thread) = 0;
-    virtual VisualizationData *create_data() = 0;
+    virtual QList<VisualizationData *> create_data() = 0;
     
     VisualizationThread *get_v_thread() const { return v_thread; }
 };

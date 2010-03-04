@@ -45,5 +45,6 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
     else if(last_node->get_right() == old_node) last_node->set_right(node);
     /* Then add the block to the new, "changed" node. */
     node->add_block(new Block(address, size));
+    snapshot->inc_block_count();
     snapshot->update_timestamp(get_timestamp());
 }

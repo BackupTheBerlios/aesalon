@@ -28,6 +28,7 @@ void VisualizationThread::send_request(DataRequest *request) {
 
 void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request = new_request;
+    get_request_queue()->clear_queue();
     current_image = new QPixmap(200, 100);
     current_image->fill(QColor(255, 255, 255).rgb());
     current_request->set_renderer(new VisualizationRenderer(current_image, is_splittable()));
@@ -46,11 +47,13 @@ void VisualizationThread::process_queue() {
             this->quit();
             return;
         }
-        VisualizationData *data = request->create_data();
+        QList<VisualizationData *> data = request->create_data();
         v_data.append(data);
-        if(current_request && data->is_within(current_request)) {
-            /* then add the data to the current renderer instance . . . */
-            current_request->get_renderer()->add_data(data);
+        if(current_request) {
+            foreach(VisualizationData *vdata, data) {
+                /* then add the data to the current renderer instance . . . */
+                current_request->get_renderer()->add_data(vdata);
+            }
         }
     }
     if(current_request && canvas_size) {
