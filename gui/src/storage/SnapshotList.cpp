@@ -56,6 +56,7 @@ bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amou
     Snapshot *list_shot = get_closest_snapshot(temporary_snapshot->get_timestamp());
     QList<Event *> event_list = list_shot->get_event_list()->get_event_list();
     bool applied = false;
+    qDebug("move_snapshot_to_event(): amount starts off as %i", amount);
     while(amount) {
         for(int i = 0; i < event_list.size() && amount; i ++) {
             Event *event = event_list[i];
@@ -100,7 +101,6 @@ int SnapshotList::count_events(const Timestamp& from, const Timestamp& to) {
                 finished = true;
                 break;
             }
-            /*qDebug("count_events(): found regular event, incrementing count");*/
             count ++;
         }
         if(finished) break;

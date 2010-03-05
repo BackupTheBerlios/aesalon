@@ -2,14 +2,19 @@
 #define AESALON_GUI_STORAGE_TIMESTAMP_H
 
 #include <QDateTime>
+#include <time.h>
+
+#ifndef TIME_SOURCE
+    #define TIME_SOURCE CLOCK_REALTIME
+#endif
 
 class Timestamp {
 private:
-    QDateTime internal_time;
+    struct timespec internal_time;
 public:
-    Timestamp() : internal_time(QDateTime::currentDateTime()) {}
+    Timestamp();
     Timestamp(const Timestamp &other) : internal_time(other.internal_time) {}
-    Timestamp(uint seconds) : internal_time(QDateTime::fromTime_t(seconds)) {}
+    Timestamp(uint seconds);
     
     bool operator<(const Timestamp &other) const;
     bool operator<=(const Timestamp &other) const;
@@ -21,8 +26,6 @@ public:
     qint64 ms_until(const Timestamp &other) const;
     void add_ms(qint64 ms);
     QString to_string() const;
-    
-    static Timestamp from_seconds(quint64 seconds);
 };
 
 #endif

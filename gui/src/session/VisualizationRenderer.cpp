@@ -43,8 +43,6 @@ void VisualizationRenderer::recalc_ranges() {
     qint64 upper_range = range.get_upper_data() / 12;
     if(range.get_upper_data() % 12) upper_range ++;
     
-    qDebug("upper_range: %lli", upper_range);
-    
     range.set_upper_data(upper_range * 12);
     
     if(can_split == false) {

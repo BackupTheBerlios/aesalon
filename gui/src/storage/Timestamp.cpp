@@ -1,23 +1,42 @@
+#include <time.h>
 #include "Timestamp.h"
 
+Timestamp::Timestamp() {
+    clock_gettime(TIME_SOURCE, &internal_time);
+}
+
+Timestamp::Timestamp(uint seconds) {
+    internal_time.tv_sec = seconds;
+    internal_time.tv_nsec = 0;
+}
+
 bool Timestamp::operator<(const Timestamp &other) const {
-    return internal_time < other.internal_time;
+    if(internal_time.tv_sec < other.internal_time.tv_sec) return true;
+    else if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec < other.internal_time.tv_nsec) return true;
+    else return false;
 }
 
 bool Timestamp::operator<=(const Timestamp &other) const {
-    return internal_time <= other.internal_time;
+    if(internal_time.tv_sec < other.internal_time.tv_sec) return true;
+    else if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec <= other.internal_time.tv_nsec) return true;
+    else return false;
 }
 
 bool Timestamp::operator>(const Timestamp &other) const {
-    return internal_time > other.internal_time;
+    if(internal_time.tv_sec > other.internal_time.tv_sec) return true;
+    else if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec > other.internal_time.tv_nsec) return true;
+    else return false;
 }
 
 bool Timestamp::operator>=(const Timestamp &other) const {
-    return internal_time >= other.internal_time;
+    if(internal_time.tv_sec > other.internal_time.tv_sec) return true;
+    else if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec >= other.internal_time.tv_nsec) return true;
+    else return false;
 }
 
 bool Timestamp::operator==(const Timestamp &other) const {
-    return internal_time == other.internal_time;
+    if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec == other.internal_time.tv_nsec) return true;
+    else return false;
 }
 
 Timestamp &Timestamp::operator=(const Timestamp &other) {
@@ -26,29 +45,21 @@ Timestamp &Timestamp::operator=(const Timestamp &other) {
 }
 
 qint64 Timestamp::seconds_until(const Timestamp& other) const {
-    return internal_time.secsTo(other.internal_time);
+    return other.internal_time.tv_sec - internal_time.tv_sec;
 }
 
 qint64 Timestamp::ms_until(const Timestamp& other) const {
-    /*qint64 seconds = seconds_until(other);*/
-    QTime this_time = internal_time.time();
-    QTime other_time = other.internal_time.time();
-    
-    if(*this < other) {
-        if(this_time <= other_time) return this_time.msecsTo(other_time);
-        else qCritical("NOTE: comparision between different-day QTimes NYI! (1)");
-    }
-    else if(*this >= other) {
-        if(this_time >= other_time) return -other_time.msecsTo(this_time);
-        else qCritical("NOTE: comparision between different-day QTimes NYI! (2)");
-    }
-    return -1;
+    qint64 ms = seconds_until(other) * 1000;
+    ms += (other.internal_time.tv_nsec - internal_time.tv_nsec) / 1000000;
+    return ms;
 }
 
 void Timestamp::add_ms(qint64 ms) {
-    internal_time = internal_time.addMSecs(ms);
+    internal_time.tv_nsec += ms * 1000000;
+    while(internal_time.tv_nsec >= 1000000000) internal_time.tv_nsec -= 1000000000, internal_time.tv_sec ++;
+    /*internal_time = internal_time.addMSecs(ms);*/
 }
 
 QString Timestamp::to_string() const {
-    return internal_time.toString();
+    return QString().sprintf("%li:%li", internal_time.tv_sec, internal_time.tv_nsec);
 }

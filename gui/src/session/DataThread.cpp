@@ -32,7 +32,9 @@ void DataThread::run() {
 }
 
 void DataThread::event_received(Event *event) {
-    get_snapshot_list()->get_snapshot(current_snapshot->get_snapshot_id()-1)->add_event(event);
+    Snapshot *last = get_snapshot_list()->get_snapshot(current_snapshot->get_snapshot_id()-1);
+    if(last->get_event_list()->get_event_list().size() > 1000) create_new_snapshot();
+    last->add_event(event);
     event->apply_to(current_snapshot);
 }
 

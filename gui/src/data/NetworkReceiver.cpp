@@ -43,7 +43,6 @@ void NetworkReceiver::prepend_quint64(quint64 data) {
     unprocessed.prepend(char(data & 0xff));
 }
 
-
 void NetworkReceiver::data_received() {
     QByteArray received = tcp_socket->readAll();
     unprocessed += received;
@@ -78,9 +77,9 @@ void NetworkReceiver::data_received() {
                     prepend_quint64(new_address);
                     break;
                 }
-                qDebug("Realloc event received: old address 0x%llx, new address 0x%llx, new size 0x%llx", address, new_address, new_size);
                 /* From the man page for realloc: "If ptr is NULL, then the call is equivalent to malloc(size),
-                    for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr). */
+                    for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr).
+                    Ergo, don't emit free/alloc events for such cases. */
                 if(address != 0) emit event_received(new FreeEvent(address));
                 if(new_size != 0) emit event_received(new AllocEvent(new_address, new_size));
             }
