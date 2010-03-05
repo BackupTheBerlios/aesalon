@@ -14,7 +14,7 @@ private:
 public:
     Timestamp();
     Timestamp(const Timestamp &other) : internal_time(other.internal_time) {}
-    Timestamp(uint seconds);
+    Timestamp(quint64 ns);
     
     bool operator<(const Timestamp &other) const;
     bool operator<=(const Timestamp &other) const;

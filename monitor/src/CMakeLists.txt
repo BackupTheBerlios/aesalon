@@ -40,6 +40,8 @@ set(SOURCES
 
 add_executable(aesalon ${SOURCES})
 
+target_link_libraries(aesalon rt)
+
 install(TARGETS aesalon RUNTIME DESTINATION bin)
 
 if(PROFILE_BUILD)

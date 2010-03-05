@@ -18,16 +18,18 @@ public:
 private:
     /** Current event type. */
     event_type_e type;
+    u_int64_t timestamp;
 public:
     /** Constructor, takes a type. All other stored data is in the derived
         types. */
-    BasicEvent(event_type_e type) : type(type) {}
+    BasicEvent(event_type_e type);
     virtual ~BasicEvent() {}
     
     /** Returns the type of the current event.
         @return The type of the current event.
     */
     event_type_e get_type() const { return type; }
+    u_int64_t get_timestamp() const { return timestamp; }
     
     virtual Block *serialize();
 };

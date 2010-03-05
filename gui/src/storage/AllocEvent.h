@@ -9,7 +9,7 @@ private:
     MemoryAddress address;
     MemorySize size;
 public:
-    AllocEvent(MemoryAddress address, MemorySize size) : Event(), address(address), size(size) {}
+    AllocEvent(const Timestamp &timestamp, MemoryAddress address, MemorySize size) : Event(timestamp), address(address), size(size) {}
     virtual ~AllocEvent() {}
     
     MemoryAddress get_address() const { return address; }

@@ -5,9 +5,9 @@ Timestamp::Timestamp() {
     clock_gettime(TIME_SOURCE, &internal_time);
 }
 
-Timestamp::Timestamp(uint seconds) {
-    internal_time.tv_sec = seconds;
-    internal_time.tv_nsec = 0;
+Timestamp::Timestamp(quint64 ns) {
+    internal_time.tv_sec = ns / 1000000000;
+    internal_time.tv_nsec = ns % 1000000000;
 }
 
 bool Timestamp::operator<(const Timestamp &other) const {

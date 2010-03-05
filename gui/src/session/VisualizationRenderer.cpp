@@ -40,10 +40,13 @@ void VisualizationRenderer::recalc_ranges() {
             range.set_upper_data(data->get_data_range().get_upper_data());
     }
     
-    qint64 upper_range = range.get_upper_data() / 12;
-    if(range.get_upper_data() % 12) upper_range ++;
-    
-    range.set_upper_data(upper_range * 12);
+    qint64 data_range = (range.get_upper_data()-range.get_lower_data()) / 12;
+    if((range.get_upper_data() - range.get_lower_data()) % 12) data_range ++;
+    range.set_upper_data((data_range * 12) + range.get_lower_data());
+    qint64 time_range = range.get_lower_time().ms_until(range.get_upper_time()) / 12;
+    Timestamp upper_time = range.get_lower_time();
+    upper_time.add_ms(time_range * 12);
+    range.set_upper_time(upper_time);
     
     if(can_split == false) {
         

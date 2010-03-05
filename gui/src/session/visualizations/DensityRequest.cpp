@@ -8,8 +8,8 @@ DensityRequest::~DensityRequest() {
 
 }
 
-VisualizationData* DensityRequest::create_data() {
-    
+QList<VisualizationData *> DensityRequest::create_data() {
+    return QList<VisualizationData *>();
 }
 
 void DensityRequest::gather_data(DataThread *data_thread) {

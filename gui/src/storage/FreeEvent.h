@@ -8,7 +8,7 @@ class FreeEvent : public Event {
 private:
     MemoryAddress address;
 public:
-    FreeEvent(MemoryAddress address) : Event(), address(address) {}
+    FreeEvent(const Timestamp &timestamp, MemoryAddress address) : Event(timestamp), address(address) {}
     virtual ~FreeEvent() {}
     
     virtual void apply_to(Snapshot *snapshot);  

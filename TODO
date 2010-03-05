@@ -13,5 +13,5 @@ GUI:
 - Add other DataSources (LaunchSource, etc.)
 - Make the generated QImage size configurable (maybe use QAbstractScrollArea for VCanvas?)
 - Implement Density visualization
-- Generating two graphs quickly results in double-painting
+- Generating two graphs quickly results in double-painting . . . why?
 - Use double-buffering for VisualizationCanvas

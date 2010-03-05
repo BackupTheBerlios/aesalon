@@ -11,7 +11,6 @@ private:
     quint16 port;
     QTcpSocket *tcp_socket;
     QByteArray unprocessed;
-    bool interrupted;
 public:
     NetworkReceiver(DataThread *data_thread, QString host, quint16 port);
     virtual ~NetworkReceiver();

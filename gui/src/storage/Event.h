@@ -8,7 +8,7 @@ class Event {
 private:
     Timestamp timestamp;
 public:
-    Event() : timestamp() {}
+    Event(const Timestamp &timestamp) : timestamp(timestamp) {}
     virtual ~Event() {}
     
     const Timestamp &get_timestamp() const { return timestamp; }

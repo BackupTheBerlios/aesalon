@@ -1,9 +1,17 @@
+#include <time.h>
 #include "BasicEvent.h"
 #include "BlockEvent.h"
 #include "misc/StreamAsString.h"
 #include "exception/EventException.h"
 
 namespace Event {
+
+BasicEvent::BasicEvent(BasicEvent::event_type_e type) : type(type) {
+    struct timespec time;
+    clock_gettime(CLOCK_REALTIME, &time);
+    timestamp = time.tv_sec * 1000000000;
+    timestamp += time.tv_nsec;
+}
 
 
 /* Serialization format:
@@ -16,6 +24,7 @@ Block *BasicEvent::serialize() {
         block->get_data()[0] |= 0x01;
     }
     else throw Exception::EventException("Asked to serialize invalid Event");
+    block->push_word(timestamp);
     return block;
 }
 

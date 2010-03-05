@@ -9,6 +9,7 @@ namespace Event {
     first bit is taken by BasicEvent
     second and third bits are block_type
     rest of the first byte is reserved
+    next eight bytes are timestamp
     after that, depends on type . . .
 */
 Block *BlockEvent::serialize() {
