@@ -15,18 +15,19 @@ QPointF VisualizationRenderer::resolve_point(const VisualizationRenderPoint &poi
     const Timestamp &lower_time = range.get_lower_time();
     qreal x = qreal(lower_time.ms_until(point.get_time_element()))
         / lower_time.ms_until(range.get_upper_time()) * image->width();
-    qreal y = point.get_data_element() * (image->height() / qreal(range.get_upper_data() - range.get_lower_data()));
+    qreal data_range = range.get_upper_data() - range.get_lower_data();
+    qreal y_percentage = (point.get_data_element() - range.get_lower_data()) / data_range;
+    qreal y = image->height() * y_percentage;
     y = image->height() - y;
     return QPointF(x, y);
 }
-
 
 void VisualizationRenderer::recalc_ranges() {
     if(data_list.size() == 0) return;
     
     range = data_list[0]->get_data_range();
     /* TODO: find a workaround for this . . . e.g. support rendering from an offset display . . . */
-    range.set_lower_data(0);
+    /*range.set_lower_data(0);*/
     foreach(VisualizationData *data, data_list) {
         if(data->get_data_range().get_lower_time() < range.get_lower_time())
             range.set_lower_time(data->get_data_range().get_lower_time());
@@ -38,7 +39,13 @@ void VisualizationRenderer::recalc_ranges() {
         if(data->get_data_range().get_upper_data() > range.get_upper_data())
             range.set_upper_data(data->get_data_range().get_upper_data());
     }
-    range.set_upper_data(range.get_upper_data() * 2);
+    
+    qint64 upper_range = range.get_upper_data() / 12;
+    if(range.get_upper_data() % 12) upper_range ++;
+    
+    qDebug("upper_range: %lli", upper_range);
+    
+    range.set_upper_data(upper_range * 12);
     
     if(can_split == false) {
         
@@ -59,7 +66,7 @@ void VisualizationRenderer::paint_grid() {
     qint64 total_data_size = (range.get_upper_data() - range.get_lower_data());
     
     for(int x = 0; x < 12; x ++) {
-        qint64 value = x * (total_data_size / 12.0);
+        qint64 value = (x * (total_data_size / 12.0)) + range.get_lower_data();
         paint_line(VisualizationRenderPoint(range.get_lower_time(), value),
             VisualizationRenderPoint(range.get_upper_time(), value), qRgb(32, 32, 32), Qt::DotLine);
         QString desc;

@@ -8,10 +8,10 @@ DensityRequest::~DensityRequest() {
 
 }
 
-void DensityRequest::gather_data(DataThread *data_thread) {
-
+VisualizationData* DensityRequest::create_data() {
+    
 }
 
-VisualizationData* DensityRequest::create_data() {
+void DensityRequest::gather_data(DataThread *data_thread) {
 
 }
