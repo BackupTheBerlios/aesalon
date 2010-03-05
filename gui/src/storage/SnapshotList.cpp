@@ -52,12 +52,12 @@ Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
     return list_shot;
 }
 
-bool SnapshotList::move_snapshot_to_next_event(Snapshot *temporary_snapshot) {
+bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amount) {
     Snapshot *list_shot = get_closest_snapshot(temporary_snapshot->get_timestamp());
     QList<Event *> event_list = list_shot->get_event_list()->get_event_list();
     bool applied = false;
-    do {
-        for(int i = 0; i < event_list.size(); i ++) {
+    while(amount) {
+        for(int i = 0; i < event_list.size() && amount; i ++) {
             Event *event = event_list[i];
             if(event->get_timestamp() >= temporary_snapshot->get_timestamp() && 
                 !temporary_snapshot->get_event_list()->get_event_list().contains(event)) {
@@ -65,7 +65,7 @@ bool SnapshotList::move_snapshot_to_next_event(Snapshot *temporary_snapshot) {
                 event->apply_to(temporary_snapshot);
                 temporary_snapshot->add_event(event);
                 applied = true;
-                break;
+                amount --;
             }
         }
         if(list_shot->get_snapshot_id()+1 > internal_list.back()->get_snapshot_id()) {
@@ -73,6 +73,43 @@ bool SnapshotList::move_snapshot_to_next_event(Snapshot *temporary_snapshot) {
         }
         list_shot = get_snapshot(list_shot->get_snapshot_id()+1);
         event_list = list_shot->get_event_list()->get_event_list();
-    } while(!applied);
+    }
     return applied;
+}
+
+int SnapshotList::count_events(const Timestamp& from, const Timestamp& to) {
+    Snapshot *snapshot = get_closest_snapshot(from);
+    
+    qDebug("count_events: from is %s, to is %s", qPrintable(from.to_string()), qPrintable(to.to_string()));
+    
+    int count = 0;
+    EventList *list = snapshot->get_event_list();
+    int i = 0;
+    for(; i < list->get_event_list().size(); i ++) {
+        if(from >= list->get_event_list()[i]->get_timestamp()) {
+            qDebug("Found starting event . . .");
+            count ++;
+            break;
+        }
+    }
+    while(true) {
+        bool finished = false;
+        for(i = 0; i < list->get_event_list().size(); i ++) {
+            if(to < list->get_event_list()[i]->get_timestamp()) {
+                qDebug("count_events(): found last event . . .");
+                finished = true;
+                break;
+            }
+            /*qDebug("count_events(): found regular event, incrementing count");*/
+            count ++;
+        }
+        if(finished) break;
+        i = 0;
+        if(snapshot->get_snapshot_id()+1 > internal_list.back()->get_snapshot_id()) {
+            break;
+        }
+        snapshot = get_snapshot(snapshot->get_snapshot_id()+1);
+        list = snapshot->get_event_list();
+    }
+    return count;
 }

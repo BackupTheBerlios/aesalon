@@ -25,9 +25,13 @@ void ActiveBlocksRequest::gather_data(DataThread* data_thread) {
     if(snapshot == NULL) {
         return;
     }
+    int event_count = snapshot_list->count_events(from, to);
+    qDebug("Total number of events: %i", event_count);
+    qreal step_size = event_count / 144.0;
+    qDebug("calculated step size is %i", step_size);
     while(snapshot->get_timestamp() < to) {
         data_list.append(new ActiveBlocksData(snapshot->get_timestamp(), snapshot->get_block_count()));
-        if(!snapshot_list->move_snapshot_to_next_event(snapshot)) break;
+        if(!snapshot_list->move_snapshot_to_event(snapshot, step_size)) break;
     }
     
     snapshot->free_tree();    

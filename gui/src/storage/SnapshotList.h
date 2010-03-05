@@ -27,8 +27,8 @@ public:
     
     /* NOTE: can only adjust forwards in time, not backwards 
     void adjust_temporary_snapshot(Snapshot *temporary_snapshot, const Timestamp &to_timestamp);*/
-    
-    bool move_snapshot_to_next_event(Snapshot *temporary_snapshot);
+    bool move_snapshot_to_event(Snapshot *temporary_snapshot, int amount);
+    int count_events(const Timestamp &from, const Timestamp &to);
 };
 
 #endif
