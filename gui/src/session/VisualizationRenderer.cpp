@@ -98,11 +98,13 @@ void VisualizationRenderer::update(const QSize &canvas_size) {
     if(canvas_size != image->size()) {
         (*image) = image->scaled(canvas_size);
     }
+    painter = new QPainter(image);
     recalc_ranges();
     /* Paint the image white . . . */
-    image->fill(qRgb(255, 255, 255));
+    painter->fillRect(0, 0, image->width(), image->height(), Qt::red);
     paint_grid();
     render_data();
+    delete painter;
 }
 
 void VisualizationRenderer::add_data(VisualizationData *data) {
@@ -116,12 +118,11 @@ void VisualizationRenderer::paint_line(const VisualizationRenderPoint &from, con
     QPointF to_point = resolve_point(to);
     QLineF line(from_point, to_point);
     
-    QPainter painter(image);
     QPen pen(style);
     
     pen.setColor(colour);
-    painter.setPen(pen);
-    painter.drawLine(line);
+    painter->setPen(pen);
+    painter->drawLine(line);
 }
 
 void VisualizationRenderer::paint_box(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to, QRgb line_colour,
@@ -131,24 +132,22 @@ void VisualizationRenderer::paint_box(const VisualizationRenderPoint &from, cons
     QPointF to_point = resolve_point(to);
     QRectF rect(from_point, to_point);
     
-    QPainter painter(image);
     QPen pen(line_style);
     pen.setColor(line_colour);
-    painter.setPen(pen);
+    painter->setPen(pen);
     QBrush brush(fill_style);
     brush.setColor(fill_colour);
-    painter.setBrush(brush);
-    painter.drawRect(rect);
+    painter->setBrush(brush);
+    painter->drawRect(rect);
 }
 
 void VisualizationRenderer::paint_text(const VisualizationRenderPoint &point, QString text, int size, QRgb colour) {
     QPointF location = resolve_point(point);
-    QPainter painter(image);
     QPen pen(Qt::SolidLine);
     pen.setColor(colour);
-    painter.setPen(pen);
-    painter.setFont(QFont("DejaVu Sans", size));
-    painter.drawText(location, text);
+    painter->setPen(pen);
+    painter->setFont(QFont("DejaVu Sans", size));
+    painter->drawText(location, text);
 }
 
 void VisualizationRenderer::paint_graph_element(const VisualizationRenderPoint &point, QRgb colour) {

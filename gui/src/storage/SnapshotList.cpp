@@ -1,5 +1,6 @@
 #include <QList>
 #include <QtAlgorithms>
+#include <algorithm>
 
 #include "SnapshotList.h"
 #include "Event.h"
@@ -53,7 +54,6 @@ Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
     /*foreach(Snapshot *snapshot, internal_list) {
         qDebug("Snapshot %lli, time is %s", snapshot->get_snapshot_id(), qPrintable(snapshot->get_timestamp().to_string()));
     }*/
-
     while (n > 0) {
         half = n / 2;
         middle = begin + half;

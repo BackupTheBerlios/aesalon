@@ -15,6 +15,7 @@ private:
     VisualizationRenderDataRange range;
     QList<VisualizationData *> data_list;
     bool can_split;
+    QPainter *painter;
     
     VisualizationRenderPoint graph_point;
     bool graph_point_valid;
