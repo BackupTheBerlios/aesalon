@@ -107,33 +107,30 @@ bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amou
 }
 
 int SnapshotList::count_events(const Timestamp& from, const Timestamp& to) {
-    Snapshot *snapshot = get_closest_snapshot(from);
-    
+    Snapshot *from_snapshot = get_closest_snapshot(from);
+    Snapshot *to_snapshot = NULL;
     int count = 0;
-    EventList *list = snapshot->get_event_list();
+    
     int i = 0;
-    for(; i < list->get_event_list().size(); i ++) {
-        if(from >= list->get_event_list()[i]->get_timestamp()) {
+    for(; i < from_snapshot->get_event_list()->get_event_list().size(); i ++) {
+        if(from >= from_snapshot->get_event_list()->get_event_list()[i]->get_timestamp()) {
             count ++;
             break;
         }
     }
-    while(true) {
-        bool finished = false;
-        for(i = 0; i < list->get_event_list().size(); i ++) {
-            if(to < list->get_event_list()[i]->get_timestamp()) {
-                finished = true;
-                break;
-            }
-            count ++;
+    to_snapshot = get_closest_snapshot(to);
+    if(to_snapshot != from_snapshot) {
+        for(SnapshotID j = from_snapshot->get_snapshot_id(); j < to_snapshot->get_snapshot_id(); j ++) {
+            count += get_snapshot(j)->get_event_list()->get_event_list().count();
         }
-        if(finished) break;
         i = 0;
-        if(snapshot->get_snapshot_id()+1 > internal_list.back()->get_snapshot_id()) {
+    }
+    for(; i < to_snapshot->get_event_list()->get_event_list().size(); i ++) {
+        if(to > to_snapshot->get_event_list()->get_event_list()[i]->get_timestamp()) {
             break;
         }
-        snapshot = get_snapshot(snapshot->get_snapshot_id()+1);
-        list = snapshot->get_event_list();
+        count ++;
     }
+    
     return count;
 }
