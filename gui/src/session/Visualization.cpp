@@ -20,9 +20,9 @@ VisualizationCanvas::VisualizationCanvas(QWidget *parent) : QScrollArea(parent),
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     
-    QTimer *timer = new QTimer(this);
+    /*QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(image_updated()));
-    timer->start(5000);
+    timer->start(5000);*/
     
     setMinimumSize(200, 200);
 }
@@ -94,6 +94,10 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     connect(to_slider, SIGNAL(changed(Timestamp)), SLOT(handle_slider_change_to(Timestamp)));
     main_layout->addWidget(to_slider);
     
+    follow_checkbox = new QCheckBox(tr("&Real-time updating"));
+    follow_checkbox->setCheckState(Qt::Unchecked);
+    main_layout->addWidget(follow_checkbox);
+    
     /*main_layout->addRow(tr("From:"), from_slider);
     main_layout->addRow(tr("To:"), to_slider);*/
     
@@ -147,6 +151,15 @@ void Visualization::update_slider_ranges() {
             from_slider->set_range(*data_thread->get_start_time(), Timestamp());
             to_slider->set_range(*data_thread->get_start_time(), Timestamp());
         }
+    }
+    if(follow_checkbox->isChecked()) {
+        if(data_thread->get_finish_time()) {
+            follow_checkbox->setEnabled(false);
+            follow_checkbox->setChecked(false);
+        }
+        to_slider->set_value(Timestamp());
+        current_request = new VisualizationRequest(from_slider->current_value(), to_slider->current_value());
+        emit visualization_request(current_request);
     }
 }
 

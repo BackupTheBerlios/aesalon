@@ -6,6 +6,7 @@
 #include <QFormLayout>
 #include <QScrollArea>
 #include <QLabel>
+#include <QCheckBox>
 
 #include "VisualizationThread.h"
 #include "VisualizationRequest.h"
@@ -51,6 +52,7 @@ private:
     QVBoxLayout *main_layout;
     TimeSlider *from_slider;
     TimeSlider *to_slider;
+    QCheckBox *follow_checkbox;
     QSize *canvas_size;
 protected:
     virtual VisualizationThread *create_v_thread(DataThread *data_thread, QSize *canvas_size)

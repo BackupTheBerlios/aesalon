@@ -82,7 +82,7 @@ void VisualizationRenderer::paint_grid() {
         QString desc;
         qint64 time_diff = range.get_lower_time().ms_until(ts);
         desc.sprintf("%02lli:%02lli.%03lli", (time_diff / 1000) / 60, (time_diff / 1000) % 60, time_diff % 1000);
-        paint_text(VisualizationRenderPoint(ts, 0), desc, 8, qRgb(0, 0, 0));
+        paint_text(VisualizationRenderPoint(ts, range.get_lower_data()), desc, 8, qRgb(0, 0, 0));
     }
 }
 

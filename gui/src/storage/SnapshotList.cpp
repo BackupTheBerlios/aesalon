@@ -1,3 +1,6 @@
+#include <QList>
+#include <QtAlgorithms>
+
 #include "SnapshotList.h"
 #include "Event.h"
 
@@ -43,20 +46,45 @@ Snapshot *SnapshotList::get_snapshot_for(const Timestamp &timestamp) {
 }
 
 Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
+    QList<Snapshot *>::iterator begin = internal_list.begin(), end = internal_list.end(), middle;
+    int n = end - begin;
+    int half;
+
+    /*foreach(Snapshot *snapshot, internal_list) {
+        qDebug("Snapshot %lli, time is %s", snapshot->get_snapshot_id(), qPrintable(snapshot->get_timestamp().to_string()));
+    }*/
+
+    while (n > 0) {
+        half = n / 2;
+        middle = begin + half;
+        if(timestamp > (*middle)->get_timestamp()) {
+            begin = middle + 1;
+            n -= half;
+            n --;
+        }
+        else {
+            n = half;
+        }
+    }
+    /*qDebug("closest snapshot for %s was %lli", qPrintable(timestamp.to_string()), (*begin)->get_snapshot_id());*/
+    if(begin != internal_list.begin()) begin --;
+    return *(begin);
+#if 0
     Snapshot *list_shot = NULL;
     /* NOTE: speed this up via a binary-style search through the list: try size/2, size/2+size/4 or size/2-size/4 . . . */
     for(int i = 0; i < internal_list.size(); i ++) {
         if(timestamp >= internal_list[i]->get_timestamp())
             list_shot = internal_list[i];
     }
+    
     return list_shot;
+#endif
 }
 
 bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amount) {
     Snapshot *list_shot = get_closest_snapshot(temporary_snapshot->get_timestamp());
     QList<Event *> event_list = list_shot->get_event_list()->get_event_list();
     bool applied = false;
-    qDebug("move_snapshot_to_event(): amount starts off as %i", amount);
     while(amount) {
         for(int i = 0; i < event_list.size() && amount; i ++) {
             Event *event = event_list[i];
@@ -81,14 +109,11 @@ bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amou
 int SnapshotList::count_events(const Timestamp& from, const Timestamp& to) {
     Snapshot *snapshot = get_closest_snapshot(from);
     
-    qDebug("count_events: from is %s, to is %s", qPrintable(from.to_string()), qPrintable(to.to_string()));
-    
     int count = 0;
     EventList *list = snapshot->get_event_list();
     int i = 0;
     for(; i < list->get_event_list().size(); i ++) {
         if(from >= list->get_event_list()[i]->get_timestamp()) {
-            qDebug("Found starting event . . .");
             count ++;
             break;
         }
@@ -97,7 +122,6 @@ int SnapshotList::count_events(const Timestamp& from, const Timestamp& to) {
         bool finished = false;
         for(i = 0; i < list->get_event_list().size(); i ++) {
             if(to < list->get_event_list()[i]->get_timestamp()) {
-                qDebug("count_events(): found last event . . .");
                 finished = true;
                 break;
             }

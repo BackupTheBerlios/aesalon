@@ -47,6 +47,8 @@ void DataThread::started() {
     /* NOTE: get this from somewhere else . . . hardcoding it is a bad idea. */
     snapshot_timer->start(5000);
     start_time = new Timestamp();
+    snapshot_list.get_snapshot(1)->update_timestamp(*start_time);
+    current_snapshot->update_timestamp(*start_time);
     emit data_started();
 }
 
