@@ -9,6 +9,6 @@ DensityVisualization::~DensityVisualization() {
 
 }
 
-VisualizationThread* DensityVisualization::create_v_thread(DataThread *data_thread, QSize *canvas_size) {
-    return new DensityThread(data_thread, canvas_size);
+VisualizationThread* DensityVisualization::create_v_thread(DataThread *data_thread) {
+    return new DensityThread(data_thread);
 }

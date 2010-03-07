@@ -1,6 +1,6 @@
 #include "DensityThread.h"
 
-DensityThread::DensityThread(DataThread *data_thread, QSize *canvas_size, QObject *parent): VisualizationThread(data_thread, canvas_size, parent) {
+DensityThread::DensityThread(DataThread *data_thread, QObject *parent): VisualizationThread(data_thread, parent) {
     
 }
 

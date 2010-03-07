@@ -8,7 +8,7 @@ public:
     DensityVisualization(DataThread* data_thread, QWidget* parent = 0);
     virtual ~DensityVisualization();
 protected:
-    virtual VisualizationThread* create_v_thread(DataThread *data_thread, QSize *canvas_size);
+    virtual VisualizationThread* create_v_thread(DataThread *data_thread);
 };
 
 #endif

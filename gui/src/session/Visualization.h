@@ -5,6 +5,8 @@
 #include <QImage>
 #include <QFormLayout>
 #include <QScrollArea>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 #include <QLabel>
 #include <QCheckBox>
 
@@ -12,51 +14,21 @@
 #include "VisualizationRequest.h"
 #include "DataThread.h"
 #include "TimeSlider.h"
-
-class VisualizationCanvas : public QScrollArea { Q_OBJECT
-private:
-    QPixmap *image;
-    QTimer *update_timer;
-    QLabel *image_label;
-    qreal scale;
-    QPoint last_mouse_position;
-    QSize canvas_size;
-private:
-    void calc_canvas_size();
-    QPointF resolve_point(const VisualizationRenderPoint &point) const;
-public:
-    VisualizationCanvas(QWidget *parent);
-    virtual ~VisualizationCanvas() {}
-    
-    QPixmap *get_image() const { return image; }
-    QSize *get_canvas_size() { return &canvas_size; }
-protected:
-    virtual void resizeEvent(QResizeEvent *event);
-    virtual void wheelEvent(QWheelEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseMoveEvent(QMouseEvent *event);
-public slots:
-    void update_image(QPixmap *image);
-    void image_updated();
-    void set_scale(qreal new_scale);
-signals:
-    void request_rerender();
-};
+#include "VisualizationDisplay.h"
 
 class Visualization : public QWidget { Q_OBJECT
 private:
     VisualizationThread *v_thread;
     DataThread *data_thread;
     VisualizationRequest *current_request;
-    VisualizationCanvas *canvas;
     QVBoxLayout *main_layout;
     TimeSlider *from_slider;
     TimeSlider *to_slider;
     QCheckBox *follow_checkbox;
-    QSize *canvas_size;
+    VisualizationDisplay *display;
 protected:
-    virtual VisualizationThread *create_v_thread(DataThread *data_thread, QSize *canvas_size)
-        { data_thread = data_thread; canvas_size = canvas_size; return NULL; }
+    virtual VisualizationThread *create_v_thread(DataThread *data_thread)
+        { data_thread = data_thread; return NULL; }
 public:
     Visualization(DataThread *data_thread, QWidget *parent = 0);
     virtual ~Visualization();

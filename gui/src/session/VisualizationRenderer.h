@@ -7,15 +7,15 @@
 #include "VisualizationRenderDataRange.h"
 #include "VisualizationRenderPoint.h"
 #include "VisualizationData.h"
+#include "VisualizationCanvas.h"
 
 class VisualizationRenderer {
 private:
-    QPixmap *image;
+    VisualizationCanvas *canvas;
     QList<VisualizationRenderDataRange> gaps;
     VisualizationRenderDataRange range;
     QList<VisualizationData *> data_list;
     bool can_split;
-    QPainter *painter;
     
     VisualizationRenderPoint graph_point;
     bool graph_point_valid;
@@ -25,10 +25,10 @@ private:
     void render_data();
     QPointF resolve_point(const VisualizationRenderPoint &point) const;
 public:
-    VisualizationRenderer(QPixmap *image, bool can_split);
+    VisualizationRenderer(VisualizationCanvas *canvas, bool can_split);
     virtual ~VisualizationRenderer();
     
-    void update(const QSize &canvas_size);
+    void update();
     void add_data(VisualizationData *data);
     
     /* NOTE: this *need* to be reentrant! */

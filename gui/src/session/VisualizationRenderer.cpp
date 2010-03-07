@@ -1,9 +1,11 @@
 #include <QDebug>
+#include <QGraphicsView>
+#include <QGraphicsTextItem>
 #include <QPainter>
 #include "VisualizationRenderer.h"
 
-VisualizationRenderer::VisualizationRenderer(QPixmap *image, bool can_split)
-    : image(image), can_split(can_split), graph_point(Timestamp(0), 0) {
+VisualizationRenderer::VisualizationRenderer(VisualizationCanvas *canvas, bool can_split)
+    : canvas(canvas), can_split(can_split), graph_point(Timestamp(0), 0) {
     
 }
 
@@ -13,12 +15,13 @@ VisualizationRenderer::~VisualizationRenderer() {
 
 QPointF VisualizationRenderer::resolve_point(const VisualizationRenderPoint &point) const {
     const Timestamp &lower_time = range.get_lower_time();
+    QRect size = canvas->views()[0]->geometry();
     qreal x = qreal(lower_time.ms_until(point.get_time_element()))
-        / lower_time.ms_until(range.get_upper_time()) * image->width();
+        / lower_time.ms_until(range.get_upper_time()) * size.width();
     qreal data_range = range.get_upper_data() - range.get_lower_data();
     qreal y_percentage = (point.get_data_element() - range.get_lower_data()) / data_range;
-    qreal y = image->height() * y_percentage;
-    y = image->height() - y;
+    qreal y = size.height() * y_percentage;
+    y = size.height() - y;
     return QPointF(x, y);
 }
 
@@ -92,19 +95,13 @@ void VisualizationRenderer::render_data() {
     }
 }
 
-void VisualizationRenderer::update(const QSize &canvas_size) {
+void VisualizationRenderer::update() {
     graph_point_valid = false;
     if(data_list.size() == 0) return;
-    if(canvas_size != image->size()) {
-        (*image) = image->scaled(canvas_size);
-    }
-    painter = new QPainter(image);
+    
     recalc_ranges();
-    /* Paint the image white . . . */
-    painter->fillRect(0, 0, image->width(), image->height(), Qt::red);
     paint_grid();
     render_data();
-    delete painter;
 }
 
 void VisualizationRenderer::add_data(VisualizationData *data) {
@@ -112,17 +109,11 @@ void VisualizationRenderer::add_data(VisualizationData *data) {
 }
 
 void VisualizationRenderer::paint_line(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to, QRgb colour, Qt::PenStyle style) {
-    /*qDebug("Painting line from (%s,%lli) to (%s,%lli) . . .", qPrintable(from.get_time_element().to_string()), from.get_data_element(),
-        qPrintable(to.get_time_element().to_string()), to.get_data_element());*/
-    QPointF from_point = resolve_point(from);
-    QPointF to_point = resolve_point(to);
-    QLineF line(from_point, to_point);
+    QLineF line(resolve_point(from), resolve_point(to));
     
     QPen pen(style);
-    
     pen.setColor(colour);
-    painter->setPen(pen);
-    painter->drawLine(line);
+    canvas->addLine(line, pen);
 }
 
 void VisualizationRenderer::paint_box(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to, QRgb line_colour,
@@ -134,20 +125,19 @@ void VisualizationRenderer::paint_box(const VisualizationRenderPoint &from, cons
     
     QPen pen(line_style);
     pen.setColor(line_colour);
-    painter->setPen(pen);
     QBrush brush(fill_style);
     brush.setColor(fill_colour);
-    painter->setBrush(brush);
-    painter->drawRect(rect);
+    canvas->addRect(rect, pen, brush);
 }
 
 void VisualizationRenderer::paint_text(const VisualizationRenderPoint &point, QString text, int size, QRgb colour) {
     QPointF location = resolve_point(point);
-    QPen pen(Qt::SolidLine);
-    pen.setColor(colour);
-    painter->setPen(pen);
-    painter->setFont(QFont("DejaVu Sans", size));
-    painter->drawText(location, text);
+    QGraphicsTextItem *text_item = new QGraphicsTextItem(text);
+    QFont font("DejaVu Sans", 8);
+    text_item->setFont(font);
+    text_item->translate(location.x(), location.y());
+    text_item->setDefaultTextColor(colour);
+    canvas->addItem(text_item);
 }
 
 void VisualizationRenderer::paint_graph_element(const VisualizationRenderPoint &point, QRgb colour) {

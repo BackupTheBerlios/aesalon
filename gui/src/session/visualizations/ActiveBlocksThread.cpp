@@ -2,7 +2,7 @@
 #include "ActiveBlocksRequest.h"
 #include "../DataThread.h"
 
-ActiveBlocksThread::ActiveBlocksThread(DataThread *data_thread, QSize *canvas_size) : VisualizationThread(data_thread, canvas_size) {
+ActiveBlocksThread::ActiveBlocksThread(DataThread *data_thread) : VisualizationThread(data_thread) {
 
 }
 

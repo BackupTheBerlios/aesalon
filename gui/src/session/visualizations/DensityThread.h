@@ -8,7 +8,7 @@ protected:
     virtual void generate_requests(VisualizationRequest* current_request);
     virtual bool is_splittable() const { return false; }
 public:
-    DensityThread(DataThread* data_thread, QSize* canvas_size, QObject* parent = 0);
+    DensityThread(DataThread* data_thread, QObject* parent = 0);
     virtual ~DensityThread();
 };
 
