@@ -1,3 +1,4 @@
+#include <QScrollBar>
 #include "VisualizationDisplay.h"
 #include "VisualizationDisplay.moc"
 
@@ -22,9 +23,28 @@ void VisualizationDisplay::change_canvas(VisualizationCanvas *new_canvas) {
 void VisualizationDisplay::wheelEvent(QWheelEvent *event) {
     qreal scale_amount = 1 + (event->delta() / 1000.0);
     scale(scale_amount, scale_amount);
-    centerOn(mapToScene(event->globalPos()));
+    /*centerOn(mapToScene(event->globalPos()));*/
     QGraphicsView::wheelEvent(event);
 }
+
+void VisualizationDisplay::mouseMoveEvent(QMouseEvent* event) {
+    if(event->buttons() & Qt::LeftButton) {
+        QPoint difference = mouse_position - event->globalPos();
+        
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() + difference.x());
+        verticalScrollBar()->setValue(verticalScrollBar()->value() + difference.y());
+        
+        mouse_position = event->globalPos();
+    }
+    QGraphicsView::mouseMoveEvent(event);
+}
+
+void VisualizationDisplay::mousePressEvent(QMouseEvent* event) {
+    if(event->button() == Qt::LeftButton)
+        mouse_position = event->globalPos();
+    QGraphicsView::mousePressEvent(event);
+}
+
 
 void VisualizationDisplay::paintEvent(QPaintEvent *event) {
     QGraphicsView::paintEvent(event);

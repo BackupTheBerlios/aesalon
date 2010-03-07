@@ -9,6 +9,7 @@
 class VisualizationDisplay : public QGraphicsView { Q_OBJECT
 private:
     VisualizationCanvas *canvas;
+    QPoint mouse_position;
 public:
     VisualizationDisplay(QWidget *parent);
     virtual ~VisualizationDisplay();
@@ -18,6 +19,8 @@ public slots:
     void change_canvas(VisualizationCanvas *new_canvas);
 protected:
     virtual void wheelEvent(QWheelEvent* event);
+    virtual void mouseMoveEvent(QMouseEvent* event);
+    virtual void mousePressEvent(QMouseEvent* event);
     virtual void paintEvent(QPaintEvent *event);
 };
 
