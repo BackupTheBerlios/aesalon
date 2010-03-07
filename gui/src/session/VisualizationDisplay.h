@@ -1,6 +1,7 @@
 #ifndef AESALON_GUI_SESSION_VISUALIZATION_DISPLAY_H
 #define AESALON_GUI_SESSION_VISUALIZATION_DISPLAY_H
 
+#include <QLabel>
 #include <QGraphicsView>
 #include <QWheelEvent>
 
@@ -10,6 +11,7 @@ class VisualizationDisplay : public QGraphicsView { Q_OBJECT
 private:
     VisualizationCanvas *canvas;
     QPoint mouse_position;
+    QLabel *position_label;
 public:
     VisualizationDisplay(QWidget *parent);
     virtual ~VisualizationDisplay();
@@ -22,6 +24,12 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
     virtual void paintEvent(QPaintEvent *event);
+    virtual void keyPressEvent(QKeyEvent* event);
+    virtual void keyReleaseEvent(QKeyEvent* event);
+    virtual void resizeEvent(QResizeEvent* event);
+signals:
+    void position_changed(qint64 time, qreal value);
+    void update_request();
 };
 
 #endif

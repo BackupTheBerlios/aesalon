@@ -32,7 +32,7 @@ protected:
     virtual bool is_splittable() const = 0;
 public slots:
     void update_request(VisualizationRequest *new_request);
-    void update_graph();
+    void render_request();
 private slots:
     void process_queue();
 signals:

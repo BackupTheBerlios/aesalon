@@ -34,7 +34,7 @@ void VisualizationThread::update_request(VisualizationRequest *new_request) {
     generate_requests(current_request);
 }
 
-void VisualizationThread::update_graph() {
+void VisualizationThread::render_request() {
     if(current_request) current_request->get_renderer()->update();
 }
 

@@ -26,6 +26,7 @@ private:
     TimeSlider *to_slider;
     QCheckBox *follow_checkbox;
     VisualizationDisplay *display;
+    QLabel *position_label;
 protected:
     virtual VisualizationThread *create_v_thread(DataThread *data_thread)
         { data_thread = data_thread; return NULL; }
@@ -45,6 +46,7 @@ private slots:
     void update_slider_ranges();
     void handle_slider_change_from(Timestamp time);
     void handle_slider_change_to(Timestamp time);
+    void position_changed(qint64 time, qreal value);
 signals:
     void visualization_request(VisualizationRequest *request);
 };

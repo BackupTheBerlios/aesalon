@@ -98,8 +98,9 @@ void VisualizationRenderer::render_data() {
 void VisualizationRenderer::update() {
     graph_point_valid = false;
     if(data_list.size() == 0) return;
-    
+    canvas->clear();
     recalc_ranges();
+    canvas->set_data_range(range);
     paint_grid();
     render_data();
 }

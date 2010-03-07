@@ -25,7 +25,11 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     main_layout->addWidget(follow_checkbox);
     
     display = new VisualizationDisplay(this);
+    connect(display, SIGNAL(position_changed(qint64,qreal)), SLOT(position_changed(qint64,qreal)));
     main_layout->addWidget(display);
+    
+    position_label = new QLabel();
+    main_layout->addWidget(position_label);
     
     setLayout(main_layout);
     
@@ -50,6 +54,7 @@ void Visualization::initialize() {
         return;
     }
     connect(this, SIGNAL(visualization_request(VisualizationRequest*)), v_thread, SLOT(update_request(VisualizationRequest*)));
+    connect(display, SIGNAL(update_request()), v_thread, SLOT(render_request()));
     v_thread->start();
     if(data_thread->get_start_time()) {
         from_slider->set_range(*data_thread->get_start_time(), Timestamp());
@@ -88,4 +93,8 @@ void Visualization::handle_slider_change_to(Timestamp time) {
     /* NOTE: deleting this will crash the program if data is being visualized! */
     current_request = new VisualizationRequest(display->get_canvas(), from_slider->current_value(), to_slider->current_value());
     emit visualization_request(current_request);
+}
+
+void Visualization::position_changed(qint64 time, qreal value) {
+    position_label->setText(QString().sprintf("%02lli:%02lli:%03lli,%.02f", (time / 1000) / 60, (time / 1000) % 60, time % 1000, value));
 }
