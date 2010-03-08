@@ -23,6 +23,7 @@ public:
     virtual ~SymbolParser();
     
     Symbol *get_symbol(std::string name) const;
+    Symbol *get_symbol(Word address) const;
     
     void dump_symbols() const;
 };

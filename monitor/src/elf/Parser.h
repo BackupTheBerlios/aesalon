@@ -41,6 +41,7 @@ public:
     Section *get_section(std::string name) const;
     
     Symbol *get_symbol(std::string name) const;
+    Symbol *get_symbol(Word address) const;
     void dump_symbols() const { symbol_parser->dump_symbols(); }
     
     std::string get_filename() const { return filename; }

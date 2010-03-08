@@ -15,10 +15,11 @@ bool MallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     address = portal->read_memory(rbp-0x08);
     size = portal->read_memory(rbp-0x18);
     ret_address = portal->read_memory(rbp-0x20);
+    Word scope_address = portal->read_memory(rbp+8);
     
     /*std::cout << "Allocation detected: address is 0x" << std::hex << address << ", size is " << std::dec << size << std::endl;*/
     
-    Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::ALLOC_EVENT, address, size));
+    Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::ALLOC_EVENT, scope_address, address, size));
     
     return true;
 }

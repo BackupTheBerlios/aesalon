@@ -75,6 +75,18 @@ Symbol *SymbolParser::get_symbol(std::string name) const {
     return NULL;
 }
 
+Symbol *SymbolParser::get_symbol(Word address) const {
+    StorageManager *storage_manager = Initializer::get_instance()->get_storage_manager();
+    for(symbol_vector_t::const_iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
+        Symbol *symbol = storage_manager->get_symbol(*i);
+        if(symbol->get_address() <= address && address < symbol->get_address() + symbol->get_size()) {
+            return symbol;
+        }
+    }
+    return NULL;
+}
+
+
 void SymbolParser::dump_symbols() const {
     std::cout << "Symbol dump: \n";
     for(symbol_vector_t::const_iterator i = symbol_vector.begin(); i != symbol_vector.end(); i ++) {
