@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
     int x = 0;
     sleep(1);
     for(; x < NUM_BLOCKS; x ++) {
-        blocks[x] = malloc(sizeof(int));
+        blocks[x] = malloc(sizeof(int) * x);
         printf("Allocated block at address %p . . .\n", blocks[x]);
         sleep(1);
     }

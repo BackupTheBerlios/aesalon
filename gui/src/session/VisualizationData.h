@@ -17,7 +17,6 @@ public:
     
     virtual void paint_onto(VisualizationRenderer *renderer) const = 0;
     
-    virtual bool is_within(VisualizationRequest *request) const = 0;
     virtual bool is_cachable() const = 0;
     
     VisualizationRenderDataRange &get_data_range() { return data_range; }

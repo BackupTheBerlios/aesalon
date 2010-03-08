@@ -1,4 +1,5 @@
 #include "AllocEvent.h"
+#include "EventVisitor.h"
 
 void AllocEvent::apply_to(Snapshot *snapshot) {
     /* Create the head node if it doesn't exist . . . */
@@ -44,7 +45,11 @@ void AllocEvent::apply_to(Snapshot *snapshot) {
     if(last_node->get_left() == old_node) last_node->set_left(node);
     else if(last_node->get_right() == old_node) last_node->set_right(node);
     /* Then add the block to the new, "changed" node. */
-    node->add_block(new Block(address, size));
+    node->add_block(new Block(get_timestamp(), address, size));
     snapshot->inc_block_count();
     snapshot->update_timestamp(get_timestamp());
+}
+
+void AllocEvent::accept(EventVisitor &visitor) {
+    visitor.visit(this);
 }

@@ -16,8 +16,3 @@ ActiveBlocksData::~ActiveBlocksData() {
 void ActiveBlocksData::paint_onto(VisualizationRenderer *renderer) const {
     renderer->paint_graph_element(VisualizationRenderPoint(timestamp, value), qRgb(0, 0, 0));
 }
-
-bool ActiveBlocksData::is_within(VisualizationRequest* request) const {
-    if(request->get_from() <= timestamp && request->get_to() >= timestamp) return true;
-    return false;
-}

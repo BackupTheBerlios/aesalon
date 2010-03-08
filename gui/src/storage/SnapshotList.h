@@ -6,6 +6,7 @@
 #include "SnapshotID.h"
 #include "Snapshot.h"
 #include "Timestamp.h"
+#include "EventVisitor.h"
 
 class SnapshotList {
 private:
@@ -28,6 +29,9 @@ public:
     /* NOTE: can only adjust forwards in time, not backwards 
     void adjust_temporary_snapshot(Snapshot *temporary_snapshot, const Timestamp &to_timestamp);*/
     bool move_snapshot_to_event(Snapshot *temporary_snapshot, int amount);
+    
+    void iterate_through(const Timestamp &from, const Timestamp &to, EventVisitor &visitor);
+    
     int count_events(const Timestamp &from, const Timestamp &to);
 };
 

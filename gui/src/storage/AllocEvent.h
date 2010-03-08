@@ -16,6 +16,8 @@ public:
     MemorySize get_size() const { return size; }
     
     virtual void apply_to(Snapshot *snapshot);
+    
+    virtual void accept(EventVisitor &visitor);
 };
 
 #endif

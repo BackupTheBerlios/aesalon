@@ -39,6 +39,11 @@ bool Timestamp::operator==(const Timestamp &other) const {
     else return false;
 }
 
+bool Timestamp::operator!=(const Timestamp &other) const {
+    if(internal_time.tv_sec != other.internal_time.tv_sec || internal_time.tv_nsec != other.internal_time.tv_nsec) return true;
+    else return false;
+}
+
 Timestamp &Timestamp::operator=(const Timestamp &other) {
     internal_time = other.internal_time;
     return *this;

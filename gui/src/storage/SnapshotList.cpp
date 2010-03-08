@@ -106,6 +106,34 @@ bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amou
     return applied;
 }
 
+void SnapshotList::iterate_through(const Timestamp &from, const Timestamp &to, EventVisitor &visitor) {
+    Snapshot *from_snapshot = get_closest_snapshot(from);
+    Snapshot *to_snapshot = NULL;
+    
+    int i = 0;
+    for(; i < from_snapshot->get_event_list()->get_event_list().size(); i ++) {
+        if(from >= from_snapshot->get_event_list()->get_event_list()[i]->get_timestamp()) {
+            from_snapshot->get_event_list()->get_event_list()[i]->accept(visitor);
+            break;
+        }
+    }
+    to_snapshot = get_closest_snapshot(to);
+    if(to_snapshot != from_snapshot) {
+        for(SnapshotID j = from_snapshot->get_snapshot_id(); j < to_snapshot->get_snapshot_id(); j ++) {
+            foreach(Event *event, get_snapshot(j)->get_event_list()->get_event_list()) {
+                event->accept(visitor);
+            }
+        }
+        i = 0;
+    }
+    for(; i < to_snapshot->get_event_list()->get_event_list().size(); i ++) {
+        if(to > to_snapshot->get_event_list()->get_event_list()[i]->get_timestamp()) {
+            break;
+        }
+        to_snapshot->get_event_list()->get_event_list()[i]->accept(visitor);
+    }
+}
+
 int SnapshotList::count_events(const Timestamp& from, const Timestamp& to) {
     Snapshot *from_snapshot = get_closest_snapshot(from);
     Snapshot *to_snapshot = NULL;

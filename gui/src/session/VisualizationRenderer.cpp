@@ -81,7 +81,7 @@ void VisualizationRenderer::paint_grid() {
     for(int y = 0; y < 12; y ++) {
         Timestamp ts = range.get_lower_time();
         ts.add_ms(y * (total_time / 12.0));
-        paint_line(VisualizationRenderPoint(ts, 0), VisualizationRenderPoint(ts, range.get_upper_data()), qRgb(32, 32, 32), Qt::DotLine);
+        paint_line(VisualizationRenderPoint(ts, range.get_lower_data()), VisualizationRenderPoint(ts, range.get_upper_data()), qRgb(32, 32, 32), Qt::DotLine);
         QString desc;
         qint64 time_diff = range.get_lower_time().ms_until(ts);
         desc.sprintf("%02lli:%02lli.%03lli", (time_diff / 1000) / 60, (time_diff / 1000) % 60, time_diff % 1000);
