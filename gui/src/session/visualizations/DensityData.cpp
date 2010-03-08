@@ -7,7 +7,8 @@ DensityData::DensityData(const Timestamp &allocated_at, const Timestamp &release
     get_data_range().set_upper_time(released_at);
     get_data_range().set_lower_data(address);
     get_data_range().set_upper_data(address+size);
-    qDebug("DensityData(): address is %lli, size is %lli", address, size);
+    /*qDebug("DensityData(): address is %lli, size is %lli", address, size);*/
+    colour = qRgb(0, 64, 32);
 }
 
 DensityData::~DensityData() {
@@ -30,5 +31,5 @@ void DensityData::paint_onto(VisualizationRenderer* renderer) const {
     to.set_data_element(address + size);
     from.set_time_element(allocated_at);
     to.set_time_element(released_at);
-    renderer->paint_box(from, to, qRgb(192, 192, 192), qRgb(0, 64, 32), Qt::SolidLine, Qt::SolidPattern);
+    renderer->paint_box(from, to, qRgb(0, 0, 0), colour, Qt::SolidLine, Qt::SolidPattern);
 }

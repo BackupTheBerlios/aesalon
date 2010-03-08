@@ -17,6 +17,9 @@ private:
     QList<VisualizationData *> data_list;
     
     QMap<MemoryAddress, DensityData *> density_data;
+    static QList<QRgb> colours;
+    int colour_index;
+    QRgb get_colour();
 public:
     DensityRequest(VisualizationThread* v_thread, const Timestamp &from, const Timestamp &to);
     virtual ~DensityRequest();
