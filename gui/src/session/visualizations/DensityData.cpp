@@ -16,10 +16,9 @@ DensityData::~DensityData() {
 }
 
 void DensityData::set_release_time(const Timestamp& time) {
-     released_at = time;
-     get_data_range().set_upper_time(released_at);
+    released_at = time;
+    get_data_range().set_upper_time(released_at);
 }
-
 
 bool DensityData::is_cachable() const {
     return complete;

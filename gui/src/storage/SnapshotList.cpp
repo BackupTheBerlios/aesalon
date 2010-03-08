@@ -69,16 +69,6 @@ Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
     /*qDebug("closest snapshot for %s was %lli", qPrintable(timestamp.to_string()), (*begin)->get_snapshot_id());*/
     if(begin != internal_list.begin()) begin --;
     return *(begin);
-#if 0
-    Snapshot *list_shot = NULL;
-    /* NOTE: speed this up via a binary-style search through the list: try size/2, size/2+size/4 or size/2-size/4 . . . */
-    for(int i = 0; i < internal_list.size(); i ++) {
-        if(timestamp >= internal_list[i]->get_timestamp())
-            list_shot = internal_list[i];
-    }
-    
-    return list_shot;
-#endif
 }
 
 bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amount) {
@@ -107,30 +97,25 @@ bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amou
 }
 
 void SnapshotList::iterate_through(const Timestamp &from, const Timestamp &to, EventVisitor &visitor) {
-    Snapshot *from_snapshot = get_closest_snapshot(from);
-    Snapshot *to_snapshot = NULL;
-    
-    int i = 0;
-    for(; i < from_snapshot->get_event_list()->get_event_list().size(); i ++) {
-        if(from >= from_snapshot->get_event_list()->get_event_list()[i]->get_timestamp()) {
-            from_snapshot->get_event_list()->get_event_list()[i]->accept(visitor);
-            break;
-        }
+    Snapshot *snapshot = get_closest_snapshot(from);
+    QList<Event *> event_list = snapshot->get_event_list()->get_event_list();
+    int index = 0;
+    for(; index < event_list.size(); index ++) {
+        if(from <= event_list[index]->get_timestamp()) break;
     }
-    to_snapshot = get_closest_snapshot(to);
-    if(to_snapshot != from_snapshot) {
-        for(SnapshotID j = from_snapshot->get_snapshot_id(); j < to_snapshot->get_snapshot_id(); j ++) {
-            foreach(Event *event, get_snapshot(j)->get_event_list()->get_event_list()) {
-                event->accept(visitor);
+    bool finished = false;
+    while(true) {
+        for(; index < event_list.size(); index ++) {
+            if(to < event_list[index]->get_timestamp()) {
+                finished = true;
+                break;
             }
+            event_list[index]->accept(visitor);
         }
-        i = 0;
-    }
-    for(; i < to_snapshot->get_event_list()->get_event_list().size(); i ++) {
-        if(to > to_snapshot->get_event_list()->get_event_list()[i]->get_timestamp()) {
-            break;
-        }
-        to_snapshot->get_event_list()->get_event_list()[i]->accept(visitor);
+        if(finished || snapshot->get_snapshot_id() == internal_list.last()->get_snapshot_id()) break;
+        snapshot = get_snapshot(snapshot->get_snapshot_id() + 1);
+        event_list = snapshot->get_event_list()->get_event_list();
+        index = 0;
     }
 }
 
