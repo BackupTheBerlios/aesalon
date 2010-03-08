@@ -64,7 +64,11 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     /* Wait for the SIGTRAP that indicates a exec() call . . . */
     wait_for_signal();
     /* place a breakpoint at main, for intialization purposes. */
-    Word main_address = Initializer::get_instance()->get_program_manager()->get_elf_parser()->get_symbol("main")->get_address();
+    ELF::Symbol *main_symbol = Initializer::get_instance()->get_program_manager()->get_elf_parser()->get_symbol("main");
+    if(main_symbol == NULL) {
+        throw Exception::PTraceException("Could not resolve main symbol, executable may be stripped");
+    }
+    Word main_address = main_symbol->get_address();
     place_breakpoint(main_address, initial_observer);
     
     /* Now continue until main(). */

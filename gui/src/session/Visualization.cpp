@@ -100,5 +100,6 @@ void Visualization::handle_slider_change_to(Timestamp time) {
 }
 
 void Visualization::position_changed(qint64 time, qreal value) {
-    position_label->setText(QString().sprintf("%02lli:%02lli:%03lli,%.02f", (time / 1000) / 60, (time / 1000) % 60, time % 1000, value));
+    if(time < 0) time = 0;
+    position_label->setText(QString().sprintf("%02lli:%02lli:%03lli,%lli", (time / 1000) / 60, (time / 1000) % 60, time % 1000, qint64(value)));
 }

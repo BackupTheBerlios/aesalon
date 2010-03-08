@@ -68,8 +68,8 @@ void DensityRequest::gather_blocks(BiTreeNode *node) {
     if(node->get_block_list_size()) {
         foreach(Block *block, node->get_block_list()) {
             density_data[block->get_address()] =
-                new DensityData(block->get_allocation_time(), block->get_release_time(), block->get_address(), block->get_size(),
-                    block->get_release_time() != Timestamp(0));
+                new DensityData(from, to, block->get_address(), block->get_size(),
+                    false);
             density_data[block->get_address()]->set_colour(get_colour());
         }
     }

@@ -8,7 +8,7 @@ ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
     
     elf_parser = new ELF::Parser(argument_list->get_argument(0));
     libc_parser = new ELF::Parser(Initializer::get_instance()->get_argument_parser()->get_argument("libc-path")->get_data());
-    disassembler = new ASM::Disassembler(elf_parser);
+    /*disassembler = new ASM::Disassembler(elf_parser);*/
     
     /*disassembler->get_symbol_il("main");*/
 }
@@ -17,7 +17,7 @@ ProgramManager::~ProgramManager() {
     if(ptrace_portal) delete ptrace_portal;
     delete elf_parser;
     delete libc_parser;
-    delete disassembler;
+    /*delete disassembler;*/
     delete argument_list;
 }
 

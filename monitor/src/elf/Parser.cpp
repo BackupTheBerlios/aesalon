@@ -5,11 +5,16 @@
 #include <iostream>
 
 #include "Parser.h"
+#include "exception/ElfException.h"
 
 namespace ELF {
 
 Parser::Parser(std::string filename) : filename(filename) {
     file_fd = open(filename.c_str(), O_RDONLY);
+    
+    if(file_fd == -1) {
+        throw Exception::ElfException(Misc::StreamAsString() << "Couldn't open executable \"" << filename << "\" . . .");
+    }
     
     header = new Header(file_fd);
     
