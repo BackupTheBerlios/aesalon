@@ -11,7 +11,4 @@ GUI:
 - Store the maximum tree depth inside the DataSource
 - Add the ability to create new DataSources
 - Add other DataSources (LaunchSource, etc.)
-- Make the generated QImage size configurable (maybe use QAbstractScrollArea for VCanvas?)
-- Implement Density visualization
-- Generating two graphs quickly results in double-painting . . . why?
-- Use double-buffering for VisualizationCanvas
+- Implement partial requests, e.g. the ability to change an already-existing VRequest

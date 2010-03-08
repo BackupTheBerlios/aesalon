@@ -22,14 +22,18 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     
     follow_checkbox = new QCheckBox(tr("&Real-time updating"));
     follow_checkbox->setCheckState(Qt::Unchecked);
-    main_layout->addWidget(follow_checkbox);
+    position_label = new QLabel();
+    QFont font = position_label->font();
+    font.setBold(true);
+    position_label->setFont(font);
+    QHBoxLayout *status_layout = new QHBoxLayout();
+    status_layout->addWidget(follow_checkbox);
+    status_layout->addWidget(position_label);
+    main_layout->addLayout(status_layout);
     
     display = new VisualizationDisplay(this);
     connect(display, SIGNAL(position_changed(qint64,qreal)), SLOT(position_changed(qint64,qreal)));
     main_layout->addWidget(display);
-    
-    position_label = new QLabel();
-    main_layout->addWidget(position_label);
     
     setLayout(main_layout);
     

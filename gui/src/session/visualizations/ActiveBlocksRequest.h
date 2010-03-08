@@ -5,14 +5,19 @@
 #include "storage/Timestamp.h"
 #include "storage/BiTreeNode.h"
 #include "ActiveBlocksData.h"
+#include "storage/EventVisitor.h"
 
-class ActiveBlocksRequest : public DataRequest {
+class ActiveBlocksRequest : public DataRequest, public EventVisitor {
 private:
     Timestamp from, to;
-    QList<ActiveBlocksData *> data_list;
+    QList<VisualizationData *> data_list;
+    quint64 block_count;
 public:
     ActiveBlocksRequest(VisualizationThread* v_thread, const Timestamp &from, const Timestamp &to);
     virtual ~ActiveBlocksRequest();
+    
+    virtual void visit(AllocEvent *event);
+    virtual void visit(FreeEvent *event);
     
     virtual QList<VisualizationData*> create_data();
     virtual void gather_data(DataThread* data_thread);

@@ -142,7 +142,7 @@ void VisualizationRenderer::paint_text(const VisualizationRenderPoint &point, QS
 }
 
 void VisualizationRenderer::paint_graph_element(const VisualizationRenderPoint &point, QRgb colour) {
-    paint_line(VisualizationRenderPoint(point.get_time_element(), 0), point, colour);
+    paint_line(VisualizationRenderPoint(point.get_time_element(), range.get_lower_data()), point, colour);
     if(graph_point_valid == true) {
         paint_line(graph_point, point, colour);
     }
