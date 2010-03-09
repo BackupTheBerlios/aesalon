@@ -15,8 +15,8 @@ public:
     
     void event_received(Event *event);
 signals:
-    void started();
-    void finished();
+    void started(Timestamp *time);
+    void finished(Timestamp *time);
 };
 
 #endif

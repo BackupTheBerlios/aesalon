@@ -59,6 +59,12 @@ qint64 Timestamp::ms_until(const Timestamp& other) const {
     return ms;
 }
 
+qint64 Timestamp::ns_until(const Timestamp& other) const {
+    qint64 ns = seconds_until(other) * 1000000000;
+    ns += (other.internal_time.tv_nsec - internal_time.tv_nsec);
+    return ns;
+}
+
 void Timestamp::add_ms(qint64 ms) {
     internal_time.tv_nsec += ms * 1000000;
     while(internal_time.tv_nsec >= 1000000000) internal_time.tv_nsec -= 1000000000, internal_time.tv_sec ++;

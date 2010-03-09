@@ -18,8 +18,8 @@ DataThread::~DataThread() {
 
 void DataThread::run() {
     data_receiver = data_source->spawn_receiver(this);
-    connect(data_receiver, SIGNAL(started()), SLOT(started()));
-    connect(data_receiver, SIGNAL(finished()), SLOT(finished()));
+    connect(data_receiver, SIGNAL(started(Timestamp *)), SLOT(started(Timestamp *)));
+    connect(data_receiver, SIGNAL(finished(Timestamp *)), SLOT(finished(Timestamp *)));
     snapshot_timer = new QTimer();
     connect(snapshot_timer, SIGNAL(timeout()), this, SLOT(create_new_snapshot()));
     request_queue_timer = new QTimer();
@@ -43,19 +43,20 @@ void DataThread::create_new_snapshot() {
     current_snapshot = snapshot_list.append_snapshot();
 }
 
-void DataThread::started() {
+void DataThread::started(Timestamp *time) {
     /* NOTE: get this from somewhere else . . . hardcoding it is a bad idea. */
     snapshot_timer->start(5000);
-    start_time = new Timestamp();
+    start_time = time;
     snapshot_list.get_snapshot(1)->update_timestamp(*start_time);
     current_snapshot->update_timestamp(*start_time);
     emit data_started();
 }
 
-void DataThread::finished() {
+void DataThread::finished(Timestamp *time) {
+    if(finish_time) return;
     snapshot_timer->stop();
     /*current_snapshot = snapshot_list.append_snapshot();*/
-    finish_time = new Timestamp();
+    finish_time = time;
     emit data_finished();
 }
 

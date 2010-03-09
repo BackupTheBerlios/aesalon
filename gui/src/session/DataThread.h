@@ -35,8 +35,8 @@ public:
     SnapshotList *get_snapshot_list() { return &snapshot_list; }
 private slots:
     void create_new_snapshot();
-    void started();
-    void finished();
+    void started(Timestamp *time);
+    void finished(Timestamp *time);
     void process_request_queue();
 protected:
     virtual void run();

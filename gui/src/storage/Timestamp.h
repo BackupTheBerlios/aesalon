@@ -25,6 +25,7 @@ public:
     Timestamp &operator=(const Timestamp &other);
     qint64 seconds_until(const Timestamp &other) const;
     qint64 ms_until(const Timestamp &other) const;
+    qint64 ns_until(const Timestamp &other) const;
     void add_ms(qint64 ms);
     QString to_string() const;
 };

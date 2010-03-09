@@ -48,9 +48,9 @@ void NetworkReceiver::data_received() {
     while(unprocessed.size()) {
         quint8 type_byte = unprocessed.at(0);
         unprocessed.remove(0, 1);
-        /* If the first bit is set, then it's a block event . . . */
-        if(type_byte & 0x01) {
-            quint8 block_type = (type_byte & 0x06) >> 1;
+        /* If the first bit is set, and the second is not, then it's a block event . . . */
+        if((type_byte & 0x03) == 1) {
+            quint8 block_type = (type_byte & 0x0c) >> 2;
             quint8 block_type_sizes[] = {16, 24, 8};
             if(unprocessed.size() < (block_type_sizes[block_type]+8)) {
                 unprocessed.prepend(type_byte);
@@ -76,13 +76,24 @@ void NetworkReceiver::data_received() {
                 emit event_received(new FreeEvent(timestamp, address));
             }
         }
+        else if((type_byte & 0x03) == 2) {
+            if(unprocessed.size() < 8) {
+                unprocessed.prepend(type_byte);
+                break;
+            }
+            quint64 raw_timestamp = pop_quint64();
+            Timestamp *timestamp = new Timestamp(raw_timestamp);
+            /* one indicates finished, zero started. */
+            if((type_byte & 0x04) == 0) emit started(timestamp);
+            else emit finished(timestamp);
+        }
     }
 }
 
 void NetworkReceiver::connected() {
-    emit started();
+    /*emit started();*/
 }
 
 void NetworkReceiver::disconnected() {
-    emit finished();
+    emit finished(new Timestamp());
 }

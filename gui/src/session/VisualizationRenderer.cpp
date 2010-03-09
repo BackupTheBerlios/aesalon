@@ -16,8 +16,8 @@ VisualizationRenderer::~VisualizationRenderer() {
 QPointF VisualizationRenderer::resolve_point(const VisualizationRenderPoint &point) const {
     const Timestamp &lower_time = range.get_lower_time();
     QRect size = canvas->views()[0]->geometry();
-    qreal x = qreal(lower_time.ms_until(point.get_time_element()))
-        / lower_time.ms_until(range.get_upper_time()) * size.width();
+    qreal x = qreal(lower_time.ns_until(point.get_time_element()))
+        / lower_time.ns_until(range.get_upper_time()) * size.width();
     qreal data_range = range.get_upper_data() - range.get_lower_data();
     qreal y_percentage = (point.get_data_element() - range.get_lower_data()) / data_range;
     qreal y = size.height() * y_percentage;
@@ -46,10 +46,10 @@ void VisualizationRenderer::recalc_ranges() {
     qint64 data_range = (range.get_upper_data()-range.get_lower_data()) / 12;
     if((range.get_upper_data() - range.get_lower_data()) % 12) data_range ++;
     range.set_upper_data((data_range * 12) + range.get_lower_data());
-    qint64 time_range = range.get_lower_time().ms_until(range.get_upper_time()) / 12;
+    /*qint64 time_range = range.get_lower_time().ms_until(range.get_upper_time()) / 12;
     Timestamp upper_time = range.get_lower_time();
     upper_time.add_ms(time_range * 12);
-    range.set_upper_time(upper_time);
+    range.set_upper_time(upper_time);*/
     
     if(can_split == false) {
         

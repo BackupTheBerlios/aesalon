@@ -1,9 +1,11 @@
 #include <QApplication>
+#include <QMetaType>
+
 #include "MainWindow.h"
 #include "MainWindow.moc"
-
 #include "MainArea.h"
 #include "Configuration.h"
+#include "storage/Timestamp.h"
 
 MainWindow::MainWindow(QWidget *parent) {
     QSettings settings;

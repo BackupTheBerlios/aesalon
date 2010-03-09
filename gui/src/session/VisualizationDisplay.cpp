@@ -26,8 +26,9 @@ void VisualizationDisplay::change_canvas(VisualizationCanvas *new_canvas) {
 void VisualizationDisplay::wheelEvent(QWheelEvent *event) {
     qreal scale_amount = 1 + (event->delta() / 1000.0);
     if(scale_amount <= 0) scale_amount = 0.01;
+    QPointF centre_point = mapToScene(event->pos());
     scale(scale_amount, scale_amount);
-    centerOn(mapToScene(event->pos()));
+    centerOn(centre_point);
     QGraphicsView::wheelEvent(event);
 }
 

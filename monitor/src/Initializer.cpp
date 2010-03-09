@@ -5,6 +5,7 @@
 #include "misc/StreamAsString.h"
 #include "misc/String.h"
 #include "misc/Message.h"
+#include "event/MonitorEvent.h"
 
 #include "Initializer.h"
 
@@ -130,6 +131,7 @@ void Initializer::usage() {
 
 void Initializer::run() {
     program_manager->execute();
+    get_event_queue()->push_event(new Event::MonitorEvent(Event::MonitorEvent::PROGRAM_STARTED));
     while(program_manager->is_running()) {
         program_manager->wait();
         if(event_queue->peek_event()) {
@@ -137,5 +139,7 @@ void Initializer::run() {
         }
         /*server_socket->accept_connections();*/
     }
+    get_event_queue()->push_event(new Event::MonitorEvent(Event::MonitorEvent::PROGRAM_FINISHED));
+    get_socket()->send_data(event_queue);
 }
 

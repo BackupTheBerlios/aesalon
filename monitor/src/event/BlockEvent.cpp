@@ -6,8 +6,8 @@
 namespace Event {
 
 /* serialization format:
-    first bit is taken by BasicEvent
-    second and third bits are block_type
+    first two bits are taken by BasicEvent
+    third and fourth bits are block_type
     rest of the first byte is reserved
     next eight bytes are timestamp
     after that, depends on type . . .
@@ -15,7 +15,7 @@ namespace Event {
 Block *BlockEvent::serialize() {
     Block *serialized = BasicEvent::serialize();
     
-    serialized->get_data()[0] |= (block_type << 1) & 0x06;
+    serialized->get_data()[0] |= (block_type << 2) & 0x0c;
     
     serialized->push_word(get_address());
 

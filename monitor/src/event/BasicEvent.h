@@ -13,7 +13,8 @@ class BasicEvent {
 public:
     /** Event type enum, used for dynamic_cast<>ing later. */
     enum event_type_e {
-        BLOCK_EVENT
+        BLOCK_EVENT,
+        MONITOR_EVENT
     };
 private:
     /** Current event type. */
