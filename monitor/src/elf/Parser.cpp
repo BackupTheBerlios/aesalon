@@ -59,11 +59,6 @@ Section *Parser::get_section(std::string name) const {
     return NULL;
 }
 
-Symbol *Parser::get_symbol(Word address) const {
-    return symbol_parser->get_symbol(address);
-}
-
-
 Symbol *Parser::get_symbol(std::string name) const {
     return symbol_parser->get_symbol(name);
 }
