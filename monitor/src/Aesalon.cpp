@@ -1,5 +1,5 @@
-/** Aesalon, a program to visualize dynamic memory allocations in real-time.
-    Copyright (C) 2009-2010 strange &lt;kawk256@gmail.com&gt;
+/** Aesalon, a project to visualize dynamic memory allocations in real-time.
+    Copyright (C) 2009-2010 strange <kawk256@gmail.com>
 
     This program is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
@@ -15,9 +15,11 @@
     with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     @file Aesalon.cpp
-    @mainpage Aesalon doxygen documentation
-    Aesalon is a program that allows a user to visualize, in real-time, the
-    dynamically-allocated memory of a program.
+    @mainpage Aesalon monitor doxygen documentation
+    Aesalon is a project that allows a user to visualize, in real-time, the
+    dynamically-allocated memory of a program. The project is split in two
+    primary sections: the monitor and the GUI. This is the documentation for
+    the monitor.
     
     Aesalon was originally designed and written by strange &lt;kawk256@gmail.com&gt;.
     

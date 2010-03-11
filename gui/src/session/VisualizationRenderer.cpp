@@ -1,3 +1,22 @@
+/** Aesalon, a project to visualize dynamic memory allocations in real-time.
+    Copyright (C) 2009-2010 strange <kawk256@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program.  If not, see <http://www.gnu.org/licenses/>.
+    
+    @file session/VisualizationRenderer.cpp
+*/
+
 #include <QDebug>
 #include <QGraphicsView>
 #include <QGraphicsTextItem>
@@ -73,9 +92,9 @@ void VisualizationRenderer::paint_grid() {
         qint64 value = (x * (total_data_size / 12.0)) + range.get_lower_data();
         paint_line(VisualizationRenderPoint(range.get_lower_time(), value),
             VisualizationRenderPoint(range.get_upper_time(), value), qRgb(32, 32, 32), Qt::DotLine);
-        QString desc;
+/*        QString desc;
         desc.sprintf("%lli", value);
-        paint_text(VisualizationRenderPoint(range.get_lower_time(), value), desc, 8, qRgb(0, 0, 0));
+        paint_text(VisualizationRenderPoint(range.get_lower_time(), value), desc, 8, qRgb(0, 0, 0));*/
     }
     
     for(int y = 0; y < 12; y ++) {
