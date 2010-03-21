@@ -45,6 +45,9 @@ Block *BasicEvent::serialize() {
     else if(type == MONITOR_EVENT) {
         block->get_data()[0] |= 0x02;
     }
+    else if(type == SCOPE_EVENT) {
+        block->get_data()[0] |= 0x03;
+    }
     else throw Exception::EventException("Asked to serialize invalid Event");
     block->push_word(timestamp);
     return block;

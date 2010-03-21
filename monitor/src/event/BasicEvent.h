@@ -33,7 +33,8 @@ public:
     /** Event type enum, used for dynamic_cast<>ing later. */
     enum event_type_e {
         BLOCK_EVENT,
-        MONITOR_EVENT
+        MONITOR_EVENT,
+        SCOPE_EVENT
     };
 private:
     /** Current event type. */

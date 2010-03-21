@@ -34,6 +34,7 @@ endif(DEVELOPMENT_BUILD)
 # Compile the tests if this is a dev build
 if(DEVELOPMENT_BUILD)
     add_subdirectory(tests)
+    add_custom_target("doc" DEPENDS monitor_doc gui_doc)
 endif(DEVELOPMENT_BUILD)
 
 # Compile the monitor, if wanted

@@ -28,6 +28,7 @@
 #include "misc/ArgumentParser.h"
 #include "StorageManager.h"
 #include "misc/ConfigParser.h"
+#include "tracker/ScopeManager.h"
 
 /** Initializer class. Basically, handles initialization of the Monitor. */
 class Initializer : public Misc::Singleton<Initializer> {
@@ -46,6 +47,7 @@ private:
     Misc::ConfigParser *config_parser;
     
     StorageManager *storage_manager;
+    Tracker::ScopeManager *scope_manager;
     
     /** Initialize the aesalon monitor. */
     void initialize();
@@ -79,6 +81,7 @@ public:
     Event::Queue *get_event_queue() const { return event_queue; }
     Misc::ArgumentParser *get_argument_parser() const { return argument_parser; }
     StorageManager *get_storage_manager() const { return storage_manager; }
+    Tracker::ScopeManager *get_scope_manager() const { return scope_manager; }
     
     int get_return_value() const { return return_value; }
     void set_return_value(int new_return_value) { return_value = new_return_value; }

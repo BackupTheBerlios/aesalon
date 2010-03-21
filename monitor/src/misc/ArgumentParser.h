@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License along
     with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    @file ArgumentParser.h
+    @file misc/ArgumentParser.h
 */
 
 #ifndef AESALON_ARGUMENT_PARSER_H

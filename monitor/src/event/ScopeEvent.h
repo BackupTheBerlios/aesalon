@@ -14,34 +14,36 @@
     You should have received a copy of the GNU General Public License along
     with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    @file tcp/Socket.h
+    @file event/ScopeEvent.h
 */
-
-#ifndef AESALON_MONITOR_TCPSOCKET_H
-#define AESALON_MONITOR_TCPSOCKET_H
+#ifndef AESALON_EVENT_SCOPE_H
+#define AESALON_EVENT_SCOPE_H
 
 #include <string>
 
-#include "Types.h"
+#include "BasicEvent.h"
 
-namespace TCP {
+namespace Event {
 
-class Socket {
-private:
-    int socket_fd;
-    bool valid;
+class ScopeEvent : public BasicEvent {
 public:
-    Socket(std::string host, int port);
-    Socket(int socket_fd) : socket_fd(socket_fd), valid(true) {}
-    virtual ~Socket();
+    enum scope_event_type_e {
+        NEW_SCOPE
+    };
+private:
+    scope_event_type_e scope_type;
+    Word scope_id;
+    std::string name;
+public:
+    ScopeEvent(scope_event_type_e scope_type, Word id, std::string name);
+    virtual ~ScopeEvent();
     
-    void send_data(Block *data);
+    Word get_scope_id() const { return scope_id; }
+    std::string get_name() const { return name; }
     
-    void disconnect();
-    
-    bool is_valid() const { return valid; }
+    virtual Block* serialize();
 };
 
-} // namespace TCP
+} // namespace Event
 
 #endif

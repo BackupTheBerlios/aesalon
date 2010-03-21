@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License along
     with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    @file Initializer.h
+    @file ProgramManager.h
     This file contains the definition of the ProgramManager class.
 */
 #ifndef AESALON_MONITOR_PROGRAM_MANAGER_H
