@@ -27,9 +27,9 @@ VisualizationDisplay::VisualizationDisplay(QWidget *parent): QGraphicsView(paren
     QBrush bg(Qt::SolidPattern);
     bg.setColor(Qt::white);
     setBackgroundBrush(bg);
-    position_label = new QLabel();
-    this->setCornerWidget(position_label);
-    this->setCursor(Qt::CrossCursor);
+    setCursor(Qt::CrossCursor);
+    setTransformationAnchor(AnchorUnderMouse);
+    setViewportUpdateMode(FullViewportUpdate);
 }
 
 VisualizationDisplay::~VisualizationDisplay() {

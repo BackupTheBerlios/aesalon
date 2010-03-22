@@ -30,7 +30,6 @@ class VisualizationDisplay : public QGraphicsView { Q_OBJECT
 private:
     VisualizationCanvas *canvas;
     QPoint mouse_position;
-    QLabel *position_label;
 public:
     VisualizationDisplay(QWidget *parent);
     virtual ~VisualizationDisplay();
