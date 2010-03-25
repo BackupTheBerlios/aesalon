@@ -41,9 +41,6 @@ private:
     DataThread *data_thread;
     VisualizationRequest *current_request;
     QVBoxLayout *main_layout;
-    TimeSlider *from_slider;
-    TimeSlider *to_slider;
-    QCheckBox *follow_checkbox;
     VisualizationDisplay *display;
     QLabel *position_label;
 protected:
@@ -61,11 +58,6 @@ public:
     virtual QString get_title() const {
         return "ERROR!";
     }
-private slots:
-    void update_slider_ranges();
-    void handle_slider_change_from(Timestamp time);
-    void handle_slider_change_to(Timestamp time);
-    void position_changed(qint64 time, qreal value);
 signals:
     void visualization_request(VisualizationRequest *request);
 };

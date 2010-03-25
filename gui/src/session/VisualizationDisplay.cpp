@@ -17,73 +17,71 @@
     @file session/VisualizationDisplay.cpp
 */
 
-#include <QScrollBar>
+#include <QPainter>
 #include "VisualizationDisplay.h"
 #include "VisualizationDisplay.moc"
 
-VisualizationDisplay::VisualizationDisplay(QWidget *parent): QGraphicsView(parent) {
-    QBrush bg(Qt::SolidPattern);
-    bg.setColor(Qt::white);
-    setBackgroundBrush(bg);
+VisualizationDisplay::VisualizationDisplay(QWidget *parent): QWidget(parent), renderer(renderer) {
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setCursor(Qt::CrossCursor);
-    setTransformationAnchor(AnchorUnderMouse);
-    setViewportUpdateMode(FullViewportUpdate);
+    setBackgroundRole(QPalette::BrightText);
+    
+    canvas = QImage(size(), QImage::Format_ARGB32);
+    canvas.fill(qRgba(255, 255, 255, 255));
+    
+    renderer = new VisualizationRenderer(false);
 }
 
 VisualizationDisplay::~VisualizationDisplay() {
 
 }
 
+void VisualizationDisplay::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    
+    
+    painter.drawImage(0, 0, canvas);    
+    
+    QPen pen(Qt::DotLine);
+    pen.setColor(qRgb(192, 192, 192));
+    painter.setPen(pen);
+    qreal x_step = (width()-1) / 12;
+    for(int x = 0; x <= 12; x ++) {
+        painter.drawLine(x_step * x, 0, x_step * x, height()-1);
+    }
+    
+    qreal y_step = (height()-1) / 12.0;
+    for(int y = 0; y <= 12; y ++) {
+        painter.drawLine(0, y_step * y, width()-1, y_step * y);
+    }
+
+    
+    QWidget::paintEvent(event);
+}
+
 void VisualizationDisplay::wheelEvent(QWheelEvent *event) {
-    qreal scale_amount = 1 + (event->delta() / 1000.0);
-    if(scale_amount <= 0) scale_amount = 0.01;
-    QPointF centre_point = mapToScene(event->pos());
-    scale(scale_amount, scale_amount);
-    centerOn(centre_point);
-    QGraphicsView::wheelEvent(event);
+    QWidget::wheelEvent(event);
 }
 
 void VisualizationDisplay::mouseMoveEvent(QMouseEvent* event) {
-    if(event->buttons() & Qt::LeftButton) {
-        QPoint difference = mouse_position - event->globalPos();
-        
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value() + difference.x());
-        verticalScrollBar()->setValue(verticalScrollBar()->value() + difference.y());
-        
-        mouse_position = event->globalPos();
-    }
-    if(scene()->height()) {
-        QPointF where = mapToScene(event->pos());
-        where.setY(scene()->height() - where.y());
-        qreal value_percentage = where.y() / scene()->height();
-        qreal timestamp_percentage = where.x() / scene()->width();
-        /*qint64 total_ms = canvas->get_data_range().get_lower_time().ms_until(canvas->get_data_range().get_upper_time());
-        qint64 total_data_range = canvas->get_data_range().get_upper_data() - canvas->get_data_range().get_lower_data();
-        qint64 ms = (timestamp_percentage * total_ms);
-        emit position_changed(ms, (value_percentage * total_data_range) + canvas->get_data_range().get_lower_data());*/
-    }
-    QGraphicsView::mouseMoveEvent(event);
+    QWidget::mouseMoveEvent(event);
 }
 
 void VisualizationDisplay::mousePressEvent(QMouseEvent* event) {
     if(event->button() == Qt::LeftButton)
         mouse_position = event->globalPos();
-    QGraphicsView::mousePressEvent(event);
-}
-
-void VisualizationDisplay::paintEvent(QPaintEvent *event) {
-    QGraphicsView::paintEvent(event);
+    QWidget::mousePressEvent(event);
 }
 
 void VisualizationDisplay::keyPressEvent(QKeyEvent *event) {
-    QGraphicsView::keyPressEvent(event);
+    QWidget::keyPressEvent(event);
 }
 
 void VisualizationDisplay::keyReleaseEvent(QKeyEvent *event) {
-    QGraphicsView::keyReleaseEvent(event);
+    QWidget::keyReleaseEvent(event);
 }
 
 void VisualizationDisplay::resizeEvent(QResizeEvent* event) {
-    emit update_request();
-    QGraphicsView::resizeEvent(event);
+    canvas = canvas.scaled(event->size());
+    update();
 }

@@ -91,5 +91,6 @@ void Timestamp::add_ms(qint64 ms) {
 }
 
 QString Timestamp::to_string() const {
-    return QString().sprintf("%li:%li", internal_time.tv_sec, internal_time.tv_nsec);
+    return QString().sprintf("%02li:%02li.%03li.%03li", internal_time.tv_sec / 60,
+        internal_time.tv_sec % 60, internal_time.tv_nsec / 1000000, internal_time.tv_nsec / 1000);
 }

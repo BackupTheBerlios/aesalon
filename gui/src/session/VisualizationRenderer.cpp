@@ -44,6 +44,11 @@ QPointF VisualizationRenderer::resolve_point(const VisualizationRenderPoint &poi
     return QPointF(x, y);
 }
 
+VisualizationRenderPoint VisualizationRenderer::resolve_point(const QPointF &point) const {
+
+}
+
+
 void VisualizationRenderer::recalc_ranges() {
     if(data_list.size() == 0) return;
     

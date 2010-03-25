@@ -41,6 +41,7 @@ private:
     void paint_grid();
     void render_data();
     QPointF resolve_point(const VisualizationRenderPoint &point) const;
+    VisualizationRenderPoint resolve_point(const QPointF &point) const;
 public:
     VisualizationRenderer(bool can_split);
     virtual ~VisualizationRenderer();
@@ -48,7 +49,7 @@ public:
     void update();
     void add_data(VisualizationData *data);
     
-    /* NOTE: this *need* to be reentrant! */
+    /* NOTE: these *need* to be reentrant! */
     void paint_line(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to,
         QRgb colour, Qt::PenStyle style = Qt::SolidLine);
     void paint_box(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to,
