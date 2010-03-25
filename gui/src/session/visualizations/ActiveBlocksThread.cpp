@@ -29,7 +29,7 @@ ActiveBlocksThread::~ActiveBlocksThread() {
 
 }
 
-void ActiveBlocksThread::generate_requests(VisualizationRequest* current_request) {
+/*void ActiveBlocksThread::generate_requests(VisualizationRequest* current_request) {
     send_request(new ActiveBlocksRequest(this, current_request->get_from(), current_request->get_to()));
-}
+}*/
 

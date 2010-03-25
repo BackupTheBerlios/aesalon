@@ -28,6 +28,6 @@ DensityThread::~DensityThread() {
 
 }
 
-void DensityThread::generate_requests(VisualizationRequest *current_request) {
+/*void DensityThread::generate_requests(VisualizationRequest *current_request) {
     send_request(new DensityRequest(this, current_request->get_from(), current_request->get_to()));
-}
+}*/

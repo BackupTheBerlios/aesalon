@@ -20,7 +20,6 @@
 #include <QPainter>
 #include "ActiveBlocksData.h"
 #include "../VisualizationRenderer.h"
-#include "../VisualizationRequest.h"
 
 ActiveBlocksData::ActiveBlocksData(const Timestamp &timestamp, int value) : VisualizationData(), timestamp(timestamp), value(value) {
     get_data_range().set_lower_data(value);

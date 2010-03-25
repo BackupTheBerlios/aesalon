@@ -24,7 +24,7 @@
 
 class DensityThread : public VisualizationThread {
 protected:
-    virtual void generate_requests(VisualizationRequest* current_request);
+    /*virtual void generate_requests(VisualizationRequest* current_request);*/
     virtual bool is_splittable() const { return false; }
 public:
     DensityThread(DataThread* data_thread, QObject* parent = 0);

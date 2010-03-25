@@ -30,7 +30,6 @@
 #include <QCheckBox>
 
 #include "VisualizationThread.h"
-#include "VisualizationRequest.h"
 #include "DataThread.h"
 #include "TimeSlider.h"
 #include "VisualizationDisplay.h"
@@ -39,7 +38,6 @@ class Visualization : public QWidget { Q_OBJECT
 private:
     VisualizationThread *v_thread;
     DataThread *data_thread;
-    VisualizationRequest *current_request;
     QVBoxLayout *main_layout;
     VisualizationDisplay *display;
     QLabel *position_label;
@@ -58,8 +56,6 @@ public:
     virtual QString get_title() const {
         return "ERROR!";
     }
-signals:
-    void visualization_request(VisualizationRequest *request);
 };
 
 #endif

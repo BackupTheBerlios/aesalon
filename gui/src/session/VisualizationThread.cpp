@@ -26,7 +26,6 @@
 VisualizationThread::VisualizationThread(DataThread *data_thread, QObject *parent)
     : QThread(parent), data_thread(data_thread) {
     request_queue = new DataRequestQueue();
-    current_request = NULL;
 }
 
 VisualizationThread::~VisualizationThread() {
@@ -45,18 +44,6 @@ void VisualizationThread::send_request(DataRequest *request) {
     data_thread->get_request_queue()->push_request(request);
 }
 
-void VisualizationThread::update_request(VisualizationRequest *new_request) {
-    current_request = new_request;
-    get_request_queue()->clear_queue();
-    current_request->set_renderer(new VisualizationRenderer(is_splittable()));
-    emit replace_image(current_image);
-    generate_requests(current_request);
-}
-
-void VisualizationThread::render_request() {
-    if(current_request) current_request->get_renderer()->update();
-}
-
 void VisualizationThread::process_queue() {
     bool changed = false;
     while(get_request_queue()->current_requests() > 0) {
@@ -67,17 +54,5 @@ void VisualizationThread::process_queue() {
         }
         QList<VisualizationData *> data = request->create_data();
         v_data.append(data);
-        if(current_request) {
-            foreach(VisualizationData *vdata, data) {
-                /* then add the data to the current renderer instance . . . */
-                current_request->get_renderer()->add_data(vdata);
-            }
-            changed = true;
-        }
-    }
-    
-    if(changed && current_request) {
-        current_request->get_renderer()->update();
-        emit image_updated();
     }
 }

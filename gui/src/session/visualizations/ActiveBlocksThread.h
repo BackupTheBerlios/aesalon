@@ -27,7 +27,7 @@ public:
     ActiveBlocksThread(DataThread *data_thread);
     virtual ~ActiveBlocksThread();
 protected:
-    virtual void generate_requests(VisualizationRequest* current_request);
+    /*virtual void generate_requests(VisualizationRequest* current_request);*/
     virtual bool is_splittable() const { return false; }
 };
 
