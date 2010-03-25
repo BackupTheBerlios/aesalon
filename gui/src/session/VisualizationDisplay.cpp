@@ -22,8 +22,6 @@
 #include "VisualizationDisplay.moc"
 
 VisualizationDisplay::VisualizationDisplay(QWidget *parent): QGraphicsView(parent) {
-    canvas = new VisualizationCanvas(this);
-    setScene(canvas);
     QBrush bg(Qt::SolidPattern);
     bg.setColor(Qt::white);
     setBackgroundBrush(bg);
@@ -34,12 +32,6 @@ VisualizationDisplay::VisualizationDisplay(QWidget *parent): QGraphicsView(paren
 
 VisualizationDisplay::~VisualizationDisplay() {
 
-}
-
-void VisualizationDisplay::change_canvas(VisualizationCanvas *new_canvas) {
-    canvas = new_canvas;
-    this->setScene(canvas);
-    this->update();
 }
 
 void VisualizationDisplay::wheelEvent(QWheelEvent *event) {
@@ -65,10 +57,10 @@ void VisualizationDisplay::mouseMoveEvent(QMouseEvent* event) {
         where.setY(scene()->height() - where.y());
         qreal value_percentage = where.y() / scene()->height();
         qreal timestamp_percentage = where.x() / scene()->width();
-        qint64 total_ms = canvas->get_data_range().get_lower_time().ms_until(canvas->get_data_range().get_upper_time());
+        /*qint64 total_ms = canvas->get_data_range().get_lower_time().ms_until(canvas->get_data_range().get_upper_time());
         qint64 total_data_range = canvas->get_data_range().get_upper_data() - canvas->get_data_range().get_lower_data();
         qint64 ms = (timestamp_percentage * total_ms);
-        emit position_changed(ms, (value_percentage * total_data_range) + canvas->get_data_range().get_lower_data());
+        emit position_changed(ms, (value_percentage * total_data_range) + canvas->get_data_range().get_lower_data());*/
     }
     QGraphicsView::mouseMoveEvent(event);
 }

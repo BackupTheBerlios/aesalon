@@ -48,7 +48,7 @@ void VisualizationThread::send_request(DataRequest *request) {
 void VisualizationThread::update_request(VisualizationRequest *new_request) {
     current_request = new_request;
     get_request_queue()->clear_queue();
-    current_request->set_renderer(new VisualizationRenderer(new_request->get_canvas(), is_splittable()));
+    current_request->set_renderer(new VisualizationRenderer(is_splittable()));
     emit replace_image(current_image);
     generate_requests(current_request);
 }

@@ -103,7 +103,7 @@ void Visualization::handle_slider_change_from(Timestamp time) {
         to_slider->set_value(time);
     }
     /* NOTE: deleting this will crash the program if data is being visualized! */
-    current_request = new VisualizationRequest(display->get_canvas(), from_slider->current_value(), to_slider->current_value());
+    current_request = new VisualizationRequest(from_slider->current_value(), to_slider->current_value());
     emit visualization_request(current_request);
 }
 
@@ -114,7 +114,7 @@ void Visualization::handle_slider_change_to(Timestamp time) {
         to_slider->set_value(time);
     }
     /* NOTE: deleting this will crash the program if data is being visualized! */
-    current_request = new VisualizationRequest(display->get_canvas(), from_slider->current_value(), to_slider->current_value());
+    current_request = new VisualizationRequest(from_slider->current_value(), to_slider->current_value());
     emit visualization_request(current_request);
 }
 

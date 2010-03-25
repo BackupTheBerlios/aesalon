@@ -23,8 +23,8 @@
 #include <QPainter>
 #include "VisualizationRenderer.h"
 
-VisualizationRenderer::VisualizationRenderer(VisualizationCanvas *canvas, bool can_split)
-    : canvas(canvas), can_split(can_split), graph_point(Timestamp(0), 0) {
+VisualizationRenderer::VisualizationRenderer(bool can_split)
+    : can_split(can_split), graph_point(Timestamp(0), 0) {
     
 }
 
@@ -34,7 +34,7 @@ VisualizationRenderer::~VisualizationRenderer() {
 
 QPointF VisualizationRenderer::resolve_point(const VisualizationRenderPoint &point) const {
     const Timestamp &lower_time = range.get_lower_time();
-    QRect size = canvas->views()[0]->geometry();
+    QRect size; /* FIXME */
     qreal x = qreal(lower_time.ns_until(point.get_time_element()))
         / lower_time.ns_until(range.get_upper_time()) * size.width();
     qreal data_range = range.get_upper_data() - range.get_lower_data();
@@ -117,9 +117,7 @@ void VisualizationRenderer::render_data() {
 void VisualizationRenderer::update() {
     graph_point_valid = false;
     if(data_list.size() == 0) return;
-    canvas->clear();
     recalc_ranges();
-    canvas->set_data_range(range);
     paint_grid();
     render_data();
 }
@@ -133,7 +131,7 @@ void VisualizationRenderer::paint_line(const VisualizationRenderPoint &from, con
     
     QPen pen(style);
     pen.setColor(colour);
-    canvas->addLine(line, pen);
+    /*canvas->addLine(line, pen);*/
 }
 
 void VisualizationRenderer::paint_box(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to, QRgb line_colour,
@@ -147,7 +145,7 @@ void VisualizationRenderer::paint_box(const VisualizationRenderPoint &from, cons
     pen.setColor(line_colour);
     QBrush brush(fill_style);
     brush.setColor(fill_colour);
-    canvas->addRect(rect, pen, brush);
+    /*canvas->addRect(rect, pen, brush);*/
 }
 
 void VisualizationRenderer::paint_text(const VisualizationRenderPoint &point, QString text, int size, QRgb colour) {
@@ -157,7 +155,7 @@ void VisualizationRenderer::paint_text(const VisualizationRenderPoint &point, QS
     text_item->setFont(font);
     text_item->translate(location.x(), location.y());
     text_item->setDefaultTextColor(colour);
-    canvas->addItem(text_item);
+    /*canvas->addItem(text_item);*/
 }
 
 void VisualizationRenderer::paint_graph_element(const VisualizationRenderPoint &point, QRgb colour) {

@@ -26,11 +26,9 @@
 #include "VisualizationRenderDataRange.h"
 #include "VisualizationRenderPoint.h"
 #include "VisualizationData.h"
-#include "VisualizationCanvas.h"
 
 class VisualizationRenderer {
 private:
-    VisualizationCanvas *canvas;
     QList<VisualizationRenderDataRange> gaps;
     VisualizationRenderDataRange range;
     QList<VisualizationData *> data_list;
@@ -44,7 +42,7 @@ private:
     void render_data();
     QPointF resolve_point(const VisualizationRenderPoint &point) const;
 public:
-    VisualizationRenderer(VisualizationCanvas *canvas, bool can_split);
+    VisualizationRenderer(bool can_split);
     virtual ~VisualizationRenderer();
     
     void update();
