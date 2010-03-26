@@ -3,12 +3,12 @@
 
 #include <QString>
 
-#include "VisualizationRenderPoint.h"
+#include "VisualizationPoint.h"
 
 class VisualizationAxisFormatter {
 public:
-    virtual QString format_data(const VisualizationRenderPoint &point) const;
-    virtual QString format_time(const VisualizationRenderPoint &point) const;
+    virtual QString format_data(const VisualizationPoint &point) const;
+    virtual QString format_time(const VisualizationPoint &point) const;
 };
 
 #endif

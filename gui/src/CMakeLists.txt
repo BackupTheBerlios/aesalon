@@ -9,7 +9,7 @@ aux_source_directory(. DOT_SOURCES)
 aux_source_directory(data DATA_SOURCES)
 aux_source_directory(main MAIN_SOURCES)
 aux_source_directory(session SESSION_SOURCES)
-aux_source_directory(session/visualizations VISUALIZATION_SOURCES)
+aux_source_directory(visualization VISUALIZATION_SOURCES)
 aux_source_directory(storage STORAGE_SOURCES)
 
 set(SOURCES

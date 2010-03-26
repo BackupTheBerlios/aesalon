@@ -19,10 +19,8 @@
 
 #include "DataThread.h"
 #include "DataThread.moc"
-#include "VisualizationThread.h"
 
 DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(parent), data_source(data_source) {
-    request_queue = new DataRequestQueue();
     current_snapshot = snapshot_list.append_snapshot();
     current_snapshot->set_head_node(new BiTreeNode(current_snapshot->get_snapshot_id()));
     current_snapshot = snapshot_list.append_snapshot();
@@ -41,10 +39,6 @@ void DataThread::run() {
     connect(data_receiver, SIGNAL(finished(Timestamp *)), SLOT(finished(Timestamp *)));
     snapshot_timer = new QTimer();
     connect(snapshot_timer, SIGNAL(timeout()), this, SLOT(create_new_snapshot()));
-    request_queue_timer = new QTimer();
-    request_queue_timer->setSingleShot(false);
-    connect(request_queue_timer, SIGNAL(timeout()), this, SLOT(process_request_queue()));
-    request_queue_timer->start(500);
     exec();
     delete data_receiver;
     delete snapshot_timer;
@@ -77,12 +71,4 @@ void DataThread::finished(Timestamp *time) {
     /*current_snapshot = snapshot_list.append_snapshot();*/
     finish_time = time;
     emit data_finished();
-}
-
-void DataThread::process_request_queue() {
-    while(request_queue->current_requests()) {
-        DataRequest *request = request_queue->pop_request();
-        request->gather_data(this);
-        request->get_v_thread()->get_request_queue()->push_request(request);
-    }
 }

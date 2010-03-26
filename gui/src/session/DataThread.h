@@ -26,8 +26,6 @@
 
 #include "storage/SnapshotList.h"
 #include "data/DataSource.h"
-#include "DataRequest.h"
-#include "DataRequestQueue.h"
 
 class DataThread : public QThread { Q_OBJECT
 private:
@@ -37,15 +35,12 @@ private:
     SnapshotList snapshot_list;
     Snapshot *current_snapshot;
     QTimer *snapshot_timer;
-    DataRequestQueue *request_queue;
-    QTimer *request_queue_timer;
     
     Timestamp *start_time, *finish_time;
 public:
     DataThread(QObject *parent, DataSource *data_source);
     virtual ~DataThread();
     
-    DataRequestQueue *get_request_queue() const { return request_queue; }
     void event_received(Event *event);
     
     const Timestamp *get_start_time() const { return start_time; }
@@ -56,7 +51,6 @@ private slots:
     void create_new_snapshot();
     void started(Timestamp *time);
     void finished(Timestamp *time);
-    void process_request_queue();
 protected:
     virtual void run();
 signals:

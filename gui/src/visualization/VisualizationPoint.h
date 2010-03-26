@@ -14,31 +14,26 @@
     You should have received a copy of the GNU General Public License along
     with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    @file session/VisualizationData.h
+    @file session/VisualizationRenderPoint.h
 */
 
-#ifndef AESALON_GUI_SESSION_VISUALIZATION_DATA_H
-#define AESALON_GUI_SESSION_VISUALIZATION_DATA_H
+#ifndef AESALON_GUI_SESSION_VISUALIZATION_RENDER_POINT_H
+#define AESALON_GUI_SESSION_VISUALIZATION_RENDER_POINT_H
 
-#include <QPixmap>
+#include "storage/Timestamp.h"
 
-#include "VisualizationRenderDataRange.h"
-
-class VisualizationRequest;
-class VisualizationRenderer;
-
-class VisualizationData {
+class VisualizationPoint {
 private:
-    VisualizationRenderDataRange data_range;
+    Timestamp time_element;
+    qint64 data_element;
 public:
-    VisualizationData();
-    virtual ~VisualizationData();
+    VisualizationPoint(const Timestamp &time, qint64 data) : time_element(time), data_element(data) {}
     
-    virtual void paint_onto(VisualizationRenderer *renderer) const = 0;
+    const Timestamp &get_time_element() const { return time_element; }
+    void set_time_element(const Timestamp &new_time) { time_element = new_time; }
     
-    virtual bool is_cachable() const = 0;
-    
-    VisualizationRenderDataRange &get_data_range() { return data_range; }
+    qint64 get_data_element() const { return data_element; }
+    void set_data_element(qint64 new_data) { data_element = new_data; }
 };
 
 #endif

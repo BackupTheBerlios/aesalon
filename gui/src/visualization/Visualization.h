@@ -14,22 +14,34 @@
     You should have received a copy of the GNU General Public License along
     with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    @file session/visualizations/ActiveBlocksThread.cpp
+    @file session/Visualization.h
 */
 
-#include "ActiveBlocksThread.h"
-#include "ActiveBlocksRequest.h"
-#include "../DataThread.h"
+#ifndef AESALON_GUI_SESSION_VISUALIZATION_H
+#define AESALON_GUI_SESSION_VISUALIZATION_H
 
-ActiveBlocksThread::ActiveBlocksThread(DataThread *data_thread) : VisualizationThread(data_thread) {
+#include <QWidget>
+#include <QImage>
+#include <QFormLayout>
+#include <QScrollArea>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QLabel>
+#include <QCheckBox>
 
-}
+#include "session/DataThread.h"
+#include "session/TimeSlider.h"
+#include "VisualizationDisplay.h"
 
-ActiveBlocksThread::~ActiveBlocksThread() {
+class Visualization : public QWidget { Q_OBJECT
+private:
+    DataThread *data_thread;
+    QVBoxLayout *main_layout;
+    VisualizationDisplay *display;
+    QLabel *position_label;
+public:
+    Visualization(DataThread *data_thread, QWidget *parent = 0);
+    virtual ~Visualization();
+};
 
-}
-
-/*void ActiveBlocksThread::generate_requests(VisualizationRequest* current_request) {
-    send_request(new ActiveBlocksRequest(this, current_request->get_from(), current_request->get_to()));
-}*/
-
+#endif

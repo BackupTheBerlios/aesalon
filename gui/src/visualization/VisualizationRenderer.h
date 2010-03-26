@@ -23,39 +23,36 @@
 #include <QPixmap>
 #include <QWidget>
 
-#include "VisualizationRenderDataRange.h"
-#include "VisualizationRenderPoint.h"
-#include "VisualizationData.h"
+#include "VisualizationDataRange.h"
+#include "VisualizationPoint.h"
+#include "storage/EventVisitor.h"
+#include "storage/Snapshot.h"
 
-class VisualizationRenderer {
+class VisualizationRenderer : public EventVisitor {
 private:
-    QList<VisualizationRenderDataRange> gaps;
-    VisualizationRenderDataRange range;
-    QList<VisualizationData *> data_list;
+    QList<VisualizationDataRange> gaps;
+    VisualizationDataRange range;
     bool can_split;
     
-    VisualizationRenderPoint graph_point;
+    VisualizationPoint graph_point;
     bool graph_point_valid;
-    
-    void recalc_ranges();
-    void paint_grid();
-    void render_data();
-    QPointF resolve_point(const VisualizationRenderPoint &point) const;
-    VisualizationRenderPoint resolve_point(const QPointF &point) const;
 public:
     VisualizationRenderer(bool can_split);
     virtual ~VisualizationRenderer();
-    
-    void update();
-    void add_data(VisualizationData *data);
+
+    virtual void begin_update(Snapshot *starting_snaphot);
+    virtual void end_update();
+private:
+    QPointF resolve_point(const VisualizationPoint &point) const;
+    VisualizationPoint resolve_point(const QPointF &point) const;
     
     /* NOTE: these *need* to be reentrant! */
-    void paint_line(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to,
+    void paint_line(const VisualizationPoint &from, const VisualizationPoint &to,
         QRgb colour, Qt::PenStyle style = Qt::SolidLine);
-    void paint_box(const VisualizationRenderPoint &from, const VisualizationRenderPoint &to,
+    void paint_box(const VisualizationPoint &from, const VisualizationPoint &to,
         QRgb line_colour, QRgb fill_colour, Qt::PenStyle line_style = Qt::SolidLine, Qt::BrushStyle fill_style = Qt::SolidPattern);
-    void paint_text(const VisualizationRenderPoint &point, QString text, int size, QRgb colour);
-    void paint_graph_element(const VisualizationRenderPoint &point, QRgb colour);
+    void paint_text(const VisualizationPoint &point, QString text, int size, QRgb colour);
+    void paint_graph_element(const VisualizationPoint &point, QRgb colour);
 };
 
 #endif

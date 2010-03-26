@@ -44,5 +44,5 @@ Session::~Session() {
 }
 
 void Session::new_visualization(Visualization *visualization) {
-    tab_widget->addTab(visualization, visualization->get_title());
+    /*tab_widget->addTab(visualization, visualization->get_title());*/
 }

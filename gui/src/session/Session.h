@@ -31,7 +31,7 @@
 #include "data/DataReceiver.h"
 #include "storage/SnapshotList.h"
 #include "DataThread.h"
-#include "Visualization.h"
+#include "visualization/Visualization.h"
 
 class Session : public QWidget { Q_OBJECT
 private:

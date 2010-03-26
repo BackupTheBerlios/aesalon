@@ -39,7 +39,6 @@ VisualizationDisplay::~VisualizationDisplay() {
 void VisualizationDisplay::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     
-    
     painter.drawImage(0, 0, canvas);    
     
     QPen pen(Qt::DotLine);

@@ -58,7 +58,6 @@ void SessionOverview::update_time_running() {
 void SessionOverview::new_visualization() {
     Visualization *visualization = v_list->create_from_selected(data_thread);
     if(visualization) {
-        visualization->initialize();
         emit new_visualization(visualization);
     }
 }

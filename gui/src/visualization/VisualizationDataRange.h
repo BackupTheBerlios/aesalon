@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License along
     with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    @file session/VisualizationRenderDataRange.h
+    @file session/VisualizationDataRange.h
 */
 
 #ifndef AESALON_GUI_SESSION_VISUALIZATION_RENDER_DATA_RANGE_H
@@ -25,13 +25,13 @@
 
 #include "storage/Timestamp.h"
 
-class VisualizationRenderDataRange {
+class VisualizationDataRange {
 private:
     Timestamp lower_time, upper_time;
     qint64 lower_data, upper_data;
 public:
-    VisualizationRenderDataRange();
-    VisualizationRenderDataRange(const Timestamp &lower_time, const Timestamp &upper_time, qint64 lower_data, qint64 upper_data);
+    VisualizationDataRange();
+    VisualizationDataRange(const Timestamp &lower_time, const Timestamp &upper_time, qint64 lower_data, qint64 upper_data);
     
     const Timestamp &get_lower_time() const { return lower_time; }
     void set_lower_time(const Timestamp &new_time) { lower_time = new_time; }

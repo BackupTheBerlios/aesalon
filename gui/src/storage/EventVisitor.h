@@ -28,8 +28,10 @@ public:
     EventVisitor() {}
     virtual ~EventVisitor() {}
     
-    virtual void visit(AllocEvent *event) = 0;
-    virtual void visit(FreeEvent *event) = 0;
+    /* Default implementations are provided for visitors that do not care about
+        all event types. */
+    virtual void visit(AllocEvent *event);
+    virtual void visit(FreeEvent *event);
 };
 
 #endif

@@ -25,7 +25,7 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include "storage/Timestamp.h"
-#include "VisualizationList.h"
+#include "visualization/VisualizationList.h"
 
 class SessionOverview : public QWidget { Q_OBJECT
 private:

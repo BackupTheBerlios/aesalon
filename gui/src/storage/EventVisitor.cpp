@@ -19,3 +19,10 @@
 
 #include "EventVisitor.h"
 
+void EventVisitor::visit(AllocEvent* event) {
+
+}
+
+void EventVisitor::visit(FreeEvent* event) {
+
+}

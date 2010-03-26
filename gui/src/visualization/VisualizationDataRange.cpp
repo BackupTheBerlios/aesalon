@@ -14,27 +14,19 @@
     You should have received a copy of the GNU General Public License along
     with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    @file session/visualizations/ActiveBlocksData.h
+    @file session/VisualizationDataRange.cpp
 */
 
-#ifndef AESALON_GUI_SESSION_VISUALIZATION_ACTIVE_BLOCKS_DATA_H
-#define AESALON_GUI_SESSION_VISUALIZATION_ACTIVE_BLOCKS_DATA_H
+#include "VisualizationDataRange.h"
 
-#include <QPixmap>
-
-#include "../VisualizationData.h"
-
-class ActiveBlocksData : public VisualizationData {
-private:
-    Timestamp timestamp;
-    int value;
-public:
-    ActiveBlocksData(const Timestamp &timestamp, int value);
-    virtual ~ActiveBlocksData();
+VisualizationDataRange::VisualizationDataRange()
+    : lower_time(Timestamp(0)), upper_time(Timestamp(0)),
+    lower_data(0), upper_data(0) {
     
-    virtual void paint_onto(VisualizationRenderer* renderer) const;
-    
-    virtual bool is_cachable() const { return true; }
-};
+}
 
-#endif
+
+VisualizationDataRange::VisualizationDataRange(const Timestamp &lower_time, const Timestamp &upper_time, qint64 lower_data, qint64 upper_data)
+    : lower_time(lower_time), upper_time(upper_time), lower_data(lower_data), upper_data(upper_data) {
+    
+}
