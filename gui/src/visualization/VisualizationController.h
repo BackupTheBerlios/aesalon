@@ -5,19 +5,25 @@
 
 #include "VisualizationDataRange.h"
 #include "VisualizationRenderer.h"
+#include "VisualizationUpdater.h"
 #include "session/DataThread.h"
 
 class VisualizationController : public QThread { Q_OBJECT
 private:
     DataThread *data_thread;
     VisualizationRenderer *renderer;
+    VisualizationUpdater *updater;
 public:
     VisualizationController(DataThread *data_thread, VisualizationRenderer *renderer, QObject *parent);
     virtual ~VisualizationController();
 protected:
     virtual void run();
 public slots:
-    void update_region(const VisualizationDataRange &range);
+    void change_updater(VisualizationUpdater *new_updater);
+
+    void update_region(const VisualizationDataRange &region);
+signals:
+    void move_display(const VisualizationDataRange &new_range);
 };
 
 #endif

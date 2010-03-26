@@ -21,7 +21,7 @@
 #include "VisualizationDisplay.h"
 #include "VisualizationDisplay.moc"
 
-VisualizationDisplay::VisualizationDisplay(VisualizationFactory *factory, QWidget *parent): QWidget(parent), renderer(renderer) {
+VisualizationDisplay::VisualizationDisplay(const VisualizationFactory *factory, QWidget *parent): QWidget(parent), renderer(renderer) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setCursor(Qt::CrossCursor);
     setBackgroundRole(QPalette::BrightText);

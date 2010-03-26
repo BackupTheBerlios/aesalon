@@ -27,13 +27,14 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QLabel>
-#include <QCheckBox>
+#include <QPushButton>
 
 #include "session/DataThread.h"
 #include "session/TimeSlider.h"
 #include "VisualizationDisplay.h"
 #include "VisualizationController.h"
 #include "VisualizationFactory.h"
+#include "VisualizationSettings.h"
 
 class Visualization : public QWidget { Q_OBJECT
 private:
@@ -41,6 +42,8 @@ private:
     QVBoxLayout *main_layout;
     VisualizationDisplay *display;
     QLabel *position_label;
+    QPushButton *settings_button;
+    VisualizationSettings *settings;
     VisualizationController *controller;
 public:
     Visualization(VisualizationFactory *factory, DataThread *data_thread, QWidget *parent = 0);

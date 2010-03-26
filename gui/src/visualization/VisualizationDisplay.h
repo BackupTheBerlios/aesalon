@@ -34,7 +34,7 @@ private:
 protected:
     VisualizationRenderer *renderer;
 public:
-    VisualizationDisplay(VisualizationFactory *factory, QWidget *parent);
+    VisualizationDisplay(const VisualizationFactory *factory, QWidget *parent);
     virtual ~VisualizationDisplay();
     
     VisualizationRenderer *get_renderer() const { return renderer; }

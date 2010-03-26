@@ -5,7 +5,7 @@
 
 class DensityDisplay : public VisualizationDisplay { Q_OBJECT
 public:
-    DensityDisplay(VisualizationFactory *factory, QWidget* parent);
+    DensityDisplay(const VisualizationFactory *factory, QWidget* parent);
     virtual ~DensityDisplay();
 };
 

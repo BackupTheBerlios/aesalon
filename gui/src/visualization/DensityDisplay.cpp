@@ -2,7 +2,7 @@
 #include "DensityDisplay.moc"
 #include "DensityRenderer.h"
 
-DensityDisplay::DensityDisplay(VisualizationFactory *factory, QWidget* parent) : VisualizationDisplay(factory, parent) {
+DensityDisplay::DensityDisplay(const VisualizationFactory *factory, QWidget* parent) : VisualizationDisplay(factory, parent) {
     
 }
 

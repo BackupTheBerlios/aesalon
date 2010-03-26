@@ -19,11 +19,12 @@
 
 #include "VisualizationList.h"
 #include "VisualizationList.moc"
+#include "VisualizationFactory.h"
+#include "DensityFactory.h"
 
 VisualizationList::VisualizationList() {
     sortItems(Qt::AscendingOrder);
-    /*addItem(ActiveBlocksVisualization::get_static_title());
-    addItem(DensityVisualization::get_static_title());*/
+    addItem(tr("Density Visualization"));
 }
 
 VisualizationList::~VisualizationList() {
@@ -33,8 +34,8 @@ VisualizationList::~VisualizationList() {
 Visualization* VisualizationList::create_from_selected(DataThread *data_thread) const {
     if(currentItem() == NULL) return NULL;
     QString title = currentItem()->text();
-    /* NOTE: Find a better way! */
-    /*if(title == ActiveBlocksVisualization::get_static_title()) return new ActiveBlocksVisualization(data_thread);
-    else if(title == DensityVisualization::get_static_title()) return new DensityVisualization(data_thread);
-    else */return NULL;
+    if(title == tr("Density Visualization")) {
+        return new Visualization(new DensityFactory(), data_thread);
+    }
+    return NULL;
 }

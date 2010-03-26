@@ -37,6 +37,12 @@ Visualization::Visualization(VisualizationFactory *factory, DataThread *data_thr
     position_label->setFont(font);
     QHBoxLayout *status_layout = new QHBoxLayout();
     status_layout->addWidget(position_label);
+    
+    settings = new VisualizationSettings(this);
+    
+    settings_button = new QPushButton(tr("Visualization settings"));
+    connect(settings_button, SIGNAL(clicked(bool)), settings, SLOT(exec()));
+    status_layout->addWidget(settings_button);
     main_layout->addLayout(status_layout);
     
     display = factory->create_display(this);

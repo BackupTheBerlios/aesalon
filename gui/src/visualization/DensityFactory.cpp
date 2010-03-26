@@ -11,7 +11,7 @@ DensityFactory::~DensityFactory() {
 }
 
 VisualizationDisplay *DensityFactory::create_display(QWidget *parent) const {
-    return new DensityDisplay(parent);
+    return new DensityDisplay(this, parent);
 }
 
 VisualizationRenderer *DensityFactory::create_renderer(QImage *image) const {
