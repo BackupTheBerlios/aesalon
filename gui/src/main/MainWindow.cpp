@@ -27,6 +27,7 @@
 #include "storage/Timestamp.h"
 
 MainWindow::MainWindow(QWidget *parent) {
+    setWindowTitle("Aesalon GUI");
     QSettings settings;
     setup_menus();
     setCentralWidget(new MainArea());

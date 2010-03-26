@@ -4,7 +4,10 @@
 #include <QDialog>
 #include <QTabWidget>
 #include <QDialogButtonBox>
+#include <QLabel>
 #include <QVBoxLayout>
+#include <QFormLayout>
+#include <QSpinBox>
 
 #include "VisualizationUpdater.h"
 
@@ -14,7 +17,11 @@ private:
     QTabWidget *tab_widget;
     QDialogButtonBox *lower_buttons;
     QWidget *normal_panel;
+    QFormLayout *normal_layout;
     QWidget *realtime_panel;
+    QFormLayout *realtime_layout;
+    QSpinBox *realtime_history_length;
+    QSpinBox *realtime_cycle_time;
 public:
     VisualizationSettings(QWidget *parent);
     virtual ~VisualizationSettings();
