@@ -34,6 +34,8 @@ private:
 public:
     VisualizationDisplay(QWidget *parent);
     virtual ~VisualizationDisplay();
+    
+    VisualizationRenderer *get_renderer() const { return renderer; }
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void wheelEvent(QWheelEvent* event);

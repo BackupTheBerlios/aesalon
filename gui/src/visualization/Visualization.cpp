@@ -42,9 +42,13 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     display = new VisualizationDisplay(this);
     main_layout->addWidget(display);
     
+    controller = new VisualizationController(data_thread, display->get_renderer(), this);
+    controller->start();
+    
     setLayout(main_layout);
 }
 
 Visualization::~Visualization() {
-    
+    controller->quit();
+    controller->wait();
 }

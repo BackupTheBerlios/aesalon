@@ -20,16 +20,18 @@
 #ifndef AESALON_GUI_SESSION_VISUALIZATION_RENDERER_H
 #define AESALON_GUI_SESSION_VISUALIZATION_RENDERER_H
 
-#include <QPixmap>
-#include <QWidget>
+#include <QObject>
+#include <QColor>
+#include <QImage>
 
 #include "VisualizationDataRange.h"
 #include "VisualizationPoint.h"
 #include "storage/EventVisitor.h"
 #include "storage/Snapshot.h"
 
-class VisualizationRenderer : public EventVisitor {
+class VisualizationRenderer : public QObject, public EventVisitor { Q_OBJECT
 private:
+    QImage *image;
     QList<VisualizationDataRange> gaps;
     VisualizationDataRange range;
     bool can_split;
@@ -37,15 +39,17 @@ private:
     VisualizationPoint graph_point;
     bool graph_point_valid;
 public:
-    VisualizationRenderer(bool can_split);
+    VisualizationRenderer(QImage *image, bool can_split);
     virtual ~VisualizationRenderer();
+
+    QPointF resolve_point(const VisualizationPoint &point) const;
+    VisualizationPoint resolve_point(const QPointF &point) const;
 
     virtual void begin_update(Snapshot *starting_snaphot);
     virtual void end_update();
+public slots:
+    void update_range(const VisualizationDataRange &new_range);
 private:
-    QPointF resolve_point(const VisualizationPoint &point) const;
-    VisualizationPoint resolve_point(const QPointF &point) const;
-    
     /* NOTE: these *need* to be reentrant! */
     void paint_line(const VisualizationPoint &from, const VisualizationPoint &to,
         QRgb colour, Qt::PenStyle style = Qt::SolidLine);

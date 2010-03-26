@@ -32,6 +32,7 @@
 #include "session/DataThread.h"
 #include "session/TimeSlider.h"
 #include "VisualizationDisplay.h"
+#include "VisualizationController.h"
 
 class Visualization : public QWidget { Q_OBJECT
 private:
@@ -39,6 +40,7 @@ private:
     QVBoxLayout *main_layout;
     VisualizationDisplay *display;
     QLabel *position_label;
+    VisualizationController *controller;
 public:
     Visualization(DataThread *data_thread, QWidget *parent = 0);
     virtual ~Visualization();

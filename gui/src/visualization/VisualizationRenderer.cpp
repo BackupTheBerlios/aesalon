@@ -22,21 +22,14 @@
 #include <QGraphicsTextItem>
 #include <QPainter>
 #include "VisualizationRenderer.h"
+#include "VisualizationRenderer.moc"
 
-VisualizationRenderer::VisualizationRenderer(bool can_split)
-    : can_split(can_split), graph_point(Timestamp(0), 0) {
+VisualizationRenderer::VisualizationRenderer(QImage *image, bool can_split)
+    : QObject(NULL), EventVisitor(), image(image), can_split(can_split), graph_point(Timestamp(0), 0) {
     
 }
 
 VisualizationRenderer::~VisualizationRenderer() {
-    
-}
-
-void VisualizationRenderer::begin_update(Snapshot *starting_snaphot) {
-
-}
-
-void VisualizationRenderer::end_update() {
     
 }
 
@@ -55,6 +48,18 @@ QPointF VisualizationRenderer::resolve_point(const VisualizationPoint &point) co
 VisualizationPoint VisualizationRenderer::resolve_point(const QPointF &point) const {
     /* TODO: implement this */
     return VisualizationPoint(Timestamp(0), 0);
+}
+
+void VisualizationRenderer::begin_update(Snapshot *starting_snaphot) {
+
+}
+
+void VisualizationRenderer::end_update() {
+    
+}
+
+void VisualizationRenderer::update_range(const VisualizationDataRange &new_range) {
+    range = new_range;
 }
 
 void VisualizationRenderer::paint_line(const VisualizationPoint &from, const VisualizationPoint &to, QRgb colour, Qt::PenStyle style) {

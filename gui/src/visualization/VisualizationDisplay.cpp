@@ -29,7 +29,7 @@ VisualizationDisplay::VisualizationDisplay(QWidget *parent): QWidget(parent), re
     canvas = QImage(size(), QImage::Format_ARGB32);
     canvas.fill(qRgba(255, 255, 255, 255));
     
-    renderer = new VisualizationRenderer(false);
+    renderer = new VisualizationRenderer(&canvas, false);
 }
 
 VisualizationDisplay::~VisualizationDisplay() {
