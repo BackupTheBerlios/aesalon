@@ -25,14 +25,16 @@
 #include <QWheelEvent>
 
 #include "VisualizationRenderer.h"
+#include "VisualizationFactory.h"
 
 class VisualizationDisplay : public QWidget { Q_OBJECT
 private:
     QPoint mouse_position;
     QImage canvas;
+protected:
     VisualizationRenderer *renderer;
 public:
-    VisualizationDisplay(QWidget *parent);
+    VisualizationDisplay(VisualizationFactory *factory, QWidget *parent);
     virtual ~VisualizationDisplay();
     
     VisualizationRenderer *get_renderer() const { return renderer; }

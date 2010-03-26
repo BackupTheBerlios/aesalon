@@ -33,6 +33,7 @@
 #include "session/TimeSlider.h"
 #include "VisualizationDisplay.h"
 #include "VisualizationController.h"
+#include "VisualizationFactory.h"
 
 class Visualization : public QWidget { Q_OBJECT
 private:
@@ -42,7 +43,7 @@ private:
     QLabel *position_label;
     VisualizationController *controller;
 public:
-    Visualization(DataThread *data_thread, QWidget *parent = 0);
+    Visualization(VisualizationFactory *factory, DataThread *data_thread, QWidget *parent = 0);
     virtual ~Visualization();
 };
 

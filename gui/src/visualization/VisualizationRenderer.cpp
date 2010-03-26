@@ -45,17 +45,34 @@ QPointF VisualizationRenderer::resolve_point(const VisualizationPoint &point) co
     return QPointF(x, y);
 }
 
+QRectF VisualizationRenderer::resolve_range(const VisualizationDataRange &rect) const {
+    const Timestamp &lower_time = range.get_lower_time();
+    QRect size; /* FIXME */
+    qreal x1 = qreal(lower_time.ns_until(rect.get_lower_time()))
+        / lower_time.ns_until(range.get_upper_time()) * size.width();
+    qreal x2 = qreal(lower_time.ns_until(rect.get_upper_time()))
+        / lower_time.ns_until(range.get_upper_time()) * size.width();
+    qreal data_range = range.get_upper_data() - range.get_lower_data();
+    qreal y1_percentage = (rect.get_lower_data() - range.get_lower_data()) / data_range;
+    qreal y2_percentage = (rect.get_upper_data() - range.get_lower_data()) / data_range;
+    qreal y1 = size.height() * y1_percentage;
+    qreal y2 = size.height() * y2_percentage;
+    y1 = size.height() - y1;
+    y2 = size.height() - y2;
+    return QRectF(x1, y1, x2 - x1, y2 - y1);
+}
+
 VisualizationPoint VisualizationRenderer::resolve_point(const QPointF &point) const {
     /* TODO: implement this */
     return VisualizationPoint(Timestamp(0), 0);
 }
 
 void VisualizationRenderer::begin_update(Snapshot *starting_snaphot) {
-
+    painter.begin(image);
 }
 
 void VisualizationRenderer::end_update() {
-    
+    painter.end();
 }
 
 void VisualizationRenderer::update_range(const VisualizationDataRange &new_range) {
@@ -67,7 +84,8 @@ void VisualizationRenderer::paint_line(const VisualizationPoint &from, const Vis
     
     QPen pen(style);
     pen.setColor(colour);
-    /*canvas->addLine(line, pen);*/
+    painter.setPen(pen);
+    painter.drawLine(line);
 }
 
 void VisualizationRenderer::paint_box(const VisualizationPoint &from, const VisualizationPoint &to, QRgb line_colour,
@@ -81,16 +99,37 @@ void VisualizationRenderer::paint_box(const VisualizationPoint &from, const Visu
     pen.setColor(line_colour);
     QBrush brush(fill_style);
     brush.setColor(fill_colour);
-    /*canvas->addRect(rect, pen, brush);*/
+    painter.setPen(pen);
+    painter.setBrush(brush);
+    
+    painter.drawRect(rect);
 }
+
+void VisualizationRenderer::paint_box(const VisualizationDataRange& range, QRgb line_colour, QRgb fill_colour,
+    Qt::PenStyle line_style, Qt::BrushStyle fill_style) {
+
+    QRectF rect = resolve_range(range);
+    
+    QPen pen(line_style);
+    pen.setColor(line_colour);
+    QBrush brush(fill_style);
+    brush.setColor(fill_colour);
+    
+    painter.setPen(pen);
+    painter.setBrush(brush);
+    
+    painter.drawRect(rect);
+}
+
 
 void VisualizationRenderer::paint_text(const VisualizationPoint &point, QString text, int size, QRgb colour) {
     QPointF location = resolve_point(point);
-    QGraphicsTextItem *text_item = new QGraphicsTextItem(text);
+    /* TODO: implement this */
+    /*QGraphicsTextItem *text_item = new QGraphicsTextItem(text);
     QFont font("DejaVu Sans", 8);
     text_item->setFont(font);
     text_item->translate(location.x(), location.y());
-    text_item->setDefaultTextColor(colour);
+    text_item->setDefaultTextColor(colour);*/
     /*canvas->addItem(text_item);*/
 }
 

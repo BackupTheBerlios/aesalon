@@ -14,7 +14,6 @@ private:
 public:
     VisualizationController(DataThread *data_thread, VisualizationRenderer *renderer, QObject *parent);
     virtual ~VisualizationController();
-    
 protected:
     virtual void run();
 public slots:

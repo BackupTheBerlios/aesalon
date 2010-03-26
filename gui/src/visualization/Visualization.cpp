@@ -25,7 +25,7 @@
 #include "Visualization.h"
 #include "Visualization.moc"
 
-Visualization::Visualization(DataThread *data_thread, QWidget *parent)
+Visualization::Visualization(VisualizationFactory *factory, DataThread *data_thread, QWidget *parent)
     : QWidget(parent), data_thread(data_thread) {
     this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     
@@ -39,7 +39,7 @@ Visualization::Visualization(DataThread *data_thread, QWidget *parent)
     status_layout->addWidget(position_label);
     main_layout->addLayout(status_layout);
     
-    display = new VisualizationDisplay(this);
+    display = factory->create_display(this);
     main_layout->addWidget(display);
     
     controller = new VisualizationController(data_thread, display->get_renderer(), this);
