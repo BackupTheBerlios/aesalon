@@ -19,6 +19,8 @@ public:
     void set_image_size(const QSize &new_size);
     
     void combine_with(const Canvas &canvas);
+    
+    void paint_onto(QPaintDevice *device);
 };
 
 #endif
