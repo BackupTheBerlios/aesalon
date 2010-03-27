@@ -77,6 +77,7 @@ void VisualizationRenderer::end_update() {
 
 void VisualizationRenderer::update_range(const VisualizationDataRange &new_range) {
     range = new_range;
+    image->fill(qRgb(128, 128, 128));
 }
 
 void VisualizationRenderer::paint_line(const VisualizationPoint &from, const VisualizationPoint &to, QRgb colour, Qt::PenStyle style) {

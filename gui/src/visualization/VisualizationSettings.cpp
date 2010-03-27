@@ -1,6 +1,7 @@
 #include "VisualizationSettings.h"
 #include "VisualizationSettings.moc"
 #include "SingleUpdater.h"
+#include "RealtimeUpdater.h"
 
 VisualizationSettings::VisualizationSettings(QWidget *parent) : QDialog(parent) {
     setMinimumSize(640, 300);
@@ -65,7 +66,7 @@ void VisualizationSettings::accept() {
         /*emit change_updater(new SingleUpdater());*/
     }
     else {
-        emit change_updater(new VisualizationUpdater());
+        emit change_updater(new RealtimeUpdater(realtime_history_length->value(), realtime_cycle_time->value()));
     }
     QDialog::accept();
 }

@@ -22,7 +22,7 @@
 #include "storage/AllocEvent.h"
 #include "storage/FreeEvent.h"
 
-NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 port) : DataReceiver(data_thread), host(host), port(port) {
+NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 port) : DataReceiver(data_thread), host(host), port(port), start_time(0) {
     tcp_socket = new QTcpSocket(this);
     tcp_socket->connectToHost(host, port);
     connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));
@@ -76,7 +76,7 @@ void NetworkReceiver::data_received() {
                 break;
             }
             quint64 raw_timestamp = pop_quint64();
-            Timestamp timestamp = Timestamp(raw_timestamp);
+            Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
             quint64 address = pop_quint64();
             if(block_type == 0) {
                 quint64 size = pop_quint64();

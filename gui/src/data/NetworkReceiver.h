@@ -30,6 +30,7 @@ private:
     quint16 port;
     QTcpSocket *tcp_socket;
     QByteArray unprocessed;
+    Timestamp start_time;
 public:
     NetworkReceiver(DataThread *data_thread, QString host, quint16 port);
     virtual ~NetworkReceiver();
