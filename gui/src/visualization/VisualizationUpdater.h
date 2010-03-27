@@ -11,7 +11,9 @@ public:
     virtual ~VisualizationUpdater();
 signals:
     void render_region(const VisualizationDataRange &region);
+    void render_region(const Timestamp &from, const Timestamp &to);
     void move_display(const VisualizationDataRange &region);
+    void move_display(const Timestamp &begin, const Timestamp &end);
 };
 
 #endif

@@ -22,6 +22,8 @@ public slots:
     void change_updater(VisualizationUpdater *new_updater);
 
     void update_region(const VisualizationDataRange &region);
+    void update_region(const Timestamp &start, const Timestamp &end);
+    void move_display(const Timestamp &start, const Timestamp &end);
 signals:
     void move_display(const VisualizationDataRange &new_range);
 };

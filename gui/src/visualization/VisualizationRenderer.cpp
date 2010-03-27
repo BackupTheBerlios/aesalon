@@ -27,6 +27,8 @@
 VisualizationRenderer::VisualizationRenderer(QImage *image, bool can_split)
     : QObject(NULL), EventVisitor(), image(image), can_split(can_split), graph_point(Timestamp(0), 0) {
     
+    range.set_lower_data(0);
+    range.set_lower_data(500);
 }
 
 VisualizationRenderer::~VisualizationRenderer() {

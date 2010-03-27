@@ -49,6 +49,7 @@ Visualization::Visualization(VisualizationFactory *factory, DataThread *data_thr
     main_layout->addWidget(display);
     
     controller = new VisualizationController(data_thread, display->get_renderer(), this);
+    connect(settings, SIGNAL(change_updater(VisualizationUpdater*)), controller, SLOT(change_updater(VisualizationUpdater*)));
     controller->start();
     
     setLayout(main_layout);

@@ -20,12 +20,12 @@ void RealtimeUpdater::render_cycle() {
         range.set_lower_time(Timestamp());
         current_time.add_ms(-cycle_length);
         range.set_upper_time(current_time);
-        emit move_display(range);
+        emit move_display(range.get_lower_time(), range.get_upper_time());
         current_time.add_ms(cycle_length);
     }
     VisualizationDataRange render_range;
     render_range.set_upper_time(current_time);
     current_time.add_ms(-cycle_length);
     render_range.set_lower_time(current_time);
-    emit render_region(render_range);
+    emit render_region(render_range.get_lower_time(), render_range.get_upper_time());
 }
