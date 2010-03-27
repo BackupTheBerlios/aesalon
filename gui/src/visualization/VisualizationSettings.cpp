@@ -3,7 +3,8 @@
 #include "SingleUpdater.h"
 #include "RealtimeUpdater.h"
 
-VisualizationSettings::VisualizationSettings(QWidget *parent) : QDialog(parent) {
+VisualizationSettings::VisualizationSettings(VisualizationDataRange *display_range, QWidget *parent)
+    : QDialog(parent), display_range(display_range) {
     setMinimumSize(640, 300);
     setWindowTitle(tr("Visualization settings"));
     
@@ -14,8 +15,6 @@ VisualizationSettings::VisualizationSettings(QWidget *parent) : QDialog(parent) 
     
     normal_layout = new QFormLayout();
     normal_layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
-    
-    
     
     normal_panel->setLayout(normal_layout);
     
@@ -66,7 +65,7 @@ void VisualizationSettings::accept() {
         /*emit change_updater(new SingleUpdater());*/
     }
     else {
-        emit change_updater(new RealtimeUpdater(realtime_history_length->value(), realtime_cycle_time->value()));
+        emit change_updater(new RealtimeUpdater(display_range, realtime_history_length->value(), realtime_cycle_time->value()));
     }
     QDialog::accept();
 }

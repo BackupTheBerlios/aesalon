@@ -10,7 +10,7 @@ private:
     QTimer *cycle_timer;
     VisualizationDataRange range;
 public:
-    RealtimeUpdater(int history_length, int cycle_length);
+    RealtimeUpdater(VisualizationDataRange *display_range, int history_length, int cycle_length);
     virtual ~RealtimeUpdater();
 private slots:
     void render_cycle();

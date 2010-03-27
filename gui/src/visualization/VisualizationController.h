@@ -13,6 +13,7 @@ private:
     DataThread *data_thread;
     VisualizationRenderer *renderer;
     VisualizationUpdater *updater;
+    Timestamp time_range;
 public:
     VisualizationController(DataThread *data_thread, VisualizationRenderer *renderer, QObject *parent);
     virtual ~VisualizationController();
@@ -20,6 +21,8 @@ protected:
     virtual void run();
 public slots:
     void change_updater(VisualizationUpdater *new_updater);
+
+    const Timestamp &get_time_range() const { return time_range; }
 
     void update_region(const VisualizationDataRange &region);
     void update_region(const Timestamp &start, const Timestamp &end);

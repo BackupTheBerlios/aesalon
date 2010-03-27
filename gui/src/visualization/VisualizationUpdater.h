@@ -6,8 +6,10 @@
 #include "VisualizationDataRange.h"
 
 class VisualizationUpdater : public QObject { Q_OBJECT
+protected:
+    VisualizationDataRange *display_range;
 public:
-    VisualizationUpdater();
+    VisualizationUpdater(VisualizationDataRange *display_range);
     virtual ~VisualizationUpdater();
 signals:
     void render_region(const VisualizationDataRange &region);

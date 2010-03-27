@@ -38,15 +38,15 @@ Visualization::Visualization(VisualizationFactory *factory, DataThread *data_thr
     QHBoxLayout *status_layout = new QHBoxLayout();
     status_layout->addWidget(position_label);
     
-    settings = new VisualizationSettings(this);
-    
     settings_button = new QPushButton(tr("Visualization settings"));
-    connect(settings_button, SIGNAL(clicked(bool)), settings, SLOT(exec()));
     status_layout->addWidget(settings_button);
     main_layout->addLayout(status_layout);
     
     display = factory->create_display(this);
     main_layout->addWidget(display);
+    
+    settings = new VisualizationSettings(&display->get_renderer()->get_range(), this);
+    connect(settings_button, SIGNAL(clicked(bool)), settings, SLOT(exec()));
     
     controller = new VisualizationController(data_thread, display->get_renderer(), this);
     connect(settings, SIGNAL(change_updater(VisualizationUpdater*)), controller, SLOT(change_updater(VisualizationUpdater*)));

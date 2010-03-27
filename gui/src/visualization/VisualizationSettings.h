@@ -22,8 +22,9 @@ private:
     QFormLayout *realtime_layout;
     QSpinBox *realtime_history_length;
     QSpinBox *realtime_cycle_time;
+    VisualizationDataRange *display_range;
 public:
-    VisualizationSettings(QWidget *parent);
+    VisualizationSettings(VisualizationDataRange *display_range, QWidget *parent);
     virtual ~VisualizationSettings();
 public slots:
     virtual void accept();

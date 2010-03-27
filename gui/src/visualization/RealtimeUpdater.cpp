@@ -1,8 +1,8 @@
 #include "RealtimeUpdater.h"
 #include "RealtimeUpdater.moc"
 
-RealtimeUpdater::RealtimeUpdater(int history_length, int cycle_length)
-    : VisualizationUpdater(), history_length(history_length), cycle_length(cycle_length) {
+RealtimeUpdater::RealtimeUpdater(VisualizationDataRange *display_range, int history_length, int cycle_length)
+    : VisualizationUpdater(display_range), history_length(history_length), cycle_length(cycle_length) {
     cycle_timer = new QTimer(this);
     connect(cycle_timer, SIGNAL(timeout()), SLOT(render_cycle()));
     cycle_timer->start(cycle_length);

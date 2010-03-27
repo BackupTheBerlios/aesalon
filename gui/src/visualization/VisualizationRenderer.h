@@ -44,7 +44,7 @@ public:
     VisualizationRenderer(QImage *image, bool can_split);
     virtual ~VisualizationRenderer();
 
-    const VisualizationDataRange &get_range() const { return range; }
+    VisualizationDataRange &get_range() { return range; }
 
     QPointF resolve_point(const VisualizationPoint &point) const;
     QRectF resolve_range(const VisualizationDataRange &rect) const;

@@ -39,7 +39,7 @@ VisualizationDisplay::~VisualizationDisplay() {
 void VisualizationDisplay::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     
-    painter.drawImage(0, 0, canvas);    
+    painter.drawImage(0, 0, canvas);
     
     QPen pen(Qt::DotLine);
     pen.setColor(qRgb(192, 192, 192));

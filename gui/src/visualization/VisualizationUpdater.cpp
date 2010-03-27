@@ -1,7 +1,7 @@
 #include "VisualizationUpdater.h"
 #include "VisualizationUpdater.moc"
 
-VisualizationUpdater::VisualizationUpdater() {
+VisualizationUpdater::VisualizationUpdater(VisualizationDataRange *display_range) : display_range(display_range) {
     
 }
 

@@ -9,7 +9,7 @@ private:
     VisualizationDataRange range;
     QTimer *timer;
 public:
-    SingleUpdater(const VisualizationDataRange &range);
+    SingleUpdater(VisualizationDataRange *display_range, const VisualizationDataRange &range);
     virtual ~SingleUpdater();
 private slots:
     void send_update();
