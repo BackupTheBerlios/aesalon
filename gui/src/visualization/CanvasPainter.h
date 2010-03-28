@@ -15,6 +15,8 @@ public:
     
 public slots:
     void paint_canvas(Canvas *canvas);
+signals:
+    void done();
 };
 
 #endif

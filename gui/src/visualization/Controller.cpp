@@ -9,22 +9,26 @@ Controller::~Controller() {
 }
 
 void Controller::run() {
-    update_timer = new QTimer();
-    update_timer->setInterval(1000);
-    connect(update_timer, SIGNAL(timeout()), SLOT(rt_update()));
+    update_timer = NULL;
     exec();
     delete update_timer;
 }
 
 void Controller::change_update_time(int ms) {
+    if(!update_timer) {
+        update_timer = new QTimer();
+        connect(update_timer, SIGNAL(timeout()), this, SLOT(rt_update()));
+    }
     update_timer->setInterval(ms);
 }
 
 void Controller::begin_rt() {
+    if(!update_timer) {
+        update_timer = new QTimer();
+        connect(update_timer, SIGNAL(timeout()), this, SLOT(rt_update()));
+    }
     if(data_thread->get_finish_time() != NULL || data_thread->get_start_time() == NULL) return;
-    qDebug("begin_rt() . . .");
     update_timer->start();
-    qDebug("update timer interval is %lli", update_timer->interval());
     emit clear_canvas();
     last_update = data_thread->get_start_time()->ns_until(Timestamp());
     emit shift_range_to(Timestamp(last_update));
@@ -41,7 +45,7 @@ void Controller::render_full() {
     if(data_thread->get_finish_time() == NULL) time_range = data_thread->get_start_time()->ns_until(Timestamp());
     else time_range = data_thread->get_start_time()->ns_until(*data_thread->get_finish_time());
     /* TODO: find a better way than setting the max range to a really high value . . . */
-    DataRange range(Timestamp(0), 0, Timestamp(time_range), 9999999999999999999999999.0);
+    DataRange range(Timestamp(0), 0, Timestamp(time_range), 1e50);
     Canvas *canvas = render_region(range);
     canvas->calculate_data_range();
     emit change_range(canvas->get_range());
@@ -49,13 +53,17 @@ void Controller::render_full() {
 }
 
 void Controller::rt_update() {
-    qDebug("Updating . . .");
+    if(data_thread->get_finish_time()) {
+        end_rt();
+        emit shift_range_to(Timestamp(data_thread->get_start_time()->ns_until(*data_thread->get_finish_time())));
+        return;
+    }
     qint64 now = data_thread->get_start_time()->ns_until(Timestamp());
     Timestamp from(last_update), to(now);
     last_update = now;
-    DataRange range(from, 0, to, 9999999999999999999999999.0);
+    DataRange range(from, 0, to, 1e50);
     emit shift_range_to(to);
-    emit render_region(range);
+    emit canvas_update(render_region(range));
 }
 
 Canvas *Controller::render_region(const DataRange &range) {

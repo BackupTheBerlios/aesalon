@@ -8,14 +8,12 @@
 Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(parent) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMouseTracking(true);
-    
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), SLOT(update()));
-    timer->start(500);
+
     canvas_painter = new CanvasPainter(&rendered);
     rendered = QImage(width(), height(), QImage::Format_RGB32);
     
     connect(this, SIGNAL(paint_canvas(Canvas *)), canvas_painter, SLOT(paint_canvas(Canvas*)));
+    connect(canvas_painter, SIGNAL(done()), SLOT(update()));
     
     formatter = factory->create_formatter();
 }
@@ -45,6 +43,10 @@ void Viewport::shift_range_to(const Timestamp &high_time) {
     timestamp.add_ns(-time_difference);
     range.get_begin().set_time_element(timestamp);
     set_canvas_range(range);
+}
+
+void Viewport::force_repaint() {
+    emit paint_canvas(&local_canvas);
 }
 
 void Viewport::paintEvent(QPaintEvent *event) {

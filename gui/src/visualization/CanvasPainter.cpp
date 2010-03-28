@@ -12,4 +12,5 @@ CanvasPainter::~CanvasPainter() {
 void CanvasPainter::paint_canvas(Canvas* canvas) {
     image->fill(qRgb(255, 255, 255));
     canvas->paint_onto(image);
+    emit done();
 }

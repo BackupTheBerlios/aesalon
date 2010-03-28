@@ -21,6 +21,7 @@ public slots:
     void clear_canvas();
     void set_canvas_range(const DataRange &new_range);
     void shift_range_to(const Timestamp &high_time);
+    void force_repaint();
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);

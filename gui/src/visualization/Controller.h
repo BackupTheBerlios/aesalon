@@ -32,6 +32,7 @@ signals:
     void canvas_update(Canvas *canvas);
     void change_range(const DataRange &range);
     void shift_range_to(Timestamp timestamp);
+    void force_repaint();
 };
 
 #endif
