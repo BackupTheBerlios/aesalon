@@ -8,7 +8,7 @@
 #include "DataRange.h"
 #include "Renderer.h"
 
-class Controller : public QThread {
+class Controller : public QThread { Q_OBJECT
 private:
     DataThread *data_thread;
     QTimer *update_timer;

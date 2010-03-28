@@ -12,7 +12,7 @@ public:
     CanvasLineObject(const DataPoint &from, const DataPoint &to, QColor line_colour);
     virtual ~CanvasLineObject();
     
-    virtual void paint_onto(QPaintDevice *device, const CoordinateMapper &mapper);
+    virtual void paint_onto(QPainter* painter, const CoordinateMapper& mapper);
 };
 
 #endif

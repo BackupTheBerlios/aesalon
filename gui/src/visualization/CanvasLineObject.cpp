@@ -10,6 +10,7 @@ CanvasLineObject::~CanvasLineObject() {
 
 }
 
-void CanvasLineObject::paint_onto(QPaintDevice *device, const CoordinateMapper &mapper) {
-    
+void CanvasLineObject::paint_onto(QPainter *painter, const CoordinateMapper &mapper) {
+    painter->setPen(line_colour);
+    painter->drawLine(mapper.map_to(get_bounding_rect().get_begin()), mapper.map_to(get_bounding_rect().get_end()));
 }

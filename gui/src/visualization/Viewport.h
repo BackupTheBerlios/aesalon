@@ -14,6 +14,9 @@ public:
 public slots:
     void merge_canvas(Canvas *canvas);
     void clear_canvas();
+protected:
+    virtual void paintEvent(QPaintEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
 };
 
 #endif

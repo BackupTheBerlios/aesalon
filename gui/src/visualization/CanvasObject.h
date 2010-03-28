@@ -1,7 +1,7 @@
 #ifndef AESALON_GUI_VISUALIZATION_CANVAS_OBJECT_H
 #define AESALON_GUI_VISUALIZATION_CANVAS_OBJECT_H
 
-#include <QPaintDevice>
+#include <QPainter>
 
 #include "DataRange.h"
 #include "CoordinateMapper.h"
