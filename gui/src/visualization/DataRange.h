@@ -12,7 +12,9 @@ public:
         const Timestamp &end_time = Timestamp(0), qreal end_data = 0.0);
     
     const DataPoint &get_begin() const { return begin; }
+    DataPoint &get_begin() { return begin; }
     const DataPoint &get_end() const { return end; }
+    DataPoint &get_end() { return end; }
     
     bool intersects(const DataRange &range) const;
     DataRange intersecting_range(const DataRange &other_range) const;

@@ -103,7 +103,10 @@ void NetworkReceiver::data_received() {
             quint64 raw_timestamp = pop_quint64();
             Timestamp *timestamp = new Timestamp(raw_timestamp);
             /* one indicates finished, zero started. */
-            if((type_byte & 0x04) == 0) emit started(timestamp);
+            if((type_byte & 0x04) == 0) {
+                start_time = *timestamp;
+                emit started(timestamp);
+            }
             else emit finished(timestamp);
         }
     }

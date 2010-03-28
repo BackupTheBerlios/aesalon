@@ -11,6 +11,9 @@ private:
 public:
     Viewport(QWidget *parent);
     virtual ~Viewport();
+public slots:
+    void merge_canvas(Canvas *canvas);
+    void clear_canvas();
 };
 
 #endif

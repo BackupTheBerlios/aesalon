@@ -5,19 +5,15 @@
 
 #include "Canvas.h"
 #include "storage/Snapshot.h"
+#include "storage/EventVisitor.h"
 
-class Renderer : public QObject { Q_OBJECT
-private:
-    Canvas *current_canvas;
+class Renderer : public EventVisitor {
 public:
     Renderer();
     virtual ~Renderer();
     
-    void begin_rendering(Snapshot *snapshot);
-    Canvas *end_rendering();
-protected:
-    virtual void initialize_rendering() = 0;
-    virtual void finish_rendering() = 0;
+    virtual void begin_rendering(const DataRange &render_range, Snapshot *snapshot) = 0;
+    virtual Canvas *end_rendering() = 0;
 };
 
 #endif

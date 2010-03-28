@@ -5,13 +5,16 @@
 #include <QTimer>
 
 #include "session/DataThread.h"
+#include "DataRange.h"
+#include "Renderer.h"
 
 class Controller : public QThread {
 private:
     DataThread *data_thread;
     QTimer *update_timer;
+    Renderer *renderer;
 public:
-    Controller(DataThread *data_thread);
+    Controller(Renderer *renderer, DataThread *data_thread);
     virtual ~Controller();
     
     virtual void run();
@@ -19,6 +22,7 @@ public slots:
     void change_update_time(int ms);
 private slots:
     void update();
+    void render_region(const DataRange &range);
 };
 
 #endif
