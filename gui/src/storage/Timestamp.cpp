@@ -97,5 +97,5 @@ void Timestamp::add_ns(qint64 ns) {
 
 QString Timestamp::to_string() const {
     return QString().sprintf("%02li:%02li.%03li.%03li", internal_time.tv_sec / 60,
-        internal_time.tv_sec % 60, internal_time.tv_nsec / 1000000, internal_time.tv_nsec / 1000);
+        internal_time.tv_sec % 60, internal_time.tv_nsec / 1000000, (internal_time.tv_nsec / 1000) % 1000);
 }

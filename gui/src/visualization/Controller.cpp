@@ -26,6 +26,7 @@ void Controller::attach() {
 }
 
 void Controller::render_full() {
+    if(data_thread->get_start_time() == NULL) return;
     emit clear_canvas();
     qint64 time_range = 0;
     if(data_thread->get_finish_time() == NULL) time_range = data_thread->get_start_time()->ns_until(Timestamp());

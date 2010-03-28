@@ -24,8 +24,10 @@ private:
     Viewport *viewport;
     Controller *controller;
 public:
-    Visualization(Renderer *renderer, DataThread *data_thread);
+    Visualization(VisualizationFactory *factory, DataThread *data_thread);
     virtual ~Visualization();
+private slots:
+    void set_position(QString formatted);
 signals:
     void cycle_time_changed(int new_delay);
 };

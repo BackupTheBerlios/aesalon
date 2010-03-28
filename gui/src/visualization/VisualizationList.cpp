@@ -20,7 +20,7 @@
 #include "VisualizationList.h"
 #include "VisualizationList.moc"
 
-#include "DensityRenderer.h"
+#include "DensityFactory.h"
 
 VisualizationList::VisualizationList() {
     sortItems(Qt::AscendingOrder);
@@ -35,7 +35,7 @@ Visualization* VisualizationList::create_from_selected(DataThread *data_thread) 
     if(currentItem() == NULL) return NULL;
     QString title = currentItem()->text();
     if(title == tr("Density Visualization")) {
-        return new Visualization(new DensityRenderer(), data_thread);
+        return new Visualization(new DensityFactory(), data_thread);
     }
     return NULL;
 }

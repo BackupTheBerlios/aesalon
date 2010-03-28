@@ -1,10 +1,10 @@
 #include "Visualization.h"
 #include "Visualization.moc"
 
-Visualization::Visualization(Renderer *renderer, DataThread *data_thread) {
+Visualization::Visualization(VisualizationFactory *factory, DataThread *data_thread) {
     QVBoxLayout *main_layout = new QVBoxLayout();
     
-    controller = new Controller(renderer, data_thread);
+    controller = new Controller(factory->create_renderer(), data_thread);
     connect(this, SIGNAL(cycle_time_changed(int)), controller, SLOT(change_update_time(int)));
     
     upper_layout = new QHBoxLayout();
@@ -30,10 +30,11 @@ Visualization::Visualization(Renderer *renderer, DataThread *data_thread) {
     
     main_layout->addLayout(upper_layout);
     
-    viewport = new Viewport(this);
+    viewport = new Viewport(factory, this);
     connect(controller, SIGNAL(canvas_update(Canvas*)), viewport, SLOT(merge_canvas(Canvas*)));
     connect(controller, SIGNAL(clear_canvas()), viewport, SLOT(clear_canvas()));
     connect(controller, SIGNAL(change_range(DataRange)), viewport, SLOT(set_canvas_range(DataRange)));
+    connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)));
     main_layout->addWidget(viewport);
     
     setLayout(main_layout);
@@ -44,4 +45,8 @@ Visualization::Visualization(Renderer *renderer, DataThread *data_thread) {
 Visualization::~Visualization() {
     controller->quit();
     controller->wait();
+}
+
+void Visualization::set_position(QString formatted) {
+    position_label->setText(formatted);
 }

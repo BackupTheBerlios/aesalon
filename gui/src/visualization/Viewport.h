@@ -5,14 +5,16 @@
 
 #include "Canvas.h"
 #include "CanvasPainter.h"
+#include "VisualizationFactory.h"
 
 class Viewport : public QWidget { Q_OBJECT
 private:
     Canvas local_canvas;
     CanvasPainter *canvas_painter;
     QImage rendered;
+    AxisFormatter *formatter;
 public:
-    Viewport(QWidget *parent);
+    Viewport(VisualizationFactory *factory, QWidget *parent);
     virtual ~Viewport();
 public slots:
     void merge_canvas(Canvas *canvas);
@@ -22,8 +24,10 @@ protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void resizeEvent(QResizeEvent *event);
+    virtual void wheelEvent(QWheelEvent *event);
 signals:
     void paint_canvas(Canvas *canvas);
+    void mouse_position(QString formatted);
 };
 
 #endif
