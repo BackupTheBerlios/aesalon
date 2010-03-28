@@ -13,6 +13,7 @@ private:
     DataThread *data_thread;
     QTimer *update_timer;
     Renderer *renderer;
+    qint64 last_update;
 public:
     Controller(Renderer *renderer, DataThread *data_thread);
     virtual ~Controller();
@@ -20,15 +21,17 @@ public:
     virtual void run();
 public slots:
     void change_update_time(int ms);
-    void attach();
+    void begin_rt();
+    void end_rt();
     void render_full();
 private slots:
-    void update();
+    void rt_update();
     Canvas *render_region(const DataRange &range);
 signals:
     void clear_canvas();
     void canvas_update(Canvas *canvas);
     void change_range(const DataRange &range);
+    void shift_range_to(Timestamp timestamp);
 };
 
 #endif

@@ -20,6 +20,7 @@ public slots:
     void merge_canvas(Canvas *canvas);
     void clear_canvas();
     void set_canvas_range(const DataRange &new_range);
+    void shift_range_to(const Timestamp &high_time);
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);

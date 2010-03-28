@@ -37,9 +37,37 @@ void Viewport::set_canvas_range(const DataRange &new_range) {
     local_canvas.set_range(new_range);
 }
 
+void Viewport::shift_range_to(const Timestamp &high_time) {
+    DataRange range = local_canvas.get_range();
+    qint64 time_difference = range.get_begin().get_time_element().ns_until(range.get_end().get_time_element());
+    range.get_end().set_time_element(high_time);
+    Timestamp timestamp = high_time;
+    timestamp.add_ns(-time_difference);
+    range.get_begin().set_time_element(timestamp);
+    set_canvas_range(range);
+}
+
 void Viewport::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
+    CoordinateMapper mapper(size(), local_canvas.get_range());
     painter.drawImage(0, 0, rendered);
+    
+    QPen pen(Qt::DotLine);
+    pen.setColor(qRgba(128, 128, 128, 64));
+    
+    painter.setPen(pen);
+    
+    qreal x_step = (width()-1) / 12.0;
+    
+    for(int x = 0; x <= 12; x ++) {
+        painter.drawLine(x * x_step, 0, x * x_step, height()-1);
+    }
+    
+    qreal y_step = (height()-1) / 12.0;
+    
+    for(int y = 0; y <= 12; y ++) {
+        painter.drawLine(0, y * y_step, width()-1, y * y_step);
+    }
 }
 
 void Viewport::mouseMoveEvent(QMouseEvent *event) {
@@ -65,10 +93,6 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     const Timestamp centre_time = centre_point.get_time_element();
     qreal centre_data = centre_point.get_data_element();
     qreal scale_amount = 1 - (event->delta() / 1000.0);
-    
-    qDebug("time_range: %lli", time_range);
-    qDebug("data_range: %f", data_range);
-    qDebug("scale_amount: %f", scale_amount);
     
     Timestamp timestamp = centre_time;
     timestamp.add_ns(time_range * -scale_amount);

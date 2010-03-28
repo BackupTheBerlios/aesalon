@@ -10,9 +10,8 @@ Controller::~Controller() {
 
 void Controller::run() {
     update_timer = new QTimer();
-    connect(update_timer, SIGNAL(timeout()), SLOT(update()));
-    /* NOTE: this shouldn't be hardcoded . . . */
-    update_timer->start(1000);
+    update_timer->setInterval(1000);
+    connect(update_timer, SIGNAL(timeout()), SLOT(rt_update()));
     exec();
     delete update_timer;
 }
@@ -21,8 +20,18 @@ void Controller::change_update_time(int ms) {
     update_timer->setInterval(ms);
 }
 
-void Controller::attach() {
-    
+void Controller::begin_rt() {
+    if(data_thread->get_finish_time() != NULL || data_thread->get_start_time() == NULL) return;
+    qDebug("begin_rt() . . .");
+    update_timer->start();
+    qDebug("update timer interval is %lli", update_timer->interval());
+    emit clear_canvas();
+    last_update = data_thread->get_start_time()->ns_until(Timestamp());
+    emit shift_range_to(Timestamp(last_update));
+}
+
+void Controller::end_rt() {
+    update_timer->stop();
 }
 
 void Controller::render_full() {
@@ -39,8 +48,14 @@ void Controller::render_full() {
     emit canvas_update(canvas);
 }
 
-void Controller::update() {
-    
+void Controller::rt_update() {
+    qDebug("Updating . . .");
+    qint64 now = data_thread->get_start_time()->ns_until(Timestamp());
+    Timestamp from(last_update), to(now);
+    last_update = now;
+    DataRange range(from, 0, to, 9999999999999999999999999.0);
+    emit shift_range_to(to);
+    emit render_region(range);
 }
 
 Canvas *Controller::render_region(const DataRange &range) {

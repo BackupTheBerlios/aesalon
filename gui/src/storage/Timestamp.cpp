@@ -86,16 +86,20 @@ qint64 Timestamp::ns_until(const Timestamp& other) const {
 
 void Timestamp::add_ms(qint64 ms) {
     internal_time.tv_nsec += ms * 1000000;
-    while(internal_time.tv_nsec >= 1000000000) internal_time.tv_nsec -= 1000000000, internal_time.tv_sec ++;
+    normalize();
 }
 
 void Timestamp::add_ns(qint64 ns) {
     internal_time.tv_nsec += ns;
-    while(internal_time.tv_nsec >= 1000000000) internal_time.tv_nsec -= 1000000000, internal_time.tv_sec ++;
+    normalize();
 }
 
-
 QString Timestamp::to_string() const {
-    return QString().sprintf("%02li:%02li.%03li.%03li", internal_time.tv_sec / 60,
-        internal_time.tv_sec % 60, internal_time.tv_nsec / 1000000, (internal_time.tv_nsec / 1000) % 1000);
+    return QString().sprintf("%c%02li:%02li.%03li.%03li", internal_time.tv_sec < 0?'-':' ', qAbs(internal_time.tv_sec / 60),
+        qAbs(internal_time.tv_sec % 60), qAbs(internal_time.tv_nsec / 1000000), qAbs((internal_time.tv_nsec / 1000) % 1000));
+}
+
+void Timestamp::normalize() {
+    while(internal_time.tv_nsec >= 1000000000) internal_time.tv_nsec -= 1000000000, internal_time.tv_sec ++;
+    while(internal_time.tv_nsec < 0) internal_time.tv_nsec += 1000000000, internal_time.tv_sec --;
 }

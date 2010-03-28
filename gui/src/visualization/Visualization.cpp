@@ -23,7 +23,7 @@ Visualization::Visualization(VisualizationFactory *factory, DataThread *data_thr
     
     request_button = new QPushButton(tr("&Request"));
     request_menu = new QMenu();
-    request_menu->addAction(tr("Real-&time visualization"), controller, SLOT(attach()));
+    request_menu->addAction(tr("Real-&time visualization"), controller, SLOT(begin_rt()));
     request_menu->addAction(tr("&Full visualization"), controller, SLOT(render_full()));
     request_button->setMenu(request_menu);
     upper_layout->addWidget(request_button);
@@ -34,6 +34,7 @@ Visualization::Visualization(VisualizationFactory *factory, DataThread *data_thr
     connect(controller, SIGNAL(canvas_update(Canvas*)), viewport, SLOT(merge_canvas(Canvas*)));
     connect(controller, SIGNAL(clear_canvas()), viewport, SLOT(clear_canvas()));
     connect(controller, SIGNAL(change_range(DataRange)), viewport, SLOT(set_canvas_range(DataRange)));
+    connect(controller, SIGNAL(shift_range_to(Timestamp)), viewport, SLOT(shift_range_to(Timestamp)));
     connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)));
     main_layout->addWidget(viewport);
     

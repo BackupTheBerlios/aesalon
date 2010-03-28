@@ -48,6 +48,8 @@ public:
     void add_ms(qint64 ms);
     void add_ns(qint64 ns);
     QString to_string() const;
+private:
+    void normalize();
 };
 
 #endif
