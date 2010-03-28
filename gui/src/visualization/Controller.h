@@ -20,9 +20,15 @@ public:
     virtual void run();
 public slots:
     void change_update_time(int ms);
+    void attach();
+    void render_full();
 private slots:
     void update();
-    void render_region(const DataRange &range);
+    Canvas *render_region(const DataRange &range);
+signals:
+    void clear_canvas();
+    void canvas_update(Canvas *canvas);
+    void change_range(const DataRange &range);
 };
 
 #endif

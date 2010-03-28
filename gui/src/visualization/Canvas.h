@@ -16,6 +16,7 @@ public:
     
     const DataRange &get_range() const { return range; }
     void set_range(const DataRange &new_range);
+    void calculate_data_range();
     
     void add_object(CanvasObject *object);
     void clear();
