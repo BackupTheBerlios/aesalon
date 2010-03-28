@@ -47,6 +47,7 @@ public:
     qint64 ns_until(const Timestamp &other) const;
     void add_ms(qint64 ms);
     void add_ns(qint64 ns);
+    qint64 to_ns() const;
     QString to_string() const;
 private:
     void normalize();

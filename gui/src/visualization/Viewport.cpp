@@ -85,15 +85,43 @@ void Viewport::resizeEvent(QResizeEvent *event) {
 
 void Viewport::wheelEvent(QWheelEvent *event) {
     DataRange range = local_canvas.get_range();
-    qint64 time_range = range.get_begin().get_time_element().ns_until(range.get_end().get_time_element()) / 2;
+    CoordinateMapper mapper(size(), range);
+    
+    DataPoint mouse_position = mapper.map_to(event->pos());
+    
+    qint64 x_start = range.get_begin().get_time_element().to_ns();
+    qint64 x_end = range.get_end().get_time_element().to_ns();
+    qint64 x_range = x_end - x_start;
+    qreal x_percentage = (mouse_position.get_time_element().to_ns() - x_start) / qreal(x_range);
+    
+    qreal y_start = range.get_begin().get_data_element();
+    qreal y_end = range.get_end().get_data_element();
+    qint64 y_range = y_end - y_start;
+    qreal y_percentage = (mouse_position.get_data_element() - y_start) / qreal(y_range);
+    
+    qint64 x_mouse = x_start + x_percentage * x_range;
+    qreal y_mouse = y_start + y_percentage * y_range;
+    
+    qreal scale_amount = 1.0 - ((event->delta() / 120.0) / 10.0);
+    
+    qint64 new_x = x_start + (x_percentage*x_range / scale_amount) - (x_percentage*x_range);
+    qint64 new_y = y_start + (y_percentage*y_range / scale_amount) - (y_percentage*y_range);
+    
+    range.get_begin().set_time_element(Timestamp(new_x));
+    range.get_begin().set_data_element(new_y);
+    range.get_end().set_time_element(Timestamp(new_x + x_range * scale_amount));
+    range.get_end().set_data_element(new_y + y_range * scale_amount);
+    
+    /*qint64 time_range = range.get_begin().get_time_element().ns_until(range.get_end().get_time_element()) / 2;
     qreal data_range = (range.get_end().get_data_element() - range.get_begin().get_data_element()) / 2;
-    /*Timestamp centre_time = range.get_begin().get_time_element();
-    centre_time.add_ns(time_range);
-    qreal centre_data = (range.get_begin().get_data_element() + range.get_end().get_data_element()) / 2;*/
+    
     CoordinateMapper mapper(size(), range);
     DataPoint centre_point = mapper.map_to(event->pos());
+    qreal x_prop = range.get_begin().get_time_element().ns_until(centre_point.get_time_element()) / qreal(time_range);
+    qreal y_prop = centre_point.get_data_element() / data_range;
     const Timestamp centre_time = centre_point.get_time_element();
     qreal centre_data = centre_point.get_data_element();
+    
     qreal scale_amount = 1 - (event->delta() / 1000.0);
     
     Timestamp timestamp = centre_time;
@@ -103,7 +131,8 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     range.get_end().set_time_element(timestamp);
     
     range.get_begin().set_data_element(centre_data - (data_range * scale_amount));
-    range.get_end().set_data_element(centre_data + (data_range * scale_amount));
+    range.get_end().set_data_element(centre_data + (data_range * scale_amount));*/
+    
     set_canvas_range(range);
     emit paint_canvas(&local_canvas);
 }

@@ -94,6 +94,10 @@ void Timestamp::add_ns(qint64 ns) {
     normalize();
 }
 
+qint64 Timestamp::to_ns() const {
+    return (internal_time.tv_sec * 1000000000) + internal_time.tv_nsec;
+}
+
 QString Timestamp::to_string() const {
     return QString().sprintf("%c%02li:%02li.%03li.%03li", internal_time.tv_sec < 0?'-':' ', qAbs(internal_time.tv_sec / 60),
         qAbs(internal_time.tv_sec % 60), qAbs(internal_time.tv_nsec / 1000000), qAbs((internal_time.tv_nsec / 1000) % 1000));
