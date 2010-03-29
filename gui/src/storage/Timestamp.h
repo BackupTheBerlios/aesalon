@@ -21,18 +21,19 @@
 #define AESALON_GUI_STORAGE_TIMESTAMP_H
 
 #include <QDateTime>
-#include <time.h>
 
 #ifndef TIME_SOURCE
     #define TIME_SOURCE CLOCK_REALTIME
 #endif
 
+#define NS_PER_SEC 1000000000
+#define NS_PER_MS 1000000
+
 class Timestamp {
 private:
-    struct timespec internal_time;
+    qint64 ns;
 public:
     Timestamp();
-    Timestamp(const Timestamp &other) : internal_time(other.internal_time) {}
     Timestamp(quint64 ns);
     
     bool operator<(const Timestamp &other) const;
@@ -42,6 +43,7 @@ public:
     bool operator==(const Timestamp &other) const;
     bool operator!=(const Timestamp &other) const;
     Timestamp &operator=(const Timestamp &other);
+    
     qint64 seconds_until(const Timestamp &other) const;
     qint64 ms_until(const Timestamp &other) const;
     qint64 ns_until(const Timestamp &other) const;
@@ -49,8 +51,6 @@ public:
     void add_ns(qint64 ns);
     qint64 to_ns() const;
     QString to_string() const;
-private:
-    void normalize();
 };
 
 #endif

@@ -21,89 +21,77 @@
 #include "Timestamp.h"
 
 Timestamp::Timestamp() {
+    struct timespec internal_time;
     clock_gettime(TIME_SOURCE, &internal_time);
+    ns = internal_time.tv_nsec;
+    ns += internal_time.tv_sec * NS_PER_SEC;
 }
 
-Timestamp::Timestamp(quint64 ns) {
-    internal_time.tv_sec = ns / 1000000000;
-    internal_time.tv_nsec = ns % 1000000000;
+Timestamp::Timestamp(quint64 ns) : ns(ns) {
+
 }
 
 bool Timestamp::operator<(const Timestamp &other) const {
-    if(internal_time.tv_sec < other.internal_time.tv_sec) return true;
-    else if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec < other.internal_time.tv_nsec) return true;
+    if(ns < other.ns) return true;
     else return false;
 }
 
 bool Timestamp::operator<=(const Timestamp &other) const {
-    if(internal_time.tv_sec < other.internal_time.tv_sec) return true;
-    else if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec <= other.internal_time.tv_nsec) return true;
+    if(ns <= other.ns) return true;
     else return false;
 }
 
 bool Timestamp::operator>(const Timestamp &other) const {
-    if(internal_time.tv_sec > other.internal_time.tv_sec) return true;
-    else if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec > other.internal_time.tv_nsec) return true;
+    if(ns > other.ns) return true;
     else return false;
 }
 
 bool Timestamp::operator>=(const Timestamp &other) const {
-    if(internal_time.tv_sec > other.internal_time.tv_sec) return true;
-    else if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec >= other.internal_time.tv_nsec) return true;
+    if(ns >= other.ns) return true;
     else return false;
 }
 
 bool Timestamp::operator==(const Timestamp &other) const {
-    if(internal_time.tv_sec == other.internal_time.tv_sec && internal_time.tv_nsec == other.internal_time.tv_nsec) return true;
+    if(ns == other.ns) return true;
     else return false;
 }
 
 bool Timestamp::operator!=(const Timestamp &other) const {
-    if(internal_time.tv_sec != other.internal_time.tv_sec || internal_time.tv_nsec != other.internal_time.tv_nsec) return true;
+    if(ns != other.ns) return true;
     else return false;
 }
 
 Timestamp &Timestamp::operator=(const Timestamp &other) {
-    internal_time = other.internal_time;
+    ns = other.ns;
     return *this;
 }
 
-qint64 Timestamp::seconds_until(const Timestamp& other) const {
-    return other.internal_time.tv_sec - internal_time.tv_sec;
+qint64 Timestamp::seconds_until(const Timestamp &other) const {
+    return (other.ns - ns) / NS_PER_SEC;
 }
 
-qint64 Timestamp::ms_until(const Timestamp& other) const {
-    qint64 ms = seconds_until(other) * 1000;
-    ms += (other.internal_time.tv_nsec - internal_time.tv_nsec) / 1000000;
-    return ms;
+qint64 Timestamp::ms_until(const Timestamp &other) const {
+    return (other.ns - ns) / NS_PER_MS;
 }
 
-qint64 Timestamp::ns_until(const Timestamp& other) const {
-    qint64 ns = seconds_until(other) * 1000000000;
-    ns += (other.internal_time.tv_nsec - internal_time.tv_nsec);
-    return ns;
+qint64 Timestamp::ns_until(const Timestamp &other) const {
+    return other.ns - ns;
 }
 
 void Timestamp::add_ms(qint64 ms) {
-    internal_time.tv_nsec += ms * 1000000;
-    normalize();
+    ns += ms * NS_PER_MS;
 }
 
 void Timestamp::add_ns(qint64 ns) {
-    internal_time.tv_nsec += ns;
-    normalize();
+    this->ns += ns;
 }
 
 qint64 Timestamp::to_ns() const {
-    return (internal_time.tv_sec * 1000000000) + internal_time.tv_nsec;
+    return ns;
 }
 
 QString Timestamp::to_string() const {
-    return QString().sprintf("%c%02li:%02li.%03li.%03li", internal_time.tv_sec < 0?'-':' ', qAbs(internal_time.tv_sec / 60),
-        qAbs(internal_time.tv_sec % 60), qAbs(internal_time.tv_nsec / 1000000), qAbs((internal_time.tv_nsec / 1000) % 1000));
-}
-
-void Timestamp::normalize() {
-    while(internal_time.tv_nsec >= 1000000000) internal_time.tv_nsec -= 1000000000, internal_time.tv_sec ++;
-    while(internal_time.tv_nsec < 0) internal_time.tv_nsec += 1000000000, internal_time.tv_sec --;
+    qint64 seconds = ns / NS_PER_SEC;
+    return QString().sprintf("%s%02lli:%02lli.%03lli.%03lli", ns < 0?"-":"", qAbs(seconds / 60),
+        qAbs(seconds % 60), qAbs(ns / NS_PER_MS), qAbs((ns / 1000) % 1000));
 }
