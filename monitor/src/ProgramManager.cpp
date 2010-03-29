@@ -69,18 +69,7 @@ void ProgramManager::place_initial_breakpoints() {
     if(overload_parser == NULL) return;
     Word overload_offset = get_ptrace_portal()->get_lib_offset(overload_path.substr(overload_path.find_last_of('/')));
     
-    /* TODO: find a better way than adding hard-coded values to get the offset of the int3 instruction . . . */
-    PTrace::Breakpoint *bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_malloc_hook")->get_address()+69, 0xcc);
-    get_ptrace_portal()->add_breakpoint(bp);
-    bp->add_observer(get_ptrace_portal()->get_malloc_observer());
-    
-    bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_realloc_hook")->get_address()+80, 0xcc);
-    get_ptrace_portal()->add_breakpoint(bp);
-    bp->add_observer(get_ptrace_portal()->get_realloc_observer());
-    
-    bp = new PTrace::Breakpoint(overload_offset + overload_parser->get_symbol("aesalon_free_hook")->get_address()+65, 0xcc);
-    get_ptrace_portal()->add_breakpoint(bp);
-    bp->add_observer(get_ptrace_portal()->get_free_observer());
+    overload_parser->get_symbol("pipe_fd");
     
     delete overload_parser;
 }

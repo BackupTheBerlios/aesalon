@@ -52,17 +52,25 @@
 namespace PTrace {
 
 Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
+    int fds[2];
+    if(pipe(fds) == -1)
+        throw Exception::PTraceException(Misc::StreamAsString() << "Could not create pipe: " << strerror(errno));
     pid = fork();
     if(pid == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
     else if(pid == 0) {
+        close(fds[0]);
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
         /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
         setenv("LD_PRELOAD", Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data().c_str(), 1);
+        setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
         if(execv(argument_list->get_argument(0).c_str(), argument_list->get_as_argv()) == -1) {
             throw Exception::PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
         }
     }
+    close(fds[1]);
+    pipe_fd = fds[0];
+    
     /*std::string mem_filename = Misc::StreamAsString() << "/proc/" << pid << "/mem";
     read_fd = open(mem_filename.c_str(), O_RDONLY);
     if(read_fd == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Failed to open " << mem_filename << ":" << strerror(errno));*/
@@ -75,23 +83,11 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     add_signal_observer(new SegfaultObserver());
     
     /* This is a single-shot breakpoint observer, but since there's currently no way to remove observers, stick it on last. */
-    initial_observer = new MainObserver();
     malloc_observer = new MallocObserver();
     free_observer = new FreeObserver();
     realloc_observer = new ReallocObserver();
     
-    /* Wait for the SIGTRAP that indicates a exec() call . . . */
-    wait_for_signal();
-    /* place a breakpoint at main, for intialization purposes. */
-    ELF::Symbol *main_symbol = Initializer::get_instance()->get_program_manager()->get_elf_parser()->get_symbol("main");
-    if(main_symbol == NULL) {
-        throw Exception::PTraceException("Could not resolve main symbol, executable may be stripped");
-    }
-    Word main_address = main_symbol->get_address();
-    place_breakpoint(main_address, initial_observer);
-    
-    /* Now continue until main(). */
-    continue_execution();
+    /* The overload library will set itself up from here . . . */
 }
 
 Portal::~Portal() {
@@ -99,7 +95,6 @@ Portal::~Portal() {
     delete realloc_observer;
     delete free_observer;
     delete malloc_observer;
-    delete initial_observer;
     for(breakpoint_list_t::iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
         delete *i;
     }

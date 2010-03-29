@@ -55,6 +55,8 @@ private:
     BreakpointObserver *malloc_observer;
     BreakpointObserver *free_observer;
     BreakpointObserver *realloc_observer;
+    
+    int pipe_fd;
 public:
     /** Generic constructor for PTracePortal.
         @param argument_list The arguments to spawn the child with.
