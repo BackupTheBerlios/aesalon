@@ -27,22 +27,26 @@
 #include <unistd.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void __attribute__((constructor)) aesalon_constructor();
 void __attribute__((destructor)) aesalon_destructor();
 
 void *get_scope_address();
 
-void *calloc(size_t nmemb, size_t size);
+/*void *calloc(size_t nmemb, size_t size);*/
 void *malloc(size_t size);
 void free(void *ptr);
 void *realloc(void *ptr, size_t size);
 
-void __attribute__ ((visibility ("hidden"))) *(*original_calloc)(size_t nmemb, size_t size);
-void __attribute__ ((visibility ("hidden"))) *(*original_malloc)(size_t size);
-void __attribute__ ((visibility ("hidden"))) *(*original_free)(void *ptr);
-void __attribute__ ((visibility ("hidden"))) *(*original_realloc)(void *ptr, size_t size);
+void *(*original_calloc)(size_t nmemb, size_t size);
+void *(*original_malloc)(size_t size);
+void *(*original_free)(void *ptr);
+void *(*original_realloc)(void *ptr, size_t size);
 
-int __attribute__ ((visibility ("hidden"))) pipe_fd;
+int pipe_fd;
 
 void __attribute__((constructor)) aesalon_constructor() {
 #ifdef DEVELOPMENT_BUILD
@@ -93,7 +97,7 @@ void* get_scope_address() {
     asm("mov rax, [rbp + 16]");
 }
 
-void *calloc(size_t nmemb, size_t size) {
+/*void *calloc(size_t nmemb, size_t size) {
     allocation_data_u data;    
     static unsigned char type = ALLOC_TYPE;
     
@@ -108,7 +112,7 @@ void *calloc(size_t nmemb, size_t size) {
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
     return (void *)data.data.address;
-}
+}*/
 
 void *malloc(size_t size) {
     allocation_data_u data;
@@ -161,3 +165,7 @@ void *realloc(void *ptr, size_t size) {
     
     return (void *)data.data.new_address;
 }
+
+#ifdef __cplusplus
+}
+#endif

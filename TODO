@@ -3,6 +3,7 @@ Monitor:
 - Implement proper taint-tracking so references can be calculated
 - Send or do something with allocation scope in OverloadParser
 - Figure out why select() in ServerSocket::accept_connections mistakenly detects a connection
+- Find out how to overload calloc() properly in the overload library (dlsym() calls calloc())
 GUI:
 - Embed Konsole inside Session for LaunchSources?
 - Add "temporary sessions", e.g. sessions that aren't saved
