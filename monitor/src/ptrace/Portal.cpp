@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dlfcn.h>
 
 #include <iostream>
 #include <fstream>
@@ -55,6 +56,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     int fds[2];
     if(pipe(fds) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Could not create pipe: " << strerror(errno));
+    Word malloc_offset = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc")->get_address();
 #endif
     pid = fork();
     if(pid == -1)
@@ -66,6 +68,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
         /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
         setenv("LD_PRELOAD", Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data().c_str(), 1);
         setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
+        setenv("aesalon_malloc_offset", (Misc::StreamAsString() << std::hex << malloc_offset).operator std::string().c_str(), 1);
         close(fds[0]);
 #endif
         if(execv(argument_list->get_argument(0).c_str(), argument_list->get_as_argv()) == -1) {

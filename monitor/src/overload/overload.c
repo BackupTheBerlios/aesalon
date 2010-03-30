@@ -26,6 +26,7 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include <string.h>
+#include <fcntl.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +37,7 @@ void __attribute__((destructor)) aesalon_destructor();
 
 void *get_scope_address();
 
-/*void *calloc(size_t nmemb, size_t size);*/
+void *calloc(size_t nmemb, size_t size);
 void *malloc(size_t size);
 void free(void *ptr);
 void *realloc(void *ptr, size_t size);
@@ -45,6 +46,8 @@ void *(*original_calloc)(size_t nmemb, size_t size);
 void *(*original_malloc)(size_t size);
 void *(*original_free)(void *ptr);
 void *(*original_realloc)(void *ptr, size_t size);
+
+unsigned long get_libc_offset();
 
 int pipe_fd;
 
@@ -58,20 +61,29 @@ void __attribute__((constructor)) aesalon_constructor() {
         exit(1);
     }
     sscanf(pipe_str, "%i", &pipe_fd);
+    unsigned long malloc_offset;
+    char *malloc_offset_str = getenv("aesalon_malloc_offset");
+    if(pipe_str == NULL) {
+        fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_malloc_offset environment variable not set.\n");
+        exit(1);
+    }
+    sscanf(malloc_offset_str, "%lx", &original_malloc);
+    unsigned long libc_offset = get_libc_offset();
+    original_malloc += libc_offset;
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} found pipe fd (%i)\n", pipe_fd);
     
     printf("{aesalon} Resolving symbols . . .\n");
+/*    printf("{aesalon} Resolving malloc . . .\n");
+#endif
+    *(void **) (&original_malloc) = dlsym(RTLD_NEXT, "malloc");
+#ifdef DEVELOPMENT_BUILD
+    printf("{aesalon} Resolved malloc (%p) (guess was %p (%p + %p)).\n", original_malloc, malloc_offset + libc_offset, libc_offset, malloc_offset);*/
     printf("{aesalon} Resolving calloc . . .\n");
 #endif
     *(void **) (&original_calloc) = dlsym(RTLD_NEXT, "calloc");
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Resolved calloc (%p).\n", original_calloc);
-    printf("{aesalon} Resolving malloc . . .\n");
-#endif
-    *(void **) (&original_malloc) = dlsym(RTLD_NEXT, "malloc");
-#ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved malloc (%p).\n", original_malloc);
     printf("{aesalon} Resolving free . . .\n");
 #endif
     *(void **) (&original_free) = dlsym(RTLD_NEXT, "free");
@@ -97,22 +109,25 @@ void* get_scope_address() {
     asm("mov rax, [rbp + 16]");
 }
 
-/*void *calloc(size_t nmemb, size_t size) {
+void *calloc(size_t nmemb, size_t size) {
     allocation_data_u data;    
     static unsigned char type = ALLOC_TYPE;
     
     asm("push [rbp + 8]");
     data.data.scope = (unsigned long)get_scope_address();
     asm("add rsp, 8");
-    
-    data.data.address = (unsigned long)original_calloc(nmemb, size);
     data.data.size = nmemb * size;
+    if(original_calloc != NULL) data.data.address = (unsigned long)original_calloc(nmemb, size);
+    else {
+        data.data.address = (unsigned long)original_malloc(data.data.size);
+        memset((void *)data.data.address, 0, data.data.size);
+    }
     
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
     return (void *)data.data.address;
-}*/
+}
 
 void *malloc(size_t size) {
     allocation_data_u data;
@@ -165,6 +180,33 @@ void *realloc(void *ptr, size_t size) {
     
     return (void *)data.data.new_address;
 }
+
+long unsigned int get_libc_offset() {
+    char buffer[1024];
+    
+    sprintf(buffer, "/proc/%i/maps", getpid());
+    
+    int fd = open(buffer, O_RDONLY);
+    unsigned long address = 0;
+    
+    int ret = 1;
+    while(ret > 0) {
+        char c = 0;
+        int pos = 0;
+        while(c != '\n' && (ret = read(fd, &c, sizeof(c)))) buffer[pos++] = c;
+        buffer[pos] = 0;
+        
+        char str[128];
+        sscanf(buffer, "%lx-%*lx %*s %*s %*s %*s %s", &address, str, str, str, str, str, str);
+
+        if(strstr(str, "libc-")) break;
+    }
+    
+    close(fd);
+    
+    return address;
+}
+
 
 #ifdef __cplusplus
 }

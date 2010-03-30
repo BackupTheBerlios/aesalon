@@ -4,9 +4,12 @@
 #add_custom_command(OUTPUT overload.so COMMAND cp overload.o overload.so DEPENDS overload.o WORKING_DIRECTORY src/monitor/overload)
 #add_custom_target(Overload /usr/bin/nasm -f elf64 overload.asm -o overload.o COMMAND gcc -shared overload.o -o overload.so)
 if(DEVELOPMENT_BUILD)
-    add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload.so -ldl -masm=intel -DDEVELOPMENT_BUILD DEPENDS overload.c)
+    add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload.so -ldl -masm=intel
+        -DLIBC_PATH='"${LIBC_PATH}"'
+        -DDEVELOPMENT_BUILD DEPENDS overload.c)
 else(DEVELOPMENT_BUILD)
-    add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -shared overload.c -o aesalon_overload.so -ldl -masm=intel DEPENDS overload.c)
+    add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -shared overload.c -o aesalon_overload.so -ldl -masm=intel
+        -DLIBC_PATH="${LIBC_PATH}" DEPENDS overload.c)
 endif(DEVELOPMENT_BUILD)
 
 add_custom_target("overload library" ALL DEPENDS aesalon_overload.so)
