@@ -64,12 +64,12 @@ void Block::push_word(Word data) {
     std::size_t offset = get_size();
     /* Reserve space for one 64-bit integer . . . */
     resize(get_size()+8);
-    get_data()[offset+7] = (data >> 56) & 0xff;
-    get_data()[offset+6] = (data >> 48) & 0xff;
-    get_data()[offset+5] = (data >> 40) & 0xff;
-    get_data()[offset+4] = (data >> 32) & 0xff;
-    get_data()[offset+3] = (data >> 24) & 0xff;
-    get_data()[offset+2] = (data >> 16) & 0xff;
-    get_data()[offset+1] = (data >> 8) & 0xff;
     get_data()[offset+0] = (data >> 0) & 0xff;
+    get_data()[offset+1] = (data >> 8) & 0xff;
+    get_data()[offset+2] = (data >> 16) & 0xff;
+    get_data()[offset+3] = (data >> 24) & 0xff;
+    get_data()[offset+4] = (data >> 32) & 0xff;
+    get_data()[offset+5] = (data >> 40) & 0xff;
+    get_data()[offset+6] = (data >> 48) & 0xff;
+    get_data()[offset+7] = (data >> 56) & 0xff;
 }

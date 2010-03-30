@@ -24,6 +24,7 @@
 #include "ptrace/Portal.h"
 #include "elf/Parser.h"
 #include "asm/Disassembler.h"
+#include "overload/OverloadParser.h"
 
 class ProgramManager {
 private:
@@ -33,8 +34,12 @@ private:
     
     PTrace::Portal *ptrace_portal;
     
-    ELF::Parser *elf_parser, *libc_parser, *overload_parser;
+    ELF::Parser *elf_parser, *libc_parser;
     ASM::Disassembler *disassembler;
+    
+#ifdef USE_OVERLOAD
+    OverloadParser *overload_parser;
+#endif
     
     std::size_t malloc_breakpoint_id;
     std::size_t free_breakpoint_id;

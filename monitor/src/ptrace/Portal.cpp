@@ -43,7 +43,6 @@
 #include "MallocObserver.h"
 #include "FreeObserver.h"
 #include "ReallocObserver.h"
-#include "MainObserver.h"
 
 #include "misc/String.h"
 
@@ -52,24 +51,31 @@
 namespace PTrace {
 
 Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
+#ifdef USE_OVERLOAD
     int fds[2];
     if(pipe(fds) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Could not create pipe: " << strerror(errno));
+#endif
     pid = fork();
     if(pid == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
     else if(pid == 0) {
-        close(fds[0]);
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+#ifdef USE_OVERLOAD
         /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
         setenv("LD_PRELOAD", Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data().c_str(), 1);
+        std::cout << "path to overload library is " << Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data() << std::endl;
         setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
+        close(fds[0]);
+#endif
         if(execv(argument_list->get_argument(0).c_str(), argument_list->get_as_argv()) == -1) {
             throw Exception::PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
         }
     }
+#ifdef USE_OVERLOAD
     close(fds[1]);
     pipe_fd = fds[0];
+#endif
     
     /*std::string mem_filename = Misc::StreamAsString() << "/proc/" << pid << "/mem";
     read_fd = open(mem_filename.c_str(), O_RDONLY);
@@ -78,14 +84,17 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     /*ptrace(PTRACE_SETOPTIONS, pid, 0, PTRACE_O_TRACESYSGOOD);*/
     
     /* Trap signals are the most common, so add the TrapObserver on first. */
+#ifndef USE_OVERLOAD
     add_signal_observer(new TrapObserver());
+#endif
     add_signal_observer(new ExitObserver());
     add_signal_observer(new SegfaultObserver());
-    
-    /* This is a single-shot breakpoint observer, but since there's currently no way to remove observers, stick it on last. */
+
+#ifndef USE_OVERLOAD
     malloc_observer = new MallocObserver();
     free_observer = new FreeObserver();
     realloc_observer = new ReallocObserver();
+#endif
     
     /* The overload library will set itself up from here . . . */
 }
@@ -238,6 +247,7 @@ void Portal::handle_signal() {
     }
     else if(WIFSIGNALED(status)) signal = WTERMSIG(status);
     else if(WIFEXITED(status)) signal = -1;
+    else return;
     
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
@@ -259,7 +269,13 @@ void Portal::single_step() {
 
 int Portal::wait_for_signal() {
     int status;
-    if(waitpid(pid, &status, 0) == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
+    if(
+#ifndef USE_OVERLOAD
+    waitpid(pid, &status, 0)
+#else
+    waitpid(pid, &status, WNOHANG)
+#endif
+        == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
     return status;
 }
 

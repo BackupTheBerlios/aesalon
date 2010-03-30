@@ -34,6 +34,9 @@ ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
 }
 
 ProgramManager::~ProgramManager() {
+#ifdef USE_OVERLOAD
+    delete overload_parser;
+#endif
     if(ptrace_portal) delete ptrace_portal;
     delete elf_parser;
     delete libc_parser;
@@ -44,11 +47,17 @@ ProgramManager::~ProgramManager() {
 void ProgramManager::execute() {
     running = true;
     ptrace_portal = new PTrace::Portal(get_argument_list());
+#ifdef USE_OVERLOAD
+    overload_parser = new OverloadParser(ptrace_portal->get_pipe_fd());
+#endif
     /*std::cout << "\tlibc offset is: " << get_ptrace_portal()->get_libc_offset() << std::endl;
     std::cout << "\ttherefore, address of malloc is: " << libc_parser->get_symbol("malloc")->get_address() + get_ptrace_portal()->get_libc_offset() << std::endl;*/
 }
 
 void ProgramManager::wait() {
+#ifdef USE_OVERLOAD
+    overload_parser->parse();
+#endif
     ptrace_portal->handle_signal();
 }
 
@@ -64,12 +73,12 @@ void ProgramManager::place_initial_breakpoints() {
     Word realloc_address = libc_offset + get_libc_parser()->get_symbol("realloc")->get_address();
     realloc_breakpoint_id = get_ptrace_portal()->place_breakpoint(realloc_address, get_ptrace_portal()->get_realloc_observer());*/
     
-    std::string overload_path = Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data();
+    /*std::string overload_path = Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data();
     overload_parser = new ELF::Parser(overload_path);
     if(overload_parser == NULL) return;
     Word overload_offset = get_ptrace_portal()->get_lib_offset(overload_path.substr(overload_path.find_last_of('/')));
     
     overload_parser->get_symbol("pipe_fd");
     
-    delete overload_parser;
+    delete overload_parser;*/
 }

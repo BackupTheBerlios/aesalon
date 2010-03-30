@@ -3,6 +3,9 @@ add_definitions(-DAESALON_MAJOR_VERSION="${AESALON_MAJOR_VERSION}" -DAESALON_MIN
 add_definitions(-DAESALON_PLATFORM_x86=0 -DAESALON_PLATFORM_x86_64=1)
 
 add_definitions(-DSYS_CONFIG_PATH="${SYS_CONFIG_PATH}" -DUSER_CONFIG_PATH="${USER_CONFIG_PATH}")
+if(USE_OVERLOAD_LIBRARY)
+    add_definitions(-DUSE_OVERLOAD)
+endif(USE_OVERLOAD_LIBRARY)
 
 if(PROFILE_BUILD)
     add_definitions(-pg)
@@ -24,6 +27,7 @@ aux_source_directory(ptrace PTRACE_SOURCES)
 aux_source_directory(taint TAINT_SOURCES)
 aux_source_directory(tcp TCP_SOURCES)
 aux_source_directory(tracker TRACKER_SOURCES)
+set(OVERLOAD_SOURCES overload/OverloadParser.cpp)
 
 set(SOURCES
     ${DOT_SOURCES}
@@ -32,6 +36,7 @@ set(SOURCES
     ${EVENT_SOURCES}
     ${EXCEPTION_SOURCES}
     ${MISC_SOURCES}
+    ${OVERLOAD_SOURCES}
     ${PTRACE_SOURCES}
     ${TAINT_SOURCES}
     ${TCP_SOURCES}

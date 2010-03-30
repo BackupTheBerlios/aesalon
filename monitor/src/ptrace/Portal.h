@@ -55,8 +55,10 @@ private:
     BreakpointObserver *malloc_observer;
     BreakpointObserver *free_observer;
     BreakpointObserver *realloc_observer;
-    
+
+#ifdef USE_OVERLOAD
     int pipe_fd;
+#endif
 public:
     /** Generic constructor for PTracePortal.
         @param argument_list The arguments to spawn the child with.
@@ -151,6 +153,10 @@ public:
         @return The address of the library, or 0 if no such library was found.
     */
     Word get_lib_offset(std::string unique_identifer);
+    
+#ifdef USE_OVERLOAD
+    int get_pipe_fd() const { return pipe_fd; }
+#endif
 };
 
 } // namespace PTrace

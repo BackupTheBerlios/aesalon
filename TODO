@@ -1,13 +1,13 @@
 Monitor:
 - Fix Breakpoint's method of storing observers to be more efficient
 - Implement proper taint-tracking so references can be calculated
-- Record location a block is allocated?
+- Send or do something with allocation scope in OverloadParser
 - Figure out why select() in ServerSocket::accept_connections mistakenly detects a connection
 GUI:
-- Embed Konsole inside ActiveSession?
+- Embed Konsole inside Session for LaunchSources?
 - Add "temporary sessions", e.g. sessions that aren't saved
 - Find a way to store the snapshot intervals -- perhaps in DataSource?
 - Store the maximum tree depth inside the DataSource
 - Add the ability to create new DataSources
 - Add other DataSources (LaunchSource, etc.)
-- Implement partial requests, e.g. the ability to change an already-existing VRequest
+
