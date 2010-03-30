@@ -101,13 +101,13 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     
     qreal y_start = range.get_begin().get_data_element();
     qreal y_end = range.get_end().get_data_element();
-    qint64 y_range = y_end - y_start;
+    qreal y_range = y_end - y_start;
     qreal y_percentage = (mouse_position.get_data_element() - y_start) / qreal(y_range);
     
     qreal scale_amount = 1.0 - ((event->delta() / 120.0) / 10.0);
     
     qint64 new_x = x_start + (x_percentage*x_range / scale_amount) - (x_percentage*x_range);
-    qint64 new_y = y_start + (y_percentage*y_range / scale_amount) - (y_percentage*y_range);
+    qreal new_y = y_start + (y_percentage*y_range / scale_amount) - (y_percentage*y_range);
     
     range.get_begin().set_time_element(Timestamp(new_x));
     range.get_begin().set_data_element(new_y);

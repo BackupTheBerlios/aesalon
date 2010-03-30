@@ -82,20 +82,20 @@ char *print_number(struct number_t number) {
 
 int main(int argc, char *argv[]) {
     struct number_t *fib_numbers, temp;
-    int x = 0;
+    int x = 2;
     fib_numbers = malloc(sizeof(struct number_t) * 2);
     fib_numbers[0] = number_from_int(1);
     fib_numbers[1] = number_from_int(1);
 
     for(; x < MAX; x ++) {
-        fib_numbers = realloc(fib_numbers, sizeof(struct number_t) * (x+3));
-        fib_numbers[x+2] = add_numbers(fib_numbers[x], fib_numbers[x+1]);
-        if(!(x%100)) printf("Calculated %dth fibonacci . . .\n", x+3);
+        fib_numbers = realloc(fib_numbers, sizeof(struct number_t) * (x+1));
+        fib_numbers[x] = add_numbers(fib_numbers[x-2], fib_numbers[x-1]);
+        if(!(x%100)) printf("Calculated %dth fibonacci . . .\n", x+1);
     }
 
     printf("%ith fibonacci number is %s.\n", x, print_number(fib_numbers[x-1]));
 
-    for(x = 0; x < MAX+2; x ++) {
+    for(x = 0; x < MAX; x ++) {
         free(fib_numbers[x].data);
     }
     

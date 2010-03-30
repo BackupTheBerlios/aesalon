@@ -21,9 +21,11 @@
 #include "VisualizationList.moc"
 
 #include "DensityFactory.h"
+#include "BlockCountFactory.h"
 
 VisualizationList::VisualizationList() {
     sortItems(Qt::AscendingOrder);
+    addItem(tr("Block Count"));
     addItem(tr("Density Visualization"));
 }
 
@@ -36,6 +38,9 @@ Visualization* VisualizationList::create_from_selected(DataThread *data_thread) 
     QString title = currentItem()->text();
     if(title == tr("Density Visualization")) {
         return new Visualization(new DensityFactory(), data_thread);
+    }
+    else if(title == tr("Block Count")) {
+        return new Visualization(new BlockCountFactory(), data_thread);
     }
     return NULL;
 }
