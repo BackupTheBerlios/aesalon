@@ -2,10 +2,9 @@
 #define AESALON_OVERLOAD_COMMON_H
 
 #define ALLOC_TYPE 0
-#define ALLOC_DATA_SIZE (sizeof(char) + (sizeof(unsigned long) * 3))
+#define ALLOC_DATA_SIZE (sizeof(unsigned long) * 3)
 typedef union {
     struct {
-        unsigned char type;
         unsigned long scope;
         unsigned long address;
         unsigned long size;
@@ -14,10 +13,9 @@ typedef union {
 } allocation_data_u;
 
 #define REALLOC_TYPE 1
-#define REALLOC_DATA_SIZE (sizeof(char) + (sizeof(unsigned long) * 4))
+#define REALLOC_DATA_SIZE (sizeof(unsigned long) * 4)
 typedef union {
     struct {
-        unsigned char type;
         unsigned long scope;
         unsigned long original_address;
         unsigned long new_address;
@@ -27,10 +25,9 @@ typedef union {
 } reallocation_data_u;
 
 #define FREE_TYPE 2
-#define FREE_DATA_SIZE (sizeof(char) + (sizeof(unsigned long) * 2))
+#define FREE_DATA_SIZE (sizeof(unsigned long) * 2)
 typedef union {
     struct {
-        unsigned char type;
         unsigned long scope;
         unsigned long address;
     } data;

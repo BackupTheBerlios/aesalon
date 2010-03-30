@@ -49,7 +49,7 @@ private:
     
     signal_observer_list_t signal_observer_list;
         
-    int wait_for_signal();
+    int wait_for_signal(int &status);
     
     BreakpointObserver *initial_observer;
     BreakpointObserver *malloc_observer;

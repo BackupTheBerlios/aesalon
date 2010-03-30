@@ -60,11 +60,11 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     if(pid == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
     else if(pid == 0) {
+#ifndef USE_OVERLOAD
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
-#ifdef USE_OVERLOAD
+#else
         /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
         setenv("LD_PRELOAD", Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data().c_str(), 1);
-        std::cout << "path to overload library is " << Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data() << std::endl;
         setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
         close(fds[0]);
 #endif
@@ -101,9 +101,11 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
 
 Portal::~Portal() {
     /*close(read_fd);*/
+#ifndef USE_OVERLOAD
     delete realloc_observer;
     delete free_observer;
     delete malloc_observer;
+#endif
     for(breakpoint_list_t::iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
         delete *i;
     }
@@ -240,8 +242,9 @@ Breakpoint *Portal::get_breakpoint_by_address(Word address) const {
 
 
 void Portal::handle_signal() {
-    int status = wait_for_signal();
-    int signal;
+    int status;
+    if(wait_for_signal(status) == 0) return;
+    int signal = 0;
     if(WIFSTOPPED(status)) {
         signal = WSTOPSIG(status);
     }
@@ -252,8 +255,10 @@ void Portal::handle_signal() {
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
     }
+#ifndef USE_OVERLOAD
     /* If the signal wasn't caught by one of the signal handlers, then we're not interested in it. Continue execution. */
     continue_execution(signal);
+#endif
 }
 
 void Portal::continue_execution(int signal) {
@@ -264,19 +269,20 @@ void Portal::continue_execution(int signal) {
 void Portal::single_step() {
     if(ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't single-step program:" << strerror(errno));
-    wait_for_signal(); /* ptrace(PTRACE_SINGLESTEP throws a SIGTRAP when it's done, so wait for it. */
+    int status;
+    wait_for_signal(status); /* ptrace(PTRACE_SINGLESTEP throws a SIGTRAP when it's done, so wait for it. */
 }
 
-int Portal::wait_for_signal() {
-    int status;
-    if(
+int Portal::wait_for_signal(int &status) {
+    int return_value;
+    return_value = 
 #ifndef USE_OVERLOAD
-    waitpid(pid, &status, 0)
+    waitpid(pid, &status, 0);
 #else
-    waitpid(pid, &status, WNOHANG)
+    waitpid(pid, &status, WNOHANG);
 #endif
-        == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
-    return status;
+    if(return_value == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't waitpid() on child: " << strerror(errno));
+    return return_value;
 }
 
 void Portal::handle_breakpoint() {

@@ -16,14 +16,11 @@ OverloadParser::~OverloadParser() {
 }
 
 void OverloadParser::parse() {
-    std::cout << "OverloadParser::parse(): called . . ." << std::endl;
     unsigned char type;
     if(read(pipe_fd, &type, sizeof(type)) == -1) {
         /*throw Exception::OverloadException(Misc::StreamAsString() << "Couldn't read type from pipe: " << strerror(errno));*/
         return;
     }
-    std::cout << "OverloadParser::parse(): received type: " << type << std::endl;
-    
     if(type == ALLOC_TYPE) {
         allocation_data_u data;
         int bytes = read(pipe_fd, &data, sizeof(data));

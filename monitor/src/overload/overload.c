@@ -45,7 +45,6 @@ void __attribute__ ((visibility ("hidden"))) *(*original_realloc)(void *ptr, siz
 int pipe_fd;
 
 void __attribute__((constructor)) aesalon_constructor() {
-    printf("constructing overload library . . .\n");
     char *pipe_str = getenv("aesalon_pipe_fd");
     if(pipe_str == NULL) {
         fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_pipe_fd environment variable not set.\n");
@@ -68,9 +67,8 @@ void* get_scope_address() {
 }
 
 void *calloc(size_t nmemb, size_t size) {
-    allocation_data_u data;
-    
-    data.data.type = ALLOC_TYPE;
+    allocation_data_u data;    
+    static unsigned char type = ALLOC_TYPE;
     
     asm("push [rbp + 8]");
     data.data.scope = (unsigned long)get_scope_address();
@@ -79,16 +77,15 @@ void *calloc(size_t nmemb, size_t size) {
     data.data.address = (unsigned long)original_calloc(nmemb, size);
     data.data.size = nmemb * size;
     
+    write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
     return (void *)data.data.address;
 }
 
 void *malloc(size_t size) {
-    printf("overloaded malloc() called . . .\n");
     allocation_data_u data;
-    
-    data.data.type = ALLOC_TYPE;
+    static unsigned char type = ALLOC_TYPE;
     
     asm("push [rbp + 8]");
     data.data.scope = (unsigned long)get_scope_address();
@@ -97,6 +94,7 @@ void *malloc(size_t size) {
     data.data.address = (unsigned long)original_malloc(size);
     data.data.size = size;
     
+    write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
     return (void *)data.data.address;
@@ -104,8 +102,7 @@ void *malloc(size_t size) {
 
 void free(void *ptr) {
     free_data_u data;
-    
-    data.data.type = FREE_TYPE;
+    static unsigned char type = FREE_TYPE;
     
     asm("push [rbp + 8]");
     data.data.scope = (unsigned long)get_scope_address();
@@ -114,13 +111,13 @@ void free(void *ptr) {
     data.data.address = (unsigned long)ptr;
     original_free(ptr);
     
+    write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
 }
 
 void *realloc(void *ptr, size_t size) {
     reallocation_data_u data;
-    
-    data.data.type = REALLOC_TYPE;
+    static unsigned char type = REALLOC_TYPE;
     
     asm("push [rbp + 8]");
     data.data.scope = (unsigned long)get_scope_address();
@@ -132,6 +129,7 @@ void *realloc(void *ptr, size_t size) {
     
     data.data.new_address = (unsigned long)original_realloc(ptr, size);
     
+    write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
     return (void *)data.data.new_address;
