@@ -8,7 +8,6 @@
 #include "event/BlockEvent.h"
 
 OverloadParser::OverloadParser(int pipe_fd) : pipe_fd(pipe_fd) {
-
 }
 
 OverloadParser::~OverloadParser() {
@@ -28,7 +27,7 @@ void OverloadParser::parse() {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Couldn't read data from pipe: " << strerror(errno));*/
             return;
         }
-        else if(bytes != sizeof(type)) {
+        else if(bytes != sizeof(data)) {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Incomplete data from pipe!");*/
             return;
         }
@@ -41,7 +40,7 @@ void OverloadParser::parse() {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Couldn't read data from pipe: " << strerror(errno));*/
             return;
         }
-        else if(bytes != sizeof(type)) {
+        else if(bytes != sizeof(data)) {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Incomplete data from pipe!");*/
             return;
         }
@@ -54,7 +53,7 @@ void OverloadParser::parse() {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Couldn't read data from pipe: " << strerror(errno));*/
             return;
         }
-        else if(bytes != sizeof(type)) {
+        else if(bytes != sizeof(data)) {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Incomplete data from pipe!");*/
             return;
         }

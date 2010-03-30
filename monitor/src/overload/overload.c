@@ -42,23 +42,50 @@ void __attribute__ ((visibility ("hidden"))) *(*original_malloc)(size_t size);
 void __attribute__ ((visibility ("hidden"))) *(*original_free)(void *ptr);
 void __attribute__ ((visibility ("hidden"))) *(*original_realloc)(void *ptr, size_t size);
 
-int pipe_fd;
+int __attribute__ ((visibility ("hidden"))) pipe_fd;
 
 void __attribute__((constructor)) aesalon_constructor() {
+#ifdef DEVELOPMENT_BUILD
+    printf("{aesalon} Initializing overload library . . .\n");
+#endif
     char *pipe_str = getenv("aesalon_pipe_fd");
     if(pipe_str == NULL) {
         fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_pipe_fd environment variable not set.\n");
         exit(1);
     }
     sscanf(pipe_str, "%i", &pipe_fd);
+#ifdef DEVELOPMENT_BUILD
+    printf("{aesalon} found pipe fd (%i)\n", pipe_fd);
     
+    printf("{aesalon} Resolving symbols . . .\n");
+    printf("{aesalon} Resolving calloc . . .\n");
+#endif
     *(void **) (&original_calloc) = dlsym(RTLD_NEXT, "calloc");
+#ifdef DEVELOPMENT_BUILD
+    printf("{aesalon} Resolved calloc (%p).\n", original_calloc);
+    printf("{aesalon} Resolving malloc . . .\n");
+#endif
     *(void **) (&original_malloc) = dlsym(RTLD_NEXT, "malloc");
+#ifdef DEVELOPMENT_BUILD
+    printf("{aesalon} Resolved malloc (%p).\n", original_malloc);
+    printf("{aesalon} Resolving free . . .\n");
+#endif
     *(void **) (&original_free) = dlsym(RTLD_NEXT, "free");
+#ifdef DEVELOPMENT_BUILD
+    printf("{aesalon} Resolved free (%p).\n", original_free);
+    printf("{aesalon} Resolving realloc . . .\n");
+#endif
     *(void **) (&original_realloc) = dlsym(RTLD_NEXT, "realloc");
+#ifdef DEVELOPMENT_BUILD
+    printf("{aesalon} Resolved realloc (%p).\n", original_realloc);
+    printf("{aesalon} Overload library initialization completed.\n");
+#endif
 }
 
 void __attribute__((destructor)) aesalon_destructor() {
+#ifdef DEVELOPMENT_BUILD
+    printf("{aesalon} Overload library self-destructing . . .\n");
+#endif
     if(pipe_fd) close(pipe_fd);
 }
 
