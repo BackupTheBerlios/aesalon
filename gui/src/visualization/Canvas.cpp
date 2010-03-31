@@ -7,11 +7,18 @@ Canvas::Canvas(const DataRange &range) : range(range) {
 }
 
 Canvas::~Canvas() {
-    
+    this->clear();
 }
 
 void Canvas::set_range(const DataRange &new_range) {
     range = new_range;
+}
+
+void Canvas::shift_range(const DataPoint &by) {
+    range.get_begin().set_data_element(range.get_begin().get_data_element() + by.get_data_element());
+    range.get_begin().set_time_element(Timestamp(range.get_begin().get_time_element().to_ns() + by.get_time_element().to_ns()));
+    range.get_end().set_data_element(range.get_end().get_data_element() + by.get_data_element());
+    range.get_end().set_time_element(Timestamp(range.get_end().get_time_element().to_ns() + by.get_time_element().to_ns()));
 }
 
 void Canvas::calculate_data_range() {
@@ -26,17 +33,24 @@ void Canvas::calculate_data_range() {
     }
 }
 
-void Canvas::add_object(CanvasObject* object) {
+void Canvas::add_object(CanvasObject *object) {
     objects.append(object);
+    object->inc_references();
 }
 
 void Canvas::clear() {
+    foreach(CanvasObject *object, objects) {
+        object->dec_references();
+    }
     objects.clear();
 }
 
 void Canvas::combine_with(const Canvas &canvas) {
     foreach(CanvasObject *object, canvas.objects) {
-        if(object->get_bounding_rect().intersects(range)) objects.append(object);
+        if(object->get_bounding_rect().intersects(range)) {
+            objects.append(object);
+            object->inc_references();
+        }
     }
 }
 

@@ -51,7 +51,129 @@ unsigned long get_libc_offset();
 
 int pipe_fd;
 
+void initialize_overload();
+void deinitialize_overload();
+
+int overload_initialized = 0;
+
 void __attribute__((constructor)) aesalon_constructor() {
+    /* NOTE: the constructor may be called after other libs if there is more than one preload. */
+    if(!overload_initialized) initialize_overload();
+}
+
+void __attribute__((destructor)) aesalon_destructor() {
+    deinitialize_overload();
+}
+
+void* get_scope_address() {
+    asm("mov rax, [rbp + 16]");
+}
+
+void *calloc(size_t nmemb, size_t size) {
+    if(!overload_initialized) initialize_overload();
+    allocation_data_u data;    
+    static unsigned char type = ALLOC_TYPE;
+    
+    asm("push [rbp + 8]");
+    data.data.scope = (unsigned long)get_scope_address();
+    asm("add rsp, 8");
+    data.data.size = nmemb * size;
+    if(original_calloc != NULL) data.data.address = (unsigned long)original_calloc(nmemb, size);
+    else {
+        data.data.address = (unsigned long)original_malloc(data.data.size);
+        memset((void *)data.data.address, 0, data.data.size);
+    }
+    
+    write(pipe_fd, &type, sizeof(type));
+    write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    return (void *)data.data.address;
+}
+
+void *malloc(size_t size) {
+    if(!overload_initialized) initialize_overload();
+    allocation_data_u data;
+    static unsigned char type = ALLOC_TYPE;
+    
+    asm("push [rbp + 8]");
+    data.data.scope = (unsigned long)get_scope_address();
+    asm("add rsp, 8");
+    
+    data.data.address = (unsigned long)original_malloc(size);
+    data.data.size = size;
+    
+    write(pipe_fd, &type, sizeof(type));
+    write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    return (void *)data.data.address;
+}
+
+void free(void *ptr) {
+    if(!overload_initialized) initialize_overload();
+    free_data_u data;
+    static unsigned char type = FREE_TYPE;
+    
+    asm("push [rbp + 8]");
+    data.data.scope = (unsigned long)get_scope_address();
+    asm("add rsp, 8");
+    
+    data.data.address = (unsigned long)ptr;
+    original_free(ptr);
+    
+    write(pipe_fd, &type, sizeof(type));
+    write(pipe_fd, data.buffer, sizeof(data.buffer));
+}
+
+void *realloc(void *ptr, size_t size) {
+    if(!overload_initialized) initialize_overload();
+    reallocation_data_u data;
+    static unsigned char type = REALLOC_TYPE;
+    
+    asm("push [rbp + 8]");
+    data.data.scope = (unsigned long)get_scope_address();
+    asm("add rsp, 8");
+    
+    data.data.original_address = (unsigned long)ptr;
+    
+    data.data.new_size = size;
+    
+    data.data.new_address = (unsigned long)original_realloc(ptr, size);
+    
+    write(pipe_fd, &type, sizeof(type));
+    write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    return (void *)data.data.new_address;
+}
+
+long unsigned int get_libc_offset() {
+    char buffer[1024];
+    
+    sprintf(buffer, "/proc/%i/maps", getpid());
+    
+    int fd = open(buffer, O_RDONLY);
+    unsigned long address = 0;
+    
+    int ret = 1;
+    while(ret > 0) {
+        char c = 0;
+        int pos = 0;
+        while(c != '\n' && (ret = read(fd, &c, sizeof(c)))) buffer[pos++] = c;
+        buffer[pos] = 0;
+        
+        char str[128];
+        sscanf(buffer, "%lx-%*lx %*s %*s %*s %*s %s", &address, str, str, str, str, str, str);
+
+        if(strstr(str, "libc-")) break;
+    }
+    
+    close(fd);
+    
+    return address;
+}
+
+void initialize_overload() {
+    if(overload_initialized) return;
+    overload_initialized = 1;
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Initializing overload library . . .\n");
 #endif
@@ -98,113 +220,11 @@ void __attribute__((constructor)) aesalon_constructor() {
 #endif
 }
 
-void __attribute__((destructor)) aesalon_destructor() {
+void deinitialize_overload() {
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Overload library self-destructing . . .\n");
 #endif
-    if(pipe_fd) close(pipe_fd);
-}
-
-void* get_scope_address() {
-    asm("mov rax, [rbp + 16]");
-}
-
-void *calloc(size_t nmemb, size_t size) {
-    allocation_data_u data;    
-    static unsigned char type = ALLOC_TYPE;
-    
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
-    data.data.size = nmemb * size;
-    if(original_calloc != NULL) data.data.address = (unsigned long)original_calloc(nmemb, size);
-    else {
-        data.data.address = (unsigned long)original_malloc(data.data.size);
-        memset((void *)data.data.address, 0, data.data.size);
-    }
-    
-    write(pipe_fd, &type, sizeof(type));
-    write(pipe_fd, data.buffer, sizeof(data.buffer));
-    
-    return (void *)data.data.address;
-}
-
-void *malloc(size_t size) {
-    allocation_data_u data;
-    static unsigned char type = ALLOC_TYPE;
-    
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
-    
-    data.data.address = (unsigned long)original_malloc(size);
-    data.data.size = size;
-    
-    write(pipe_fd, &type, sizeof(type));
-    write(pipe_fd, data.buffer, sizeof(data.buffer));
-    
-    return (void *)data.data.address;
-}
-
-void free(void *ptr) {
-    free_data_u data;
-    static unsigned char type = FREE_TYPE;
-    
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
-    
-    data.data.address = (unsigned long)ptr;
-    original_free(ptr);
-    
-    write(pipe_fd, &type, sizeof(type));
-    write(pipe_fd, data.buffer, sizeof(data.buffer));
-}
-
-void *realloc(void *ptr, size_t size) {
-    reallocation_data_u data;
-    static unsigned char type = REALLOC_TYPE;
-    
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
-    
-    data.data.original_address = (unsigned long)ptr;
-    
-    data.data.new_size = size;
-    
-    data.data.new_address = (unsigned long)original_realloc(ptr, size);
-    
-    write(pipe_fd, &type, sizeof(type));
-    write(pipe_fd, data.buffer, sizeof(data.buffer));
-    
-    return (void *)data.data.new_address;
-}
-
-long unsigned int get_libc_offset() {
-    char buffer[1024];
-    
-    sprintf(buffer, "/proc/%i/maps", getpid());
-    
-    int fd = open(buffer, O_RDONLY);
-    unsigned long address = 0;
-    
-    int ret = 1;
-    while(ret > 0) {
-        char c = 0;
-        int pos = 0;
-        while(c != '\n' && (ret = read(fd, &c, sizeof(c)))) buffer[pos++] = c;
-        buffer[pos] = 0;
-        
-        char str[128];
-        sscanf(buffer, "%lx-%*lx %*s %*s %*s %*s %s", &address, str, str, str, str, str, str);
-
-        if(strstr(str, "libc-")) break;
-    }
-    
-    close(fd);
-    
-    return address;
+    if(pipe_fd) close(pipe_fd);    
 }
 
 

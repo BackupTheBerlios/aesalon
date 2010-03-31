@@ -25,6 +25,7 @@ Viewport::~Viewport() {
 void Viewport::merge_canvas(Canvas* canvas) {
     local_canvas.combine_with(*canvas);
     emit paint_canvas(&local_canvas);
+    delete canvas;
 }
 
 void Viewport::clear_canvas() {
@@ -80,7 +81,19 @@ void Viewport::paintEvent(QPaintEvent *event) {
 void Viewport::mouseMoveEvent(QMouseEvent *event) {
     CoordinateMapper mapper(size(), local_canvas.get_range());
     DataPoint point = mapper.map_to(event->posF());
+    
+    if(event->buttons() & Qt::LeftButton) {
+        DataPoint old_point = mapper.map_to(old_mouse_pos);
+        DataPoint move_by = DataPoint(point.get_time_element().ns_until(old_point.get_time_element()), old_point.get_data_element() - point.get_data_element());
+        local_canvas.shift_range(move_by);
+        old_mouse_pos = event->posF();
+        emit paint_canvas(&local_canvas);
+    }
     emit mouse_position(formatter->format_point(point));
+}
+
+void Viewport::mousePressEvent(QMouseEvent *event) {
+    if(event->button() == Qt::LeftButton) old_mouse_pos = event->posF();
 }
 
 void Viewport::resizeEvent(QResizeEvent *event) {
@@ -137,11 +150,4 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     
     set_canvas_range(range);
     emit paint_canvas(&local_canvas);
-}
-
-void Viewport::keyPressEvent(QKeyEvent *event) {
-}
-
-void Viewport::keyReleaseEvent(QKeyEvent *event) {
-    
 }

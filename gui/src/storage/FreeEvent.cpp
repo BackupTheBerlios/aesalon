@@ -21,6 +21,11 @@
 #include "EventVisitor.h"
 
 void FreeEvent::apply_to(Snapshot *snapshot) {
+    if(address == 0) {
+        /* According to the man page for free(3): "If ptr is NULL, no operation is performed"->
+            As such . . . */
+        return;
+    }
     if(!snapshot->get_head_node()) {
         qCritical("Asked to remove block from non-existent tree . . .");
         return;
@@ -46,14 +51,14 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
         last_node = node;
         if((address & mask) == 0) {
             if(node->get_left() == NULL) {
-                qCritical("Couldn't traverse tree to remove block . . .");
+                qCritical("Couldn't traverse tree to remove block (address of block was %llx)", address);
                 return;
             }
             node = node->get_left();
         }
         else {
             if(node->get_right() == NULL) {
-                qCritical("Couldn't traverse tree to remove block . . .");
+                qCritical("Couldn't traverse tree to remove block (address of block was %llx)", address);
                 return;
             }
             node = node->get_right();

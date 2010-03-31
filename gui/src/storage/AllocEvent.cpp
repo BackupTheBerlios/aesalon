@@ -21,6 +21,10 @@
 #include "EventVisitor.h"
 
 void AllocEvent::apply_to(Snapshot *snapshot) {
+    if(get_size() == 0 || get_address() == 0) {
+        /* If the size is zero, or the address is NULL, then tracking is not required.*/
+        return;
+    }
     /* Create the head node if it doesn't exist . . . */
     if(snapshot->get_head_node() == NULL) {
         snapshot->set_head_node(new BiTreeNode(snapshot->get_snapshot_id()));

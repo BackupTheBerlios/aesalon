@@ -13,6 +13,7 @@ private:
     CanvasPainter *canvas_painter;
     QImage rendered;
     AxisFormatter *formatter;
+    QPointF old_mouse_pos;
 public:
     Viewport(VisualizationFactory *factory, QWidget *parent);
     virtual ~Viewport();
@@ -25,10 +26,9 @@ public slots:
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
     virtual void resizeEvent(QResizeEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
-    virtual void keyPressEvent(QKeyEvent *event);
-    virtual void keyReleaseEvent(QKeyEvent *event);
 signals:
     void paint_canvas(Canvas *canvas);
     void mouse_position(QString formatted);

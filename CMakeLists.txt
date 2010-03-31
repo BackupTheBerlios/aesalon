@@ -31,9 +31,13 @@ else(DEVELOPMENT_BUILD)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif(DEVELOPMENT_BUILD)
 
-# Compile the tests if this is a dev build
-if(DEVELOPMENT_BUILD)
+# Compile the tests if wanted
+if(BUILD_TESTS)
     add_subdirectory(tests)
+endif(BUILD_TESTS)
+
+# If this is a dev build, add a doc target
+if(DEVELOPMENT_BUILD)
     add_custom_target("doc" DEPENDS monitor_doc gui_doc)
 endif(DEVELOPMENT_BUILD)
 

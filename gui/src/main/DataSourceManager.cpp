@@ -35,10 +35,10 @@ DataSourceManager::DataSourceManager(QWidget *parent) : QWidget(parent) {
     
     lower_button_layout = new QHBoxLayout();
     
-    new_source = new QPushButton(tr("&New data source"));
+    new_source = new QPushButton(tr("&Create data source"));
     lower_button_layout->addWidget(new_source);
     
-    create_session = new QPushButton(tr("Create &Session"));
+    create_session = new QPushButton(tr("Launch &Session"));
     connect(create_session, SIGNAL(clicked()), SLOT(launch_session()));
     lower_button_layout->addWidget(create_session);
     
