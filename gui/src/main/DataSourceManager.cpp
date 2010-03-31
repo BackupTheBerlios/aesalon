@@ -29,6 +29,7 @@ DataSourceManager::DataSourceManager(QWidget *parent) : QWidget(parent) {
     
     source_list = new QListWidget();
     source_list->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    connect(source_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(edit_data_source(QListWidgetItem*)));
     main_layout->addWidget(source_list);
     
     QTimer::singleShot(0, this, SLOT(update_list()));
@@ -36,6 +37,7 @@ DataSourceManager::DataSourceManager(QWidget *parent) : QWidget(parent) {
     lower_button_layout = new QHBoxLayout();
     
     new_source = new QPushButton(tr("&Create data source"));
+    connect(new_source, SIGNAL(clicked(bool)), SLOT(create_data_source()));
     lower_button_layout->addWidget(new_source);
     
     create_session = new QPushButton(tr("Launch &Session"));
@@ -45,6 +47,8 @@ DataSourceManager::DataSourceManager(QWidget *parent) : QWidget(parent) {
     main_layout->addLayout(lower_button_layout);
     
     this->setLayout(main_layout);
+    
+    editor = new DataSourceEditor(this);
 }
 
 DataSourceManager::~DataSourceManager() {
@@ -107,4 +111,23 @@ void DataSourceManager::launch_session() {
     Session *session = new Session(this, ds);
     emit session_launched(session);
     emit tab_request(session, session_name);
+}
+
+void DataSourceManager::create_data_source() {
+    DataSource *source = editor->create_new();
+    if(source == NULL) return;
+    add_new_data_source(source);
+    update_list();
+    save_to_config();
+}
+
+void DataSourceManager::edit_data_source(QListWidgetItem *item) {
+    DataSource *ds = NULL;
+    foreach(ds, data_source_list) {
+        if(ds && ds->get_name() == item->data(Qt::DisplayRole).toString()) break;
+    }
+    if(!ds) return;
+    editor->edit(ds);
+    update_list();
+    save_to_config();
 }

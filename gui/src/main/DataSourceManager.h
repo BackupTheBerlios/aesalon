@@ -28,6 +28,7 @@
 
 #include "data/DataSource.h"
 #include "session/Session.h"
+#include "DataSourceEditor.h"
 
 class DataSourceManager : public QWidget { Q_OBJECT
 private:
@@ -37,6 +38,7 @@ private:
     QHBoxLayout *lower_button_layout;
     QPushButton *new_source;
     QPushButton *create_session;
+    DataSourceEditor *editor;
 public:
     DataSourceManager(QWidget *parent);
     virtual ~DataSourceManager();
@@ -45,6 +47,8 @@ private slots:
     void save_to_config();
     void update_list();
     void launch_session();
+    void create_data_source();
+    void edit_data_source(QListWidgetItem *item);
 public slots:
     void add_new_data_source(DataSource *data_source);
     void data_source_changed(DataSource *data_source);
