@@ -93,5 +93,5 @@ qint64 Timestamp::to_ns() const {
 QString Timestamp::to_string() const {
     qint64 seconds = ns / NS_PER_SEC;
     return QString().sprintf("%s%02lli:%02lli.%03lli.%03lli", ns < 0?"-":"", qAbs(seconds / 60),
-        qAbs(seconds % 60), qAbs(ns / NS_PER_MS), qAbs((ns / 1000) % 1000));
+        qAbs(seconds % 60), qAbs(ns / NS_PER_MS) % 1000, qAbs((ns / 1000) % 1000));
 }

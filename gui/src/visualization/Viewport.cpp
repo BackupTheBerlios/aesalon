@@ -106,14 +106,42 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     
     qreal scale_amount = 1.0 - ((event->delta() / 120.0) / 10.0);
     
-    qint64 new_x = x_start + (x_percentage*x_range / scale_amount) - (x_percentage*x_range);
-    qreal new_y = y_start + (y_percentage*y_range / scale_amount) - (y_percentage*y_range);
+    qint64 new_x;
+    qint64 new_x_range;
+    qreal new_y;
+    qreal new_y_range;
+    
+    if(event->modifiers() & Qt::ControlModifier) {
+        new_x = x_start + (x_percentage*x_range / scale_amount) - (x_percentage*x_range);
+        new_x_range = x_range * scale_amount;
+        new_y = y_start;
+        new_y_range = y_range;
+    }
+    else if(event->modifiers() & Qt::ShiftModifier) {
+        new_x = x_start;
+        new_x_range = x_range;
+        new_y = y_start + (y_percentage*y_range / scale_amount) - (y_percentage*y_range);
+        new_y_range = y_range * scale_amount;
+    }
+    else {
+        new_x = x_start + (x_percentage*x_range / scale_amount) - (x_percentage*x_range);
+        new_x_range = x_range * scale_amount;
+        new_y = y_start + (y_percentage*y_range / scale_amount) - (y_percentage*y_range);
+        new_y_range = y_range * scale_amount;
+    }
     
     range.get_begin().set_time_element(Timestamp(new_x));
     range.get_begin().set_data_element(new_y);
-    range.get_end().set_time_element(Timestamp(new_x + x_range * scale_amount));
-    range.get_end().set_data_element(new_y + y_range * scale_amount);
+    range.get_end().set_time_element(Timestamp(new_x + new_x_range));
+    range.get_end().set_data_element(new_y + new_y_range);
     
     set_canvas_range(range);
     emit paint_canvas(&local_canvas);
+}
+
+void Viewport::keyPressEvent(QKeyEvent *event) {
+}
+
+void Viewport::keyReleaseEvent(QKeyEvent *event) {
+    
 }

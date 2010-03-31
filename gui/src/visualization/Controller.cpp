@@ -35,7 +35,7 @@ void Controller::begin_rt() {
 }
 
 void Controller::end_rt() {
-    update_timer->stop();
+    if(update_timer) update_timer->stop();
 }
 
 void Controller::render_full() {

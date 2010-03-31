@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
     
     QCoreApplication::setOrganizationName("aesalon");
     QCoreApplication::setApplicationName("gui");
+    QCoreApplication::setApplicationVersion(QString().append(AESALON_MAJOR_VERSION).append(".").append(AESALON_MINOR_VERSION).append(".").append(AESALON_PATCHLEVEL));
     
     MainWindow mw;
     mw.show();

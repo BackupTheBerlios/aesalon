@@ -27,6 +27,8 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void resizeEvent(QResizeEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
 signals:
     void paint_canvas(Canvas *canvas);
     void mouse_position(QString formatted);
