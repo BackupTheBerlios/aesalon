@@ -16,10 +16,11 @@ OverloadParser::~OverloadParser() {
 
 void OverloadParser::parse() {
     unsigned char type;
-    if(read(pipe_fd, &type, sizeof(type)) == -1) {
+    if(read(pipe_fd, &type, sizeof(type)) != sizeof(type)) {
         /*throw Exception::OverloadException(Misc::StreamAsString() << "Couldn't read type from pipe: " << strerror(errno));*/
         return;
     }
+    std::cout << "type: " << int(type) << std::endl;
     if(type == ALLOC_TYPE) {
         allocation_data_u data;
         int bytes = read(pipe_fd, &data, sizeof(data));
@@ -34,6 +35,7 @@ void OverloadParser::parse() {
         Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::ALLOC_EVENT, data.data.scope, data.data.address, data.data.size));
     }
     else if(type == FREE_TYPE) {
+        std::cout << "found FREE_TYPE . . ." << std::endl;
         free_data_u data;
         int bytes = read(pipe_fd, &data, sizeof(data));
         if(bytes == -1) {
@@ -44,6 +46,7 @@ void OverloadParser::parse() {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Incomplete data from pipe!");*/
             return;
         }
+        std::cout << "OverloadParser: pushing FreeEvent onto queue . . ." << std::endl;
         Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::FREE_EVENT, data.data.scope, data.data.address));
     }
     else if(type == REALLOC_TYPE) {

@@ -113,6 +113,8 @@ void free(void *ptr) {
     free_data_u data;
     static unsigned char type = FREE_TYPE;
     
+    printf("overloaded free(void *) . . . (type is %i) \n", type);
+    
     asm("push [rbp + 8]");
     data.data.scope = (unsigned long)get_scope_address();
     asm("add rsp, 8");
@@ -120,8 +122,11 @@ void free(void *ptr) {
     data.data.address = (unsigned long)ptr;
     original_free(ptr);
     
-    write(pipe_fd, &type, sizeof(type));
-    write(pipe_fd, data.buffer, sizeof(data.buffer));
+    int ret = 0;
+    ret = write(pipe_fd, &type, sizeof(type));
+    /*if(ret != 1)*/ printf("return value of first write: %i\n", ret);
+    ret = write(pipe_fd, data.buffer, sizeof(data.buffer));
+/*    if(ret != 16)*/ printf("return value of second write: %i\n", ret);
 }
 
 void *realloc(void *ptr, size_t size) {

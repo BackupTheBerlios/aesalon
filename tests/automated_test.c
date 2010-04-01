@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define NUM_BLOCKS 5
+#define NUM_BLOCKS 50
 
 int *blocks[NUM_BLOCKS];
 

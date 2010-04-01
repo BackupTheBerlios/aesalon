@@ -70,12 +70,14 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
         setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
         setenv("aesalon_malloc_offset", (Misc::StreamAsString() << std::hex << malloc_offset).operator std::string().c_str(), 1);
         close(fds[0]);
+        fcntl(fds[1], F_SETFL, fcntl(fds[1], F_GETFL) & ~O_NONBLOCK);
 #endif
         if(execv(argument_list->get_argument(0).c_str(), argument_list->get_as_argv()) == -1) {
             throw Exception::PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
         }
     }
 #ifdef USE_OVERLOAD
+    fcntl(fds[0], F_SETFL, fcntl(fds[0], F_GETFL) & ~O_NONBLOCK);
     close(fds[1]);
     pipe_fd = fds[0];
 #endif
