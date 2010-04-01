@@ -51,6 +51,7 @@ public:
     void inc_block_count() { block_count ++; }
     void dec_block_count() { block_count --; }
     void set_block_count(quint64 new_block_count) { block_count = new_block_count; }
+    Block *get_block(MemoryAddress address);
     
     const Timestamp &get_timestamp() const { return timestamp; }
     void update_timestamp(const Timestamp &new_timestamp) { timestamp = new_timestamp; }

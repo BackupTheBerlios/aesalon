@@ -29,6 +29,32 @@ Snapshot::~Snapshot() {
 
 }
 
+Block *Snapshot::get_block(MemoryAddress address) {
+    BiTreeNode *node = get_head_node();
+    
+    quint8 max_depth = get_max_tree_depth();
+    /* First, traverse the tree to find the right spot. Do not create any
+        nodes required to get there -- this is a removal, not an addition! */
+    for(quint8 depth = 63; depth > 64 - max_depth; depth --) {
+        quint64 mask = 0x01;
+        mask <<= depth;
+        
+        if((address & mask) == 0) {
+            if(node->get_left() == NULL) {
+                return NULL;
+            }
+            node = node->get_left();
+        }
+        else {
+            if(node->get_right() == NULL) {
+                return NULL;
+            }
+            node = node->get_right();
+        }
+    }
+    return node->get_block(address);
+}
+
 void Snapshot::free_tree() {
     QQueue<BiTreeNode *> to_visit;
     QList<BiTreeNode *> to_delete;

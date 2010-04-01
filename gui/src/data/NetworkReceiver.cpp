@@ -82,19 +82,19 @@ void NetworkReceiver::data_received() {
             quint64 address = pop_quint64();
             if(block_type == 0) {
                 quint64 size = pop_quint64();
-                emit event_received(new AllocEvent(timestamp, address, size, scope_address));
+                event_received(new AllocEvent(timestamp, address, size, scope_address));
             }
             else if(block_type == 1) {
                 quint64 new_address = pop_quint64();
                 quint64 new_size = pop_quint64();
                 /* From the man page for realloc: "If ptr is NULL, then the call is equivalent to malloc(size),
-                    for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr).
+                    for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)."
                     Ergo, don't emit free/alloc events for such cases. */
-                if(address != 0) emit event_received(new FreeEvent(timestamp, address, scope_address));
-                if(new_size != 0) emit event_received(new AllocEvent(timestamp, new_address, new_size, scope_address));
+                if(address != 0) event_received(new FreeEvent(timestamp, address, scope_address));
+                if(new_size != 0) event_received(new AllocEvent(timestamp, new_address, new_size, scope_address));
             }
             else if(block_type == 2) {
-                emit event_received(new FreeEvent(timestamp, address, scope_address));
+                event_received(new FreeEvent(timestamp, address, scope_address));
             }
         }
         else if((type_byte & 0x03) == 2) {

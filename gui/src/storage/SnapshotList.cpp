@@ -100,55 +100,73 @@ Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
 }
 
 Block *SnapshotList::get_block(const Timestamp &timestamp, MemoryAddress address) {
-    Snapshot *snapshot = get_snapshot_for(timestamp);
+    Block *block = NULL;
     
-    BiTreeNode *node = snapshot->get_head_node();
-#if 0    
-    qDebug("Traversing tree for %llx . . .", address);
-    qDebug("Timestamp is %s", qPrintable(timestamp.to_string()));
+    Snapshot *closest = get_closest_snapshot(timestamp);
     
-    class Scanner {
-    public:
-        Block *look_for(MemoryAddress address, BiTreeNode *in) {
-            if(in == NULL) return NULL;
-            if(in->get_block_list_size()) return in->get_block(address);
-            else {
-                Block *block;
-                block = look_for(address, in->get_left());
-                if(!block) block = look_for(address, in->get_right());
-                return block;
-            }
-        }
-    };
-
-    Scanner scanner;
-    Block *b = scanner.look_for(address, node);
-    return b;
-#endif    
-    quint8 max_depth = snapshot->get_max_tree_depth();
-    for(quint8 depth = 63; depth > 64 - max_depth; depth --) {
-        quint64 mask = 0x01;
-        mask <<= depth;
-        
-        if((address & mask) == 0) {
-            if(node->get_left() == NULL) {
-                qDebug("Couldn't traverse tree (depth is %i).", depth);
-                return NULL;
-            }
-            node = node->get_left();
-        }
-        else {
-            if(node->get_right() == NULL) {
-                qDebug("Couldn't traverse tree (depth is %i).", depth);
-                return NULL;
-            }
-            node = node->get_right();
-        }
+    block = closest->get_block(address);
+    
+    if(closest->get_snapshot_id() == get_last_id()) {
+        qDebug("looking at last snapshot, returning block.");
+        return block;
     }
     
-    Block *block = node->get_block(address);
+    class Visitor : public EventVisitor {
+    public:
+        enum {
+            FIRST_PASS,
+            SECOND_PASS
+        } mode;
+        MemoryAddress address;
+        AllocEvent *alloc_event;
+        FreeEvent *free_event;
+        Visitor(MemoryAddress address) : address(address) {
+            alloc_event = NULL;
+            free_event = NULL;
+            mode = FIRST_PASS;
+        }
+        virtual void visit(AllocEvent *event) {
+            if(mode == SECOND_PASS) return;
+            if(event->get_address() == address) {
+                alloc_event = event;
+                free_event = NULL;
+            }
+        }
+        virtual void visit(FreeEvent *event) {
+            if(mode == SECOND_PASS && free_event != NULL) return;
+            if(event->get_address() == address) free_event = event;
+        }
+    };
     
-    return block;
+    Visitor visitor(address);
+    
+    iterate_through(closest->get_timestamp(), timestamp, visitor);
+    
+    /* If the block was allocated earlier (e.g. previous snapshot), and not freed, return block. */
+    if(visitor.alloc_event == NULL && visitor.free_event == NULL) return block;
+    /* If the block was allocated earlier, and freed, then return NULL. */
+    if(visitor.alloc_event == NULL && visitor.free_event != NULL) return NULL;
+    
+    /* If it's been allocated and not freed, look for the FreeEvent . . . */
+    if(visitor.alloc_event != NULL && visitor.free_event == NULL) {
+        visitor.mode = Visitor::SECOND_PASS;
+        iterate_through(timestamp, get_snapshot(closest->get_snapshot_id() + 1)->get_timestamp(), visitor);
+        if(visitor.free_event == NULL) {
+            /* Then get the block information from the next snapshot . . . */
+            return get_snapshot(closest->get_snapshot_id() + 1)->get_block(address);
+        }
+        /* Else chain onto the fouth case below. */
+    }
+    /* If it's been allocated and freed already, then construct a new, temporary block. */
+    if(visitor.alloc_event != NULL && visitor.free_event != NULL) {
+        /* Construct temporary block . . . */
+        block = new Block(visitor.alloc_event->get_timestamp(), address, visitor.alloc_event->get_size(), visitor.alloc_event->get_scope());
+        block->set_release_time(visitor.free_event->get_timestamp());
+        block->set_release_scope(visitor.free_event->get_scope());
+        return block;
+    }
+    /* This should never happen. */
+    return NULL;
 }
 
 bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amount) {

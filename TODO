@@ -1,7 +1,5 @@
 Monitor:
-- Fix Breakpoint's method of storing observers to be more efficient
 - Implement proper taint-tracking so references can be calculated
-- Send or do something with allocation scope in OverloadParser
 - Figure out why select() in ServerSocket::accept_connections mistakenly detects a connection
 GUI:
 - Embed Konsole inside Session for LaunchSources?
@@ -10,4 +8,7 @@ GUI:
 - Store the maximum tree depth inside the DataSource
 - Add the ability to create new DataSources
 - Add other DataSources (LaunchSource, etc.)
-
+- Speed optimizations, such as:
+    - Partial renderings
+    - CanvasObject caching
+- Generic polishing

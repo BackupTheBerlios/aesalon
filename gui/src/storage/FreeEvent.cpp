@@ -71,9 +71,10 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
         node = node->mark_changed(snapshot->get_snapshot_id());
         if(last_node->get_left() == old_node) last_node->set_left(node);
         else if(last_node->get_right() == old_node) last_node->set_right(node);
-        node->remove_block(block);
         block->set_release_time(get_timestamp());
         block->set_release_scope(get_scope());
+        
+        node->remove_block(block);
         snapshot->dec_block_count();
     }
     else {
