@@ -94,7 +94,6 @@ void NetworkReceiver::data_received() {
                 if(new_size != 0) emit event_received(new AllocEvent(timestamp, new_address, new_size, scope_address));
             }
             else if(block_type == 2) {
-                qDebug("Received FreeEvent . . .");
                 emit event_received(new FreeEvent(timestamp, address, scope_address));
             }
         }

@@ -66,6 +66,10 @@ public:
     std::size_t get_malloc_breakpoint_id() const { return malloc_breakpoint_id; }
     std::size_t get_free_breakpoint_id() const { return free_breakpoint_id; }
     std::size_t get_realloc_breakpoint_id() const { return realloc_breakpoint_id; }    
+
+#ifdef USE_OVERLOAD
+    void process_backlog();
+#endif
 };
 
 

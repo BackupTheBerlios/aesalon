@@ -158,8 +158,16 @@ void Initializer::run() {
             get_socket()->send_data(event_queue);
         }
         /*server_socket->accept_connections();*/
+#ifdef USE_OVERLOAD
+        usleep(300);
+#endif
     }
+#ifdef USE_OVERLOAD
+    Misc::Message(Misc::Message::DEBUG_MESSAGE, "Processing backlog . . .");
+    program_manager->process_backlog();
+#endif
     get_event_queue()->push_event(new Event::MonitorEvent(Event::MonitorEvent::PROGRAM_FINISHED));
+    /* Now send off the backlog . . . */
     get_socket()->send_data(event_queue);
 }
 

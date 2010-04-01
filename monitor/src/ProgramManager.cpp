@@ -31,12 +31,11 @@ ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
     /*disassembler = new ASM::Disassembler(elf_parser);*/
     
     /*disassembler->get_symbol_il("main");*/
+    
+    overload_parser = NULL;
 }
 
 ProgramManager::~ProgramManager() {
-#ifdef USE_OVERLOAD
-    delete overload_parser;
-#endif
     if(ptrace_portal) delete ptrace_portal;
     delete elf_parser;
     delete libc_parser;
@@ -55,9 +54,6 @@ void ProgramManager::execute() {
 }
 
 void ProgramManager::wait() {
-#ifdef USE_OVERLOAD
-    overload_parser->parse();
-#endif
     ptrace_portal->handle_signal();
 }
 
@@ -81,4 +77,8 @@ void ProgramManager::place_initial_breakpoints() {
     overload_parser->get_symbol("pipe_fd");
     
     delete overload_parser;*/
+}
+
+void ProgramManager::process_backlog() {
+    delete overload_parser;
 }
