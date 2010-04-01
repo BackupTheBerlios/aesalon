@@ -69,6 +69,13 @@ Snapshot *SnapshotList::get_snapshot_for(const Timestamp &timestamp) {
 }
 
 Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
+    /*qDebug("Looking for %s . . .", qPrintable(timestamp.to_string()));
+    for(int i = internal_list.size()-1; i >= 0; i --) {
+        if(internal_list[i]->get_timestamp() <= timestamp) return internal_list[i];
+        qDebug("Passed over %i, timestamp %s", i, qPrintable(internal_list[i]->get_timestamp().to_string()));
+    }
+    return NULL;*/
+
     QList<Snapshot *>::iterator begin = internal_list.begin(), end = internal_list.end(), middle;
     int n = end - begin;
     int half;
@@ -88,7 +95,6 @@ Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
             n = half;
         }
     }
-    /*qDebug("closest snapshot for %s was %lli", qPrintable(timestamp.to_string()), (*begin)->get_snapshot_id());*/
     if(begin != internal_list.begin()) begin --;
     return *(begin);
 }
@@ -97,8 +103,9 @@ Block *SnapshotList::get_block(const Timestamp &timestamp, MemoryAddress address
     Snapshot *snapshot = get_snapshot_for(timestamp);
     
     BiTreeNode *node = snapshot->get_head_node();
-    
+#if 0    
     qDebug("Traversing tree for %llx . . .", address);
+    qDebug("Timestamp is %s", qPrintable(timestamp.to_string()));
     
     class Scanner {
     public:
@@ -107,16 +114,17 @@ Block *SnapshotList::get_block(const Timestamp &timestamp, MemoryAddress address
             if(in->get_block_list_size()) return in->get_block(address);
             else {
                 Block *block;
-                if((block = look_for(address, in->get_left())) == NULL && (block = look_for(address, in->get_right())) == NULL) {}
+                block = look_for(address, in->get_left());
+                if(!block) block = look_for(address, in->get_right());
                 return block;
             }
         }
     };
-    
+
     Scanner scanner;
     Block *b = scanner.look_for(address, node);
     return b;
-    
+#endif    
     quint8 max_depth = snapshot->get_max_tree_depth();
     for(quint8 depth = 63; depth > 64 - max_depth; depth --) {
         quint64 mask = 0x01;
@@ -138,13 +146,9 @@ Block *SnapshotList::get_block(const Timestamp &timestamp, MemoryAddress address
         }
     }
     
-    qDebug("Traversed tree, getting block . . .");
-    
     Block *block = node->get_block(address);
     
-    /*Block *block = node->get_block(address);
-    qDebug("Returning %p . . .", block);*/
-    return NULL;
+    return block;
 }
 
 bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amount) {
@@ -195,7 +199,7 @@ void SnapshotList::iterate_through(const Timestamp &from, const Timestamp &to, E
     }
 }
 
-int SnapshotList::count_events(const Timestamp& from, const Timestamp& to) {
+int SnapshotList::count_events(const Timestamp &from, const Timestamp & to) {
     Snapshot *from_snapshot = get_closest_snapshot(from);
     Snapshot *to_snapshot = NULL;
     int count = 0;

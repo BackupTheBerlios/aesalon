@@ -35,7 +35,6 @@ Block *BiTreeNode::get_block_for(MemoryAddress address) const {
     return NULL;
 }
 
-
 BiTreeNode *BiTreeNode::mark_changed(SnapshotID by_snapshot) {
     if(snapshot_id == by_snapshot) return this;
     BiTreeNode *new_node = new BiTreeNode(by_snapshot);

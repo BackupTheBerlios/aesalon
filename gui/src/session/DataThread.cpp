@@ -23,7 +23,9 @@
 DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(parent), data_source(data_source) {
     current_snapshot = snapshot_list.append_snapshot();
     current_snapshot->set_head_node(new BiTreeNode(current_snapshot->get_snapshot_id()));
+    current_snapshot->update_timestamp(Timestamp(0));
     current_snapshot = snapshot_list.append_snapshot();
+    current_snapshot->update_timestamp(Timestamp(0));
     start_time = NULL;
     finish_time = NULL;
 }
@@ -52,7 +54,7 @@ void DataThread::event_received(Event *event) {
 }
 
 void DataThread::create_new_snapshot() {
-    current_snapshot->update_timestamp(Timestamp());
+    /*current_snapshot->update_timestamp(start_time->ns_until(Timestamp()));*/
     current_snapshot = snapshot_list.append_snapshot();
 }
 
@@ -60,8 +62,8 @@ void DataThread::started(Timestamp *time) {
     /* NOTE: get this from somewhere else . . . hardcoding it is a bad idea. */
     snapshot_timer->start(5000);
     start_time = time;
-    snapshot_list.get_snapshot(1)->update_timestamp(*start_time);
-    current_snapshot->update_timestamp(*start_time);
+    /*snapshot_list.get_snapshot(1)->update_timestamp(*start_time);*/
+    /*current_snapshot->update_timestamp(*start_time);*/
     emit data_started();
 }
 
