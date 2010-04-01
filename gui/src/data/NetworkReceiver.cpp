@@ -71,16 +71,18 @@ void NetworkReceiver::data_received() {
         if((type_byte & 0x03) == 1) {
             quint8 block_type = (type_byte & 0x0c) >> 2;
             quint8 block_type_sizes[] = {16, 24, 8};
-            if(unprocessed.size() < (block_type_sizes[block_type]+8)) {
+            /* Check the size of the waiting data. At least 16 more bytes are required (8 for timestamp, 8 for scope). */
+            if(unprocessed.size() < (block_type_sizes[block_type]+16)) {
                 unprocessed.prepend(type_byte);
                 break;
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
+            quint64 scope_address = pop_quint64();
             quint64 address = pop_quint64();
             if(block_type == 0) {
                 quint64 size = pop_quint64();
-                emit event_received(new AllocEvent(timestamp, address, size));
+                emit event_received(new AllocEvent(timestamp, address, size, scope_address));
             }
             else if(block_type == 1) {
                 quint64 new_address = pop_quint64();
@@ -88,11 +90,11 @@ void NetworkReceiver::data_received() {
                 /* From the man page for realloc: "If ptr is NULL, then the call is equivalent to malloc(size),
                     for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr).
                     Ergo, don't emit free/alloc events for such cases. */
-                if(address != 0) emit event_received(new FreeEvent(timestamp, address));
-                if(new_size != 0) emit event_received(new AllocEvent(timestamp, new_address, new_size));
+                if(address != 0) emit event_received(new FreeEvent(timestamp, address, scope_address));
+                if(new_size != 0) emit event_received(new AllocEvent(timestamp, new_address, new_size, scope_address));
             }
             else if(block_type == 2) {
-                emit event_received(new FreeEvent(timestamp, address));
+                emit event_received(new FreeEvent(timestamp, address, scope_address));
             }
         }
         else if((type_byte & 0x03) == 2) {

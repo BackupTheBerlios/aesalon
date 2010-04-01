@@ -19,8 +19,16 @@
 
 #include "Block.h"
 
+Block::Block(const Timestamp &allocation_time, MemoryAddress address, MemorySize size, MemoryAddress alloc_scope)
+    : allocation_time(allocation_time), release_time(0), address(address), size(size), allocation_scope(alloc_scope),
+    release_scope(0) {
+
+}
+
+
 Block* Block::clone() {
-    Block *block = new Block(get_allocation_time(), address, size);
+    Block *block = new Block(get_allocation_time(), address, size, get_allocation_scope());
     block->set_release_time(get_release_time());
+    block->release_scope = release_scope;
     return block;
 }

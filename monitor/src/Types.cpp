@@ -27,6 +27,7 @@ Block::Block(Byte *data, std::size_t data_size) {
     for(std::size_t x = 0; x < data_size; x ++) {
         this->data.push_back(data[x]);
     }
+    reserved = data_size;
 }
 
 void Block::remove(std::size_t from, std::size_t to) {
@@ -72,4 +73,12 @@ void Block::push_word(Word data) {
     get_data()[offset+5] = (data >> 40) & 0xff;
     get_data()[offset+6] = (data >> 48) & 0xff;
     get_data()[offset+7] = (data >> 56) & 0xff;
+}
+
+void Block::resize(size_t new_size) {
+    if(new_size > reserved) {
+        reserved *= 2;
+        data.reserve(reserved);
+    }
+    data.resize(new_size);
 }

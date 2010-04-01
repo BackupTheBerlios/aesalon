@@ -54,7 +54,6 @@ void Initializer::initialize() {
     event_queue = NULL;
     return_value = 0;
     storage_manager = NULL;
-    scope_manager = NULL;
     
     config_parser = new Misc::ConfigParser();
     
@@ -107,7 +106,6 @@ void Initializer::initialize() {
     }
     
     event_queue = new Event::Queue();
-    scope_manager = new Tracker::ScopeManager();
     
     if(argument_parser->get_argument("wait")->is_found()) {
         int number;

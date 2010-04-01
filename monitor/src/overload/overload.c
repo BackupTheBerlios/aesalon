@@ -227,7 +227,6 @@ void deinitialize_overload() {
     if(pipe_fd) close(pipe_fd);    
 }
 
-
 #ifdef __cplusplus
 }
 #endif

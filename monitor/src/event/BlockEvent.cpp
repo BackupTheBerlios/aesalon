@@ -36,6 +36,7 @@ Block *BlockEvent::serialize() {
     
     serialized->get_data()[0] |= (block_type << 2) & 0x0c;
     
+    serialized->push_word(get_scope());
     serialized->push_word(get_address());
 
     switch(get_block_type()) {

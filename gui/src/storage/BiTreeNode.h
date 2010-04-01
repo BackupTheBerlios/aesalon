@@ -53,6 +53,7 @@ public:
     void add_block(Block *new_block) { block_list.append(new_block); }
     void remove_block(Block *block) { block_list.removeOne(block); }
     Block *get_block(MemoryAddress address) const;
+    Block *get_block_for(MemoryAddress address) const;
     QList<Block *> &get_block_list() { return block_list; }
     int get_block_list_size() const { return block_list.size(); }
     

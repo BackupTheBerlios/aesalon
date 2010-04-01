@@ -31,7 +31,7 @@ void OverloadParser::parse() {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Incomplete data from pipe!");*/
             return;
         }
-        Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::ALLOC_EVENT, data.data.address, data.data.size));
+        Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::ALLOC_EVENT, data.data.scope, data.data.address, data.data.size));
     }
     else if(type == FREE_TYPE) {
         free_data_u data;
@@ -44,7 +44,7 @@ void OverloadParser::parse() {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Incomplete data from pipe!");*/
             return;
         }
-        Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::FREE_EVENT, data.data.address));
+        Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::FREE_EVENT, data.data.scope, data.data.address));
     }
     else if(type == REALLOC_TYPE) {
         reallocation_data_u data;
@@ -57,6 +57,6 @@ void OverloadParser::parse() {
             /*throw Exception::OverloadException(Misc::StreamAsString() << "Incomplete data from pipe!");*/
             return;
         }
-        Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::REALLOC_EVENT, data.data.original_address, data.data.new_size, data.data.new_address));
+        Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::REALLOC_EVENT, data.data.scope, data.data.original_address, data.data.new_size, data.data.new_address));
     }
 }

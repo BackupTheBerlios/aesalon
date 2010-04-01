@@ -1,10 +1,10 @@
 #include "Visualization.h"
 #include "Visualization.moc"
 
-Visualization::Visualization(VisualizationFactory *factory, DataThread *data_thread) {
+Visualization::Visualization(VisualizationFactory *factory) {
     QVBoxLayout *main_layout = new QVBoxLayout();
     
-    controller = new Controller(factory->create_renderer(), data_thread);
+    controller = new Controller(factory);
     connect(this, SIGNAL(cycle_time_changed(int)), controller, SLOT(change_update_time(int)));
     
     upper_layout = new QHBoxLayout();

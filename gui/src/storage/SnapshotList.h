@@ -26,6 +26,7 @@
 #include "Snapshot.h"
 #include "Timestamp.h"
 #include "EventVisitor.h"
+#include "Block.h"
 
 class SnapshotList {
 private:
@@ -44,6 +45,8 @@ public:
     Snapshot *get_snapshot_for(const Timestamp &timestamp);
     Snapshot *get_closest_snapshot(const Timestamp &timestamp);
     int get_snapshot_count() const { return internal_list.size(); }
+    
+    Block *get_block_for(const Timestamp &timestamp, MemoryAddress address);
     
     /* NOTE: can only adjust forwards in time, not backwards 
     void adjust_temporary_snapshot(Snapshot *temporary_snapshot, const Timestamp &to_timestamp);*/

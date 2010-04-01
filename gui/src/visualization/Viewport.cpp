@@ -8,6 +8,7 @@
 Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(parent) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMouseTracking(true);
+    setCursor(QCursor(Qt::CrossCursor));
 
     canvas_painter = new CanvasPainter(&rendered);
     rendered = QImage(width(), height(), QImage::Format_RGB32);
@@ -16,6 +17,7 @@ Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(pare
     connect(canvas_painter, SIGNAL(done()), SLOT(update()));
     
     formatter = factory->create_formatter();
+    click_handler = factory->create_click_handler();
 }
 
 Viewport::~Viewport() {
@@ -94,6 +96,10 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
 
 void Viewport::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton) old_mouse_pos = event->posF();
+    else if(event->button() == Qt::RightButton) {
+        CoordinateMapper mapper(size(), local_canvas.get_range());
+        click_handler->handle_click(mapper.map_to(event->posF()));
+    }
 }
 
 void Viewport::resizeEvent(QResizeEvent *event) {

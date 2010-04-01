@@ -27,6 +27,15 @@ Block *BiTreeNode::get_block(MemoryAddress address) const {
     return NULL;
 }
 
+Block *BiTreeNode::get_block_for(MemoryAddress address) const {
+    foreach(Block *block, block_list) {
+        if(block->get_address() <= address && address <= (block->get_address() + block->get_size())) return block;
+    }
+    qDebug("No suitable block found . . .");
+    return NULL;
+}
+
+
 BiTreeNode *BiTreeNode::mark_changed(SnapshotID by_snapshot) {
     if(snapshot_id == by_snapshot) return this;
     BiTreeNode *new_node = new BiTreeNode(by_snapshot);

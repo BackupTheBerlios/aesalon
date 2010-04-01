@@ -73,10 +73,11 @@ void FreeEvent::apply_to(Snapshot *snapshot) {
         else if(last_node->get_right() == old_node) last_node->set_right(node);
         node->remove_block(block);
         block->set_release_time(get_timestamp());
+        block->set_release_scope(get_scope());
         snapshot->dec_block_count();
     }
     else {
-        qCritical("Asked to remove non-existent block . . .");
+        qCritical("Asked to remove non-existent block (address of block was %llx)", address);
     }
     snapshot->update_timestamp(get_timestamp());
 }

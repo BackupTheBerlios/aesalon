@@ -37,10 +37,10 @@ Visualization* VisualizationList::create_from_selected(DataThread *data_thread) 
     if(currentItem() == NULL) return NULL;
     QString title = currentItem()->text();
     if(title == tr("Density Visualization")) {
-        return new Visualization(new DensityFactory(), data_thread);
+        return new Visualization(new DensityFactory(data_thread));
     }
     else if(title == tr("Block Count")) {
-        return new Visualization(new BlockCountFactory(), data_thread);
+        return new Visualization(new BlockCountFactory(data_thread));
     }
     return NULL;
 }

@@ -6,6 +6,7 @@
 #include "Canvas.h"
 #include "CanvasPainter.h"
 #include "VisualizationFactory.h"
+#include "ClickHandler.h"
 
 class Viewport : public QWidget { Q_OBJECT
 private:
@@ -13,6 +14,7 @@ private:
     CanvasPainter *canvas_painter;
     QImage rendered;
     AxisFormatter *formatter;
+    ClickHandler *click_handler;
     QPointF old_mouse_pos;
 public:
     Viewport(VisualizationFactory *factory, QWidget *parent);

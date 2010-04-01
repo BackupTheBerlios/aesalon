@@ -26,11 +26,13 @@
 class FreeEvent : public Event {
 private:
     MemoryAddress address;
+    MemoryAddress scope;
 public:
-    FreeEvent(const Timestamp &timestamp, MemoryAddress address) : Event(timestamp), address(address) {}
+    FreeEvent(const Timestamp &timestamp, MemoryAddress address, MemoryAddress scope) : Event(timestamp), address(address), scope(scope) {}
     virtual ~FreeEvent() {}
     
     MemoryAddress get_address() const { return address; }
+    MemoryAddress get_scope() const { return scope; }
     
     virtual void apply_to(Snapshot *snapshot);  
     

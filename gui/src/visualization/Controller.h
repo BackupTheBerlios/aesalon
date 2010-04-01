@@ -7,6 +7,7 @@
 #include "session/DataThread.h"
 #include "DataRange.h"
 #include "Renderer.h"
+#include "VisualizationFactory.h"
 
 class Controller : public QThread { Q_OBJECT
 private:
@@ -15,7 +16,7 @@ private:
     Renderer *renderer;
     qint64 last_update;
 public:
-    Controller(Renderer *renderer, DataThread *data_thread);
+    Controller(VisualizationFactory *factory);
     virtual ~Controller();
     
     virtual void run();

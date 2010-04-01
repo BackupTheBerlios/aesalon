@@ -23,6 +23,8 @@
 
 #include "SnapshotList.h"
 #include "Event.h"
+#include "AllocEvent.h"
+#include "FreeEvent.h"
 
 SnapshotList::SnapshotList() : last_id(0), last_temporary_id(0) {
 
@@ -88,6 +90,39 @@ Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
     /*qDebug("closest snapshot for %s was %lli", qPrintable(timestamp.to_string()), (*begin)->get_snapshot_id());*/
     if(begin != internal_list.begin()) begin --;
     return *(begin);
+}
+
+Block *SnapshotList::get_block_for(const Timestamp &timestamp, MemoryAddress address) {
+    Snapshot *snapshot = get_snapshot_for(timestamp);
+    
+    BiTreeNode *node = snapshot->get_head_node();
+    
+    quint8 max_depth = snapshot->get_max_tree_depth();
+    for(quint8 depth = 63; depth > 64 - max_depth; depth --) {
+        quint64 mask = 0x01;
+        mask <<= depth;
+        
+        /* Mark it as we're traversing the tree downwards (save the trouble later) . . . */
+        
+        if((address & mask) == 0) {
+            if(node->get_left() == NULL) {
+                qDebug("Terminating while in tree lookup . . .");
+                return NULL;
+            }
+            node = node->get_left();
+        }
+        else {
+            if(node->get_right() == NULL) {
+                qDebug("Terminating while in tree lookup . . .");
+                return NULL;
+            }
+            node = node->get_right();
+        }
+    }
+    
+    Block *block = node->get_block_for(address);
+    qDebug("Returning %p . . .", block);
+    return block;
 }
 
 bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amount) {

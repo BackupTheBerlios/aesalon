@@ -2,6 +2,11 @@
 #include "BlockCountFormatter.h"
 #include "BlockCountRenderer.h"
 
+BlockCountFactory::BlockCountFactory(DataThread *data_thread) : VisualizationFactory(data_thread) {
+
+}
+
+
 AxisFormatter *BlockCountFactory::create_formatter() const {
     return new BlockCountFormatter();
 }

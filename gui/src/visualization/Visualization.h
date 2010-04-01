@@ -24,7 +24,7 @@ private:
     Viewport *viewport;
     Controller *controller;
 public:
-    Visualization(VisualizationFactory *factory, DataThread *data_thread);
+    Visualization(VisualizationFactory *factory);
     virtual ~Visualization();
 private slots:
     void set_position(QString formatted);

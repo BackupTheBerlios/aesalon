@@ -5,6 +5,8 @@
 
 class BlockCountFactory : public VisualizationFactory {
 public:
+    BlockCountFactory(DataThread* data_thread);
+
     virtual AxisFormatter *create_formatter() const;
     virtual Renderer *create_renderer() const;
 };

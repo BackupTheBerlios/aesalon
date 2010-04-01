@@ -33,7 +33,7 @@ bool FreeObserver::handle_breakpoint(Breakpoint *breakpoint) {
     address = portal->read_memory(rbp-0x08);
     ret_address = portal->read_memory(rbp-0x10);
     
-    Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::FREE_EVENT, address));
+    Initializer::get_instance()->get_event_queue()->push_event(new Event::BlockEvent(Event::BlockEvent::FREE_EVENT, ret_address, address));
 
     /*Initializer::get_instance()->get_event_queue()->push_event(
         new Event::BlockEvent(Event::BlockEvent::FREE_EVENT,

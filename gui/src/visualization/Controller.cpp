@@ -1,7 +1,9 @@
 #include "Controller.h"
 #include "Controller.moc"
 
-Controller::Controller(Renderer *renderer, DataThread *data_thread) : QThread(NULL), data_thread(data_thread), renderer(renderer) {
+Controller::Controller(VisualizationFactory *factory) : QThread(NULL),
+    data_thread(factory->get_data_thread()), renderer(factory->create_renderer()) {
+    update_timer = NULL;
 }
 
 Controller::~Controller() {
@@ -17,6 +19,7 @@ void Controller::run() {
 void Controller::change_update_time(int ms) {
     if(!update_timer) {
         update_timer = new QTimer();
+        update_timer->setInterval(1000);
         connect(update_timer, SIGNAL(timeout()), this, SLOT(rt_update()));
     }
     update_timer->setInterval(ms);
@@ -25,6 +28,7 @@ void Controller::change_update_time(int ms) {
 void Controller::begin_rt() {
     if(!update_timer) {
         update_timer = new QTimer();
+        update_timer->setInterval(1000);
         connect(update_timer, SIGNAL(timeout()), this, SLOT(rt_update()));
     }
     if(data_thread->get_finish_time() != NULL || data_thread->get_start_time() == NULL) return;

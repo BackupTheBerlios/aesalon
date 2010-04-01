@@ -44,6 +44,7 @@ typedef int32_t SWord;
 class Block {
 private:
     std::vector<Byte> data;
+    std::size_t reserved;
 public:
     /** Generic constructor, sets data and data_size to NULL and zero, respectively. */
     Block() : data() {}
@@ -82,14 +83,9 @@ public:
     
     void hexdump();
     
-    void resize(std::size_t new_size) {
-        data.resize(new_size);
-    }
+    void resize(std::size_t new_size);
     
     void push_word(Word data);
 };
-
-
-
 
 #endif
