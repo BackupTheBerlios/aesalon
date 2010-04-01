@@ -21,9 +21,12 @@ void BlockCountRenderer::begin_rendering(const DataRange &render_range, Snapshot
 }
 
 Canvas *BlockCountRenderer::end_rendering() {
+    
     canvas->add_object(new CanvasLineObject(
         DataPoint(canvas->get_range().get_end().get_time_element(), block_count),
         DataPoint(canvas->get_range().get_end().get_time_element(), 0), qRgb(0, 0, 0)));
+    canvas->add_object(new CanvasLineObject(DataPoint(canvas->get_range().get_end().get_time_element(), block_count),
+        point, qRgb(0, 0, 0)));
     return canvas;
 }
 

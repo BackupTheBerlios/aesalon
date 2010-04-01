@@ -54,6 +54,7 @@ void ConfigParser::parse_config_file(std::string filename) {
         if(buf_string.find("=") == std::string::npos) continue;
         std::string config_name = buf_string.substr(0, buf_string.find("="));
         buf_string = buf_string.substr(buf_string.find("=")+1);
+        if(buf_string[0] == '~') buf_string.replace(0, 1, std::string(getenv("HOME")));
         config_map[config_name] = buf_string;
     }
     
