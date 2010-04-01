@@ -1,0 +1,34 @@
+Hello, World.
+
+This is announcing the first release of Aesalon, which is tagged version 0.1.0. In one sentence, Aesalon is a tool to visualize, in real-time, the dynamically-allocated memory that another program has allocated. Aesalon currently only functions on x86_64 GNU/Linux systems, though it would be easily ported to x86 GNU/Linux, BSD, or any other POSIX-compliant system. Why hasn't it been ported yet, you ask? Well, because I'm lazy, and because my computer doesn't have anything other than x86_64 GNU/Linux distros installed.
+
+Aesalon is useful for memory-leak tracking (and it will be even more useful in the near future), and can also be used for profiling/optimization. Currently, Aesalon displays the memory data in two separate ways: a simple graph of active blocks over time, and other, what I term a "density" visualization, which is address space over time. Aesalon draws rectangles to denote blocks: the taller the block, the larger it is, the wider, the longer it was allocated for. This is the most useful visualization of the two. I'm also planning a few more, such as the ability to show which scope had the most activity, etc. However, that's for next week . . .
+
+So. If this sounds like something you'd be interested in, then download and build it. Currently, the only method of getting Aesalon is via git, at git://gitorious.org/aesalon/aesalon.git. (If anyone has a good place to host a tarball, let me know, please . . . gitorious doesn't support file hosting). You'll probably want the stable branch (though you're welcome to use the master branch . . . it just probably won't work . . .), so run something along these lines (assuming you have git installed):
+
+git clone git://gitorious.org/aesalon/aesalon.git aesalon -b stable
+
+I have git 1.7.0.2, but any version more recent than 1.6 should work. Once you've cloned Aesalon (full repository should be about 1.4MB or so), begin the build process. I'm currently using CMake for the buildsystem (I've used 2.6 and 2.8, both should work), so you'll need that. You'll also need g++ (I've only used the 4.4.x series, but 4.3 should work as well), and Qt for the GUI (only tested with 4.5.3, but anything later than 4.4 should work). The build configuration file is called build.config (how imaginative of me, eh?). Edit it if you want (run-time config file paths, etc. are in here). The build procedure is fairly standard:
+
+cd aesalon
+cmake .
+make -j {number of cores * 2}
+make install
+
+Note that CMake isn't really designed for concurrent make processes, so the output is a little . . . odd. But it works. Also, note that you don't have to to install aesalon to get it working. It runs just fine inside the build directory. Once you've built Aesalon (if you have any errors, let me know), you'll need to create a configuration file. Unless you changed it in build.config, the default system-wide location is '/etc/default/aesalon', and the per-user location is '~/.config/aesalon/aesalon.conf'. Add a line with something like 'overload-path=/usr/local/lib/aesalon_overload.so'. (Note that you'll want to use the per-user location if you haven't installed Aesalon.)
+
+Aesalon uses a TCP port to communicate with itself, so be certain that the port it uses isn't blocked by a firewall (default port is 6321). Since it is over the lo device, you shouldn't have to worry about it, however.
+
+Once you've done that, you're ready to start playing around with Aesalon. Launch the GUI (it's called aesalon_gui), and hit "Create Data Source". Enter a name, such as "localhost:6321", then hit "OK". Now, in a terminal, run something like 'aesalon --wait $(which aesalon) --help'. Launch the session from the GUI, and you should see the aesalon help message appear in the terminal. Create a "Block Count" visualization (select "Block Count" from the list, and hit "New Visualization"), and select "Request->Full Visualization" from the pop-up menu on the upper-right corner of the screen. Mouse wheel zooms (a few bugs with that, don't zoom too quickly!), left-click-and-drag shifts the visualization. As you can see, there are a few memory leaks here. (Something else I need to fix . . .)
+
+Now, try the same procedure for the density visualization. If you see naught but two lines -- one at the top, one at the bottom, then zooming in will reveal the blocks. Read the malloc() man page if you're curious as to why this happens. Something else that's on my list is the ability to "split" visualizations, to hide the large regions of empty space.
+
+Now, try right-clicking on one of the blocks. In the upper-left corner, a display should pop up, telling you more information about the block. Something I'm working on is the ability to resolve the scope addresses into scope names (I have an ELF parser implemented, I just have to actually transfer the information from the command-line monitor to the GUI).
+
+There's still a few bugs with the real-time rendering, but you're welcome to give it a shot on a program that takes a little longer than a second to execute. I suggest the "automated_test" executable, inside the "tests/" directory of the Aesalon git repository.
+
+And that should be it -- a brief introduction to Aesalon. If you have any questions, feel free to email me. Something to note: there is a reason it's version 0.1.0, as in 0.1, as in 10% . . . don't be suprised when it crashes -- be suprised when it doesn't!
+
+Good luck, and happy hacking!
+
+- strange <kawk256@gmail.com>
