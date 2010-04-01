@@ -10,7 +10,7 @@ public:
     DensityClickHandler(DataThread *data_thread);
     virtual ~DensityClickHandler();
     
-    virtual void handle_click(DataPoint at);
+    virtual void handle_click(Canvas *canvas, DataPoint at);
 };
 
 #endif

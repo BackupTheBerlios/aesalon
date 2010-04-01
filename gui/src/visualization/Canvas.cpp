@@ -45,6 +45,12 @@ void Canvas::clear() {
     objects.clear();
 }
 
+CanvasObject *Canvas::object_at(const DataPoint& point) {
+    foreach(CanvasObject *object, objects) {
+        if(object->get_bounding_rect().contains(point)) return object;
+    }
+}
+
 void Canvas::combine_with(const Canvas &canvas) {
     foreach(CanvasObject *object, canvas.objects) {
         if(object->get_bounding_rect().intersects(range)) {

@@ -21,6 +21,7 @@ public:
     
     void add_object(CanvasObject *object);
     void clear();
+    CanvasObject *object_at(const DataPoint &point);
     
     void combine_with(const Canvas &canvas);
     

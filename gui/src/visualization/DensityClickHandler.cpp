@@ -7,11 +7,18 @@ DensityClickHandler::DensityClickHandler(DataThread *data_thread) : ClickHandler
 DensityClickHandler::~DensityClickHandler() {
 }
 
-void DensityClickHandler::handle_click(DataPoint at) {
+void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     QString display;
-    Block *block = data_thread->get_snapshot_list()
-        ->get_block_for(at.get_time_element(), quint64(at.get_data_element()));
+    CanvasObject *object = canvas->object_at(at);
+    if(object == NULL) {
+        qDebug("Couldn't find CanvasObject for specified point");
+        return;
+    }
+    
+    /*Block *block = data_thread->get_snapshot_list()->get_block(at.get_time_element(), quint64(object->get_bounding_rect().get_begin().get_data_element()));*/
+    Block *block = data_thread->get_snapshot_list()->get_block(at.get_time_element(), quint64(object->get_bounding_rect().get_begin().get_data_element()));
     if(block == NULL) {
+        qDebug("Block for specified point not found");
         return;
     }
     display.sprintf("Allocated at: %s\nAllocation scope: %llx",

@@ -19,6 +19,8 @@ public:
     bool intersects(const DataRange &range) const;
     DataRange intersecting_range(const DataRange &other_range) const;
     DataRange encompassing_range(const DataRange &other_range) const;
+    
+    bool contains(const DataPoint &point) const;
 };
 
 #endif

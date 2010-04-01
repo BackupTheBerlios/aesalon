@@ -98,7 +98,7 @@ void Viewport::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton) old_mouse_pos = event->posF();
     else if(event->button() == Qt::RightButton) {
         CoordinateMapper mapper(size(), local_canvas.get_range());
-        click_handler->handle_click(mapper.map_to(event->posF()));
+        click_handler->handle_click(&local_canvas, mapper.map_to(event->posF()));
     }
 }
 

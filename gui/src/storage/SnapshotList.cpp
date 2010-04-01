@@ -18,6 +18,7 @@
 */
 
 #include <QList>
+#include <QQueue>
 #include <QtAlgorithms>
 #include <algorithm>
 
@@ -92,37 +93,58 @@ Snapshot* SnapshotList::get_closest_snapshot(const Timestamp &timestamp) {
     return *(begin);
 }
 
-Block *SnapshotList::get_block_for(const Timestamp &timestamp, MemoryAddress address) {
+Block *SnapshotList::get_block(const Timestamp &timestamp, MemoryAddress address) {
     Snapshot *snapshot = get_snapshot_for(timestamp);
     
     BiTreeNode *node = snapshot->get_head_node();
+    
+    qDebug("Traversing tree for %llx . . .", address);
+    
+    class Scanner {
+    public:
+        Block *look_for(MemoryAddress address, BiTreeNode *in) {
+            if(in == NULL) return NULL;
+            if(in->get_block_list_size()) return in->get_block(address);
+            else {
+                Block *block;
+                if((block = look_for(address, in->get_left())) == NULL && (block = look_for(address, in->get_right())) == NULL) {}
+                return block;
+            }
+        }
+    };
+    
+    Scanner scanner;
+    Block *b = scanner.look_for(address, node);
+    return b;
     
     quint8 max_depth = snapshot->get_max_tree_depth();
     for(quint8 depth = 63; depth > 64 - max_depth; depth --) {
         quint64 mask = 0x01;
         mask <<= depth;
         
-        /* Mark it as we're traversing the tree downwards (save the trouble later) . . . */
-        
         if((address & mask) == 0) {
             if(node->get_left() == NULL) {
-                qDebug("Terminating while in tree lookup . . .");
+                qDebug("Couldn't traverse tree (depth is %i).", depth);
                 return NULL;
             }
             node = node->get_left();
         }
         else {
             if(node->get_right() == NULL) {
-                qDebug("Terminating while in tree lookup . . .");
+                qDebug("Couldn't traverse tree (depth is %i).", depth);
                 return NULL;
             }
             node = node->get_right();
         }
     }
     
-    Block *block = node->get_block_for(address);
-    qDebug("Returning %p . . .", block);
-    return block;
+    qDebug("Traversed tree, getting block . . .");
+    
+    Block *block = node->get_block(address);
+    
+    /*Block *block = node->get_block(address);
+    qDebug("Returning %p . . .", block);*/
+    return NULL;
 }
 
 bool SnapshotList::move_snapshot_to_event(Snapshot *temporary_snapshot, int amount) {

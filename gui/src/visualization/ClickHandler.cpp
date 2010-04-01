@@ -1,5 +1,5 @@
 #include "ClickHandler.h"
 
-void ClickHandler::handle_click(DataPoint at) {
+void ClickHandler::handle_click(Canvas *canvas, DataPoint at) {
 
 }

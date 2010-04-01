@@ -29,3 +29,9 @@ DataRange DataRange::encompassing_range(const DataRange &other_range) const {
         qMax(other_range.get_end().get_time_element(), end.get_time_element()),
         qMax(other_range.get_end().get_data_element(), end.get_data_element()));
 }
+
+bool DataRange::contains(const DataPoint &point) const {
+    if(point.get_data_element() < begin.get_data_element() || point.get_time_element() < begin.get_time_element()
+        || point.get_data_element() > end.get_data_element() || point.get_time_element() > end.get_time_element()) return false;
+    return true;
+}
