@@ -15,6 +15,7 @@ public:
     
 public slots:
     void paint_canvas(Canvas *canvas);
+    void paint_canvas(Canvas *canvas, DataRange range);
 signals:
     void done();
 };

@@ -14,3 +14,12 @@ void CanvasPainter::paint_canvas(Canvas* canvas) {
     canvas->paint_onto(image);
     emit done();
 }
+
+void CanvasPainter::paint_canvas(Canvas *canvas, DataRange range) {
+    CoordinateMapper mapper(image->size(), canvas->get_range());
+    QPainter painter(image);
+    painter.drawRect(mapper.map_to(range));
+    painter.end();
+    canvas->paint_onto(image, range);
+    emit done();
+}

@@ -66,6 +66,24 @@ Timestamp &Timestamp::operator=(const Timestamp &other) {
     return *this;
 }
 
+Timestamp Timestamp::operator-(const Timestamp &other) const {
+    return Timestamp(ns - other.ns);
+}
+
+Timestamp Timestamp::operator+(const Timestamp &other) const {
+    return Timestamp(ns + other.ns);
+}
+
+const Timestamp& Timestamp::operator-=(const Timestamp &other) {
+    ns -= other.ns;
+    return *this;
+}
+
+const Timestamp& Timestamp::operator+=(const Timestamp &other) {
+    ns += other.ns;
+    return *this;
+}
+
 qint64 Timestamp::seconds_until(const Timestamp &other) const {
     return (other.ns - ns) / NS_PER_SEC;
 }

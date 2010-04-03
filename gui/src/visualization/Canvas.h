@@ -26,6 +26,7 @@ public:
     void combine_with(const Canvas &canvas);
     
     void paint_onto(QPaintDevice *device);
+    void paint_onto(QPaintDevice *device, const DataRange &range);
 };
 
 #endif

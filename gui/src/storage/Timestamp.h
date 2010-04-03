@@ -44,6 +44,11 @@ public:
     bool operator!=(const Timestamp &other) const;
     Timestamp &operator=(const Timestamp &other);
     
+    Timestamp operator-(const Timestamp &other) const;
+    Timestamp operator+(const Timestamp &other) const;
+    const Timestamp &operator-=(const Timestamp &other);
+    const Timestamp &operator+=(const Timestamp &other);
+    
     qint64 seconds_until(const Timestamp &other) const;
     qint64 ms_until(const Timestamp &other) const;
     qint64 ns_until(const Timestamp &other) const;

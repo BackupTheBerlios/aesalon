@@ -33,6 +33,7 @@ protected:
     virtual void wheelEvent(QWheelEvent *event);
 signals:
     void paint_canvas(Canvas *canvas);
+    void paint_canvas(Canvas *canvas, DataRange range);
     void mouse_position(QString formatted);
 };
 

@@ -14,6 +14,7 @@ Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(pare
     rendered = QImage(width(), height(), QImage::Format_RGB32);
     
     connect(this, SIGNAL(paint_canvas(Canvas *)), canvas_painter, SLOT(paint_canvas(Canvas*)));
+    connect(this, SIGNAL(paint_canvas(Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(Canvas*,DataRange)));
     connect(canvas_painter, SIGNAL(done()), SLOT(update()));
     
     formatter = factory->create_formatter();
@@ -87,9 +88,35 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     if(event->buttons() & Qt::LeftButton) {
         DataPoint old_point = mapper.map_to(old_mouse_pos);
         DataPoint move_by = DataPoint(point.get_time_element().ns_until(old_point.get_time_element()), old_point.get_data_element() - point.get_data_element());
+        QPointF move_shift = event->posF() - old_mouse_pos;
+        QImage temporary = rendered;
+        QPainter painter(&rendered);
+        rendered.fill(qRgb(255, 255, 255));
+        painter.drawImage(move_shift, temporary);
+        painter.end();
+        DataRange exposed_range;
+        if(move_shift.x() >= 0) {
+            exposed_range.get_begin().set_time_element(local_canvas.get_range().get_begin().get_time_element() - move_by.get_time_element());
+            exposed_range.get_end().set_time_element(local_canvas.get_range().get_begin().get_time_element());
+        }
+        else {
+            exposed_range.get_begin().set_time_element(local_canvas.get_range().get_end().get_time_element());
+            exposed_range.get_end().set_time_element(local_canvas.get_range().get_end().get_time_element() - move_by.get_time_element());
+        }
+        
+        if(move_shift.y() >= 0) {
+            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element() - move_by.get_data_element());
+            exposed_range.get_end().set_data_element(local_canvas.get_range().get_begin().get_data_element());
+        }
+        else {
+            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_end().get_data_element());
+            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element() - move_by.get_data_element());
+        }
+        
         local_canvas.shift_range(move_by);
         old_mouse_pos = event->posF();
-        emit paint_canvas(&local_canvas);
+        
+        emit paint_canvas(&local_canvas, exposed_range);
     }
     emit mouse_position(formatter->format_point(point));
 }
