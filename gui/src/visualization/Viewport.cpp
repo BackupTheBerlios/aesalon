@@ -95,28 +95,29 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
         painter.drawImage(move_shift, temporary);
         painter.end();
         DataRange exposed_range;
-        if(move_shift.x() >= 0) {
-            exposed_range.get_begin().set_time_element(local_canvas.get_range().get_begin().get_time_element() - move_by.get_time_element());
-            exposed_range.get_end().set_time_element(local_canvas.get_range().get_begin().get_time_element());
-        }
-        else {
-            exposed_range.get_begin().set_time_element(local_canvas.get_range().get_end().get_time_element());
-            exposed_range.get_end().set_time_element(local_canvas.get_range().get_end().get_time_element() - move_by.get_time_element());
-        }
         
-        if(move_shift.y() >= 0) {
-            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element() - move_by.get_data_element());
-            exposed_range.get_end().set_data_element(local_canvas.get_range().get_begin().get_data_element());
+        if(move_shift.x() != 0) {
+            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
+            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
+            if(move_shift.x() < 0) {
+                exposed_range.get_begin().set_time_element(local_canvas.get_range().get_end().get_time_element());
+                exposed_range.get_end().set_time_element(local_canvas.get_range().get_end().get_time_element() + move_by.get_time_element());
+            }
+            else {
+                exposed_range.get_begin().set_time_element(local_canvas.get_range().get_begin().get_time_element() + move_by.get_time_element());
+                exposed_range.get_end().set_time_element(local_canvas.get_range().get_begin().get_time_element());
+            }
+            emit paint_canvas(&local_canvas, exposed_range);
         }
-        else {
-            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_end().get_data_element());
-            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element() - move_by.get_data_element());
+        if(move_shift.y() != 0) {
+            emit paint_canvas(&local_canvas, exposed_range);
+        }
+        if(move_shift.x() != 0 && move_shift.y() != 0) {
+            emit paint_canvas(&local_canvas, exposed_range);
         }
         
         local_canvas.shift_range(move_by);
         old_mouse_pos = event->posF();
-        
-        emit paint_canvas(&local_canvas, exposed_range);
     }
     emit mouse_position(formatter->format_point(point));
 }

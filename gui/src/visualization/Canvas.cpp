@@ -76,8 +76,5 @@ void Canvas::paint_onto(QPaintDevice *device, const DataRange &range) {
     CoordinateMapper mapper(device_size, this->range);
     foreach(CanvasObject *object, objects) {
         if(object->get_bounding_rect().intersects(range)) object->paint_onto(&painter, mapper);
-        else {
-            qDebug("Not painting object, doesn't intersect range . . .");
-        }
     }
 }
