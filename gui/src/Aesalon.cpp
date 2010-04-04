@@ -33,9 +33,6 @@
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     
-    qDebug("DataRange type ID: %i", qRegisterMetaType<DataRange>("DataRange"));
-    qDebug("RenderedCanvas type ID: %i", qRegisterMetaType<RenderedCanvas>("RenderedCanvas"));
-    
     QCoreApplication::setOrganizationName("aesalon");
     QCoreApplication::setApplicationName("gui");
     QCoreApplication::setApplicationVersion(QString().append(AESALON_MAJOR_VERSION).append(".").append(AESALON_MINOR_VERSION).append(".").append(AESALON_PATCHLEVEL));

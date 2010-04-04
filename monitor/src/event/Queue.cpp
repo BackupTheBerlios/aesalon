@@ -22,6 +22,14 @@
 
 namespace Event {
 
+Queue::Queue() {
+    pthread_mutex_init(&mutex, NULL);
+}
+
+Queue::~Queue() {
+    pthread_mutex_destroy(&mutex);
+}
+
 void Queue::push_event(BasicEvent *event) {
     if(event) event_queue.push(event);
 }
@@ -37,5 +45,14 @@ BasicEvent *Queue::peek_event() {
     if(event_queue.empty()) return NULL;
     return event_queue.front();
 }
+
+void Event::Queue::lock_mutex() {
+    pthread_mutex_lock(&mutex);
+}
+
+void Event::Queue::unlock_mutex() {
+    pthread_mutex_unlock(&mutex);
+}
+
 
 }

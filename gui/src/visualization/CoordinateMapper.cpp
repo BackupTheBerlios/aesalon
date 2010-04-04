@@ -24,14 +24,8 @@ QPointF CoordinateMapper::map_to(const DataPoint &point) const {
     return QPointF(surface_size.width() * time_percentage, surface_size.height() * data_percentage);
 }
 
-#define min(one, two) ((one) < (two) ? (one) : (two))
-#define max(one, two) ((one) > (two) ? (one) : (two))
-
 QRectF CoordinateMapper::map_to(const DataRange &rect) const {
-    QPointF one = map_to(rect.get_begin());
-    QPointF two = map_to(rect.get_end());
-    QRectF rectf(QPointF(min(one.x(), two.x()), min(one.y(), two.y())), QPointF(max(one.x(), two.x()), max(one.y(), two.y())));
-    return rectf;
+    return QRectF(map_to(rect.get_begin()), map_to(rect.get_end())).normalized();
 }
 
 DataPoint CoordinateMapper::map_to(const QPointF &point) const {

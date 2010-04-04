@@ -137,12 +137,14 @@ void ServerSocket::send_data(Block *data) {
 }
 
 void ServerSocket::send_data(Event::Queue *data) {
+    data->lock_mutex();
     while(data->peek_event()) {
         Block *raw_data = data->peek_event()->serialize();
         send_data(raw_data);
         data->pop_event();
         delete raw_data;
     }
+    data->unlock_mutex();
 }
 
 void ServerSocket::disconnect_all() {
