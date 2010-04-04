@@ -56,20 +56,12 @@ void RenderedCanvas::merge(RenderedCanvas &canvas) {
     CoordinateMapper local_mapper(image.size(), range);
     /*CoordinateMapper canvas_mapper(canvas.image.size(), canvas.range);*/
     QRectF local_rect = local_mapper.map_to(canvas.get_range());
-    qDebug("local_rect: (%f,%f),(%f,%f)", local_rect.left(), local_rect.top(), local_rect.right(), local_rect.bottom());
     QRectF canvas_rect = QRectF(QPointF(0, 0), canvas.get_size());
-    qDebug("canvas_rect: (%f,%f),(%f,%f)", canvas_rect.left(), canvas_rect.top(), canvas_rect.right(), canvas_rect.bottom());
     
     qreal scaled_width = qAbs(local_rect.width());
     qreal scaled_height = qAbs(local_rect.height());
     QImage canvas_scaled = canvas.get_image().scaled(scaled_width, scaled_height);
-    qDebug("scaled_width: %f, scaled_height: %f", scaled_width, scaled_height);
-    qDebug("canvas: width is %i, height is %i . . .", canvas.get_image().width(), canvas.get_image().height());
-    qDebug("canvas_scaled: width is %i, height is %i . . .", canvas_scaled.width(), canvas_scaled.height());
     QPainter painter(&image);
-    /*image.fill(qRgb(255, 255, 255));*/
-    painter.setBrush(QBrush(qRgb(qrand() % 256, qrand() % 256, qrand() % 256)));
-    painter.drawRect(local_rect);
     painter.drawImage(local_rect.topLeft(), canvas_scaled);
     painter.end();
 }

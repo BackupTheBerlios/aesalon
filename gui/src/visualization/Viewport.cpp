@@ -117,7 +117,9 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
         }*/
         
         local_canvas.shift_range(move_by);
+        rendered_canvas.shift(move_by);
         old_mouse_pos = event->posF();
+        emit paint_canvas(size(), &local_canvas);
     }
     emit mouse_position(formatter->format_point(point));
 }

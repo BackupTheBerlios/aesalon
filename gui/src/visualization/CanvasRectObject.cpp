@@ -14,6 +14,5 @@ void CanvasRectObject::paint_onto(QPainter *painter, const CoordinateMapper &map
     painter->setPen(line_colour);
     painter->setBrush(QBrush(fill_colour));
     QRectF rect = mapper.map_to(get_bounding_rect());
-    qDebug("Drawing CanvasRectObject: rect is (%f,%f) to (%f,%f)", rect.left(), rect.top(), rect.right(), rect.bottom());
     painter->drawRect(rect);
 }
