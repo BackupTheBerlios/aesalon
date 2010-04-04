@@ -5,17 +5,17 @@
 #include "Viewport.h"
 #include "Viewport.moc"
 
-Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(parent) {
+Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(parent), rendered_canvas(size(), DataRange()) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMouseTracking(true);
     setCursor(QCursor(Qt::CrossCursor));
 
-    canvas_painter = new CanvasPainter(&rendered);
-    rendered = QImage(width(), height(), QImage::Format_RGB32);
+    canvas_painter = new CanvasPainter();
     
-    connect(this, SIGNAL(paint_canvas(Canvas *)), canvas_painter, SLOT(paint_canvas(Canvas*)));
-    connect(this, SIGNAL(paint_canvas(Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(Canvas*,DataRange)));
-    connect(canvas_painter, SIGNAL(done()), SLOT(update()));
+    
+    connect(this, SIGNAL(paint_canvas(QSize,Canvas*)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*)));
+    connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)));
+    connect(canvas_painter, SIGNAL(done(RenderedCanvas)), SLOT(merge_canvas(RenderedCanvas)));
     
     formatter = factory->create_formatter();
     click_handler = factory->create_click_handler();
@@ -27,7 +27,7 @@ Viewport::~Viewport() {
 
 void Viewport::merge_canvas(Canvas* canvas) {
     local_canvas.combine_with(*canvas);
-    emit paint_canvas(&local_canvas);
+    force_render();
     delete canvas;
 }
 
@@ -49,14 +49,18 @@ void Viewport::shift_range_to(const Timestamp &high_time) {
     set_canvas_range(range);
 }
 
-void Viewport::force_repaint() {
-    emit paint_canvas(&local_canvas);
+void Viewport::force_render() {
+    emit paint_canvas(size(), &local_canvas);
+}
+
+void Viewport::merge_canvas(RenderedCanvas canvas) {
+    rendered_canvas.merge(canvas);
 }
 
 void Viewport::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     CoordinateMapper mapper(size(), local_canvas.get_range());
-    painter.drawImage(0, 0, rendered);
+    painter.drawImage(0, 0, rendered_canvas.get_image());
     
     QPen pen(Qt::DotLine);
     pen.setColor(qRgba(128, 128, 128, 64));
@@ -88,15 +92,10 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     if(event->buttons() & Qt::LeftButton) {
         DataPoint old_point = mapper.map_to(old_mouse_pos);
         DataPoint move_by = DataPoint(point.get_time_element().ns_until(old_point.get_time_element()), old_point.get_data_element() - point.get_data_element());
-        QPointF move_shift = event->posF() - old_mouse_pos;
-        QImage temporary = rendered;
-        QPainter painter(&rendered);
-        rendered.fill(qRgb(255, 255, 255));
-        painter.drawImage(move_shift, temporary);
-        painter.end();
+        rendered_canvas.shift(move_by);
         DataRange exposed_range;
         
-        if(move_shift.x() != 0) {
+        /*if(move_shift.x() != 0) {
             exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
             exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
             if(move_shift.x() < 0) {
@@ -114,7 +113,7 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
         }
         if(move_shift.x() != 0 && move_shift.y() != 0) {
             emit paint_canvas(&local_canvas, exposed_range);
-        }
+        }*/
         
         local_canvas.shift_range(move_by);
         old_mouse_pos = event->posF();
@@ -131,8 +130,8 @@ void Viewport::mousePressEvent(QMouseEvent *event) {
 }
 
 void Viewport::resizeEvent(QResizeEvent *event) {
-    rendered = rendered.scaled(event->size());
-    emit paint_canvas(&local_canvas);
+    rendered_canvas.resize(event->size());
+    force_render();
 }
 
 void Viewport::wheelEvent(QWheelEvent *event) {
@@ -183,5 +182,5 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     range.get_end().set_data_element(new_y + new_y_range);
     
     set_canvas_range(range);
-    emit paint_canvas(&local_canvas);
+    emit paint_canvas(size(), &local_canvas);
 }

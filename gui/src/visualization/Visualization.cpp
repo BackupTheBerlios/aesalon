@@ -36,7 +36,7 @@ Visualization::Visualization(VisualizationFactory *factory) {
     connect(controller, SIGNAL(clear_canvas()), viewport, SLOT(clear_canvas()));
     connect(controller, SIGNAL(change_range(DataRange)), viewport, SLOT(set_canvas_range(DataRange)));
     connect(controller, SIGNAL(shift_range_to(Timestamp)), viewport, SLOT(shift_range_to(Timestamp)));
-    connect(controller, SIGNAL(force_repaint()), viewport, SLOT(force_repaint()));
+    connect(controller, SIGNAL(force_repaint()), viewport, SLOT(force_render()));
     connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)));
     main_layout->addWidget(viewport);
     

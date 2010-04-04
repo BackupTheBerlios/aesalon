@@ -5,19 +5,22 @@
 #include <QThread>
 
 #include "Canvas.h"
+#include "RenderedCanvas.h"
 
 class CanvasPainter : public QThread { Q_OBJECT
 private:
-    QImage *image;
+    bool processing;
 public:
-    CanvasPainter(QImage *image);
+    CanvasPainter();
     virtual ~CanvasPainter();
     
+    bool is_processing() const { return processing; }
+    
 public slots:
-    void paint_canvas(Canvas *canvas);
-    void paint_canvas(Canvas *canvas, DataRange range);
+    void paint_canvas(QSize render_size, Canvas *canvas);
+    void paint_canvas(QSize render_size, Canvas *canvas, DataRange range);
 signals:
-    void done();
+    void done(RenderedCanvas rendered);
 };
 
 #endif

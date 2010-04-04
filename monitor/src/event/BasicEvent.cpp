@@ -32,7 +32,6 @@ BasicEvent::BasicEvent(BasicEvent::event_type_e type) : type(type) {
     timestamp += time.tv_nsec;
 }
 
-
 /* Serialization format:
     first bit defines the event type, BLOCK_EVENT or REFERENCE_EVENT
 */

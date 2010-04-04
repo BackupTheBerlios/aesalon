@@ -61,18 +61,18 @@ void Canvas::combine_with(const Canvas &canvas) {
     }
 }
 
-void Canvas::paint_onto(QPaintDevice* device) {
-    QPainter painter(device);
-    QSize device_size(device->width(), device->height());
+void Canvas::paint_onto(RenderedCanvas &canvas) {
+    QPainter painter(&canvas.get_image());
+    QSize device_size(canvas.get_size().width(), canvas.get_size().height());
     CoordinateMapper mapper(device_size, range);
     foreach(CanvasObject *object, objects) {
         object->paint_onto(&painter, mapper);
     }
 }
 
-void Canvas::paint_onto(QPaintDevice *device, const DataRange &range) {
-    QPainter painter(device);
-    QSize device_size(device->width(), device->height());
+void Canvas::paint_onto(RenderedCanvas &canvas, const DataRange &range) {
+    QPainter painter(&canvas.get_image());
+    QSize device_size(canvas.get_size().width(), canvas.get_size().height());
     CoordinateMapper mapper(device_size, this->range);
     foreach(CanvasObject *object, objects) {
         if(object->get_bounding_rect().intersects(range)) object->paint_onto(&painter, mapper);
