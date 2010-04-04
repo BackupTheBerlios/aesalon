@@ -12,10 +12,9 @@ Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(pare
 
     canvas_painter = new CanvasPainter();
     
-    
-    connect(this, SIGNAL(paint_canvas(QSize,Canvas*)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*)));
-    connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)));
-    connect(canvas_painter, SIGNAL(done(RenderedCanvas)), SLOT(merge_canvas(RenderedCanvas)));
+    connect(this, SIGNAL(paint_canvas(QSize,Canvas*)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*)), Qt::QueuedConnection);
+    connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)), Qt::QueuedConnection);
+    connect(canvas_painter, SIGNAL(done(RenderedCanvas)), SLOT(merge_canvas(RenderedCanvas)), Qt::QueuedConnection);
     
     formatter = factory->create_formatter();
     click_handler = factory->create_click_handler();
@@ -37,6 +36,7 @@ void Viewport::clear_canvas() {
 
 void Viewport::set_canvas_range(const DataRange &new_range) {
     local_canvas.set_range(new_range);
+    rendered_canvas.set_range(new_range);
 }
 
 void Viewport::shift_range_to(const Timestamp &high_time) {
@@ -55,6 +55,7 @@ void Viewport::force_render() {
 
 void Viewport::merge_canvas(RenderedCanvas canvas) {
     rendered_canvas.merge(canvas);
+    update();
 }
 
 void Viewport::paintEvent(QPaintEvent *event) {

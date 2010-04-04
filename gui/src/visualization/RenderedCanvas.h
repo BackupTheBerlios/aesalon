@@ -10,6 +10,7 @@ private:
     QImage image;
     DataRange range;
 public:
+    RenderedCanvas();
     RenderedCanvas(QSize canvas_size, const DataRange &range);
     virtual ~RenderedCanvas();
     
@@ -17,6 +18,7 @@ public:
     QImage &get_image() { return image; }
     QSize get_size() const { return image.size(); }
     const DataRange &get_range() const { return range; }
+    void set_range(const DataRange &new_range) { range = new_range; }
     
     void clear();
     void resize(QSize new_size);
@@ -24,5 +26,7 @@ public:
     void shift(DataPoint amount);
     void merge(RenderedCanvas &canvas);
 };
+
+Q_DECLARE_METATYPE(RenderedCanvas)
 
 #endif

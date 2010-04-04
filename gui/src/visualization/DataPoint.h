@@ -1,6 +1,8 @@
 #ifndef AESALON_GUI_VISUALIZATION_DATA_POINT_H
 #define AESALON_GUI_VISUALIZATION_DATA_POINT_H
 
+#include <QMetaType>
+
 #include "storage/Timestamp.h"
 
 class DataPoint {
@@ -15,5 +17,7 @@ public:
     qreal get_data_element() const { return data_element; }
     void set_data_element(qreal new_value) { data_element = new_value; }
 };
+
+Q_DECLARE_METATYPE(DataPoint)
 
 #endif

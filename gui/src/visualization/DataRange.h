@@ -23,4 +23,6 @@ public:
     bool contains(const DataPoint &point) const;
 };
 
+Q_DECLARE_METATYPE(DataRange)
+
 #endif
