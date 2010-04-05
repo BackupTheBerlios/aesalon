@@ -17,6 +17,8 @@ public:
     qreal get_data_element() const { return data_element; }
     void set_data_element(qreal new_value) { data_element = new_value; }
     
+    DataPoint operator-() const;
+    
     DataPoint &operator+=(const DataPoint &other);
 };
 

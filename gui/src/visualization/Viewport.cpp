@@ -91,35 +91,43 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     DataPoint point = mapper.map_to(event->posF());
     
     if(event->buttons() & Qt::LeftButton) {
+        QPointF movement_delta = event->posF() - old_mouse_pos;
         DataPoint old_point = mapper.map_to(old_mouse_pos);
         DataPoint move_by = DataPoint(point.get_time_element() - old_point.get_time_element(), point.get_data_element() - old_point.get_data_element());
-        qDebug("move_by.time_element is %lli", move_by.get_time_element().to_ns());
-        qDebug("move_by.data_element is %f", move_by.get_data_element());
+        DataRange local_range = local_canvas.get_range();
+        
         rendered_canvas.shift(move_by);
-        DataRange exposed_range;
+        rendered_canvas.shift(movement_delta);
+        local_canvas.shift_range(move_by);
         
         /*qDebug("move_by: time is %lli, data is %f", move_by.get_time_element().to_ns(), move_by.get_data_element());*/
-        if(move_by.get_time_element().to_ns() > 0) {
-            /*qDebug("Shifting left . . .");*/
-            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
-            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
+        DataRange exposed_range;
+        if(move_by.get_time_element().to_ns() < 0) {
+            qDebug("Shifting left . . .");
+            exposed_range.get_begin().set_data_element(local_range.get_begin().get_data_element());
+            exposed_range.get_end().set_data_element(local_range.get_end().get_data_element());
             
-            exposed_range.get_begin().set_time_element(local_canvas.get_range().get_end().get_time_element());
-            exposed_range.get_end().set_time_element(local_canvas.get_range().get_end().get_time_element() - move_by.get_time_element());
+            qDebug("local_range time range is from %s to %s . . .",
+                qPrintable(local_range.get_begin().get_time_element().to_string()),
+                qPrintable(local_range.get_end().get_time_element().to_string()));
+            
+            exposed_range.get_begin().set_time_element(local_range.get_end().get_time_element() + move_by.get_time_element() + move_by.get_time_element() + move_by.get_time_element());
+            exposed_range.get_end().set_time_element(local_range.get_end().get_time_element() - move_by.get_time_element() - move_by.get_time_element());
+            qDebug("exposed_range, time range is from %s to %s . . .",
+                qPrintable(exposed_range.get_begin().get_time_element().to_string()),
+                qPrintable(exposed_range.get_end().get_time_element().to_string()));
+            
             emit paint_canvas(size(), &local_canvas, exposed_range);
         }
-        else if(move_by.get_time_element().to_ns() < 0) {
-            /*qDebug("Shifting right . . .");*/
-            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
-            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
+        /*else if(move_by.get_time_element().to_ns() > 0) {
+            qDebug("Shifting right . . .");
+            exposed_range.get_begin().set_data_element(local_range.get_begin().get_data_element());
+            exposed_range.get_end().set_data_element(local_range.get_end().get_data_element());
             
-            exposed_range.get_begin().set_time_element(local_canvas.get_range().get_begin().get_time_element() - move_by.get_time_element());
-            exposed_range.get_end().set_time_element(local_canvas.get_range().get_begin().get_time_element());
+            exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
+            exposed_range.get_end().set_time_element(local_range.get_begin().get_time_element() + move_by.get_time_element());
             emit paint_canvas(size(), &local_canvas, exposed_range);
-        }
-        
-        local_canvas.shift_range(move_by);
-        rendered_canvas.shift(move_by);
+        }*/
         old_mouse_pos = event->posF();
     }
     emit mouse_position(formatter->format_point(point));
