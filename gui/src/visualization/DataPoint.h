@@ -16,6 +16,8 @@ public:
     void set_time_element(const Timestamp &new_value) { time_element = new_value; }
     qreal get_data_element() const { return data_element; }
     void set_data_element(qreal new_value) { data_element = new_value; }
+    
+    DataPoint &operator+=(const DataPoint &other);
 };
 
 Q_DECLARE_METATYPE(DataPoint)

@@ -46,13 +46,12 @@ BasicEvent *Queue::peek_event() {
     return event_queue.front();
 }
 
-void Event::Queue::lock_mutex() {
+void Queue::lock_mutex() {
     pthread_mutex_lock(&mutex);
 }
 
-void Event::Queue::unlock_mutex() {
+void Queue::unlock_mutex() {
     pthread_mutex_unlock(&mutex);
 }
 
-
-}
+} // namespace Event

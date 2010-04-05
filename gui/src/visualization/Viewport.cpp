@@ -92,34 +92,35 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     
     if(event->buttons() & Qt::LeftButton) {
         DataPoint old_point = mapper.map_to(old_mouse_pos);
-        DataPoint move_by = DataPoint(point.get_time_element().ns_until(old_point.get_time_element()), old_point.get_data_element() - point.get_data_element());
+        DataPoint move_by = DataPoint(point.get_time_element() - old_point.get_time_element(), point.get_data_element() - old_point.get_data_element());
+        qDebug("move_by.time_element is %lli", move_by.get_time_element().to_ns());
+        qDebug("move_by.data_element is %f", move_by.get_data_element());
         rendered_canvas.shift(move_by);
         DataRange exposed_range;
         
-        /*if(move_shift.x() != 0) {
+        /*qDebug("move_by: time is %lli, data is %f", move_by.get_time_element().to_ns(), move_by.get_data_element());*/
+        if(move_by.get_time_element().to_ns() > 0) {
+            /*qDebug("Shifting left . . .");*/
             exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
             exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
-            if(move_shift.x() < 0) {
-                exposed_range.get_begin().set_time_element(local_canvas.get_range().get_end().get_time_element());
-                exposed_range.get_end().set_time_element(local_canvas.get_range().get_end().get_time_element() + move_by.get_time_element());
-            }
-            else {
-                exposed_range.get_begin().set_time_element(local_canvas.get_range().get_begin().get_time_element() + move_by.get_time_element());
-                exposed_range.get_end().set_time_element(local_canvas.get_range().get_begin().get_time_element());
-            }
-            emit paint_canvas(&local_canvas, exposed_range);
+            
+            exposed_range.get_begin().set_time_element(local_canvas.get_range().get_end().get_time_element());
+            exposed_range.get_end().set_time_element(local_canvas.get_range().get_end().get_time_element() - move_by.get_time_element());
+            emit paint_canvas(size(), &local_canvas, exposed_range);
         }
-        if(move_shift.y() != 0) {
-            emit paint_canvas(&local_canvas, exposed_range);
+        else if(move_by.get_time_element().to_ns() < 0) {
+            /*qDebug("Shifting right . . .");*/
+            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
+            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
+            
+            exposed_range.get_begin().set_time_element(local_canvas.get_range().get_begin().get_time_element() - move_by.get_time_element());
+            exposed_range.get_end().set_time_element(local_canvas.get_range().get_begin().get_time_element());
+            emit paint_canvas(size(), &local_canvas, exposed_range);
         }
-        if(move_shift.x() != 0 && move_shift.y() != 0) {
-            emit paint_canvas(&local_canvas, exposed_range);
-        }*/
         
         local_canvas.shift_range(move_by);
         rendered_canvas.shift(move_by);
         old_mouse_pos = event->posF();
-        emit paint_canvas(size(), &local_canvas);
     }
     emit mouse_position(formatter->format_point(point));
 }
