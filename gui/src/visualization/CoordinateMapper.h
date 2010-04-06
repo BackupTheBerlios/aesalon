@@ -22,6 +22,8 @@ public:
     QRectF map_to(const DataRange &rect) const;
     DataPoint map_to(const QPointF &point) const;
     DataRange map_to(const QRectF &rect) const;
+    
+    DataPoint find_offset(const QPointF &point) const;
 };
 
 #endif

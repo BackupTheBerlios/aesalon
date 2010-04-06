@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
     /* Register MOC types for Aesalon . . .*/
     qRegisterMetaType<DataRange>("DataRange");
     qRegisterMetaType<RenderedCanvas>("RenderedCanvas");
+    qRegisterMetaType<Timestamp>("Timestamp");
     
     QCoreApplication::setOrganizationName("aesalon");
     QCoreApplication::setApplicationName("gui");

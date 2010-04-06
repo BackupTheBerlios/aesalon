@@ -67,8 +67,8 @@ void RenderedCanvas::merge(RenderedCanvas &canvas) {
     QRectF local_rect = local_mapper.map_to(canvas.get_range()).normalized();
     QRectF canvas_rect = QRectF(QPointF(0, 0), canvas.get_size());
     
-    local_rect.moveBottom(25.0);
-    local_rect.setHeight(local_rect.height() + 2.0);
+    /*local_rect.moveBottom(25.0);*/
+    /*local_rect.setHeight(local_rect.height() + 2.0);*/
     
     qDebug("local_rect: (%f, %f), (%f, %f)", local_rect.left(), local_rect.top(), local_rect.right(), local_rect.bottom());
     
@@ -76,7 +76,7 @@ void RenderedCanvas::merge(RenderedCanvas &canvas) {
     QPainter painter(&image);
     /*painter.drawImage(local_rect.topLeft(), canvas_scaled);*/
     painter.setBrush(Qt::red);
-    /*painter.setPen(Qt::NoPen);*/
+    painter.setPen(Qt::NoPen);
     painter.drawRect(local_rect);
     painter.end();
 }

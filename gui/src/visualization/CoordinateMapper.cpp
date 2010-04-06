@@ -48,3 +48,16 @@ DataPoint CoordinateMapper::map_to(const QPointF &point) const {
 DataRange CoordinateMapper::map_to(const QRectF &rect) const {
     return DataRange(map_to(rect.topLeft()), map_to(rect.bottomRight()));
 }
+
+DataPoint CoordinateMapper::find_offset(const QPointF &point) const {
+    qint64 total_time = data_range.get_begin().get_time_element().ns_until(data_range.get_end().get_time_element());
+    qreal time_percentage = point.x() / surface_size.width();
+    
+    qreal total_data = data_range.get_end().get_data_element() - data_range.get_begin().get_data_element();
+    qreal data_percentage = (point.y() / surface_size.height());
+    
+    /*qDebug("find_offset: point.x() is %f, point.y() is %f", point.x(), point.y());
+    qDebug("find_offset: time_percentage is %f, data_percentage is %f .  .", time_percentage, data_percentage);*/
+    
+    return DataPoint(Timestamp(total_time * time_percentage), total_data * data_percentage);
+}

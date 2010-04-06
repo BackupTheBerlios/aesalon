@@ -93,10 +93,15 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     if(event->buttons() & Qt::LeftButton) {
         old_mouse_pos = event->posF();
         old_mouse_pos.setY(old_mouse_pos.y() - 1.0);
-        QPointF movement_delta = event->posF() - old_mouse_pos;
-        DataPoint old_point = mapper.map_to(old_mouse_pos);
-        DataPoint move_by = DataPoint(point.get_time_element() - old_point.get_time_element(), point.get_data_element() - old_point.get_data_element());
+        
         DataRange local_range = local_canvas.get_range();
+        QPointF movement_delta = event->posF() - old_mouse_pos;
+        /*DataPoint old_point = mapper.map_to(old_mouse_pos);*/
+        /*DataPoint move_by = DataPoint(point.get_time_element() - old_point.get_time_element(), point.get_data_element() - old_point.get_data_element());*/
+        /*DataPoint move_by = mapper.map_to(movement_delta);
+        move_by.set_time_element(move_by.get_time_element() - local_range.get_begin().get_time_element());
+        move_by.set_data_element(move_by.get_data_element() - local_range.get_begin().get_data_element());*/
+        DataPoint move_by = mapper.find_offset(movement_delta);
         
         rendered_canvas.shift(move_by);
         rendered_canvas.shift(movement_delta);
@@ -105,13 +110,13 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
         /*qDebug("move_by: time is %lli, data is %f", move_by.get_time_element().to_ns(), move_by.get_data_element());*/
         DataRange exposed_range;
         qDebug("Checking for movement-exposed regions . . .");
-        if(move_by.get_data_element() < 0.0) {
+        if(move_by.get_data_element() > 0.0) {
             qDebug("Shifting upwards . . .");
             exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
             exposed_range.get_end().set_time_element(local_range.get_end().get_time_element());
             
             exposed_range.get_begin().set_data_element(local_range.get_end().get_data_element());
-            exposed_range.get_end().set_data_element(local_range.get_end().get_data_element() + move_by.get_data_element());
+            exposed_range.get_end().set_data_element(local_range.get_end().get_data_element() - move_by.get_data_element());
             
             qDebug("local_range: (%s, %f), (%s, %f)",
                 qPrintable(local_range.get_begin().get_time_element().to_string()), local_range.get_begin().get_data_element(),

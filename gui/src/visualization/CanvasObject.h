@@ -12,7 +12,6 @@ class Canvas;
 class CanvasObject {
 private:
     DataRange bounding_rect;
-    int references;
     CanvasObject *next;
 public:
     CanvasObject(const DataRange &bounding_rect);
@@ -21,9 +20,6 @@ public:
     const DataRange &get_bounding_rect() const { return bounding_rect; }
     
     virtual void paint_onto(QPainter *painter, const CoordinateMapper &mapper) = 0;
-    
-    void inc_references();
-    void dec_references();
     
     CanvasObject *get_next() const { return next; }
     void set_next(CanvasObject *new_next) { next = new_next; }
