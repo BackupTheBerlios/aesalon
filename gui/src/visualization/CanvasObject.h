@@ -13,6 +13,7 @@ class CanvasObject {
 private:
     DataRange bounding_rect;
     int references;
+    CanvasObject *next;
 public:
     CanvasObject(const DataRange &bounding_rect);
     virtual ~CanvasObject();
@@ -23,6 +24,9 @@ public:
     
     void inc_references();
     void dec_references();
+    
+    CanvasObject *get_next() const { return next; }
+    void set_next(CanvasObject *new_next) { next = new_next; }
 };
 
 #endif

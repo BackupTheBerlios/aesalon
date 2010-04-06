@@ -23,5 +23,6 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas, DataRange ra
     RenderedCanvas rendered(render_size, range);
     canvas->paint_onto(rendered, range);
     processing = false;
+    delete canvas;
     emit done(rendered);
 }

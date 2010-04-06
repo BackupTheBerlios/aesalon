@@ -12,9 +12,9 @@ Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(pare
 
     canvas_painter = new CanvasPainter();
     
-    connect(this, SIGNAL(paint_canvas(QSize,Canvas*)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*)), Qt::DirectConnection);
-    connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)), Qt::DirectConnection);
-    connect(canvas_painter, SIGNAL(done(RenderedCanvas)), SLOT(merge_canvas(RenderedCanvas)), Qt::DirectConnection);
+    connect(this, SIGNAL(paint_canvas(QSize,Canvas*)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*)), Qt::QueuedConnection);
+    connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)), Qt::QueuedConnection);
+    connect(canvas_painter, SIGNAL(done(RenderedCanvas)), SLOT(merge_canvas(RenderedCanvas)), Qt::QueuedConnection);
     
     formatter = factory->create_formatter();
     click_handler = factory->create_click_handler();
@@ -50,7 +50,7 @@ void Viewport::shift_range_to(const Timestamp &high_time) {
 }
 
 void Viewport::force_render() {
-    emit paint_canvas(size(), &local_canvas);
+    emit paint_canvas(size(), local_canvas.clone());
 }
 
 void Viewport::merge_canvas(RenderedCanvas canvas) {
@@ -124,8 +124,7 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
             qDebug("exposed_range: (%s, %f), (%s, %f)",
                 qPrintable(exposed_range.get_begin().get_time_element().to_string()), exposed_range.get_begin().get_data_element(),
                 qPrintable(exposed_range.get_end().get_time_element().to_string()), exposed_range.get_end().get_data_element());
-            
-            emit paint_canvas(size(), &local_canvas, exposed_range);
+            emit paint_canvas(size(), local_canvas.clone(), exposed_range);
         }
         /*if(move_by.get_time_element().to_ns() < 0) {
             qDebug("Shifting left . . .");
@@ -219,5 +218,5 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     range.get_end().set_data_element(new_y + new_y_range);
     
     set_canvas_range(range);
-    emit paint_canvas(size(), &local_canvas);
+    force_render();
 }

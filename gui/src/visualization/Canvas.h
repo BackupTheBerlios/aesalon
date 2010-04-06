@@ -10,7 +10,9 @@
 class Canvas {
 private:
     DataRange range;
-    QList<CanvasObject *> objects;
+    CanvasObject *head;
+    CanvasObject *insertion_point;
+    CanvasObject *termination_point;
 public:
     Canvas(const DataRange &range = DataRange());
     virtual ~Canvas();
@@ -28,6 +30,8 @@ public:
     
     void paint_onto(RenderedCanvas &canvas);
     void paint_onto(RenderedCanvas &canvas, const DataRange &range);
+    
+    Canvas *clone() const;
 };
 
 #endif
