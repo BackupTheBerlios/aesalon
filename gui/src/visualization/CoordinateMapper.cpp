@@ -13,13 +13,14 @@ QPointF CoordinateMapper::map_to(const DataPoint &point) const {
     qreal total_time = data_range.get_begin().get_time_element().ns_until(data_range.get_end().get_time_element());
     qreal time_percentage = qreal(data_range.get_begin().get_time_element().ns_until(point.get_time_element())) / total_time;
     /* Bind it to slightly more than the total size of the surface . . . */
-    time_percentage = qBound(-0.01, 1.01, time_percentage);
+    /*time_percentage = qBound(-0.01, 1.01, time_percentage);*/
     
     qreal total_data = qAbs(data_range.get_end().get_data_element() - data_range.get_begin().get_data_element());
     qreal data_percentage = (point.get_data_element() - data_range.get_begin().get_data_element()) / total_data;
     /* Bind it to slightly more than the total size of the surface, and reverse it
         (data zero is at the bottom of the image, not the top) */
-    data_percentage = 1.0 - qBound(-0.01, 1.01, data_percentage);
+    /*data_percentage = 1.0 - qBound(-0.01, 1.01, data_percentage);*/
+    data_percentage = 1.0 - data_percentage;
     
     return QPointF(surface_size.width() * time_percentage, surface_size.height() * data_percentage);
 }

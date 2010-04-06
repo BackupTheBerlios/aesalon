@@ -51,7 +51,6 @@ void RenderedCanvas::shift(DataPoint amount) {
 }
 
 void RenderedCanvas::merge(RenderedCanvas &canvas) {
-    qDebug("Merging . . .");
     /* If the two canvases do not intersect, don't bother doing anything. */
     /*if(range.intersects(canvas.range) == false) {*/
         /*qDebug("Canvas objects do not intersect, returning . . .");
@@ -68,11 +67,16 @@ void RenderedCanvas::merge(RenderedCanvas &canvas) {
     QRectF local_rect = local_mapper.map_to(canvas.get_range()).normalized();
     QRectF canvas_rect = QRectF(QPointF(0, 0), canvas.get_size());
     
+    local_rect.moveBottom(25.0);
+    local_rect.setHeight(local_rect.height() + 2.0);
+    
+    qDebug("local_rect: (%f, %f), (%f, %f)", local_rect.left(), local_rect.top(), local_rect.right(), local_rect.bottom());
+    
     QImage canvas_scaled = canvas.get_image().scaled(local_rect.width(), local_rect.height());
     QPainter painter(&image);
-    qDebug("painting scaled canvas image at (%f, %f)", local_rect.left(), local_rect.top());
     /*painter.drawImage(local_rect.topLeft(), canvas_scaled);*/
     painter.setBrush(Qt::red);
+    /*painter.setPen(Qt::NoPen);*/
     painter.drawRect(local_rect);
     painter.end();
 }
