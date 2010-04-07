@@ -24,6 +24,7 @@ void RenderedCanvas::resize(QSize new_size) {
 }
 
 void RenderedCanvas::shift(QPointF amount) {
+    qDebug("Shifting canvas by QPointF(%f, %f) . . .", amount.x(), amount.y());
     /* If the shifting amount is more than the width or height of the image, then just take a shortcut. */
     if(qAbs(amount.x()) > image.width() || qAbs(amount.y()) > image.height()) {
         qDebug("Clearing RenderedCanvas, range to shift is greater than image dimensions . . .");
@@ -74,9 +75,9 @@ void RenderedCanvas::merge(RenderedCanvas &canvas) {
     
     QImage canvas_scaled = canvas.get_image().scaled(local_rect.width(), local_rect.height());
     QPainter painter(&image);
-    /*painter.drawImage(local_rect.topLeft(), canvas_scaled);*/
-    painter.setBrush(Qt::red);
+    painter.drawImage(local_rect.topLeft(), canvas_scaled);
+    /*painter.setBrush(Qt::red);
     painter.setPen(Qt::NoPen);
-    painter.drawRect(local_rect);
+    painter.drawRect(local_rect);*/
     painter.end();
 }

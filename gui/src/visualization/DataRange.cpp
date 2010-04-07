@@ -38,8 +38,8 @@ bool DataRange::intersects(const DataRange &range) const {
     */
     
     /* compare end to range.begin(), and begin to range.end() . . .*/
-    if(range.begin.get_time_element() >= end.get_time_element() || range.begin.get_data_element() >= end.get_data_element()) return false;
-    else if(begin.get_time_element() >= range.end.get_time_element() || begin.get_data_element() >= range.end.get_data_element()) return false;
+    if(range.begin.get_time_element() > end.get_time_element() || range.begin.get_data_element() > end.get_data_element()) return false;
+    else if(begin.get_time_element() > range.end.get_time_element() || begin.get_data_element() > range.end.get_data_element()) return false;
     return true;
 }
 
