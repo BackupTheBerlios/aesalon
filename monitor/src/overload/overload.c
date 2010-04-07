@@ -66,17 +66,31 @@ void __attribute__((destructor)) aesalon_destructor() {
 }
 
 void* get_scope_address() {
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
     asm("mov rax, [rbp + 16]");
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    asm("mov eax, [ebp + 8]");
+#endif
 }
+
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+    #define retrieve_scope() \
+        asm("push [rbp + 8]"); \
+        data.data.scope = (unsigned long)get_scope_address(); \
+        asm("add rsp, 8");
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    #define retrieve_scope() \
+        asm("push [ebp + 4]"); \
+        data.data.scope = (unsigned long)get_scope_address(); \
+        asm("add esp, 4");
+#endif
 
 void *calloc(size_t nmemb, size_t size) {
     if(!overload_initialized) initialize_overload();
     allocation_data_u data;    
     static unsigned char type = ALLOC_TYPE;
     
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
+    retrieve_scope();
     data.data.size = nmemb * size;
     if(original_calloc != NULL) data.data.address = (unsigned long)original_calloc(nmemb, size);
     else {
@@ -95,9 +109,7 @@ void *malloc(size_t size) {
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
     
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
+    retrieve_scope();
     
     data.data.address = (unsigned long)original_malloc(size);
     data.data.size = size;
@@ -113,9 +125,7 @@ void free(void *ptr) {
     free_data_u data;
     static unsigned char type = FREE_TYPE;
     
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
+    retrieve_scope();
     
     data.data.address = (unsigned long)ptr;
     original_free(ptr);
@@ -130,9 +140,7 @@ void *realloc(void *ptr, size_t size) {
     reallocation_data_u data;
     static unsigned char type = REALLOC_TYPE;
     
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
+    retrieve_scope();
     
     data.data.original_address = (unsigned long)ptr;
     

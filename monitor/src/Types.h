@@ -26,8 +26,15 @@
 
 #include <vector>
 
-/** Byte typedef; simply an 8-bit integer. */
+/** 8-bit unsigned integer. */
 typedef u_int8_t Byte;
+/** 8-bit signed integer. */
+typedef int8_t SByte;
+/** 64-bit unsigned integer */
+typedef u_int64_t Word64;
+/** 64-bit signed integer */
+typedef int64_t SWord64;
+
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
 /** Unsigned word, 32-bits on 32-bit machines, 64 bits on 64-bit machines. */
 typedef u_int64_t Word;

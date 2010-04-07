@@ -31,8 +31,10 @@ ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
     /*disassembler = new ASM::Disassembler(elf_parser);*/
     
     /*disassembler->get_symbol_il("main");*/
-    
+
+#ifdef USE_OVERLOAD
     overload_parser = NULL;
+#endif
 }
 
 ProgramManager::~ProgramManager() {
@@ -80,5 +82,7 @@ void ProgramManager::place_initial_breakpoints() {
 }
 
 void ProgramManager::process_backlog() {
+#ifdef USE_OVERLOAD
     delete overload_parser;
+#endif
 }
