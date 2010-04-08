@@ -39,7 +39,7 @@ Parser::Parser(std::string filename) : filename(filename) {
     
     lseek(file_fd, header->get_section_header_offset(), SEEK_SET);
     
-    for(std::size_t x = 0; x < header->get_num_sections(); x ++) {
+    for(std::size_t x = 0; x < header->get_section_count(); x ++) {
         section_list.push_back(new Section(file_fd));
     }
     

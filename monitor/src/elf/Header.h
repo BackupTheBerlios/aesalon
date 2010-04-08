@@ -34,25 +34,29 @@ public:
         ENDIAN_LITTLE,
         ENDIAN_BIG
     };
-private:
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    typedef Elf64_Ehdr header_t;
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-    typedef Elf32_Ehdr header_t;
-#endif
-    header_t data;
     
+    enum elf_type_e {
+        ELF32,
+        ELF64
+    };
+private:
     endian_mode_e endian_mode;
+    elf_type_e elf_type;
+    
+    Word section_header_offset;
+    Word section_count;
+    Word string_table_index;
 public:
     Header(int file_fd);
     virtual ~Header() {}
     
-    Word get_section_header_offset() const { return data.e_shoff; }
-    std::size_t get_num_sections() const { return data.e_shnum; } 
+    Word get_section_header_offset() const { return section_header_offset; }
+    Word get_section_count() const { return section_count; } 
     
-    std::size_t get_string_table_index() const { return data.e_shstrndx; }
+    Word get_string_table_index() const { return string_table_index; }
     
     endian_mode_e get_endian_mode() const { return endian_mode; }
+    elf_type_e get_elf_type() const { return elf_type; }
 };
 
 } // namespace ELF
