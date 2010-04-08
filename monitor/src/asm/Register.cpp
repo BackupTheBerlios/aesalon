@@ -100,6 +100,7 @@ Register Register::from_string(std::string string) {
     reg_map["esp"] = ESP;
     reg_map["ebp"] = EBP;
     reg_map["eip"] = EIP;
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
     reg_map["rax"] = RAX;
     reg_map["rbx"] = RBX;
     reg_map["rcx"] = RCX;
@@ -117,6 +118,7 @@ Register Register::from_string(std::string string) {
     reg_map["rsp"] = RSP;
     reg_map["rbp"] = RBP;
     reg_map["rip"] = RIP;
+#endif
     reg_map["cs"] = CS;
     reg_map["ss"] = SS;
     

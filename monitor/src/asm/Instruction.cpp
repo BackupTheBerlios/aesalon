@@ -59,7 +59,13 @@ void Instruction::handle_opcode(std::string opcode, std::string operands) {
     }
     else if(Misc::String::begins_with(opcode, "add")) {
         source = storage_manager->new_operand(operand[0])->get_storage_offset();
-        destination = storage_manager->new_operand(ASM::Operand::REGISTER, 0, Register::RAX)->get_storage_offset();
+        destination = storage_manager->new_operand(ASM::Operand::REGISTER, 0,
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+            Register::RAX
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+            Register::EAX
+#endif
+            )->get_storage_offset();
     }
 }
 

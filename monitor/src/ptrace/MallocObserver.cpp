@@ -27,13 +27,21 @@ namespace PTrace {
 
 bool MallocObserver::handle_breakpoint(Breakpoint *breakpoint) {
     Portal *portal = Initializer::get_instance()->get_program_manager()->get_ptrace_portal();
+
+    /* NOTE: this code is obsoleted. */
     
     Word size, address, ret_address;
-    Word rbp = portal->get_register(ASM::Register::RBP);
+    Word bp = portal->get_register(
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+    ASM::Register::RBP
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    ASM::Register::EBP
+#endif
+    );
     
-    address = portal->read_memory(rbp-0x08);
-    size = portal->read_memory(rbp-0x18);
-    ret_address = portal->read_memory(rbp-0x20);
+    address = portal->read_memory(bp-0x08);
+    size = portal->read_memory(bp-0x18);
+    ret_address = portal->read_memory(bp-0x20);
     
     /*std::cout << "Allocation detected: address is 0x" << std::hex << address << ", size is " << std::dec << size << std::endl;*/
     

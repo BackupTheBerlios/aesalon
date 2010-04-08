@@ -307,7 +307,14 @@ void Portal::handle_breakpoint() {
     }
     if(breakpoint->get_original() != 0xcc) {
         /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
-        set_register(ASM::Register::RIP, ip);
+        
+        set_register(
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+    ASM::Register::RIP
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    ASM::Register::EIP
+#endif
+        , ip);
     }
     
     breakpoint->notify();
