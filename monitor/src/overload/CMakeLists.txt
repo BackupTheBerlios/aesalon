@@ -6,7 +6,11 @@
 if(DEVELOPMENT_BUILD)
     add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload.so -ldl -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
-        -DDEVELOPMENT_BUILD DEPENDS overload.c)
+        -DDEVELOPMENT_BUILD
+        -DAESALON_PLATFORM=${AESALON_PLATFORM}
+        -DAESALON_PLATFORM_x86=0
+        -DAESALON_PLATFORM_x86_64=1
+        DEPENDS overload.c)
 else(DEVELOPMENT_BUILD)
     add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -shared overload.c -o aesalon_overload.so -ldl -masm=intel
         -DLIBC_PATH="${LIBC_PATH}" DEPENDS overload.c)

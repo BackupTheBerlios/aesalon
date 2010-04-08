@@ -20,6 +20,8 @@
 #ifndef AESALON_MONITOR_ELF_HEADER_H
 #define AESALON_MONITOR_ELF_HEADER_H
 
+/* Some variants of linux/elf.h require linux/types.h . . . */
+#include <sys/types.h>
 #include <linux/elf.h>
 
 #include "Types.h"
