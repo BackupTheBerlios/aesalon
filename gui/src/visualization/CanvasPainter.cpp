@@ -18,7 +18,7 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas* canvas) {
 }
 
 void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas, DataRange range) {
-    qDebug("CanvasPainter::paint_canvas(QSize, Canvas *, DataRange) called . . .");
+    /*qDebug("CanvasPainter::paint_canvas(QSize, Canvas *, DataRange) called . . .");*/
     processing = true;
     RenderedCanvas rendered(render_size, range);
     canvas->paint_onto(rendered, range);

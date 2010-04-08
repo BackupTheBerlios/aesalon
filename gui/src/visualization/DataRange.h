@@ -21,6 +21,8 @@ public:
     DataRange encompassing_range(const DataRange &other_range) const;
     
     bool contains(const DataPoint &point) const;
+    
+    DataRange normalized() const;
 };
 
 Q_DECLARE_METATYPE(DataRange)

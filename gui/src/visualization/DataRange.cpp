@@ -64,3 +64,11 @@ bool DataRange::contains(const DataPoint &point) const {
         || point.get_data_element() > end.get_data_element() || point.get_time_element() > end.get_time_element()) return false;
     return true;
 }
+
+DataRange DataRange::normalized() const {
+    return DataRange(
+        qMin(begin.get_time_element(), end.get_time_element()),
+        qMin(begin.get_data_element(), end.get_data_element()),
+        qMax(begin.get_time_element(), end.get_time_element()),
+        qMax(begin.get_data_element(), end.get_data_element()));
+}

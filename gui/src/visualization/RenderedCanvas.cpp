@@ -24,10 +24,10 @@ void RenderedCanvas::resize(QSize new_size) {
 }
 
 void RenderedCanvas::shift(QPointF amount) {
-    qDebug("Shifting canvas by QPointF(%f, %f) . . .", amount.x(), amount.y());
+    /*qDebug("Shifting canvas by QPointF(%f, %f) . . .", amount.x(), amount.y());*/
     /* If the shifting amount is more than the width or height of the image, then just take a shortcut. */
     if(qAbs(amount.x()) > image.width() || qAbs(amount.y()) > image.height()) {
-        qDebug("Clearing RenderedCanvas, range to shift is greater than image dimensions . . .");
+        /*qDebug("Clearing RenderedCanvas, range to shift is greater than image dimensions . . .");*/
         clear();
         return;
     }
@@ -63,7 +63,7 @@ void RenderedCanvas::merge(RenderedCanvas &canvas) {
             qPrintable(canvas.range.get_end().get_time_element().to_string()), canvas.range.get_end().get_data_element());*/
     /*    return;
     }*/
-    CoordinateMapper local_mapper(image.size(), range);
+    CoordinateMapper local_mapper(image.size(), range.normalized());
     /*CoordinateMapper canvas_mapper(canvas.image.size(), canvas.range);*/
     QRectF local_rect = local_mapper.map_to(canvas.get_range()).normalized();
     QRectF canvas_rect = QRectF(QPointF(0, 0), canvas.get_size());
@@ -71,7 +71,7 @@ void RenderedCanvas::merge(RenderedCanvas &canvas) {
     /*local_rect.moveBottom(25.0);*/
     /*local_rect.setHeight(local_rect.height() + 2.0);*/
     
-    qDebug("local_rect: (%f, %f), (%f, %f)", local_rect.left(), local_rect.top(), local_rect.right(), local_rect.bottom());
+    /*qDebug("local_rect: (%f, %f), (%f, %f)", local_rect.left(), local_rect.top(), local_rect.right(), local_rect.bottom());*/
     
     QImage canvas_scaled = canvas.get_image().scaled(local_rect.width(), local_rect.height());
     QPainter painter(&image);

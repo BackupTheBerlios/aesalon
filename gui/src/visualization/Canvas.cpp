@@ -37,7 +37,7 @@ void Canvas::calculate_data_range() {
 }
 
 void Canvas::add_object(CanvasObject *object) {
-    qDebug("Adding object to canvas, address is %p . . .", (void *)object);
+    /*qDebug("Adding object to canvas, address is %p . . .", (void *)object);*/
     if(head == NULL) {
         head = object;
         insertion_point = head;

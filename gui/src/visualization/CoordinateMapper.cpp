@@ -51,7 +51,7 @@ DataRange CoordinateMapper::map_to(const QRectF &rect) const {
 
 DataPoint CoordinateMapper::find_offset(const QPointF &point) const {
     qint64 total_time = data_range.get_begin().get_time_element().ns_until(data_range.get_end().get_time_element());
-    qreal time_percentage = point.x() / surface_size.width();
+    qreal time_percentage = -(point.x() / surface_size.width());
     
     qreal total_data = data_range.get_end().get_data_element() - data_range.get_begin().get_data_element();
     qreal data_percentage = (point.y() / surface_size.height());
