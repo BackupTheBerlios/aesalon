@@ -96,7 +96,7 @@ void File::parse() {
     }
     
     int parses = 0;
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64 || AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64 || AESALON_PLATFORM == AESALON_PLATFORM_x86
     Parser *elf_parser = new ElfParser(file_fd, this);
     if(elf_parser->parse()) parses ++;
     delete elf_parser;

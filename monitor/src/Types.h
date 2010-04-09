@@ -103,7 +103,7 @@ public:
         @param data The word to push.
         @param bits How many bits of data to push.
     */
-    void push_word(Word data, int bits);
+    void push_word(Word64 data, int bits);
 };
 
 #endif

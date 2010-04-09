@@ -57,10 +57,10 @@ void Block::resize(size_t new_size) {
     data_size = new_size;
 }
 
-void Block::push_word(Word data, int bits) {
+void Block::push_word(Word64 data, int bits) {
     std::size_t offset = data_size;
     /* Reserve space for one Word . . . */
-    int bytes = int((bits / 8.0) + 0.999);
+    int bytes = int((bits / 8.0) + 0.9);
     resize(data_size + bytes);
     
     for(int i = 0; i < bytes; i ++) {

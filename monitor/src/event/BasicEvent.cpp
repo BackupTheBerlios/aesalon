@@ -28,7 +28,7 @@ namespace Event {
 BasicEvent::BasicEvent(BasicEvent::event_type_e type) : type(type) {
     struct timespec time;
     clock_gettime(CLOCK_REALTIME, &time);
-    timestamp = time.tv_sec * 1000000000;
+    timestamp = Word64(time.tv_sec) * Word64(1000000000);
     timestamp += time.tv_nsec;
 }
 
