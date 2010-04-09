@@ -71,7 +71,7 @@ StorageAttribute *StorageManager::create_child(StorageOffset offset, const char 
         attribute->next = attribute_offset;
     }
     
-    return attribute;
+    return dereference_attribute(attribute_offset);
 }
 
 StorageOffset StorageManager::get_child(StorageOffset offset, const char *name) const {
@@ -79,18 +79,13 @@ StorageOffset StorageManager::get_child(StorageOffset offset, const char *name) 
 }
 
 StorageOffset StorageManager::get_from_list(StorageOffset offset, const char *name) const {
-    std::cout << "looking for \"" << name << "\"\n";
     if(offset == -1) {
-        std::cout << "aborting search, offset is -1 . . ." << std::endl;
         return -1;
     }
     while(offset != -1) {
         StorageAttribute *attribute = dereference_attribute(offset);
         char *attribute_name = dereference_string(attribute->name);
-        std::cout << "attribute->name: " << attribute->name << std::endl;
-        std::cout << "attribute_name: \"" << attribute_name << "\"" << std::endl;
         if(strcmp(attribute_name, name) == 0) {
-            std::cout << "found offset, value is " << attribute->value << std::endl;
             return offset;
         }
         

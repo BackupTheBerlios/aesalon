@@ -14,9 +14,9 @@
 namespace Analyzer {
 
 File::File(std::string filename, StorageManager *storage_manager) : filename(filename), storage_manager(storage_manager) {
-    parse();
     sections = symbols = attributes = -1;
     last_section = last_symbol = last_attribute = -1;
+    parse();
 }
 
 File::~File() {
@@ -55,7 +55,9 @@ Word File::get_attribute(const char *name) const {
     if(offset == 0) {
         offset = storage_manager->get_from_list(attributes, name);
     }
-    if(offset == -1) return 0;
+    if(offset == -1) {
+        return 0;
+    }
     attribute = storage_manager->dereference_attribute(offset);
     
     return attribute->value;

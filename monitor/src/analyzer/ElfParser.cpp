@@ -71,7 +71,6 @@ bool ElfParser::parse() {
 
 void ElfParser::parse_32() {
     StorageManager *sm = file->get_storage_manager();
-    
     /* Read in the header . . . */
     Elf32_Ehdr header;
     if(read(file_fd, &header, sizeof(header)) != sizeof(header)) {
@@ -82,8 +81,12 @@ void ElfParser::parse_32() {
     /* Start off by parsing the sections . . . */
     lseek(file_fd, header.e_shoff, SEEK_SET);
     
+    std::vector<StorageOffset> sections;
+    
     StorageOffset head = -1;
     StorageOffset last = -1;
+    
+    StorageOffset shstrtab = -1;
     
     Elf32_Shdr section;
     for(int s = 0; s < header.e_shnum; s ++) {
@@ -95,37 +98,32 @@ void ElfParser::parse_32() {
         StorageOffset item_offset = sm->new_attribute();
         
         sm->dereference_attribute(item_offset)->name = section.sh_name;
+        
+        StorageAttribute *size = sm->create_child(item_offset, "size");
+        size->value = section.sh_size;
+        
         sm->create_child(item_offset, "offset")->value = section.sh_offset;
         sm->create_child(item_offset, "address")->value = section.sh_addr;
-        sm->create_child(item_offset, "size")->value = section.sh_size;
         
         if(last == -1) head = item_offset;
         else sm->dereference_attribute(last)->next = item_offset;
         last = item_offset;
+        
+        if(s == header.e_shstrndx) shstrtab = item_offset;
     }
     
-    StorageOffset shstrtab = head;
-    for(int i = 0; i < header.e_shstrndx; i ++) {
-        shstrtab = sm->dereference_attribute(shstrtab)->next;
-        /* If the next is not found . . . */
-        if(shstrtab == -1) {
-            status = false;
-            return;
-        }
-    }
     /* Read the section string table . . . */
-    
     StorageOffset shstrtab_content = read_content(shstrtab);
     if(shstrtab_content == 0) {
         Misc::Message(Misc::Message::WARNING_MESSAGE, "Could not read content of string table. Perhaps it is a corrupt ELF file?");
         status = false;
         return;
     }
+    
     StorageOffset offset = head;
     while(offset != -1) {
         StorageAttribute *attribute = sm->dereference_attribute(offset);
-        StorageAttribute *name = sm->dereference_attribute(attribute->child);
-        name->value += shstrtab_content;
+        attribute->name += shstrtab_content;
         offset = attribute->next;
     }
     
@@ -153,7 +151,7 @@ void ElfParser::parse_32() {
             memcpy(&symbol, sm->dereference_string(symtab_content_offset) + offset, sizeof(symbol));
             
             StorageOffset symbol_offset = sm->new_attribute();
-            sm->create_child(symbol_offset, "name")->value = strtab_content_offset + symbol.st_name;
+            sm->dereference_attribute(symbol_offset)->name = strtab_content_offset + symbol.st_name;
             sm->create_child(symbol_offset, "address")->value = symbol.st_value;
             sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
@@ -166,7 +164,7 @@ void ElfParser::parse_32() {
     /* Now try the dynamic symbols . . . */
     StorageOffset dynsym_offset = file->get_section_offset(".dynsym");
     StorageOffset dynstr_offset = file->get_section_offset(".dynstr");
-    if(symtab_offset != -1 && strtab_offset != -1) {
+    if(dynsym_offset != -1 && dynstr_offset != -1) {
         StorageOffset dynsym_content_offset = read_content(dynsym_offset);
         StorageOffset dynstr_content_offset = read_content(dynstr_offset);
         
@@ -183,7 +181,7 @@ void ElfParser::parse_32() {
             memcpy(&symbol, sm->dereference_string(dynsym_content_offset) + offset, sizeof(symbol));
             
             StorageOffset symbol_offset = sm->new_attribute();
-            sm->create_child(symbol_offset, "name")->value = dynsym_content_offset + symbol.st_name;
+            sm->dereference_attribute(symbol_offset)->name = dynstr_content_offset + symbol.st_name;
             sm->create_child(symbol_offset, "address")->value = symbol.st_value;
             sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
@@ -213,8 +211,12 @@ void ElfParser::parse_64() {
     /* Start off by parsing the sections . . . */
     lseek(file_fd, header.e_shoff, SEEK_SET);
     
+    std::vector<StorageOffset> sections;
+    
     StorageOffset head = -1;
     StorageOffset last = -1;
+    
+    StorageOffset shstrtab = -1;
     
     Elf64_Shdr section;
     for(int s = 0; s < header.e_shnum; s ++) {
@@ -226,29 +228,18 @@ void ElfParser::parse_64() {
         StorageOffset item_offset = sm->new_attribute();
         
         sm->dereference_attribute(item_offset)->name = section.sh_name;
-        sm->create_child(item_offset, "offset")->value = section.sh_offset;
-        sm->create_child(item_offset, "address")->value = section.sh_addr;
+        
         StorageAttribute *size = sm->create_child(item_offset, "size");
         size->value = section.sh_size;
-        std::cout << "looking for stored size . . ." << std::endl;
-        Word stored_size = sm->dereference_attribute(sm->get_child(item_offset, "size"))->value;
-        std::cout << "stored size is " << size->value << std::endl;
+        
+        sm->create_child(item_offset, "offset")->value = section.sh_offset;
+        sm->create_child(item_offset, "address")->value = section.sh_addr;
         
         if(last == -1) head = item_offset;
         else sm->dereference_attribute(last)->next = item_offset;
         last = item_offset;
-    }
-    
-    std::cout << "section string table index: " << header.e_shstrndx << std::endl;
-    
-    StorageOffset shstrtab = head;
-    for(int i = 0; i < header.e_shstrndx; i ++) {
-        shstrtab = sm->dereference_attribute(shstrtab)->next;
-        /* If the next is not found . . . */
-        if(shstrtab == -1) {
-            status = false;
-            return;
-        }
+        
+        if(s == header.e_shstrndx) shstrtab = item_offset;
     }
     
     /* Read the section string table . . . */
@@ -262,8 +253,6 @@ void ElfParser::parse_64() {
     StorageOffset offset = head;
     while(offset != -1) {
         StorageAttribute *attribute = sm->dereference_attribute(offset);
-        std::cout << "Original section name: " << attribute->name << std::endl;
-        std::cout << "shstrtab_content offset: " << shstrtab_content << std::endl;
         attribute->name += shstrtab_content;
         offset = attribute->next;
     }
@@ -305,7 +294,7 @@ void ElfParser::parse_64() {
     /* Now try the dynamic symbols . . . */
     StorageOffset dynsym_offset = file->get_section_offset(".dynsym");
     StorageOffset dynstr_offset = file->get_section_offset(".dynstr");
-    if(symtab_offset != -1 && strtab_offset != -1) {
+    if(dynsym_offset != -1 && dynstr_offset != -1) {
         StorageOffset dynsym_content_offset = read_content(dynsym_offset);
         StorageOffset dynstr_content_offset = read_content(dynstr_offset);
         
@@ -334,7 +323,6 @@ void ElfParser::parse_64() {
 }
 
 StorageOffset ElfParser::read_content(StorageOffset section) {
-    std::cout << "reading content of section offset " << section << std::endl;
     StorageManager *sm = file->get_storage_manager();
     
     StorageOffset data_offset = sm->get_child(section, "data");
@@ -342,18 +330,13 @@ StorageOffset ElfParser::read_content(StorageOffset section) {
     if(data_offset != -1) return sm->dereference_attribute(data_offset)->value;
         
     StorageOffset size_offset = sm->get_child(section, "size");
-    std::cout << "size_offset: " << size_offset << std::endl;
     Word data_size = sm->dereference_attribute(size_offset)->value;
     StorageOffset read_data_offset = sm->new_string(data_size);
-    
-    std::cout << "reading data from file . . . size is " << data_size << std::endl;
     
     lseek(file_fd, sm->dereference_attribute(sm->get_child(section, "offset"))->value, SEEK_SET);
     if(read(file_fd, sm->dereference_string(read_data_offset), data_size) != (SWord)data_size) return 0;
     
     sm->create_child(section, "data")->value = read_data_offset;
-    
-    std::cout << "read_data_offset: " << read_data_offset << std::endl;
     
     return read_data_offset;
 }
