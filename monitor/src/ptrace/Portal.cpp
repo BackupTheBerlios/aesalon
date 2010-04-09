@@ -119,27 +119,27 @@ Portal::~Portal() {
     }
 }
 
-Word Portal::get_register(ASM::Register which) const {
+Word Portal::get_register(Register which) const {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-        case ASM::Register::RAX:
+        case RAX:
             /*std::cout << "Value of RAX requested; RAX is " << registers.rax << ", ORIG_RAX is " << registers.orig_rax << std::endl;*/
             return registers.rax;
-        case ASM::Register::RBX:
+        case RBX:
             return registers.rbx;
-        case ASM::Register::RDI:
+        case RDI:
             return registers.rdi;
-        case ASM::Register::RSI:
+        case RSI:
             return registers.rsi;
-        case ASM::Register::RIP:
+        case RIP:
             return registers.rip;
-        case ASM::Register::RBP:
+        case RBP:
             return registers.rbp;
-        case ASM::Register::RSP:
+        case RSP:
             return registers.rsp;
 #endif
         default:
@@ -147,14 +147,14 @@ Word Portal::get_register(ASM::Register which) const {
     }
 }
 
-void Portal::set_register(ASM::Register which, Word new_value) {
+void Portal::set_register(Register which, Word new_value) {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't set register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-        case ASM::Register::RIP:
+        case RIP:
             registers.rip = new_value;
             break;
 #endif
@@ -291,13 +291,7 @@ int Portal::wait_for_signal(int &status) {
 }
 
 void Portal::handle_breakpoint() {
-    Word ip = get_register(
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    ASM::Register::RIP
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-    ASM::Register::EIP
-#endif
-    );
+    Word ip = get_register(IP_REGISTER);
     /* Subtract one from the IP, since the 0xcc SIGTRAP instruction was executed . . . */
     ip --;
     Breakpoint *breakpoint = get_breakpoint_by_address(ip);
@@ -308,13 +302,7 @@ void Portal::handle_breakpoint() {
     if(breakpoint->get_original() != 0xcc) {
         /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
         
-        set_register(
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    ASM::Register::RIP
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-    ASM::Register::EIP
-#endif
-        , ip);
+        set_register(IP_REGISTER, ip);
     }
     
     breakpoint->notify();

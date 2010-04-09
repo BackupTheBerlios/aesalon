@@ -53,7 +53,6 @@ void Initializer::initialize() {
     server_socket = NULL;
     event_queue = NULL;
     return_value = 0;
-    storage_manager = NULL;
     
     config_parser = new Misc::ConfigParser();
     
@@ -86,8 +85,6 @@ void Initializer::initialize() {
     
     if(argument_parser->get_argument("overload-path")->get_data() == "")
         throw Exception::BasicException("No overload-path specified.");
-    
-    storage_manager = new StorageManager();
     
     if(argument_parser->get_postargs()) {
         int port;
@@ -128,7 +125,6 @@ void Initializer::deinitialize() {
     if(argument_parser) delete argument_parser;
     if(program_manager) delete program_manager;
     if(server_socket) delete server_socket;
-    if(storage_manager) delete storage_manager;
     if(event_queue) delete event_queue;
 }
 

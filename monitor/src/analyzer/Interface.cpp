@@ -3,11 +3,11 @@
 namespace Analyzer {
 
 Interface::Interface() {
-
+    storage_manager = new StorageManager();
 }
 
 Interface::~Interface() {
-
+    delete storage_manager;
 }
 
 File *Interface::parse_file(std::string filename) {
