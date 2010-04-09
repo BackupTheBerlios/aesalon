@@ -50,7 +50,6 @@ void Block::read(void *data, std::size_t size) {
 void Block::push_word(Word data) {
     std::size_t offset = data_size;
     /* Reserve space for one Word . . . */
-
     resize(data_size + AESALON_WORD_SIZE);
     
     get_data()[offset+0] = (data >> 0) & 0xff;

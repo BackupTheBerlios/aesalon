@@ -67,6 +67,7 @@ public:
     Block(Byte *data, std::size_t data_size);
     
     /** Returns the pointer referencing the data this block points to.
+        No out-of-bounds checking is done.
         @return A pointer to the beginning of the block data.
     */
     Byte *get_data() { return data; }

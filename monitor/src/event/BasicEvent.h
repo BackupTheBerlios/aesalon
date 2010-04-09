@@ -39,7 +39,7 @@ public:
 private:
     /** Current event type. */
     event_type_e type;
-    u_int64_t timestamp;
+    Word64 timestamp;
 public:
     /** Constructor, takes a type. All other stored data is in the derived
         types. */

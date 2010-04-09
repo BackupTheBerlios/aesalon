@@ -38,6 +38,7 @@ BasicEvent::BasicEvent(BasicEvent::event_type_e type) : type(type) {
 Block *BasicEvent::serialize() {
     Block *block = new Block();
     block->resize(1);
+    block->get_data()[0] = 0x0;
     if(type == BLOCK_EVENT) {
         block->get_data()[0] |= 0x01;
     }
