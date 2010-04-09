@@ -66,17 +66,31 @@ void __attribute__((destructor)) aesalon_destructor() {
 }
 
 void* get_scope_address() {
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
     asm("mov rax, [rbp + 16]");
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    asm("mov eax, [ebp + 8]");
+#endif
 }
+
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+    #define retrieve_scope() \
+        asm("push [rbp + 8]"); \
+        data.data.scope = (unsigned long)get_scope_address(); \
+        asm("add rsp, 8");
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    #define retrieve_scope() \
+        asm("push [ebp + 4]"); \
+        data.data.scope = (unsigned long)get_scope_address(); \
+        asm("add esp, 4");
+#endif
 
 void *calloc(size_t nmemb, size_t size) {
     if(!overload_initialized) initialize_overload();
     allocation_data_u data;    
     static unsigned char type = ALLOC_TYPE;
     
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
+    retrieve_scope();
     data.data.size = nmemb * size;
     if(original_calloc != NULL) data.data.address = (unsigned long)original_calloc(nmemb, size);
     else {
@@ -95,9 +109,7 @@ void *malloc(size_t size) {
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
     
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
+    retrieve_scope();
     
     data.data.address = (unsigned long)original_malloc(size);
     data.data.size = size;
@@ -113,9 +125,7 @@ void free(void *ptr) {
     free_data_u data;
     static unsigned char type = FREE_TYPE;
     
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
+    retrieve_scope();
     
     data.data.address = (unsigned long)ptr;
     original_free(ptr);
@@ -130,9 +140,7 @@ void *realloc(void *ptr, size_t size) {
     reallocation_data_u data;
     static unsigned char type = REALLOC_TYPE;
     
-    asm("push [rbp + 8]");
-    data.data.scope = (unsigned long)get_scope_address();
-    asm("add rsp, 8");
+    retrieve_scope();
     
     data.data.original_address = (unsigned long)ptr;
     
@@ -194,29 +202,13 @@ void initialize_overload() {
     unsigned long libc_offset = get_libc_offset();
     original_malloc += libc_offset;
 #ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} found pipe fd (%i)\n", pipe_fd);
-    
     printf("{aesalon} Resolving symbols . . .\n");
-/*    printf("{aesalon} Resolving malloc . . .\n");
-#endif
-    *(void **) (&original_malloc) = dlsym(RTLD_NEXT, "malloc");
-#ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved malloc (%p) (guess was %p (%p + %p)).\n", original_malloc, malloc_offset + libc_offset, libc_offset, malloc_offset);*/
-    printf("{aesalon} Resolving calloc . . .\n");
 #endif
     *(void **) (&original_calloc) = dlsym(RTLD_NEXT, "calloc");
-#ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved calloc (%p).\n", original_calloc);
-    printf("{aesalon} Resolving free . . .\n");
-#endif
     *(void **) (&original_free) = dlsym(RTLD_NEXT, "free");
-#ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved free (%p).\n", original_free);
-    printf("{aesalon} Resolving realloc . . .\n");
-#endif
     *(void **) (&original_realloc) = dlsym(RTLD_NEXT, "realloc");
 #ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved realloc (%p).\n", original_realloc);
+    printf("{aesalon} Resolved symbols.\n");
     printf("{aesalon} Overload library initialization completed.\n");
 #endif
 }

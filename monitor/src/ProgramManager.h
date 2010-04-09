@@ -22,8 +22,6 @@
 
 #include "misc/ArgumentList.h"
 #include "ptrace/Portal.h"
-#include "elf/Parser.h"
-#include "asm/Disassembler.h"
 #include "overload/OverloadParser.h"
 
 class ProgramManager {
@@ -34,16 +32,9 @@ private:
     
     PTrace::Portal *ptrace_portal;
     
-    ELF::Parser *elf_parser, *libc_parser;
-    ASM::Disassembler *disassembler;
-    
 #ifdef USE_OVERLOAD
     OverloadParser *overload_parser;
 #endif
-    
-    std::size_t malloc_breakpoint_id;
-    std::size_t free_breakpoint_id;
-    std::size_t realloc_breakpoint_id;
 public:
     ProgramManager(Misc::ArgumentList *argument_list);
     virtual ~ProgramManager();
@@ -52,27 +43,18 @@ public:
     void wait();
     
     /* called from a PTrace signal observer when the first SIGTRAP is caught, e.g. the child is loaded into memory */
-    void place_initial_breakpoints();
+    void setup();
     
     PTrace::Portal *get_ptrace_portal() const { return ptrace_portal; }
-    ELF::Parser *get_elf_parser() const { return elf_parser; }
-    ELF::Parser *get_libc_parser() const { return libc_parser; }
     
     Misc::ArgumentList *get_argument_list() const { return argument_list; }
     
     void set_running(bool new_running) { running = new_running; }
     bool is_running() const { return running; }
-    
-    std::size_t get_malloc_breakpoint_id() const { return malloc_breakpoint_id; }
-    std::size_t get_free_breakpoint_id() const { return free_breakpoint_id; }
-    std::size_t get_realloc_breakpoint_id() const { return realloc_breakpoint_id; }    
 
 #ifdef USE_OVERLOAD
     void process_backlog();
 #endif
 };
-
-
-
 
 #endif

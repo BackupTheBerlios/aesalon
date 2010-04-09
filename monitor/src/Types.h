@@ -26,42 +26,58 @@
 
 #include <vector>
 
-/** Byte typedef; simply an 8-bit integer. */
+/** 8-bit unsigned integer. */
 typedef u_int8_t Byte;
+/** 8-bit signed integer. */
+typedef int8_t SByte;
+/** 32-bit unsigned integer */
+typedef u_int32_t Word32;
+/** 32-bit signed integer */
+typedef int32_t SWord32;
+/** 64-bit unsigned integer */
+typedef u_int64_t Word64;
+/** 64-bit signed integer */
+typedef int64_t SWord64;
+
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+#define AESALON_WORD_SIZE 8
 /** Unsigned word, 32-bits on 32-bit machines, 64 bits on 64-bit machines. */
-typedef u_int64_t Word;
+typedef Word64 Word;
 /** Signed-word, signed version of @a Word. */
-typedef int64_t SWord;
+typedef SWord64 SWord;
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+#define AESALON_WORD_SIZE 4
 /** Unsigned word, 32-bits on 32-bit machines, 64 bits on 64-bit machines. */
-typedef u_int32_t Word;
+typedef Word32 Word;
 /** Signed-word, signed version of @a Word. */
-typedef int32_t SWord;
+typedef SWord32 SWord;
 #endif
 
 /** A block of data, presumably from an executable file. Custom version of std::vector&lt;Byte&gt;.*/
 class Block {
 private:
-    std::vector<Byte> data;
-    std::size_t reserved;
+    Byte *data;
+    std::size_t allocated_size;
+    std::size_t data_size;
 public:
     /** Generic constructor, sets data and data_size to NULL and zero, respectively. */
-    Block() : data() {}
-    /** Constructor that takes a pointer and a std::size_t, for data and data_size. */
+    Block() : data(NULL), allocated_size(0), data_size(0) {}
+    /** Constructor that takes a pointer and a std::size_t, for data and data_size.
+        Creates a copy of the given data. */
     Block(Byte *data, std::size_t data_size);
     
-    /** Returns the data that this block points to, with an optional offset.
-        @return The block data, @a offset bytes in.
+    /** Returns the pointer referencing the data this block points to.
+        No out-of-bounds checking is done.
+        @return A pointer to the beginning of the block data.
     */
-    Byte *get_data() { return &data[0]; }
+    Byte *get_data() { return data; }
     
     /** Retrieves the size of the current data.
         @return The current size of the referenced data.
     */
-    std::size_t get_size() const { return data.size(); }
-    /** Removes a swath of Bytes, from offset @a from to offset @a to. This invalidates all
-        pointers to the current Block.
+    std::size_t get_size() const { return data_size; }
+    /** Removes a swath of Bytes, from offset @a from to offset @a to, inclusive.
+        This may invalidate all pointers to the current Block.
         @param from Where to begin deleting.
         @param to Where to end deleteing.
     */
@@ -81,11 +97,13 @@ public:
     */
     void read(void *data, std::size_t size);
     
-    void hexdump();
-    
     void resize(std::size_t new_size);
     
-    void push_word(Word data);
+    /** Pushes a word of data onto the Block.
+        @param data The word to push.
+        @param bits How many bits of data to push.
+    */
+    void push_word(Word64 data, int bits);
 };
 
 #endif

@@ -52,8 +52,8 @@ void Initializer::initialize() {
     program_manager = NULL;
     server_socket = NULL;
     event_queue = NULL;
+    analyzer_interface = NULL;
     return_value = 0;
-    storage_manager = NULL;
     
     config_parser = new Misc::ConfigParser();
     
@@ -87,8 +87,6 @@ void Initializer::initialize() {
     if(argument_parser->get_argument("overload-path")->get_data() == "")
         throw Exception::BasicException("No overload-path specified.");
     
-    storage_manager = new StorageManager();
-    
     if(argument_parser->get_postargs()) {
         int port;
         Misc::String::to<int>(argument_parser->get_argument("tcp-port")->get_data(), port);
@@ -107,6 +105,11 @@ void Initializer::initialize() {
     
     event_queue = new Event::Queue();
     
+    Misc::Message(Misc::Message::DEBUG_MESSAGE, "Analyzing executable . . .");
+    analyzer_interface = new Analyzer::Interface();
+    analyzer_interface->parse_file(program_manager->get_argument_list()->get_argument(0));
+    analyzer_interface->parse_file(LIBC_PATH);
+    
     if(argument_parser->get_argument("wait")->is_found()) {
         int number;
         Misc::String::to<int>(
@@ -124,11 +127,11 @@ void Initializer::initialize() {
 }
 
 void Initializer::deinitialize() {
+    if(analyzer_interface) delete analyzer_interface;
     if(config_parser) delete config_parser;
     if(argument_parser) delete argument_parser;
     if(program_manager) delete program_manager;
     if(server_socket) delete server_socket;
-    if(storage_manager) delete storage_manager;
     if(event_queue) delete event_queue;
 }
 
@@ -145,7 +148,9 @@ void Initializer::usage() {
     std::cout << "\t--tcp-port, -p\t\tSet the port to listen on for connections. Currently is " << argument_parser->get_argument("tcp-port")->get_data() << "." << std::endl;
     std::cout << "\t--wait, -w\t\tNumber of TCP connections to accept before executing. Defaults to 0." << std::endl;
     std::cout << "\t--libc-path\t\tThe path to the current version of libc being used. Currently is " << LIBC_PATH << "." << std::endl;
-    std::cout << "\t--overload-path\t\tThe path to the aesalon overload library. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
+#ifdef USE_OVERLOAD
+    std::cout << "\t--overload-path\t\tThe directory containing the overload libraries. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
+#endif
     std::cout << "\t--\t\t\tOptional, denotes the end of the argument list." << std::endl;
 }
 
@@ -162,11 +167,14 @@ void Initializer::run() {
         usleep(300);
 #endif
     }
+    Event::MonitorEvent *finish_event = new Event::MonitorEvent(Event::MonitorEvent::PROGRAM_FINISHED);
 #ifdef USE_OVERLOAD
     Misc::Message(Misc::Message::DEBUG_MESSAGE, "Processing backlog . . .");
     program_manager->process_backlog();
 #endif
-    get_event_queue()->push_event(new Event::MonitorEvent(Event::MonitorEvent::PROGRAM_FINISHED));
+    get_event_queue()->lock_mutex();
+    get_event_queue()->push_event(finish_event);
+    get_event_queue()->unlock_mutex();
     /* Now send off the backlog . . . */
     get_socket()->send_data(event_queue);
 }

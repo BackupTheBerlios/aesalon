@@ -2,7 +2,7 @@ add_definitions(-std=c++0x -W -Wall -ansi -pedantic -Wno-unused-parameter -Wno-l
 add_definitions(-DAESALON_MAJOR_VERSION="${AESALON_MAJOR_VERSION}" -DAESALON_MINOR_VERSION="${AESALON_MINOR_VERSION}" -DAESALON_PATCHLEVEL="${AESALON_PATCHLEVEL}" -DAESALON_PLATFORM=${AESALON_PLATFORM})
 add_definitions(-DAESALON_PLATFORM_x86=0 -DAESALON_PLATFORM_x86_64=1)
 
-add_definitions(-DSYS_CONFIG_PATH="${SYS_CONFIG_PATH}" -DUSER_CONFIG_PATH="${USER_CONFIG_PATH}")
+add_definitions(-DSYS_CONFIG_PATH="${SYS_CONFIG_PATH}" -DUSER_CONFIG_PATH="${USER_CONFIG_PATH}" -DDIR_CONFIG_PATH="${DIR_CONFIG_PATH}")
 if(USE_OVERLOAD_LIBRARY)
     add_definitions(-DUSE_OVERLOAD)
 endif(USE_OVERLOAD_LIBRARY)
@@ -18,8 +18,9 @@ endif(DEVELOPMENT_BUILD)
 include_directories(.)
 
 aux_source_directory(. DOT_SOURCES)
-aux_source_directory(asm ASM_SOURCES)
-aux_source_directory(elf ELF_SOURCES)
+aux_source_directory(analyzer ANALYZER_SOURCES)
+#aux_source_directory(asm ASM_SOURCES)
+#aux_source_directory(elf ELF_SOURCES)
 aux_source_directory(event EVENT_SOURCES)
 aux_source_directory(exception EXCEPTION_SOURCES)
 aux_source_directory(misc MISC_SOURCES)
@@ -31,8 +32,9 @@ set(OVERLOAD_SOURCES overload/OverloadParser.cpp)
 
 set(SOURCES
     ${DOT_SOURCES}
-    ${ASM_SOURCES}
-    ${ELF_SOURCES}
+    ${ANALYZER_SOURCES}
+#    ${ASM_SOURCES}
+#    ${ELF_SOURCES}
     ${EVENT_SOURCES}
     ${EXCEPTION_SOURCES}
     ${MISC_SOURCES}

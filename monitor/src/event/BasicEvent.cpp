@@ -28,17 +28,17 @@ namespace Event {
 BasicEvent::BasicEvent(BasicEvent::event_type_e type) : type(type) {
     struct timespec time;
     clock_gettime(CLOCK_REALTIME, &time);
-    timestamp = time.tv_sec * 1000000000;
+    timestamp = Word64(time.tv_sec) * Word64(1000000000);
     timestamp += time.tv_nsec;
 }
-
 
 /* Serialization format:
     first bit defines the event type, BLOCK_EVENT or REFERENCE_EVENT
 */
-Block *BasicEvent::serialize() {
+Block *BasicEvent::serialize(int bits) {
     Block *block = new Block();
     block->resize(1);
+    block->get_data()[0] = 0x0;
     if(type == BLOCK_EVENT) {
         block->get_data()[0] |= 0x01;
     }
@@ -49,7 +49,8 @@ Block *BasicEvent::serialize() {
         block->get_data()[0] |= 0x03;
     }
     else throw Exception::EventException("Asked to serialize invalid Event");
-    block->push_word(timestamp);
+    if(bits == 64) block->get_data()[0] |= 0x80;
+    block->push_word(timestamp, 64);
     return block;
 }
 

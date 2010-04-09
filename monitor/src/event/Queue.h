@@ -23,21 +23,22 @@
 #include <iostream>
 #include <queue>
 
+#include <pthread.h>
+
 #include "BasicEvent.h"
 
 namespace Event {
 
-/** Event queue class. Wrapper around std::queue. */
+/** Event queue class. Mutex wrapper around std::queue. */
 class Queue {
 public:
     typedef std::queue<BasicEvent *> event_queue_t;
 private:
+    pthread_mutex_t mutex;
     event_queue_t event_queue;
 public:
-    /** Basic constructor, does nothing. */
-    Queue() {}
-    /** Destructor, also does nothing. */
-    virtual ~Queue() {}
+    Queue();
+    virtual ~Queue();
     
     /** Add another event onto the FIFO queue.
         @param event The event to push on the queue.
@@ -49,6 +50,9 @@ public:
         @return The first element, or NULL if there are no elements.
     */
     BasicEvent *peek_event();
+    
+    void lock_mutex();
+    void unlock_mutex();
 };
 
 } // namespace Event

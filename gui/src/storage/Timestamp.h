@@ -20,7 +20,7 @@
 #ifndef AESALON_GUI_STORAGE_TIMESTAMP_H
 #define AESALON_GUI_STORAGE_TIMESTAMP_H
 
-#include <QDateTime>
+#include <QMetaType>
 
 #ifndef TIME_SOURCE
     #define TIME_SOURCE CLOCK_REALTIME
@@ -44,6 +44,11 @@ public:
     bool operator!=(const Timestamp &other) const;
     Timestamp &operator=(const Timestamp &other);
     
+    Timestamp operator-(const Timestamp &other) const;
+    Timestamp operator+(const Timestamp &other) const;
+    const Timestamp &operator-=(const Timestamp &other);
+    const Timestamp &operator+=(const Timestamp &other);
+    
     qint64 seconds_until(const Timestamp &other) const;
     qint64 ms_until(const Timestamp &other) const;
     qint64 ns_until(const Timestamp &other) const;
@@ -52,5 +57,7 @@ public:
     qint64 to_ns() const;
     QString to_string() const;
 };
+
+Q_DECLARE_METATYPE(Timestamp)
 
 #endif

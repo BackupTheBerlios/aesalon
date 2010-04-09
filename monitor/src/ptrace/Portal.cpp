@@ -41,9 +41,6 @@
 #include "ExitObserver.h"
 #include "TrapObserver.h"
 #include "SegfaultObserver.h"
-#include "MallocObserver.h"
-#include "FreeObserver.h"
-#include "ReallocObserver.h"
 
 #include "misc/String.h"
 
@@ -56,7 +53,22 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     int fds[2];
     if(pipe(fds) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Could not create pipe: " << strerror(errno));
-    Word malloc_offset = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc")->get_address();
+    Word malloc_offset = Initializer::get_instance()->get_analyzer_interface()->get_file(LIBC_PATH)->get_symbol_address("malloc");
+    Analyzer::File *file = Initializer::get_instance()->get_analyzer_interface()->get_file();
+    
+    Word bits = file->get_attribute("platform_bits");
+    
+    std::string overload_filename = Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data();
+    if(bits == 32) {
+        overload_filename += "/aesalon_overload_32.so";
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+        throw Exception::PTraceException("Currently impossible to execute 32-bit programs when Aesalon is compiled for 64-bit platforms.");
+#endif
+    }
+    else if(bits == 64) overload_filename += "/aesalon_overload_64.so";
+    else {
+        throw Exception::PTraceException("Platform is not 32- or 64-bits. This shouldn't happen!");
+    }
 #endif
     pid = fork();
     if(pid == -1)
@@ -66,7 +78,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
 #else
         /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
-        setenv("LD_PRELOAD", Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data().c_str(), 1);
+        setenv("LD_PRELOAD", overload_filename.c_str(), 1);
         setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
         setenv("aesalon_malloc_offset", (Misc::StreamAsString() << std::hex << malloc_offset).operator std::string().c_str(), 1);
         close(fds[0]);
@@ -94,12 +106,6 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
 #endif
     add_signal_observer(new ExitObserver());
     add_signal_observer(new SegfaultObserver());
-
-#ifndef USE_OVERLOAD
-    malloc_observer = new MallocObserver();
-    free_observer = new FreeObserver();
-    realloc_observer = new ReallocObserver();
-#endif
     
     /* The overload library will set itself up from here . . . */
 }
@@ -119,27 +125,27 @@ Portal::~Portal() {
     }
 }
 
-Word Portal::get_register(ASM::Register which) const {
+Word Portal::get_register(Register which) const {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't get register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-        case ASM::Register::RAX:
+        case RAX:
             /*std::cout << "Value of RAX requested; RAX is " << registers.rax << ", ORIG_RAX is " << registers.orig_rax << std::endl;*/
             return registers.rax;
-        case ASM::Register::RBX:
+        case RBX:
             return registers.rbx;
-        case ASM::Register::RDI:
+        case RDI:
             return registers.rdi;
-        case ASM::Register::RSI:
+        case RSI:
             return registers.rsi;
-        case ASM::Register::RIP:
+        case RIP:
             return registers.rip;
-        case ASM::Register::RBP:
+        case RBP:
             return registers.rbp;
-        case ASM::Register::RSP:
+        case RSP:
             return registers.rsp;
 #endif
         default:
@@ -147,14 +153,14 @@ Word Portal::get_register(ASM::Register which) const {
     }
 }
 
-void Portal::set_register(ASM::Register which, Word new_value) {
+void Portal::set_register(Register which, Word new_value) {
     struct user_regs_struct registers;
     if(ptrace(PTRACE_GETREGS, pid, NULL, &registers) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't set register values: " << strerror(errno));
     
     switch(which) {
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-        case ASM::Register::RIP:
+        case RIP:
             registers.rip = new_value;
             break;
 #endif
@@ -291,13 +297,7 @@ int Portal::wait_for_signal(int &status) {
 }
 
 void Portal::handle_breakpoint() {
-    Word ip = get_register(
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    ASM::Register::RIP
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-    ASM::Register::EIP
-#endif
-    );
+    Word ip = get_register(IP_REGISTER);
     /* Subtract one from the IP, since the 0xcc SIGTRAP instruction was executed . . . */
     ip --;
     Breakpoint *breakpoint = get_breakpoint_by_address(ip);
@@ -307,7 +307,8 @@ void Portal::handle_breakpoint() {
     }
     if(breakpoint->get_original() != 0xcc) {
         /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
-        set_register(ASM::Register::RIP, ip);
+        
+        set_register(IP_REGISTER, ip);
     }
     
     breakpoint->notify();

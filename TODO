@@ -1,6 +1,9 @@
 Monitor:
 - Implement proper taint-tracking so references can be calculated
 - Figure out why select() in ServerSocket::accept_connections mistakenly detects a connection
+- Implement 32-bit support
+- Add support for executing shell scripts
+- Add support for executing 32-bit programs on 64-bit platforms (generate 32-bit overload)
 GUI:
 - Embed Konsole inside Session for LaunchSources?
 - Add "temporary sessions", e.g. sessions that aren't saved

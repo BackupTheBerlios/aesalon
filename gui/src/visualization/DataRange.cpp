@@ -9,8 +9,37 @@ DataRange::DataRange(const Timestamp &begin_time, qreal begin_data, const Timest
 }
 
 bool DataRange::intersects(const DataRange &range) const {
-    if(range.end.get_data_element() < begin.get_data_element() || range.end.get_time_element() < begin.get_time_element()
-        || range.begin.get_data_element() > end.get_data_element() || range.begin.get_time_element() > end.get_time_element()) return false;
+    
+    /*
+        Non-intersection:
+        A---\
+        |   |
+        \---B
+        
+                C---\
+                |   |
+                \---D
+        
+        Intersection:
+        A---\
+        |  C+-\
+        \--+B |
+           \--D
+        
+        if C >= B, or if A >= D, then the rectangles do not intersect.
+        
+        Given A and B:
+            A == B when:
+                a.x == b.x and a.y == b.y
+            A > B when:
+                a.x > b.x and a.y > b.y
+            A >= B when:
+                A == B or A > B
+    */
+    
+    /* compare end to range.begin(), and begin to range.end() . . .*/
+    if(range.begin.get_time_element() > end.get_time_element() || range.begin.get_data_element() > end.get_data_element()) return false;
+    else if(begin.get_time_element() > range.end.get_time_element() || begin.get_data_element() > range.end.get_data_element()) return false;
     return true;
 }
 
@@ -34,4 +63,12 @@ bool DataRange::contains(const DataPoint &point) const {
     if(point.get_data_element() < begin.get_data_element() || point.get_time_element() < begin.get_time_element()
         || point.get_data_element() > end.get_data_element() || point.get_time_element() > end.get_time_element()) return false;
     return true;
+}
+
+DataRange DataRange::normalized() const {
+    return DataRange(
+        qMin(begin.get_time_element(), end.get_time_element()),
+        qMin(begin.get_data_element(), end.get_data_element()),
+        qMax(begin.get_time_element(), end.get_time_element()),
+        qMax(begin.get_data_element(), end.get_data_element()));
 }

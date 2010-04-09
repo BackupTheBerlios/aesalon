@@ -4,13 +4,30 @@
 #add_custom_command(OUTPUT overload.so COMMAND cp overload.o overload.so DEPENDS overload.o WORKING_DIRECTORY src/monitor/overload)
 #add_custom_target(Overload /usr/bin/nasm -f elf64 overload.asm -o overload.o COMMAND gcc -shared overload.o -o overload.so)
 if(DEVELOPMENT_BUILD)
-    add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload.so -ldl -masm=intel
+    add_custom_command(OUTPUT aesalon_overload_32.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_32.so -ldl -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
-        -DDEVELOPMENT_BUILD DEPENDS overload.c)
+        -DDEVELOPMENT_BUILD
+        -DAESALON_PLATFORM=${AESALON_PLATFORM}
+        -DAESALON_PLATFORM_x86=0
+        -DAESALON_PLATFORM_x86_64=1
+        DEPENDS overload.c)
+    if(AESALON_PLATFORM EQUAL 1)
+    add_custom_command(OUTPUT aesalon_overload_64.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_64.so -ldl -masm=intel
+        -DLIBC_PATH='"${LIBC_PATH}"'
+        -DDEVELOPMENT_BUILD
+        -DAESALON_PLATFORM=${AESALON_PLATFORM}
+        -DAESALON_PLATFORM_x86=0
+        -DAESALON_PLATFORM_x86_64=1
+        DEPENDS overload.c)
+    endif(AESALON_PLATFORM EQUAL 1)
 else(DEVELOPMENT_BUILD)
     add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -shared overload.c -o aesalon_overload.so -ldl -masm=intel
         -DLIBC_PATH="${LIBC_PATH}" DEPENDS overload.c)
 endif(DEVELOPMENT_BUILD)
 
-add_custom_target("overload library" ALL DEPENDS aesalon_overload.so)
+if(AESALON_PLATFORM EQUAL 0)
+    add_custom_target("overload library" ALL DEPENDS aesalon_overload_32.so)
+elseif(AESALON_PLATFORM EQUAL 1)
+    add_custom_target("overload libraries" ALL DEPENDS aesalon_overload_32.so aesalon_overload_64.so)
+endif(AESALON_PLATFORM EQUAL 0)
 install(FILES aesalon_overload.so DESTINATION lib/)

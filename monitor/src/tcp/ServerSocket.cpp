@@ -30,6 +30,7 @@
 #include "ServerSocket.h"
 #include "exception/TCPException.h"
 #include "misc/String.h"
+#include "Initializer.h"
 
 namespace TCP {
 
@@ -121,7 +122,7 @@ void ServerSocket::remove_invalid_sockets() {
     /* NOTE: this is quite inefficient with large amounts of sockets . . . */
     for(; i != socket_list.end(); i ++) {
         if(!(*i)->is_valid()) {
-            (*i) = 0;
+            delete *i;
             socket_list.erase(i);
             i = socket_list.begin();
         }
@@ -137,12 +138,18 @@ void ServerSocket::send_data(Block *data) {
 }
 
 void ServerSocket::send_data(Event::Queue *data) {
+    static int bits = 0;
+    if(bits == 0) {
+        bits = Initializer::get_instance()->get_analyzer_interface()->get_file()->get_attribute("platform_bits");
+    }
+    data->lock_mutex();
     while(data->peek_event()) {
-        Block *raw_data = data->peek_event()->serialize();
+        Block *raw_data = data->peek_event()->serialize(bits);
         send_data(raw_data);
         data->pop_event();
         delete raw_data;
     }
+    data->unlock_mutex();
 }
 
 void ServerSocket::disconnect_all() {

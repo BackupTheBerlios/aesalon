@@ -31,7 +31,7 @@
 #include "BreakpointObserver.h"
 #include "misc/ArgumentList.h"
 #include "exception/PTraceException.h"
-#include "asm/Register.h"
+#include "Register.h"
 
 namespace PTrace {
 
@@ -71,9 +71,9 @@ public:
         @param which The register to get the value of.
         @return The value of the specified register.
     */
-    Word get_register(ASM::Register which) const;
+    Word get_register(Register which) const;
     
-    void set_register(ASM::Register which, Word new_value);
+    void set_register(Register which, Word new_value);
     
     /** Read a Word of memory.
         @param address The address to read.

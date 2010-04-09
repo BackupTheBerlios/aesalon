@@ -5,16 +5,16 @@
 #include "Viewport.h"
 #include "Viewport.moc"
 
-Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(parent) {
+Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(parent), rendered_canvas(size(), DataRange()) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMouseTracking(true);
     setCursor(QCursor(Qt::CrossCursor));
 
-    canvas_painter = new CanvasPainter(&rendered);
-    rendered = QImage(width(), height(), QImage::Format_RGB32);
+    canvas_painter = new CanvasPainter();
     
-    connect(this, SIGNAL(paint_canvas(Canvas *)), canvas_painter, SLOT(paint_canvas(Canvas*)));
-    connect(canvas_painter, SIGNAL(done()), SLOT(update()));
+    connect(this, SIGNAL(paint_canvas(QSize,Canvas*)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*)), Qt::DirectConnection);
+    connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)), Qt::DirectConnection);
+    connect(canvas_painter, SIGNAL(done(RenderedCanvas)), SLOT(merge_canvas(RenderedCanvas)), Qt::DirectConnection);
     
     formatter = factory->create_formatter();
     click_handler = factory->create_click_handler();
@@ -26,7 +26,7 @@ Viewport::~Viewport() {
 
 void Viewport::merge_canvas(Canvas* canvas) {
     local_canvas.combine_with(*canvas);
-    emit paint_canvas(&local_canvas);
+    force_render();
     delete canvas;
 }
 
@@ -36,6 +36,7 @@ void Viewport::clear_canvas() {
 
 void Viewport::set_canvas_range(const DataRange &new_range) {
     local_canvas.set_range(new_range);
+    rendered_canvas.set_range(new_range);
 }
 
 void Viewport::shift_range_to(const Timestamp &high_time) {
@@ -48,14 +49,19 @@ void Viewport::shift_range_to(const Timestamp &high_time) {
     set_canvas_range(range);
 }
 
-void Viewport::force_repaint() {
-    emit paint_canvas(&local_canvas);
+void Viewport::force_render() {
+    emit paint_canvas(size(), local_canvas.clone());
+}
+
+void Viewport::merge_canvas(RenderedCanvas canvas) {
+    rendered_canvas.merge(canvas);
+    update();
 }
 
 void Viewport::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     CoordinateMapper mapper(size(), local_canvas.get_range());
-    painter.drawImage(0, 0, rendered);
+    painter.drawImage(0, 0, rendered_canvas.get_image());
     
     QPen pen(Qt::DotLine);
     pen.setColor(qRgba(128, 128, 128, 64));
@@ -85,11 +91,64 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     DataPoint point = mapper.map_to(event->posF());
     
     if(event->buttons() & Qt::LeftButton) {
-        DataPoint old_point = mapper.map_to(old_mouse_pos);
-        DataPoint move_by = DataPoint(point.get_time_element().ns_until(old_point.get_time_element()), old_point.get_data_element() - point.get_data_element());
+        /*old_mouse_pos.setX(event->posF().x());*/
+        /*old_mouse_pos.setY(old_mouse_pos.y() - 2.0);*/
+        
+        DataRange local_range = local_canvas.get_range();
+        QPointF movement_delta = event->posF() - old_mouse_pos;
+        /*DataPoint old_point = mapper.map_to(old_mouse_pos);*/
+        /*DataPoint move_by = DataPoint(point.get_time_element() - old_point.get_time_element(), point.get_data_element() - old_point.get_data_element());*/
+        /*DataPoint move_by = mapper.map_to(movement_delta);
+        move_by.set_time_element(move_by.get_time_element() - local_range.get_begin().get_time_element());
+        move_by.set_data_element(move_by.get_data_element() - local_range.get_begin().get_data_element());*/
+        DataPoint move_by = mapper.find_offset(movement_delta);
+        
+        rendered_canvas.shift(move_by);
+        rendered_canvas.shift(movement_delta);
         local_canvas.shift_range(move_by);
+        
+        /*qDebug("move_by: time is %lli, data is %f", move_by.get_time_element().to_ns(), move_by.get_data_element());*/
+        DataRange exposed_range;
+        /*qDebug("Checking for movement-exposed regions . . .");*/
+        if(move_by.get_data_element() > 0.0) {
+            /*qDebug("Shifting upwards . . .");*/
+            exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
+            exposed_range.get_end().set_time_element(local_range.get_end().get_time_element());
+            
+            exposed_range.get_begin().set_data_element(local_range.get_end().get_data_element() - move_by.get_data_element());
+            exposed_range.get_end().set_data_element(local_range.get_end().get_data_element() + move_by.get_data_element());
+            
+            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), local_canvas.clone(), exposed_range);
+        }
+        else if(move_by.get_data_element() < 0.0) {
+            exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
+            exposed_range.get_end().set_time_element(local_range.get_end().get_time_element());
+            
+            exposed_range.get_begin().set_data_element(local_range.get_begin().get_data_element() + move_by.get_data_element());
+            exposed_range.get_end().set_data_element(local_range.get_begin().get_data_element() - move_by.get_data_element());
+            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), local_canvas.clone(), exposed_range);
+        }
+        
+        if(move_by.get_time_element().to_ns() > 0) {
+            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
+            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
+            
+            exposed_range.get_begin().set_time_element(local_range.get_end().get_time_element() - move_by.get_time_element());
+            exposed_range.get_end().set_time_element(local_range.get_end().get_time_element() + move_by.get_time_element());
+            
+            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), local_canvas.clone(), exposed_range);
+        }
+        else if(move_by.get_time_element().to_ns() < 0) {
+            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
+            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
+            
+            exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element() + move_by.get_time_element());
+            exposed_range.get_end().set_time_element(local_range.get_begin().get_time_element() - move_by.get_time_element());
+            
+            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), local_canvas.clone(), exposed_range);
+        }
+        
         old_mouse_pos = event->posF();
-        emit paint_canvas(&local_canvas);
     }
     emit mouse_position(formatter->format_point(point));
 }
@@ -103,8 +162,8 @@ void Viewport::mousePressEvent(QMouseEvent *event) {
 }
 
 void Viewport::resizeEvent(QResizeEvent *event) {
-    rendered = rendered.scaled(event->size());
-    emit paint_canvas(&local_canvas);
+    rendered_canvas.resize(event->size());
+    force_render();
 }
 
 void Viewport::wheelEvent(QWheelEvent *event) {
@@ -155,5 +214,5 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     range.get_end().set_data_element(new_y + new_y_range);
     
     set_canvas_range(range);
-    emit paint_canvas(&local_canvas);
+    force_render();
 }

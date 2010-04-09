@@ -5,11 +5,14 @@
 
 #include "DataRange.h"
 #include "CanvasObject.h"
+#include "RenderedCanvas.h"
 
 class Canvas {
 private:
     DataRange range;
-    QList<CanvasObject *> objects;
+    CanvasObject *head;
+    CanvasObject *insertion_point;
+    CanvasObject *termination_point;
 public:
     Canvas(const DataRange &range = DataRange());
     virtual ~Canvas();
@@ -25,7 +28,10 @@ public:
     
     void combine_with(const Canvas &canvas);
     
-    void paint_onto(QPaintDevice *device);
+    void paint_onto(RenderedCanvas &canvas);
+    void paint_onto(RenderedCanvas &canvas, const DataRange &range);
+    
+    Canvas *clone() const;
 };
 
 #endif

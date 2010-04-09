@@ -7,12 +7,13 @@
 #include "CanvasPainter.h"
 #include "VisualizationFactory.h"
 #include "ClickHandler.h"
+#include "RenderedCanvas.h"
 
 class Viewport : public QWidget { Q_OBJECT
 private:
     Canvas local_canvas;
     CanvasPainter *canvas_painter;
-    QImage rendered;
+    RenderedCanvas rendered_canvas;
     AxisFormatter *formatter;
     ClickHandler *click_handler;
     QPointF old_mouse_pos;
@@ -24,7 +25,9 @@ public slots:
     void clear_canvas();
     void set_canvas_range(const DataRange &new_range);
     void shift_range_to(const Timestamp &high_time);
-    void force_repaint();
+    void force_render();
+private slots:
+    void merge_canvas(RenderedCanvas canvas);
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
@@ -32,7 +35,8 @@ protected:
     virtual void resizeEvent(QResizeEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
 signals:
-    void paint_canvas(Canvas *canvas);
+    void paint_canvas(QSize render_size, Canvas *canvas);
+    void paint_canvas(QSize render_size, Canvas *canvas, DataRange range);
     void mouse_position(QString formatted);
 };
 

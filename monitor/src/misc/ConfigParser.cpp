@@ -27,6 +27,7 @@
 namespace Misc {
 
 ConfigParser::ConfigParser() {
+    parse_config_file(DIR_CONFIG_PATH);
     parse_config_file(SYS_CONFIG_PATH);
     parse_config_file(USER_CONFIG_PATH);
 }

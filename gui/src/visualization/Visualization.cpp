@@ -32,12 +32,12 @@ Visualization::Visualization(VisualizationFactory *factory) {
     main_layout->addLayout(upper_layout);
     
     viewport = new Viewport(factory, this);
-    connect(controller, SIGNAL(canvas_update(Canvas*)), viewport, SLOT(merge_canvas(Canvas*)));
-    connect(controller, SIGNAL(clear_canvas()), viewport, SLOT(clear_canvas()));
-    connect(controller, SIGNAL(change_range(DataRange)), viewport, SLOT(set_canvas_range(DataRange)));
-    connect(controller, SIGNAL(shift_range_to(Timestamp)), viewport, SLOT(shift_range_to(Timestamp)));
-    connect(controller, SIGNAL(force_repaint()), viewport, SLOT(force_repaint()));
-    connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)));
+    connect(controller, SIGNAL(canvas_update(Canvas*)), viewport, SLOT(merge_canvas(Canvas*)), Qt::QueuedConnection);
+    connect(controller, SIGNAL(clear_canvas()), viewport, SLOT(clear_canvas()), Qt::QueuedConnection);
+    connect(controller, SIGNAL(change_range(DataRange)), viewport, SLOT(set_canvas_range(DataRange)), Qt::QueuedConnection);
+    connect(controller, SIGNAL(shift_range_to(Timestamp)), viewport, SLOT(shift_range_to(Timestamp)), Qt::QueuedConnection);
+    connect(controller, SIGNAL(force_repaint()), viewport, SLOT(force_render()), Qt::QueuedConnection);
+    connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)), Qt::QueuedConnection);
     main_layout->addWidget(viewport);
     
     setLayout(main_layout);
