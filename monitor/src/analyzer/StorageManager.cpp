@@ -44,7 +44,6 @@ StorageString *StorageManager::new_string(StorageOffset size) {
     return reinterpret_cast<StorageString *>(storage + offset);
 }
 
-
 StorageOffset StorageManager::reserve(StorageOffset size) {
     StorageOffset final_offset = used_storage + size;
     StorageOffset original_offset = used_storage;

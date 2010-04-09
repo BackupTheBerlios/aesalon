@@ -202,29 +202,13 @@ void initialize_overload() {
     unsigned long libc_offset = get_libc_offset();
     original_malloc += libc_offset;
 #ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} found pipe fd (%i)\n", pipe_fd);
-    
     printf("{aesalon} Resolving symbols . . .\n");
-/*    printf("{aesalon} Resolving malloc . . .\n");
-#endif
-    *(void **) (&original_malloc) = dlsym(RTLD_NEXT, "malloc");
-#ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved malloc (%p) (guess was %p (%p + %p)).\n", original_malloc, malloc_offset + libc_offset, libc_offset, malloc_offset);*/
-    printf("{aesalon} Resolving calloc . . .\n");
 #endif
     *(void **) (&original_calloc) = dlsym(RTLD_NEXT, "calloc");
-#ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved calloc (%p).\n", original_calloc);
-    printf("{aesalon} Resolving free . . .\n");
-#endif
     *(void **) (&original_free) = dlsym(RTLD_NEXT, "free");
-#ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved free (%p).\n", original_free);
-    printf("{aesalon} Resolving realloc . . .\n");
-#endif
     *(void **) (&original_realloc) = dlsym(RTLD_NEXT, "realloc");
 #ifdef DEVELOPMENT_BUILD
-    printf("{aesalon} Resolved realloc (%p).\n", original_realloc);
+    printf("{aesalon} Resolved symbols.\n");
     printf("{aesalon} Overload library initialization completed.\n");
 #endif
 }

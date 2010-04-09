@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <cstring>
+#include <iostream>
 
 #include "File.h"
 #include "Initializer.h"
@@ -21,7 +22,7 @@ File::~File() {
 }
 
 StorageItem *File::get_section(std::string name) const {
-    StorageItem *item = section_cache.at(name);
+    StorageItem *item = section_cache[name];
     if(item != NULL) return item;
     for(item_map_t::const_iterator i = sections.begin(); i != sections.end(); i ++) {
         if(!strcmp(i->first, name.c_str())) {

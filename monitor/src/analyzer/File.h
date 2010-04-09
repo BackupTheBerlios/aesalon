@@ -20,7 +20,6 @@ private:
     item_map_t sections;
     item_map_t symbols;
     StorageManager *storage_manager;
-    friend class Parser;
 public:
     File(std::string filename, StorageManager *storage_manager);
     ~File();
@@ -30,7 +29,7 @@ public:
     StorageItem *get_section(std::string name) const;
     StorageItem *get_symbol(std::string name) const;
     Word get_symbol_address(std::string name) const;
-protected:
+    
     void add_section(StorageItem *item);
     void add_symbol(StorageItem *item);
 private:
