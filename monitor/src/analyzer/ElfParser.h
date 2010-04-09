@@ -3,8 +3,8 @@
 
 /*#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64 || AESALON_PLATFORM == AESALON_PLATFORM_x86*/
 
+#include "StorageOffset.h"
 #include "Parser.h"
-#include "StorageItem.h"
 
 namespace Analyzer {
 
@@ -20,7 +20,7 @@ private:
     void parse_32();
     void parse_64();
     
-    StorageString *read_content(StorageItem *section);
+    StorageOffset read_content(StorageOffset section);
 };
 
 } // namespace Analyzer

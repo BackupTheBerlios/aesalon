@@ -140,7 +140,7 @@ void ServerSocket::send_data(Block *data) {
 void ServerSocket::send_data(Event::Queue *data) {
     static int bits = 0;
     if(bits == 0) {
-        bits = Initializer::get_instance()->get_analyzer_interface()->get_file()->get_attribute("platform")->get_attribute("bits")->get_value();
+        bits = Initializer::get_instance()->get_analyzer_interface()->get_file()->get_attribute("platform_bits");
     }
     data->lock_mutex();
     while(data->peek_event()) {

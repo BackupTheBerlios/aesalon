@@ -28,5 +28,9 @@ File *Interface::get_file() const {
     return first_file;
 }
 
+/*StorageItem *Interface::dereference_item(StorageOffset offset) {
+    storage_manager->dereference(offset);
+}*/
+
 
 } // namespace Analyzer

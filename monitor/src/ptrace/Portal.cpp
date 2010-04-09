@@ -57,7 +57,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
     Analyzer::File *file = Initializer::get_instance()->get_analyzer_interface()->get_file();
     
-    Word bits = file->get_attribute("platform")->get_attribute("bits")->get_value();
+    Word bits = file->get_attribute("platform_bits");
     
     std::string overload_filename = Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data();
     if(bits == 32) {
@@ -67,8 +67,10 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
 #endif
     }
     else if(bits == 64) overload_filename += "/aesalon_overload_64.so";
-    else
+    else {
+        std::cout << "bits is " << bits << std::endl;
         throw Exception::PTraceException("Platform is not 32- or 64-bits. This shouldn't happen!");
+    }
 #endif
     pid = fork();
     if(pid == -1)

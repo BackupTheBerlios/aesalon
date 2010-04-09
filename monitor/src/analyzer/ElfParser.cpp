@@ -47,25 +47,17 @@ bool ElfParser::parse() {
     
     /* Set platform "bits" attribute */
     StorageManager *sm = file->get_storage_manager();
-    StorageItem *platform = sm->new_item();
+    StorageOffset bits_offset = sm->new_attribute();
+    sm->dereference_attribute(bits_offset)->name = sm->new_string("platform_bits");
     
-    StorageAttribute *name = sm->new_attribute();
-    name->set_name(sm->new_string("name"));
-    name->set_value(Word(sm->new_string("platform")));
-    platform->add_attribute(name);
-    
-    StorageAttribute *bits = sm->new_attribute();
-    bits->set_name(sm->new_string("bits"));
-    platform->add_attribute(bits);
-    
-    file->add_attribute(platform);
+    file->add_attribute(bits_offset);
     
     if(elf_class == ELFCLASS32) {
-        bits->set_value(32);
+        sm->dereference_attribute(bits_offset)->value = 32;
         parse_32();
     }
     else if(elf_class == ELFCLASS64) {
-        bits->set_value(64);
+        sm->dereference_attribute(bits_offset)->value = 64;
         parse_64();
     }
     else {
@@ -90,7 +82,8 @@ void ElfParser::parse_32() {
     /* Start off by parsing the sections . . . */
     lseek(file_fd, header.e_shoff, SEEK_SET);
     
-    std::vector<StorageItem *> item_list;
+    StorageOffset head = -1;
+    StorageOffset last = -1;
     
     Elf32_Shdr section;
     for(int s = 0; s < header.e_shnum; s ++) {
@@ -98,132 +91,103 @@ void ElfParser::parse_32() {
             status = false;
             return;
         }
-        StorageItem *item = sm->new_item();
-        StorageAttribute *offset = sm->new_attribute();
-        offset->set_name(sm->new_string("offset"));
-        offset->set_value(section.sh_offset);
-        item->add_attribute(offset);
         
-        StorageAttribute *address = sm->new_attribute();
-        address->set_name(sm->new_string("address"));
-        address->set_value(section.sh_addr);
-        item->add_attribute(address);
+        StorageOffset item_offset = sm->new_attribute();
         
-        StorageAttribute *size = sm->new_attribute();
-        size->set_name(sm->new_string("size"));
-        size->set_value(section.sh_size);
-        item->add_attribute(size);
+        sm->dereference_attribute(item_offset)->name = section.sh_name;
+        sm->create_child(item_offset, "offset")->value = section.sh_offset;
+        sm->create_child(item_offset, "address")->value = section.sh_addr;
+        sm->create_child(item_offset, "size")->value = section.sh_size;
         
-        StorageAttribute *name = sm->new_attribute();
-        name->set_name(sm->new_string("name"));
-        name->set_value(section.sh_name);
-        item->add_attribute(name);
-        
-        item_list.push_back(item);
+        if(last == -1) head = item_offset;
+        else sm->dereference_attribute(last)->next = item_offset;
+        last = item_offset;
     }
     
+    StorageOffset shstrtab = head;
+    for(int i = 0; i < header.e_shstrndx; i ++) {
+        shstrtab = sm->dereference_attribute(shstrtab)->next;
+        /* If the next is not found . . . */
+        if(shstrtab == -1) {
+            status = false;
+            return;
+        }
+    }
     /* Read the section string table . . . */
-    StorageItem *shstrtab = item_list[header.e_shstrndx];
-    if(!shstrtab) {
-        /* . . . then something is rather wrong. */
-        status = false;
-        return;
-    }
     
-    StorageString *shstrtab_content = read_content(shstrtab);
-    if(shstrtab_content == NULL) {
+    StorageOffset shstrtab_content = read_content(shstrtab);
+    if(shstrtab_content == 0) {
         Misc::Message(Misc::Message::WARNING_MESSAGE, "Could not read content of string table. Perhaps it is a corrupt ELF file?");
         status = false;
         return;
     }
-    for(std::vector<StorageItem *>::iterator i = item_list.begin(); i != item_list.end(); i ++) {
-        StorageItem *section = *i;
-        StorageAttribute *name = section->get_attribute("name");
-        /* name->value stores the string table offset, so add it to the string table content . . . */
-        name->set_value(Word(shstrtab_content + name->get_value()));
-        file->add_section(section);
+    StorageOffset offset = head;
+    while(offset != -1) {
+        StorageAttribute *attribute = sm->dereference_attribute(offset);
+        StorageAttribute *name = sm->dereference_attribute(attribute->child);
+        name->value += shstrtab_content;
+        offset = attribute->next;
     }
     
-    item_list.clear();
+    file->set_sections(head);
     
     /* Parse the symbols now. Note that not every ELF file has static and/or dynamic symbols.
         Some have one, some have both. Some have none, too. */
     /* Try the static symbols . . . */
-    StorageItem *symtab = file->get_section(".symtab");
-    StorageItem *strtab = file->get_section(".strtab");
-    if(symtab && strtab) {
-        StorageString *symtab_content = read_content(symtab);
-        StorageString *strtab_content = read_content(strtab);
-        Word symtab_size = symtab->get_attribute("size")->get_value();
-        if(symtab_content == NULL || strtab_content == NULL) {
+    StorageOffset symtab_offset = file->get_section_offset(".symtab");
+    StorageOffset strtab_offset = file->get_section_offset(".strtab");
+    if(symtab_offset != -1 && strtab_offset != -1) {
+        StorageOffset symtab_content_offset = read_content(symtab_offset);
+        StorageOffset strtab_content_offset = read_content(strtab_offset);
+        
+        if(symtab_content_offset == -1 || strtab_content_offset == -1) {
             status = false;
             return;
         }
+        
+        Word symtab_size = sm->dereference_attribute(sm->get_child(symtab_offset, "size"))->value;
+        
         Elf32_Sym symbol;
         StorageOffset offset = 0;
         while(offset < SWord(symtab_size)) {
-            memcpy(&symbol, symtab_content + offset, sizeof(symbol));
+            memcpy(&symbol, sm->dereference_string(symtab_content_offset) + offset, sizeof(symbol));
             
-            StorageItem *item = sm->new_item();
+            StorageOffset symbol_offset = sm->new_attribute();
+            sm->create_child(symbol_offset, "name")->value = strtab_content_offset + symbol.st_name;
+            sm->create_child(symbol_offset, "address")->value = symbol.st_value;
+            sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
-            StorageAttribute *name = sm->new_attribute();
-            name->set_name(sm->new_string("name"));
-            name->set_value(Word(strtab_content + symbol.st_name));
-            /*std::cout << "Found static symbol, name is \"" << (char *)name->get_value() << "\"" << std::endl;*/
-            item->add_attribute(name);
-            
-            StorageAttribute *address = sm->new_attribute();
-            address->set_name(sm->new_string("address"));
-            address->set_value(symbol.st_value);
-            item->add_attribute(address);
-            
-            StorageAttribute *size = sm->new_attribute();
-            size->set_name(sm->new_string("size"));
-            size->set_value(section.sh_size);
-            item->add_attribute(size);
-            
-            file->add_symbol(item);
+            file->add_symbol(symbol_offset);
             
             offset += sizeof(symbol);
         }
     }
     
     /* Now try the dynamic symbols . . . */
-    StorageItem *dynsym = file->get_section(".dynsym");
-    StorageItem *dynstr = file->get_section(".dynstr");
-    if(dynsym && dynstr) {
-        StorageString *dynsym_content = read_content(dynsym);
-        StorageString *dynstr_content = read_content(dynstr);
-        Word dynsym_size = dynsym->get_attribute("size")->get_value();
-        if(dynsym_content == NULL || dynstr_content == NULL) {
+    StorageOffset dynsym_offset = file->get_section_offset(".dynsym");
+    StorageOffset dynstr_offset = file->get_section_offset(".dynstr");
+    if(symtab_offset != -1 && strtab_offset != -1) {
+        StorageOffset dynsym_content_offset = read_content(dynsym_offset);
+        StorageOffset dynstr_content_offset = read_content(dynstr_offset);
+        
+        if(dynsym_content_offset == -1 || dynstr_content_offset == -1) {
             status = false;
             return;
         }
+        
+        Word dynsym_size = sm->dereference_attribute(sm->get_child(dynsym_offset, "size"))->value;
+        
         Elf32_Sym symbol;
         StorageOffset offset = 0;
         while(offset < SWord(dynsym_size)) {
-            memcpy(&symbol, dynsym_content + offset, sizeof(symbol));
+            memcpy(&symbol, sm->dereference_string(dynsym_content_offset) + offset, sizeof(symbol));
             
-            StorageItem *item = sm->new_item();
+            StorageOffset symbol_offset = sm->new_attribute();
+            sm->create_child(symbol_offset, "name")->value = dynsym_content_offset + symbol.st_name;
+            sm->create_child(symbol_offset, "address")->value = symbol.st_value;
+            sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
-            StorageAttribute *name = sm->new_attribute();
-            name->set_name(sm->new_string("name"));
-            name->set_value(Word(dynstr_content + symbol.st_name));
-            /*std::cout << "Found dynamic symbol, name is \"" << (char *)name->get_value() << "\"" << std::endl;*/
-            item->add_attribute(name);
-            
-            StorageAttribute *address = sm->new_attribute();
-            address->set_name(sm->new_string("address"));
-            address->set_value(symbol.st_value);
-            /*std::cout << "\taddress is " << std::hex << symbol.st_value << std::endl;*/
-            item->add_attribute(address);
-            
-            StorageAttribute *size = sm->new_attribute();
-            size->set_name(sm->new_string("size"));
-            size->set_value(section.sh_size);
-            item->add_attribute(size);
-            
-            file->add_symbol(item);
+            file->add_symbol(symbol_offset);
             
             offset += sizeof(symbol);
         }
@@ -231,14 +195,14 @@ void ElfParser::parse_32() {
 }
 
 void ElfParser::parse_64() {
-    StorageManager *sm = file->get_storage_manager();
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86
     Misc::Message(Misc::Message::WARNING_MESSAGE,
-        "Parsing 64-bit elf file, but Aesalon compiled for 32-bit GNU/Linux. "
+        "Parsing 64-bit elf file, but Aesalon was compiled for 32-bit GNU/Linux. "
         "Please recompile Aesalon for a 64-bit platform and try again.");
     status = false;
     return;
 #endif
+    StorageManager *sm = file->get_storage_manager();
     /* Read in the header . . . */
     Elf64_Ehdr header;
     if(read(file_fd, &header, sizeof(header)) != sizeof(header)) {
@@ -249,7 +213,8 @@ void ElfParser::parse_64() {
     /* Start off by parsing the sections . . . */
     lseek(file_fd, header.e_shoff, SEEK_SET);
     
-    std::vector<StorageItem *> item_list;
+    StorageOffset head = -1;
+    StorageOffset last = -1;
     
     Elf64_Shdr section;
     for(int s = 0; s < header.e_shnum; s ++) {
@@ -257,157 +222,140 @@ void ElfParser::parse_64() {
             status = false;
             return;
         }
-        StorageItem *item = sm->new_item();
-        StorageAttribute *offset = sm->new_attribute();
-        offset->set_name(sm->new_string("offset"));
-        offset->set_value(section.sh_offset);
-        item->add_attribute(offset);
         
-        StorageAttribute *address = sm->new_attribute();
-        address->set_name(sm->new_string("address"));
-        address->set_value(section.sh_addr);
-        item->add_attribute(address);
+        StorageOffset item_offset = sm->new_attribute();
         
-        StorageAttribute *size = sm->new_attribute();
-        size->set_name(sm->new_string("size"));
-        size->set_value(section.sh_size);
-        item->add_attribute(size);
+        sm->dereference_attribute(item_offset)->name = section.sh_name;
+        sm->create_child(item_offset, "offset")->value = section.sh_offset;
+        sm->create_child(item_offset, "address")->value = section.sh_addr;
+        StorageAttribute *size = sm->create_child(item_offset, "size");
+        size->value = section.sh_size;
+        std::cout << "looking for stored size . . ." << std::endl;
+        Word stored_size = sm->dereference_attribute(sm->get_child(item_offset, "size"))->value;
+        std::cout << "stored size is " << size->value << std::endl;
         
-        StorageAttribute *name = sm->new_attribute();
-        name->set_name(sm->new_string("name"));
-        name->set_value(section.sh_name);
-        item->add_attribute(name);
-        
-        item_list.push_back(item);
+        if(last == -1) head = item_offset;
+        else sm->dereference_attribute(last)->next = item_offset;
+        last = item_offset;
+    }
+    
+    std::cout << "section string table index: " << header.e_shstrndx << std::endl;
+    
+    StorageOffset shstrtab = head;
+    for(int i = 0; i < header.e_shstrndx; i ++) {
+        shstrtab = sm->dereference_attribute(shstrtab)->next;
+        /* If the next is not found . . . */
+        if(shstrtab == -1) {
+            status = false;
+            return;
+        }
     }
     
     /* Read the section string table . . . */
-    StorageItem *shstrtab = item_list[header.e_shstrndx];
-    if(!shstrtab) {
-        /* . . . then something is rather wrong. */
-        status = false;
-        return;
-    }
-    
-    StorageString *shstrtab_content = read_content(shstrtab);
-    if(shstrtab_content == NULL) {
+    StorageOffset shstrtab_content = read_content(shstrtab);
+    if(shstrtab_content == 0) {
         Misc::Message(Misc::Message::WARNING_MESSAGE, "Could not read content of string table. Perhaps it is a corrupt ELF file?");
         status = false;
         return;
     }
-    for(std::vector<StorageItem *>::iterator i = item_list.begin(); i != item_list.end(); i ++) {
-        StorageItem *section = *i;
-        StorageAttribute *name = section->get_attribute("name");
-        /* name->value stores the string table offset, so add it to the string table content . . . */
-        name->set_value(Word(shstrtab_content + name->get_value()));
-        file->add_section(section);
+    
+    StorageOffset offset = head;
+    while(offset != -1) {
+        StorageAttribute *attribute = sm->dereference_attribute(offset);
+        std::cout << "Original section name: " << attribute->name << std::endl;
+        std::cout << "shstrtab_content offset: " << shstrtab_content << std::endl;
+        attribute->name += shstrtab_content;
+        offset = attribute->next;
     }
     
-    item_list.clear();
+    file->set_sections(head);
     
     /* Parse the symbols now. Note that not every ELF file has static and/or dynamic symbols.
         Some have one, some have both. Some have none, too. */
     /* Try the static symbols . . . */
-    StorageItem *symtab = file->get_section(".symtab");
-    StorageItem *strtab = file->get_section(".strtab");
-    if(symtab && strtab) {
-        StorageString *symtab_content = read_content(symtab);
-        StorageString *strtab_content = read_content(strtab);
-        Word symtab_size = symtab->get_attribute("size")->get_value();
-        if(symtab_content == NULL || strtab_content == NULL) {
+    StorageOffset symtab_offset = file->get_section_offset(".symtab");
+    StorageOffset strtab_offset = file->get_section_offset(".strtab");
+    if(symtab_offset != -1 && strtab_offset != -1) {
+        StorageOffset symtab_content_offset = read_content(symtab_offset);
+        StorageOffset strtab_content_offset = read_content(strtab_offset);
+        
+        if(symtab_content_offset == -1 || strtab_content_offset == -1) {
             status = false;
             return;
         }
+        
+        Word symtab_size = sm->dereference_attribute(sm->get_child(symtab_offset, "size"))->value;
+        
         Elf64_Sym symbol;
         StorageOffset offset = 0;
         while(offset < SWord(symtab_size)) {
-            memcpy(&symbol, symtab_content + offset, sizeof(symbol));
+            memcpy(&symbol, sm->dereference_string(symtab_content_offset) + offset, sizeof(symbol));
             
-            StorageItem *item = sm->new_item();
+            StorageOffset symbol_offset = sm->new_attribute();
+            sm->dereference_attribute(symbol_offset)->name = strtab_content_offset + symbol.st_name;
+            sm->create_child(symbol_offset, "address")->value = symbol.st_value;
+            sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
-            StorageAttribute *name = sm->new_attribute();
-            name->set_name(sm->new_string("name"));
-            name->set_value(Word(strtab_content + symbol.st_name));
-            /*std::cout << "Found static symbol, name is \"" << (char *)name->get_value() << "\"" << std::endl;*/
-            item->add_attribute(name);
-            
-            StorageAttribute *address = sm->new_attribute();
-            address->set_name(sm->new_string("address"));
-            address->set_value(symbol.st_value);
-            item->add_attribute(address);
-            
-            StorageAttribute *size = sm->new_attribute();
-            size->set_name(sm->new_string("size"));
-            size->set_value(section.sh_size);
-            item->add_attribute(size);
-            
-            file->add_symbol(item);
+            file->add_symbol(symbol_offset);
             
             offset += sizeof(symbol);
         }
     }
     
     /* Now try the dynamic symbols . . . */
-    StorageItem *dynsym = file->get_section(".dynsym");
-    StorageItem *dynstr = file->get_section(".dynstr");
-    if(dynsym && dynstr) {
-        StorageString *dynsym_content = read_content(dynsym);
-        StorageString *dynstr_content = read_content(dynstr);
-        Word dynsym_size = dynsym->get_attribute("size")->get_value();
-        if(dynsym_content == NULL || dynstr_content == NULL) {
+    StorageOffset dynsym_offset = file->get_section_offset(".dynsym");
+    StorageOffset dynstr_offset = file->get_section_offset(".dynstr");
+    if(symtab_offset != -1 && strtab_offset != -1) {
+        StorageOffset dynsym_content_offset = read_content(dynsym_offset);
+        StorageOffset dynstr_content_offset = read_content(dynstr_offset);
+        
+        if(dynsym_content_offset == -1 || dynstr_content_offset == -1) {
             status = false;
             return;
         }
+        
+        Word dynsym_size = sm->dereference_attribute(sm->get_child(dynsym_offset, "size"))->value;
+        
         Elf64_Sym symbol;
         StorageOffset offset = 0;
         while(offset < SWord(dynsym_size)) {
-            memcpy(&symbol, dynsym_content + offset, sizeof(symbol));
+            memcpy(&symbol, sm->dereference_string(dynsym_content_offset) + offset, sizeof(symbol));
             
-            StorageItem *item = sm->new_item();
+            StorageOffset symbol_offset = sm->new_attribute();
+            sm->dereference_attribute(symbol_offset)->name = dynstr_content_offset + symbol.st_name;
+            sm->create_child(symbol_offset, "address")->value = symbol.st_value;
+            sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
-            StorageAttribute *name = sm->new_attribute();
-            name->set_name(sm->new_string("name"));
-            name->set_value(Word(dynstr_content + symbol.st_name));
-            /*std::cout << "Found dynamic symbol, name is \"" << (char *)name->get_value() << "\"" << std::endl;*/
-            item->add_attribute(name);
-            
-            StorageAttribute *address = sm->new_attribute();
-            address->set_name(sm->new_string("address"));
-            address->set_value(symbol.st_value);
-            /*std::cout << "\taddress is " << std::hex << symbol.st_value << std::endl;*/
-            item->add_attribute(address);
-            
-            StorageAttribute *size = sm->new_attribute();
-            size->set_name(sm->new_string("size"));
-            size->set_value(section.sh_size);
-            item->add_attribute(size);
-            
-            file->add_symbol(item);
+            file->add_symbol(symbol_offset);
             
             offset += sizeof(symbol);
         }
     }
 }
 
-StorageString *ElfParser::read_content(StorageItem *section) {
+StorageOffset ElfParser::read_content(StorageOffset section) {
+    std::cout << "reading content of section offset " << section << std::endl;
     StorageManager *sm = file->get_storage_manager();
     
-    if(section->get_attribute("data") != NULL) {
-        return (StorageString *)section->get_attribute("data")->get_value();
-    }
+    StorageOffset data_offset = sm->get_child(section, "data");
     
-    Word data_size = section->get_attribute("size")->get_value();
-    StorageString *data = sm->new_string(data_size);
+    if(data_offset != -1) return sm->dereference_attribute(data_offset)->value;
+        
+    StorageOffset size_offset = sm->get_child(section, "size");
+    std::cout << "size_offset: " << size_offset << std::endl;
+    Word data_size = sm->dereference_attribute(size_offset)->value;
+    StorageOffset read_data_offset = sm->new_string(data_size);
     
-    lseek(file_fd, section->get_attribute("offset")->get_value(), SEEK_SET);
-    if(read(file_fd, data, data_size) != (SWord)data_size) return 0;
+    std::cout << "reading data from file . . . size is " << data_size << std::endl;
     
-    StorageAttribute *data_attribute = sm->new_attribute();
-    data_attribute->set_name(sm->new_string("data"));
-    data_attribute->set_value(reinterpret_cast<Word>(data));
-    section->add_attribute(data_attribute);
+    lseek(file_fd, sm->dereference_attribute(sm->get_child(section, "offset"))->value, SEEK_SET);
+    if(read(file_fd, sm->dereference_string(read_data_offset), data_size) != (SWord)data_size) return 0;
     
-    return data;
+    sm->create_child(section, "data")->value = read_data_offset;
+    
+    std::cout << "read_data_offset: " << read_data_offset << std::endl;
+    
+    return read_data_offset;
 }
 
 } // namespace Analyzer

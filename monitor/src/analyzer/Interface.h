@@ -26,6 +26,8 @@ public:
     File *get_file() const;
     
     StorageManager *get_storage_manager() const { return storage_manager; }
+    
+    /*StorageItem *dereference_item(StorageOffset offset);*/
 };
 
 } // namespace Analyzer
