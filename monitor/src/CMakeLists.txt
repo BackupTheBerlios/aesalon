@@ -18,8 +18,9 @@ endif(DEVELOPMENT_BUILD)
 include_directories(.)
 
 aux_source_directory(. DOT_SOURCES)
-aux_source_directory(asm ASM_SOURCES)
-aux_source_directory(elf ELF_SOURCES)
+aux_source_directory(analyzer ANALYZER_SOURCES)
+#aux_source_directory(asm ASM_SOURCES)
+#aux_source_directory(elf ELF_SOURCES)
 aux_source_directory(event EVENT_SOURCES)
 aux_source_directory(exception EXCEPTION_SOURCES)
 aux_source_directory(misc MISC_SOURCES)
@@ -31,8 +32,9 @@ set(OVERLOAD_SOURCES overload/OverloadParser.cpp)
 
 set(SOURCES
     ${DOT_SOURCES}
-    ${ASM_SOURCES}
-    ${ELF_SOURCES}
+    ${ANALYZER_SOURCES}
+#    ${ASM_SOURCES}
+#    ${ELF_SOURCES}
     ${EVENT_SOURCES}
     ${EXCEPTION_SOURCES}
     ${MISC_SOURCES}
