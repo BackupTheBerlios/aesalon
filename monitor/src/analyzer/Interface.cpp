@@ -11,7 +11,8 @@ Interface::~Interface() {
 }
 
 File *Interface::parse_file(std::string filename) {
-    File *file = new File(filename);
+    File *file = new File(filename, storage_manager);
+    file_map[filename] = file;
     return file;
 }
 

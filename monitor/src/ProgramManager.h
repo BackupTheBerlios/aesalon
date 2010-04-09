@@ -57,7 +57,4 @@ public:
 #endif
 };
 
-
-
-
 #endif

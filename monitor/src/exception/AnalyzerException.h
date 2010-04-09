@@ -17,19 +17,19 @@
     @file exception/ElfException.h
 */
 
-#ifndef AESALON_MONITOR_ELF_EXCEPTION_H
-#define AESALON_MONITOR_ELF_EXCEPTION_H
+#ifndef AESALON_MONITOR_ANALYZER_EXCEPTION_H
+#define AESALON_MONITOR_ANALYZER_EXCEPTION_H
 
 #include "BasicException.h"
 #include "misc/StreamAsString.h"
 
 namespace Exception {
 
-class ElfException : public BasicException {
+class AnalyzerException : public BasicException {
 public:
-    ElfException(std::string message) :
-        BasicException(Misc::StreamAsString() << "Elf parser exception: " << message) {}
-    virtual ~ElfException() {}
+    AnalyzerException(std::string message) :
+        BasicException(Misc::StreamAsString() << "Analyzer exception: " << message) {}
+    virtual ~AnalyzerException() {}
 };
 
 } // namespace Exception

@@ -52,6 +52,7 @@ void Initializer::initialize() {
     program_manager = NULL;
     server_socket = NULL;
     event_queue = NULL;
+    analyzer_interface = NULL;
     return_value = 0;
     
     config_parser = new Misc::ConfigParser();
@@ -104,6 +105,11 @@ void Initializer::initialize() {
     
     event_queue = new Event::Queue();
     
+    Misc::Message(Misc::Message::DEBUG_MESSAGE, "Analyzing executable . . .");
+    analyzer_interface = new Analyzer::Interface();
+    analyzer_interface->parse_file(program_manager->get_argument_list()->get_argument(0));
+    analyzer_interface->parse_file(LIBC_PATH);
+    
     if(argument_parser->get_argument("wait")->is_found()) {
         int number;
         Misc::String::to<int>(
@@ -121,6 +127,7 @@ void Initializer::initialize() {
 }
 
 void Initializer::deinitialize() {
+    if(analyzer_interface) delete analyzer_interface;
     if(config_parser) delete config_parser;
     if(argument_parser) delete argument_parser;
     if(program_manager) delete program_manager;

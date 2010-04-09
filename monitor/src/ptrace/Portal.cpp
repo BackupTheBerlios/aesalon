@@ -41,9 +41,6 @@
 #include "ExitObserver.h"
 #include "TrapObserver.h"
 #include "SegfaultObserver.h"
-#include "MallocObserver.h"
-#include "FreeObserver.h"
-#include "ReallocObserver.h"
 
 #include "misc/String.h"
 
@@ -56,7 +53,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     int fds[2];
     if(pipe(fds) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Could not create pipe: " << strerror(errno));
-    Word malloc_offset = Initializer::get_instance()->get_program_manager()->get_libc_parser()->get_symbol("malloc")->get_address();
+    Word malloc_offset = Initializer::get_instance()->get_analyzer_interface()->get_file(LIBC_PATH)->get_symbol_address("malloc");
 #endif
     pid = fork();
     if(pid == -1)
@@ -94,12 +91,6 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
 #endif
     add_signal_observer(new ExitObserver());
     add_signal_observer(new SegfaultObserver());
-
-#ifndef USE_OVERLOAD
-    malloc_observer = new MallocObserver();
-    free_observer = new FreeObserver();
-    realloc_observer = new ReallocObserver();
-#endif
     
     /* The overload library will set itself up from here . . . */
 }

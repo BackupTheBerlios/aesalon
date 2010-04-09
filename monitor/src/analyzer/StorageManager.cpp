@@ -1,4 +1,5 @@
 #include <sys/mman.h>
+#include <cstring>
 #include "StorageManager.h"
 
 namespace Analyzer {
@@ -30,6 +31,19 @@ StorageAttribute *StorageManager::new_attribute() {
     object_list.push_back(attribute);
     return attribute;
 }
+
+StorageString *StorageManager::new_string(std::string string) {
+    std::size_t length = string.length() * sizeof(char);
+    StorageOffset offset = reserve(length + sizeof(char));
+    std::memcpy(storage + offset, string.c_str(), length + 1);
+    return reinterpret_cast<StorageString *>(storage + offset);
+}
+
+StorageString *StorageManager::new_string(StorageOffset size) {
+    StorageOffset offset = reserve(size);
+    return reinterpret_cast<StorageString *>(storage + offset);
+}
+
 
 StorageOffset StorageManager::reserve(StorageOffset size) {
     StorageOffset final_offset = used_storage + size;

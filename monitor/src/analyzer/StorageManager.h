@@ -5,6 +5,7 @@
 #include "StorageOffset.h"
 #include "StorageItem.h"
 #include "StorageAttribute.h"
+#include "StorageString.h"
 
 namespace Analyzer {
 
@@ -22,6 +23,9 @@ public:
     
     StorageItem *new_item();
     StorageAttribute *new_attribute();
+    StorageString *new_string(std::string string);
+    StorageString *new_string(StorageOffset size);
+    
 private:
     StorageOffset reserve(StorageOffset size);
 };
