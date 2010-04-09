@@ -8,7 +8,9 @@ StorageItem::StorageItem() {
 }
 
 StorageItem::~StorageItem() {
-
+    for(attribute_list_t::iterator i = attribute_list.begin(); i != attribute_list.end(); i ++) {
+        (*i)->~StorageObject();
+    }
 }
 
 void StorageItem::add_attribute(StorageAttribute *attribute) {

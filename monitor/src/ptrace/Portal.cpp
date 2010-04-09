@@ -54,6 +54,21 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     if(pipe(fds) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Could not create pipe: " << strerror(errno));
     Word malloc_offset = Initializer::get_instance()->get_analyzer_interface()->get_file(LIBC_PATH)->get_symbol_address("malloc");
+    /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
+    Analyzer::File *file = Initializer::get_instance()->get_analyzer_interface()->get_file();
+    
+    Word bits = file->get_attribute("platform")->get_attribute("bits")->get_value();
+    
+    std::string overload_filename = Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data();
+    if(bits == 32) {
+        overload_filename += "/aesalon_overload_32.so";
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+        throw Exception::PTraceException("Currently impossible to execute 32-bit programs when Aesalon is compiled for 64-bit platforms.");
+#endif
+    }
+    else if(bits == 64) overload_filename += "/aesalon_overload_64.so";
+    else
+        throw Exception::PTraceException("Platform is not 32- or 64-bits. This shouldn't happen!");
 #endif
     pid = fork();
     if(pid == -1)
@@ -62,8 +77,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
 #ifndef USE_OVERLOAD
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
 #else
-        /* TODO: add onto any currently-existing LD_PRELOAD env variable. */
-        setenv("LD_PRELOAD", Initializer::get_instance()->get_argument_parser()->get_argument("overload-path")->get_data().c_str(), 1);
+        setenv("LD_PRELOAD", overload_filename.c_str(), 1);
         setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
         setenv("aesalon_malloc_offset", (Misc::StreamAsString() << std::hex << malloc_offset).operator std::string().c_str(), 1);
         close(fds[0]);

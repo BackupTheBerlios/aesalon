@@ -18,7 +18,15 @@ File::File(std::string filename, StorageManager *storage_manager) : filename(fil
 }
 
 File::~File() {
-
+    for(item_map_t::const_iterator i = sections.begin(); i != sections.end(); i ++) {
+        i->second->~StorageObject();
+    }
+    for(item_map_t::const_iterator i = symbols.begin(); i != symbols.end(); i ++) {
+        i->second->~StorageObject();
+    }
+    for(item_map_t::const_iterator i = attributes.begin(); i != attributes.end(); i ++) {
+        i->second->~StorageObject();
+    }
 }
 
 StorageItem *File::get_section(std::string name) const {
@@ -55,12 +63,30 @@ Word File::get_symbol_address(std::string name) const {
     return item->get_attribute("address")->get_value();
 }
 
+StorageItem *File::get_attribute(std::string name) const {
+    StorageItem *item = attribute_cache[name];
+    if(item != NULL) return item;
+    for(item_map_t::const_iterator i = attributes.begin(); i != attributes.end(); i ++) {
+        if(!strcmp(i->first, name.c_str())) {
+            item = i->second;
+            break;
+        }
+    }
+    if(item == NULL) return NULL;
+    attribute_cache[name] = item;
+    return item;
+}
+
 void File::add_section(StorageItem *item) {
     sections[(StorageString *)item->get_attribute("name")->get_value()] = item;
 }
 
 void File::add_symbol(StorageItem *item) {
     symbols[(StorageString *)item->get_attribute("name")->get_value()] = item;
+}
+
+void File::add_attribute(StorageItem *item) {
+    attributes[(StorageString *)item->get_attribute("name")->get_value()] = item;
 }
 
 void File::parse() {

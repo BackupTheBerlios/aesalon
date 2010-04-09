@@ -35,7 +35,7 @@ BasicEvent::BasicEvent(BasicEvent::event_type_e type) : type(type) {
 /* Serialization format:
     first bit defines the event type, BLOCK_EVENT or REFERENCE_EVENT
 */
-Block *BasicEvent::serialize() {
+Block *BasicEvent::serialize(int bits) {
     Block *block = new Block();
     block->resize(1);
     block->get_data()[0] = 0x0;
@@ -49,7 +49,7 @@ Block *BasicEvent::serialize() {
         block->get_data()[0] |= 0x03;
     }
     else throw Exception::EventException("Asked to serialize invalid Event");
-    block->push_word(timestamp);
+    block->push_word(timestamp, 64);
     return block;
 }
 

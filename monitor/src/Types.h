@@ -99,7 +99,11 @@ public:
     
     void resize(std::size_t new_size);
     
-    void push_word(Word data);
+    /** Pushes a word of data onto the Block.
+        @param data The word to push.
+        @param bits How many bits of data to push.
+    */
+    void push_word(Word data, int bits);
 };
 
 #endif

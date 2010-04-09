@@ -47,23 +47,6 @@ void Block::read(void *data, std::size_t size) {
     remove(0, size);
 }
 
-void Block::push_word(Word data) {
-    std::size_t offset = data_size;
-    /* Reserve space for one Word . . . */
-    resize(data_size + AESALON_WORD_SIZE);
-    
-    get_data()[offset+0] = (data >> 0) & 0xff;
-    get_data()[offset+1] = (data >> 8) & 0xff;
-    get_data()[offset+2] = (data >> 16) & 0xff;
-    get_data()[offset+3] = (data >> 24) & 0xff;
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    get_data()[offset+4] = (data >> 32) & 0xff;
-    get_data()[offset+5] = (data >> 40) & 0xff;
-    get_data()[offset+6] = (data >> 48) & 0xff;
-    get_data()[offset+7] = (data >> 56) & 0xff;
-#endif
-}
-
 void Block::resize(size_t new_size) {
     if(new_size > allocated_size) {
         if(allocated_size == 0) allocated_size = 1;
@@ -72,4 +55,15 @@ void Block::resize(size_t new_size) {
         if(data == NULL) throw Exception::OutOfMemoryException();
     }
     data_size = new_size;
+}
+
+void Block::push_word(Word data, int bits) {
+    std::size_t offset = data_size;
+    /* Reserve space for one Word . . . */
+    int bytes = int((bits / 8.0) + 0.999);
+    resize(data_size + bytes);
+    
+    for(int i = 0; i < bytes; i ++) {
+        get_data()[offset+i] = (data >> (i * 8)) & 0xff;
+    }
 }

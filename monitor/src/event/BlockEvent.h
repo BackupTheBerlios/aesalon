@@ -49,7 +49,7 @@ public:
     Word get_size() const { return size; }
     Word get_new_address() const { return new_address; }
     
-    virtual Block *serialize();
+    virtual Block *serialize(int bits);
 };
 
 } // namesace Event

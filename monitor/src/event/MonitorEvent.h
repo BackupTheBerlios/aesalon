@@ -36,7 +36,7 @@ public:
     MonitorEvent(monitor_event_type_e monitor_event_type) : BasicEvent(MONITOR_EVENT), monitor_event_type(monitor_event_type) {}
     virtual ~MonitorEvent() {}
     
-    virtual Block* serialize();
+    virtual Block* serialize(int bits);
 };
 
 } // namespace Event

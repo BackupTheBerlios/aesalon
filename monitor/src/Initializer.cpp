@@ -148,7 +148,9 @@ void Initializer::usage() {
     std::cout << "\t--tcp-port, -p\t\tSet the port to listen on for connections. Currently is " << argument_parser->get_argument("tcp-port")->get_data() << "." << std::endl;
     std::cout << "\t--wait, -w\t\tNumber of TCP connections to accept before executing. Defaults to 0." << std::endl;
     std::cout << "\t--libc-path\t\tThe path to the current version of libc being used. Currently is " << LIBC_PATH << "." << std::endl;
-    std::cout << "\t--overload-path\t\tThe path to the aesalon overload library. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
+#ifdef USE_OVERLOAD
+    std::cout << "\t--overload-path\t\tThe directory containing the overload libraries. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
+#endif
     std::cout << "\t--\t\t\tOptional, denotes the end of the argument list." << std::endl;
 }
 

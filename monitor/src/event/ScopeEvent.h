@@ -41,7 +41,7 @@ public:
     Word get_scope_id() const { return scope_id; }
     std::string get_name() const { return name; }
     
-    virtual Block* serialize();
+    virtual Block* serialize(int bits);
 };
 
 } // namespace Event

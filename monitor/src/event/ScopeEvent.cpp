@@ -31,8 +31,8 @@ ScopeEvent::~ScopeEvent() {
 
 }
 
-Block* ScopeEvent::serialize() {
-    Block *serialized = BasicEvent::serialize();
+Block* ScopeEvent::serialize(int bits) {
+    Block *serialized = BasicEvent::serialize(bits);
     
     const char *data = name.c_str();
     std::size_t length = name.length();

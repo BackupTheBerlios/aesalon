@@ -21,8 +21,8 @@
 
 namespace Event {
 
-Block* MonitorEvent::serialize() {
-    Block *serialized = BasicEvent::serialize();
+Block* MonitorEvent::serialize(int bits) {
+    Block *serialized = BasicEvent::serialize(bits);
     serialized->get_data()[0] |= (monitor_event_type << 2) & 0x04;
     return serialized;
 }

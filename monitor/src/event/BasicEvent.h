@@ -39,6 +39,7 @@ public:
 private:
     /** Current event type. */
     event_type_e type;
+    /* Timestamp of this event. */
     Word64 timestamp;
 public:
     /** Constructor, takes a type. All other stored data is in the derived
@@ -52,7 +53,7 @@ public:
     event_type_e get_type() const { return type; }
     u_int64_t get_timestamp() const { return timestamp; }
     
-    virtual Block *serialize();
+    virtual Block *serialize(int bits);
 };
 
 } // namespace Event

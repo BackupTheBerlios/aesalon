@@ -44,8 +44,30 @@ bool ElfParser::parse() {
     status = true;
     
     Byte elf_class = ident[EI_CLASS];
-    if(elf_class == ELFCLASS32) parse_32();
-    else if(elf_class == ELFCLASS64) parse_64();
+    
+    /* Set platform "bits" attribute */
+    StorageManager *sm = file->get_storage_manager();
+    StorageItem *platform = sm->new_item();
+    
+    StorageAttribute *name = sm->new_attribute();
+    name->set_name(sm->new_string("name"));
+    name->set_value(Word(sm->new_string("platform")));
+    platform->add_attribute(name);
+    
+    StorageAttribute *bits = sm->new_attribute();
+    bits->set_name(sm->new_string("bits"));
+    platform->add_attribute(bits);
+    
+    file->add_attribute(platform);
+    
+    if(elf_class == ELFCLASS32) {
+        bits->set_value(32);
+        parse_32();
+    }
+    else if(elf_class == ELFCLASS64) {
+        bits->set_value(64);
+        parse_64();
+    }
     else {
         Misc::Message(Misc::Message::DEBUG_MESSAGE, "Unknown ELF class encountered . . .");
         return false;
@@ -57,6 +79,7 @@ bool ElfParser::parse() {
 
 void ElfParser::parse_32() {
     StorageManager *sm = file->get_storage_manager();
+    
     /* Read in the header . . . */
     Elf32_Ehdr header;
     if(read(file_fd, &header, sizeof(header)) != sizeof(header)) {
