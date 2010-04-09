@@ -19,21 +19,20 @@ The build procedure is fairly standard:
 cd aesalon
 cmake .
 make -j {number of cores * 2}
-make install
 
-Note that CMake isn't really designed for concurrent make processes, so the output is a little . . . odd. But it works. Also, note that you don't have to to install aesalon to get it working. It runs perfectly well inside the build directory.
+Note that CMake isn't really designed for concurrent make processes, so the output is a little . . . odd. But it works . . .
 
-Once you've built Aesalon (if you have any errors, let me know), you'll need to create a configuration file. Unless you changed it in build.config, the default system-wide location is '/etc/default/aesalon', and the per-user location is '~/.config/aesalon/aesalon.conf'. Add a line with something like 'overload-path=/usr/local/lib/'. (Note that you'll want to use the per-user location if you haven't installed Aesalon.) The overload-path variable is the path to the location where the files 'aesalon_overload_32.so' (and _64.so if you compiled for x86_64) are located.
+Once you've built Aesalon (if you have any errors, let me know), you'll need to create a configuration file. Unless you changed it in build.config, the location is ~/.config/aesalon/aesalon.config. Add a line such as 'overload-path=~/other/src/aesalon/'; the overload-path is the directory that contains the files 'aesalon_overload_32.so' and 'aesalon_overload_64.so'. (The 64-bit version won't exist if Aesalon was compiled for x86).
 
-Aesalon uses a TCP port to communicate with itself, so be certain that the port it uses isn't blocked by a firewall (default port is 6321). Since it is over the lo device, you shouldn't have to worry about it, however.
+Aesalon uses a TCP port to communicate with itself, so be certain that the port it uses isn't blocked by a firewall (default port is 6321). Since it is over the loopback device, you shouldn't have to worry about it, however.
 
 Once you've done that, you're ready to start playing around with Aesalon. Launch the GUI (it's called aesalon_gui), and hit "Create Data Source". Enter a name, such as "localhost:6321", then hit "OK". Now, in a terminal, run something like 'aesalon --wait $(which aesalon) --help'. Launch the session from the GUI, and you should see the aesalon help message appear in the terminal. Create a "Block Count" visualization (select "Block Count" from the list, and hit "New Visualization"), and select "Request->Full Visualization" from the pop-up menu on the upper-right corner of the screen. Mouse wheel zooms (a few bugs with that, don't zoom too quickly!), left-click-and-drag shifts the visualization. As you can see, there are a few memory leaks here. (Something else I need to fix . . .)
 
-Now, try the same procedure for the density visualization. If you see naught but two lines -- one at the top, one at the bottom, then zooming in will reveal the blocks. Read the malloc() man page if you're curious as to why this happens. Something else that's on my list is the ability to "split" visualizations, to hide the large regions of empty space.
+Now, try the same procedure for the density visualization. If you see naught but two lines -- one at the top, one at the bottom, then zooming in will reveal the blocks. Read the malloc() man page if you're curious as to why this happens. Something else that's on my list is the ability to "split" visualizations, to hide the large regions of empty space . . .
 
 Now, try right-clicking on one of the blocks. In the upper-left corner, a display should pop up, telling you more information about the block. Something I'm working on is the ability to resolve the scope addresses into scope names (I have an ELF parser implemented, I just have to actually transfer the information from the command-line monitor to the GUI).
 
-There's still a few bugs with the real-time rendering, but you're welcome to give it a shot on a program that takes a little longer than a second to execute. I suggest the "automated_test" executable, inside the "tests/" directory of the Aesalon git repository.
+There's still a few bugs with the real-time rendering, but you're welcome to give it a shot on a program that takes a little longer than a second to execute. I suggest the "automated_test" executable, inside the "tests/" directory.
 
 And that should be it -- a brief introduction to Aesalon. If you have any questions, feel free to email me.
 
