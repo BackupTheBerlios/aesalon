@@ -1,0 +1,4 @@
+From 0.1.0 to 0.2.0:
++   Implemented partial rendering, moving around in the visualizations should be much faster now.
++   Added 32-bit support
+
