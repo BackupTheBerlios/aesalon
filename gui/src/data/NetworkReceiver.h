@@ -36,6 +36,7 @@ public:
     virtual ~NetworkReceiver();
 private:
     quint64 pop_quint64();
+    quint64 pop_word(int bytes);
     void prepend_quint64(quint64 data);
 private slots:
     void data_received();

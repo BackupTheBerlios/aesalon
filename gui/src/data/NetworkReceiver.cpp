@@ -50,6 +50,16 @@ quint64 NetworkReceiver::pop_quint64() {
     return ret;
 }
 
+quint64 NetworkReceiver::pop_word(int bytes) {
+    quint64 value = 0;
+    if(unprocessed.size() < bytes) return 0;
+    for(int i = 0; i < bytes; i ++) {
+        value |= quint64(quint8(unprocessed.at(i) & 0xff)) << (i * 8);
+    }
+    unprocessed.remove(0, bytes);
+    return value;
+}
+
 void NetworkReceiver::prepend_quint64(quint64 data) {
     unprocessed.prepend(char((data << 56) & 0xff));
     unprocessed.prepend(char((data << 48) & 0xff));
@@ -65,28 +75,43 @@ void NetworkReceiver::data_received() {
     QByteArray received = tcp_socket->readAll();
     unprocessed += received;
     while(unprocessed.size()) {
-        quint8 type_byte = unprocessed.at(0);
+        quint8 header = unprocessed.at(0);
         unprocessed.remove(0, 1);
+        int word_size = (header & 0x80)?8:4;
         /* If the first bit is set, and the second is not, then it's a block event . . . */
-        if((type_byte & 0x03) == 1) {
-            quint8 block_type = (type_byte & 0x0c) >> 2;
-            quint8 block_type_sizes[] = {16, 24, 8};
-            /* Check the size of the waiting data. At least 16 more bytes are required (8 for timestamp, 8 for scope). */
-            if(unprocessed.size() < (block_type_sizes[block_type]+16)) {
-                unprocessed.prepend(type_byte);
+        if((header & 0x03) == 1) {
+            quint8 block_type = (header & 0x0c) >> 2;
+            /* Block event types:
+                0: allocation event:
+                    + scope
+                    + address
+                    + size
+                1: resize event:
+                    + scope
+                    + address
+                    + size
+                    + new_address
+                2: free event:
+                    + scope
+                    + address
+            */
+            quint8 block_type_sizes[] = {word_size * 3, word_size * 4, word_size * 2};
+            /* Check the size of the waiting data. The extra 8 bytes is for the timestamp. */
+            if(unprocessed.size() < (block_type_sizes[block_type]+8)) {
+                unprocessed.prepend(header);
                 break;
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
-            quint64 scope_address = pop_quint64();
-            quint64 address = pop_quint64();
+            quint64 scope_address = pop_word(word_size);
+            quint64 address = pop_word(word_size);
             if(block_type == 0) {
-                quint64 size = pop_quint64();
+                quint64 size = pop_word(word_size);
                 event_received(new AllocEvent(timestamp, address, size, scope_address));
             }
             else if(block_type == 1) {
-                quint64 new_address = pop_quint64();
-                quint64 new_size = pop_quint64();
+                quint64 new_address = pop_word(word_size);
+                quint64 new_size = pop_word(word_size);
                 /* From the man page for realloc: "If ptr is NULL, then the call is equivalent to malloc(size),
                     for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)."
                     Ergo, don't emit free/alloc events for such cases. */
@@ -97,15 +122,15 @@ void NetworkReceiver::data_received() {
                 event_received(new FreeEvent(timestamp, address, scope_address));
             }
         }
-        else if((type_byte & 0x03) == 2) {
+        else if((header & 0x03) == 2) {
             if(unprocessed.size() < 8) {
-                unprocessed.prepend(type_byte);
+                unprocessed.prepend(header);
                 break;
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp *timestamp = new Timestamp(raw_timestamp);
             /* one indicates finished, zero started. */
-            if((type_byte & 0x04) == 0) {
+            if((header & 0x04) == 0) {
                 start_time = *timestamp;
                 emit started(timestamp);
             }

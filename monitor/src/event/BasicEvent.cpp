@@ -49,6 +49,7 @@ Block *BasicEvent::serialize(int bits) {
         block->get_data()[0] |= 0x03;
     }
     else throw Exception::EventException("Asked to serialize invalid Event");
+    if(bits == 64) block->get_data()[0] |= 0x80;
     block->push_word(timestamp, 64);
     return block;
 }
