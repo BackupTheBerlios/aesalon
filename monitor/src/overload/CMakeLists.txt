@@ -21,8 +21,20 @@ if(DEVELOPMENT_BUILD)
         DEPENDS overload.c)
     endif(AESALON_PLATFORM EQUAL 1)
 else(DEVELOPMENT_BUILD)
-    add_custom_command(OUTPUT aesalon_overload.so COMMAND /usr/bin/gcc -fPIC -shared overload.c -o aesalon_overload.so -ldl -masm=intel
-        -DLIBC_PATH="${LIBC_PATH}" DEPENDS overload.c)
+    add_custom_command(OUTPUT aesalon_overload_32.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_32.so -ldl -masm=intel
+        -DLIBC_PATH='"${LIBC_PATH}"'
+        -DAESALON_PLATFORM=${AESALON_PLATFORM}
+        -DAESALON_PLATFORM_x86=0
+        -DAESALON_PLATFORM_x86_64=1
+        DEPENDS overload.c)
+    if(AESALON_PLATFORM EQUAL 1)
+    add_custom_command(OUTPUT aesalon_overload_64.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_64.so -ldl -masm=intel
+        -DLIBC_PATH='"${LIBC_PATH}"'
+        -DAESALON_PLATFORM=${AESALON_PLATFORM}
+        -DAESALON_PLATFORM_x86=0
+        -DAESALON_PLATFORM_x86_64=1
+        DEPENDS overload.c)
+    endif(AESALON_PLATFORM EQUAL 1)
 endif(DEVELOPMENT_BUILD)
 
 if(AESALON_PLATFORM EQUAL 0)
