@@ -28,8 +28,15 @@ public:
     virtual ~Visualization();
 private slots:
     void set_position(QString formatted);
+    
+    void send_begin_rt();
+    void send_end_rt();
+    void send_render_full();
 signals:
     void cycle_time_changed(int new_delay);
+    void begin_rt();
+    void end_rt();
+    void render_full();
 };
 
 #endif

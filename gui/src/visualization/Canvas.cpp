@@ -80,9 +80,7 @@ void Canvas::combine_with(const Canvas &canvas) {
         qWarning("Cannot merge with a canvas that has a termination point.");
         return;
     }
-    if(insertion_point == NULL) head = canvas.head; 
-    else insertion_point->set_next(canvas.head);
-    
+    add_object(canvas.head);
     insertion_point = canvas.insertion_point;
 }
 

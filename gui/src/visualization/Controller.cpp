@@ -44,7 +44,6 @@ void Controller::end_rt() {
 
 void Controller::render_full() {
     if(data_thread->get_start_time() == NULL) return;
-    emit clear_canvas();
     qint64 time_range = 0;
     if(data_thread->get_finish_time() == NULL) time_range = data_thread->get_start_time()->ns_until(Timestamp());
     else time_range = data_thread->get_start_time()->ns_until(*data_thread->get_finish_time());
@@ -53,6 +52,7 @@ void Controller::render_full() {
     Canvas *canvas = render_region(range);
     canvas->calculate_data_range();
     emit change_range(canvas->get_range());
+    emit clear_canvas();
     emit canvas_update(canvas);
 }
 
