@@ -47,7 +47,7 @@ void *(*original_malloc)(size_t size);
 void *(*original_free)(void *ptr);
 void *(*original_realloc)(void *ptr, size_t size);
 
-unsigned long get_libc_offset();
+unsigned long get_libc_offset(char *libc_path);
 
 int pipe_fd;
 
@@ -154,7 +154,7 @@ void *realloc(void *ptr, size_t size) {
     return (void *)data.data.new_address;
 }
 
-long unsigned int get_libc_offset() {
+long unsigned int get_libc_offset(char *libc_path) {
     char buffer[1024];
     
     sprintf(buffer, "/proc/%i/maps", getpid());
@@ -172,7 +172,9 @@ long unsigned int get_libc_offset() {
         char str[128];
         sscanf(buffer, "%lx-%*lx %*s %*s %*s %*s %s", &address, str, str, str, str, str, str);
 
-        if(strstr(str, "libc-")) break;
+        if(strcmp(str, libc_path) == 0) {
+            break;
+        }
     }
     
     close(fd);
@@ -199,7 +201,12 @@ void initialize_overload() {
         exit(1);
     }
     sscanf(malloc_offset_str, "%lx", &original_malloc);
-    unsigned long libc_offset = get_libc_offset();
+    char *libc_path = getenv("aesalon_libc_path");
+    if(libc_path == NULL) {
+        fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_libc_path environment variable not set.\n");
+        exit(1);
+    }
+    unsigned long libc_offset = get_libc_offset(libc_path);
     original_malloc += libc_offset;
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Resolving symbols . . .\n");

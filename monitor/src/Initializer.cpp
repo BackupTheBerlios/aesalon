@@ -108,7 +108,7 @@ void Initializer::initialize() {
     Misc::Message(Misc::Message::DEBUG_MESSAGE, "Analyzing executable . . .");
     analyzer_interface = new Analyzer::Interface();
     analyzer_interface->parse_file(program_manager->get_argument_list()->get_argument(0));
-    analyzer_interface->parse_file(LIBC_PATH);
+    analyzer_interface->parse_file(argument_parser->get_argument("libc-path")->get_data());
     
     if(argument_parser->get_argument("wait")->is_found()) {
         int number;
@@ -147,7 +147,7 @@ void Initializer::usage() {
     std::cout << "\t--help, -h\t\tPrint this usage message." << std::endl;
     std::cout << "\t--tcp-port, -p\t\tSet the port to listen on for connections. Currently is " << argument_parser->get_argument("tcp-port")->get_data() << "." << std::endl;
     std::cout << "\t--wait, -w\t\tNumber of TCP connections to accept before executing. Defaults to 0." << std::endl;
-    std::cout << "\t--libc-path\t\tThe path to the current version of libc being used. Currently is " << LIBC_PATH << "." << std::endl;
+    std::cout << "\t--libc-path\t\tThe path to the current version of libc being used. Currently is " << argument_parser->get_argument("libc-path")->get_data() << "." << std::endl;
 #ifdef USE_OVERLOAD
     std::cout << "\t--overload-path\t\tThe directory containing the overload libraries. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
 #endif
