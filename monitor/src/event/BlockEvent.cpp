@@ -36,17 +36,17 @@ Block *BlockEvent::serialize(int bits) {
     
     serialized->get_data()[0] |= (block_type << 2) & 0x0c;
     
-    serialized->push_word(get_scope(), bits);
-    serialized->push_word(get_address(), bits);
+    serialized->push_word(scope, bits);
+    serialized->push_word(address, bits);
 
     switch(get_block_type()) {
         case ALLOC_EVENT:
-            serialized->push_word(get_size(), bits);
+            serialized->push_word(size, bits);
             break;
         case REALLOC_EVENT:
             /* NOTE: the new address first makes it easier to deserialize later */
-            serialized->push_word(get_new_address(), bits);
-            serialized->push_word(get_size(), bits);
+            serialized->push_word(new_address, bits);
+            serialized->push_word(size, bits);
             break;
         case FREE_EVENT: break;
         default:

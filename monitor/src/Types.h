@@ -70,12 +70,12 @@ public:
         No out-of-bounds checking is done.
         @return A pointer to the beginning of the block data.
     */
-    Byte *get_data() { return data; }
+    inline Byte *get_data() { return data; }
     
     /** Retrieves the size of the current data.
         @return The current size of the referenced data.
     */
-    std::size_t get_size() const { return data_size; }
+    inline std::size_t get_size() const { return data_size; }
     /** Removes a swath of Bytes, from offset @a from to offset @a to, inclusive.
         This may invalidate all pointers to the current Block.
         @param from Where to begin deleting.

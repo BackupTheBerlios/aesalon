@@ -38,18 +38,19 @@ BasicEvent::BasicEvent(BasicEvent::event_type_e type) : type(type) {
 Block *BasicEvent::serialize(int bits) {
     Block *block = new Block();
     block->resize(1);
-    block->get_data()[0] = 0x0;
+    Byte *data = block->get_data();
+    data[0] = 0x0;
     if(type == BLOCK_EVENT) {
-        block->get_data()[0] |= 0x01;
+        data[0] |= 0x01;
     }
     else if(type == MONITOR_EVENT) {
-        block->get_data()[0] |= 0x02;
+        data[0] |= 0x02;
     }
     else if(type == SCOPE_EVENT) {
-        block->get_data()[0] |= 0x03;
+        data[0] |= 0x03;
     }
     else throw Exception::EventException("Asked to serialize invalid Event");
-    if(bits == 64) block->get_data()[0] |= 0x80;
+    if(bits == 64) data[0] |= 0x80;
     block->push_word(timestamp, 64);
     return block;
 }

@@ -64,6 +64,6 @@ void Block::push_word(Word64 data, int bits) {
     resize(data_size + bytes);
     
     for(int i = 0; i < bytes; i ++) {
-        get_data()[offset+i] = (data >> (i * 8)) & 0xff;
+        this->data[offset+i] = (data >> (i * 8)) & 0xff;
     }
 }
