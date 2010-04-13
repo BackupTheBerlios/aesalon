@@ -48,7 +48,8 @@ bool ElfParser::parse() {
     /* Set platform "bits" attribute */
     StorageManager *sm = file->get_storage_manager();
     StorageOffset bits_offset = sm->new_attribute();
-    sm->dereference_attribute(bits_offset)->name = sm->new_string("platform_bits");
+    StorageOffset string = sm->new_string("platform_bits");
+    sm->dereference_attribute(bits_offset)->name = string;
     
     file->add_attribute(bits_offset);
     

@@ -56,7 +56,8 @@ char *StorageManager::dereference_string(StorageOffset offset) const {
 
 StorageAttribute *StorageManager::create_child(StorageOffset offset, const char *name) { 
     StorageOffset attribute_offset = new_attribute();
-    dereference_attribute(attribute_offset)->name = new_string(name);
+    StorageOffset string = new_string(name);
+    dereference_attribute(attribute_offset)->name = string;
     
     StorageAttribute *attribute = dereference_attribute(offset);
     offset = attribute->child;
