@@ -107,7 +107,6 @@ Block *SnapshotList::get_block(const Timestamp &timestamp, MemoryAddress address
     block = closest->get_block(address);
     
     if(closest->get_snapshot_id() == get_last_id()) {
-        qDebug("looking at last snapshot, returning block.");
         return block;
     }
     
