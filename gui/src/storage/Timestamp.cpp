@@ -113,3 +113,7 @@ QString Timestamp::to_string() const {
     return QString().sprintf("%s%02lli:%02lli.%03lli.%03lli", ns < 0?"-":"", qAbs(seconds / 60),
         qAbs(seconds % 60), qAbs(ns / NS_PER_MS) % 1000, qAbs((ns / 1000) % 1000));
 }
+
+/*uint qHash(const Timestamp &timestamp) {
+    return qHash(timestamp.to_ns());
+}*/

@@ -101,12 +101,6 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     pipe_fd = fds[0];
 #endif
     
-    /*std::string mem_filename = Misc::StreamAsString() << "/proc/" << pid << "/mem";
-    read_fd = open(mem_filename.c_str(), O_RDONLY);
-    if(read_fd == -1) throw Exception::PTraceException(Misc::StreamAsString() << "Failed to open " << mem_filename << ":" << strerror(errno));*/
-    
-    /*ptrace(PTRACE_SETOPTIONS, pid, 0, PTRACE_O_TRACESYSGOOD);*/
-    
     /* Trap signals are the most common, so add the TrapObserver on first. */
 #ifndef USE_OVERLOAD
     add_signal_observer(new TrapObserver());
@@ -118,7 +112,6 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
 }
 
 Portal::~Portal() {
-    /*close(read_fd);*/
 #ifndef USE_OVERLOAD
     delete realloc_observer;
     delete free_observer;
@@ -182,10 +175,6 @@ Word Portal::read_memory(Word address) const {
     Word return_value = ptrace(PTRACE_PEEKDATA, pid, address, NULL);
     if(return_value == Word(-1) && errno != 0)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));
-    /*Word return_value;
-    lseek(read_fd, address, SEEK_SET);
-    if(read(read_fd, &return_value, sizeof(return_value)) == -1)
-        throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't read memory: " << strerror(errno));*/
     return return_value;
 }
 
@@ -252,9 +241,6 @@ Breakpoint *Portal::get_breakpoint_by_address(Word address) const {
     for(std::size_t x = 0; x < breakpoint_list.size(); x ++) {
         if(bp[x]->get_address() == address) return bp[x];
     }
-    /*for(breakpoint_list_t::const_iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
-        if((*i)->get_address() == address) return *i;
-    }*/
     return NULL;
 }
 

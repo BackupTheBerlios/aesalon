@@ -60,4 +60,6 @@ public:
 
 Q_DECLARE_METATYPE(Timestamp)
 
+/*uint qHash(const Timestamp &timestamp);*/
+
 #endif

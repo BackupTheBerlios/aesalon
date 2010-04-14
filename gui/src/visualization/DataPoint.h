@@ -2,6 +2,7 @@
 #define AESALON_GUI_VISUALIZATION_DATA_POINT_H
 
 #include <QMetaType>
+#include <QHash>
 
 #include "storage/Timestamp.h"
 
@@ -23,5 +24,7 @@ public:
 };
 
 Q_DECLARE_METATYPE(DataPoint)
+
+uint qHash(const DataPoint &point);
 
 #endif

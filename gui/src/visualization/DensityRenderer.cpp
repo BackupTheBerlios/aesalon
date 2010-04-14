@@ -1,5 +1,5 @@
 #include "DensityRenderer.h"
-#include "CanvasRectObject.h"
+#include "CanvasDensityObject.h"
 #include "storage/AllocEvent.h"
 #include "storage/FreeEvent.h"
 
@@ -20,7 +20,7 @@ void DensityRenderer::begin_rendering(const DataRange &render_range, Snapshot *s
 Canvas* DensityRenderer::end_rendering() {
     foreach(DataRange range, blocks) {
         range.get_end().set_time_element(canvas->get_range().get_end().get_time_element());
-        canvas->add_object(new CanvasRectObject(range, qRgb(0, 0, 0), qRgb(128, 128, 128)));
+        canvas->add_object(new CanvasDensityObject(range, qRgb(0, 0, 0)));
     }
     return canvas;
 }
@@ -34,7 +34,7 @@ void DensityRenderer::visit(FreeEvent* event) {
     DataRange range = blocks[event->get_address()];
     blocks.remove(event->get_address());
     range.get_end().set_time_element(event->get_timestamp());
-    canvas->add_object(new CanvasRectObject(range, qRgb(0, 0, 0), qRgb(128, 128, 128)));
+    canvas->add_object(new CanvasDensityObject(range, qRgb(0, 0, 0)));
 }
 
 void DensityRenderer::assemble_blocks(BiTreeNode* node) {

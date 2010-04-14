@@ -10,3 +10,8 @@ DataPoint &DataPoint::operator+=(const DataPoint &other) {
     data_element += other.data_element;
     return *this;
 }
+
+uint qHash(const DataPoint &point) {
+    /* TODO: implement qHash for qreals . . . */
+    return qHash(point.get_time_element().to_ns()) ^ qHash(quint64(point.get_data_element() * 10));
+}
