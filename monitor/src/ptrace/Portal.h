@@ -32,6 +32,7 @@
 #include "misc/ArgumentList.h"
 #include "exception/PTraceException.h"
 #include "Register.h"
+#include "MapParser.h"
 
 namespace PTrace {
 
@@ -50,12 +51,8 @@ private:
     signal_observer_list_t signal_observer_list;
         
     int wait_for_signal(int &status);
-    
-    BreakpointObserver *initial_observer;
-    BreakpointObserver *malloc_observer;
-    BreakpointObserver *free_observer;
-    BreakpointObserver *realloc_observer;
 
+    MapParser *map_parser;
 #ifdef USE_OVERLOAD
     int pipe_fd;
 #endif
@@ -143,9 +140,7 @@ public:
         signal_observer_list.push_back(new_observer);
     }
     
-    BreakpointObserver *get_malloc_observer() const { return malloc_observer; }
-    BreakpointObserver *get_free_observer() const { return free_observer; }
-    BreakpointObserver *get_realloc_observer() const { return realloc_observer; }
+    MapParser *get_map_parser() const { return map_parser; }
     
     /** Reads the memory map in /proc for the child process to determine the address a library is lodaded into.
         @note This function is expensive, do not overuse it.

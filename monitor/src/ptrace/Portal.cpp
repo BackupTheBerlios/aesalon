@@ -108,15 +108,14 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     add_signal_observer(new ExitObserver());
     add_signal_observer(new SegfaultObserver());
     
+    map_parser = new MapParser(pid);
+    
     /* The overload library will set itself up from here . . . */
 }
 
 Portal::~Portal() {
-#ifndef USE_OVERLOAD
-    delete realloc_observer;
-    delete free_observer;
-    delete malloc_observer;
-#endif
+    delete map_parser;
+    
     for(breakpoint_list_t::iterator i = breakpoint_list.begin(); i != breakpoint_list.end(); i ++) {
         delete *i;
     }
