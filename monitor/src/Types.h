@@ -66,6 +66,9 @@ public:
         Creates a copy of the given data. */
     Block(Byte *data, std::size_t data_size);
     
+    /** Destructor, deletes content associated with this Block instance. */
+    ~Block();
+    
     /** Returns the pointer referencing the data this block points to.
         No out-of-bounds checking is done.
         @return A pointer to the beginning of the block data.

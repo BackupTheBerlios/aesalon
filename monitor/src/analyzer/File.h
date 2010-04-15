@@ -26,6 +26,9 @@ public:
     
     StorageManager *get_storage_manager() const { return storage_manager; }
     
+    Object get_section(const char *name) const;
+    Object get_symbol(const char *name) const;
+    
     /*StorageOffset *get_section(std::string name) const;*/
     
     /*Symbol *get_symbol(std::string name) const;*/

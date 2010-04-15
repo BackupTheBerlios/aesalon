@@ -31,6 +31,10 @@ Block::Block(Byte *data, std::size_t data_size) {
     this->data_size = data_size;
 }
 
+Block::~Block() {
+    free(data);
+}
+
 void Block::remove(std::size_t from, std::size_t to) {
     if(from > data_size || to > data_size || from >= to) return;
     std::memmove(data + from, data + to, to - from);

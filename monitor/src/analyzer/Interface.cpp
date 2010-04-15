@@ -8,6 +8,10 @@ Interface::Interface() {
 }
 
 Interface::~Interface() {
+    for(file_map_t::iterator i = file_map.begin(); i != file_map.end(); i ++) {
+        delete i->second;
+    }
+
     delete storage_manager;
 }
 
@@ -27,10 +31,5 @@ File *Interface::get_file(std::string filename) const {
 File *Interface::get_file() const {
     return first_file;
 }
-
-/*StorageItem *Interface::dereference_item(StorageOffset offset) {
-    storage_manager->dereference(offset);
-}*/
-
 
 } // namespace Analyzer

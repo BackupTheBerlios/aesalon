@@ -108,6 +108,18 @@ void *malloc(size_t size) {
     if(!overload_initialized) initialize_overload();
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
+
+    /*void *bp = NULL;
+    asm("mov qword [rbp-0x18], rbp");
+    
+    unsigned long bt_address = 0x0;
+    
+    do {
+        printf("bp: %p\n", bp);
+        bt_address = *((unsigned long *)(bp + 8));
+        printf("backtrace address: %p\n", bt_address);
+        bp = (void *)*((unsigned long *)bp);
+    } while(bp != NULL && bt_address != 0);*/
     
     retrieve_scope();
     

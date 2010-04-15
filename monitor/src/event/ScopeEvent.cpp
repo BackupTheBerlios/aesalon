@@ -31,21 +31,22 @@ ScopeEvent::~ScopeEvent() {
 
 }
 
-Block* ScopeEvent::serialize(int bits) {
+Block *ScopeEvent::serialize(int bits) {
     Block *serialized = BasicEvent::serialize(bits);
     
-    const char *data = name.c_str();
     std::size_t length = name.length();
     if(length > 256) {
         Misc::Message(Misc::Message::WARNING_MESSAGE, "scope name length > 256 characters, truncating");
         name.erase(255);
-        data = name.c_str();
+        length = name.length();
     }
+    
+    const char *data = name.c_str();
     
     std::size_t pos = serialized->get_size();
     serialized->resize(pos + length + 1);
-    serialized->get_data()[pos] = length & 0xff;
-    memcpy(serialized->get_data()+pos+1, data, length % 0x100);
+    serialized->get_data()[pos] = length;
+    memcpy(serialized->get_data()+pos+1, data, length);
     
     return serialized;
 }

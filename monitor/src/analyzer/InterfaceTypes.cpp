@@ -2,11 +2,11 @@
 
 namespace Analyzer {
 
-Symbol::Symbol(const std::string &name, Word address, Word size) : name(name), address(address), size(size) {
+Object::Object(const std::string &name, Word address, Word size) : name(name), address(address), size(size) {
 
 }
 
-Symbol::~Symbol() {
+Object::~Object() {
 
 }
 

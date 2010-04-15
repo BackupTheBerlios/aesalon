@@ -25,9 +25,9 @@ public:
     File *get_file(std::string filename) const;
     File *get_file() const;
     
-    StorageManager *get_storage_manager() const { return storage_manager; }
+    Object get_symbol(const char *name);
     
-    /*StorageItem *dereference_item(StorageOffset offset);*/
+    StorageManager *get_storage_manager() const { return storage_manager; }
 };
 
 } // namespace Analyzer

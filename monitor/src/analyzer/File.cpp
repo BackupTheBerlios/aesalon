@@ -20,6 +20,25 @@ File::File(std::string filename, StorageManager *storage_manager) : filename(fil
 }
 
 File::~File() {
+
+}
+
+Object File::get_section(const char *name) const {
+    StorageOffset offset = get_section_offset(name);
+    if(offset == -1) return Object("", 0, 0);
+    StorageAttribute *object = storage_manager->dereference_attribute(offset);
+    return Object(storage_manager->dereference_string(object->name),
+        storage_manager->dereference_attribute(storage_manager->get_child(offset, "address"))->value,
+        storage_manager->dereference_attribute(storage_manager->get_child(offset, "size"))->value);
+}
+
+Object File::get_symbol(const char *name) const {
+    StorageOffset offset = get_symbol_offset(name);
+    if(offset == -1) return Object("", 0, 0);
+    StorageAttribute *object = storage_manager->dereference_attribute(offset);
+    return Object(storage_manager->dereference_string(object->name),
+        storage_manager->dereference_attribute(storage_manager->get_child(offset, "address"))->value,
+        storage_manager->dereference_attribute(storage_manager->get_child(offset, "size"))->value);
 }
 
 StorageOffset File::get_section_offset(const char *name) const {

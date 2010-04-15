@@ -6,15 +6,14 @@
 #include "Types.h"
 
 namespace Analyzer {
-
-class Symbol {
+class Object {
 private:
     std::string name;
     Word address;
     Word size;
 public:
-    Symbol(const std::string &name, Word address, Word size);
-    ~Symbol();
+    Object(const std::string &name, Word address, Word size);
+    ~Object();
     
     const std::string &get_name() const { return name; }
     Word get_address() const { return address; }
