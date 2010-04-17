@@ -33,7 +33,7 @@ include_directories(.)
 add_executable(aesalon_gui ${SOURCES})
 
 if(PROFILE_BUILD)
-    set_target_properties(aesalon PROPERTIES LINK_FLAGS -pg)
+    set_target_properties(aesalon_gui PROPERTIES LINK_FLAGS -pg)
 endif(PROFILE_BUILD)
 
 target_link_libraries(aesalon_gui QtCore QtGui QtNetwork)

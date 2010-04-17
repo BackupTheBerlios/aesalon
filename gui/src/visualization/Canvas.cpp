@@ -49,13 +49,9 @@ void Canvas::add_object(CanvasObject *object) {
 }
 
 void Canvas::clear() {
-    /*if(termination_point == NULL) {
-        qDebug("Decrementing refcount of objects in non-terminated canvas . . .");
-        CanvasObject *object;
-        CanvasObject *next = head;
-        while((object = next) && object != termination_point) next = object->get_next(), object->dec_references();
-    }*/
     head = NULL;
+    insertion_point = NULL;
+    termination_point = NULL;
 }
 
 CanvasObject *Canvas::object_at(const DataPoint& point) {
@@ -68,19 +64,16 @@ CanvasObject *Canvas::object_at(const DataPoint& point) {
 }
 
 void Canvas::combine_with(const Canvas &canvas) {
-    /*CanvasObject *object = canvas.head;
-    while(object && object != termination_point) {
-        if(object->get_bounding_rect().intersects(range)) {
-            object->inc_references();
-            add_object(object);
-        }
-        object = object->get_next();
-    }*/
     if(termination_point != NULL || canvas.termination_point != NULL) {
         qWarning("Cannot merge with a canvas that has a termination point.");
         return;
     }
-    add_object(canvas.head);
+    if(insertion_point != NULL) {
+        insertion_point->set_next(canvas.head);
+    }
+    else {
+        head = canvas.head;
+    }
     insertion_point = canvas.insertion_point;
 }
 

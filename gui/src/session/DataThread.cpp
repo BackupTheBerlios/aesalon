@@ -36,6 +36,7 @@ DataThread::~DataThread() {
 }
 
 void DataThread::run() {
+    this->setPriority(HighestPriority);
     data_receiver = data_source->spawn_receiver(this);
     connect(data_receiver, SIGNAL(started(Timestamp *)), SLOT(started(Timestamp *)));
     connect(data_receiver, SIGNAL(finished(Timestamp *)), SLOT(finished(Timestamp *)));

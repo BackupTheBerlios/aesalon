@@ -17,6 +17,8 @@
     @file data/NetworkReceiver.cpp
 */
 
+#include <QTime>
+
 #include "NetworkReceiver.h"
 #include "NetworkReceiver.moc"
 #include "storage/AllocEvent.h"
@@ -24,13 +26,23 @@
 
 NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 port) : DataReceiver(data_thread), host(host), port(port), start_time(0) {
     tcp_socket = new QTcpSocket(this);
+    /*connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));*/
+    recv_timer = new QTimer();
+    connect(recv_timer, SIGNAL(timeout()), this, SLOT(process_queue()));
+    recv_timer->start(100);
+    /* NOTE: may want to do something with the disconnected signal . . . */
+    
+    device_reader = new DeviceReader(tcp_socket);
+    connect(device_reader, SIGNAL(data_ready(QByteArray)), SLOT(data_received(QByteArray)), Qt::QueuedConnection);
+    
+    device_reader->start(QThread::HighestPriority);
+    
     tcp_socket->connectToHost(host, port);
-    connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));
-    connect(tcp_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(tcp_socket, SIGNAL(connected()), SLOT(connected()));
 }
 
 NetworkReceiver::~NetworkReceiver() {
+    device_reader->quit();
+    device_reader->wait();
 }
 
 quint64 NetworkReceiver::pop_quint64() {
@@ -71,9 +83,13 @@ void NetworkReceiver::prepend_quint64(quint64 data) {
     unprocessed.prepend(char(data & 0xff));
 }
 
-void NetworkReceiver::data_received() {
-    QByteArray received = tcp_socket->readAll();
-    unprocessed += received;
+void NetworkReceiver::data_received(QByteArray data) {
+    qDebug("Received data . . .");
+    unprocessed += data;
+}
+
+void NetworkReceiver::process_queue() {
+    qDebug("process_queue called, unprocessed size is %i", unprocessed.size());
     while(unprocessed.size()) {
         quint8 header = unprocessed.at(0);
         unprocessed.remove(0, 1);
@@ -136,6 +152,9 @@ void NetworkReceiver::data_received() {
             }
             else emit finished(timestamp);
         }
+        else {
+            qDebug("Invalid event type encountered . . .");
+        }
     }
 }
 
@@ -144,5 +163,6 @@ void NetworkReceiver::connected() {
 }
 
 void NetworkReceiver::disconnected() {
+    device_reader->quit();
     emit finished(new Timestamp());
 }
