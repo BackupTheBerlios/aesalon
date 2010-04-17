@@ -82,8 +82,12 @@ void Viewport::paintEvent(QPaintEvent *event) {
     
     DataPoint point = mapper.map_to(QPointF(0, 0));
     static QFont grid_font = QFont("DejaVu Sans", 8);
+    QFontMetrics metrics(grid_font);
     painter.setFont(grid_font);
-    painter.drawText(20, 20, point.get_time_element().to_string());
+    painter.drawText(5, metrics.height() + 5, formatter->format_point(point));
+    point = mapper.map_to(QPointF(width()-1, height()-1));
+    QString formatted = formatter->format_point(point);
+    painter.drawText(width() - (metrics.width(formatted)+5), height()-6, formatted);
 }
 
 void Viewport::mouseMoveEvent(QMouseEvent *event) {
@@ -175,18 +179,19 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     qint64 x_start = range.get_begin().get_time_element().to_ns();
     qint64 x_end = range.get_end().get_time_element().to_ns();
     qint64 x_range = x_end - x_start;
-    qreal x_percentage = (mouse_position.get_time_element().to_ns() - x_start) / qreal(x_range);
     
     qreal y_start = range.get_begin().get_data_element();
     qreal y_end = range.get_end().get_data_element();
     qreal y_range = y_end - y_start;
-    qreal y_percentage = (mouse_position.get_data_element() - y_start) / qreal(y_range);
     
     qreal scale_amount = 1.0 - ((event->delta() / 120.0) / 10.0);
     if(scale_amount < 0.1) scale_amount = 0.1;
     else if(scale_amount > 10.0) scale_amount = 10.0;
 
 #if 0
+    qreal x_percentage = (mouse_position.get_time_element().to_ns() - x_start) / qreal(x_range);
+    qreal y_percentage = (mouse_position.get_data_element() - y_start) / qreal(y_range);
+
     qint64 new_x;
     qint64 new_x_range;
     qreal new_y;

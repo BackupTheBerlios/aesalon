@@ -3,8 +3,8 @@
 
 #include <QMap>
 
-#include "Canvas.h"
+#include "CanvasObject.h"
 
-typedef QMap<qreal, Canvas *> CanvasMap;
+typedef QMap<qreal, CanvasObject *> CanvasMap;
 
 #endif

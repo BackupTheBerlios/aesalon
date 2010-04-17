@@ -12,7 +12,5 @@ GUI:
 - Store the maximum tree depth inside the DataSource
 - Add the ability to create new DataSources
 - Add other DataSources (LaunchSource, etc.)
-- Speed optimizations, such as:
-    - Partial renderings
-    - CanvasObject caching
 - Generic polishing
+- Partial painting in Viewport::paintEvent()

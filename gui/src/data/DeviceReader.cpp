@@ -10,7 +10,7 @@ DeviceReader::~DeviceReader() {
 }
 
 void DeviceReader::run() {
-    const int max_data = 4096;
+    const int max_data = 16384;
     while(device->isOpen()) {
         QByteArray data = device->read(max_data);
         if(data.size() > 0) emit data_ready(data);

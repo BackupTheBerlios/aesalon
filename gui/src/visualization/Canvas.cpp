@@ -3,7 +3,7 @@
 #include "CoordinateMapper.h"
 
 Canvas::Canvas(const DataRange &range) : range(range), head(NULL), termination_point(NULL) {
-    
+    object_count = 0;
 }
 
 Canvas::~Canvas() {
@@ -47,11 +47,13 @@ void Canvas::add_object(CanvasObject *object) {
         head->get_prev()->set_next(object);
         head->set_prev(object);
     }
+    object_count ++;
 }
 
 void Canvas::clear() {
     head = NULL;
     termination_point = NULL;
+    object_count = 0;
 }
 
 CanvasObject *Canvas::object_at(const DataPoint& point) {
@@ -75,10 +77,10 @@ void Canvas::combine_with(const Canvas &canvas) {
         head->get_prev()->set_next(canvas.head);
     }
     else {
-        qDebug("Copying content from remote canvas into local canvas . . .");
         head = canvas.head;
     }
     head->set_prev(last);
+    inc_object_count(canvas.get_object_count());
 }
 
 void Canvas::paint_onto(RenderedCanvas &canvas) {
@@ -92,7 +94,6 @@ void Canvas::paint_onto(RenderedCanvas &canvas) {
 }
 
 void Canvas::paint_onto(RenderedCanvas &canvas, const DataRange &range) {
-    qDebug("Canvas::paint_onto(RenderedCanvas &, const DataRange &) . . .");
     QPainter painter(&canvas.get_image());
     CoordinateMapper mapper(canvas.get_size(), range);
     CanvasObject *object = head;

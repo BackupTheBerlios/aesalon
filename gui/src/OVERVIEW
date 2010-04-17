@@ -1,0 +1,16 @@
+The source code for the GUI is split into several directories. A list of
+these directories and their respective functions is provided. No namespaces
+are used in the GUI.
+
+.:
+    Contains only Aesalon.cpp, the source file that begins it all.
+data:
+    Source files relating to data receiving or reading.
+main:
+    Main GUI source files, those used for providing the primary interface.
+session:
+    Framework for Session instances, e.g. Visualization containers.
+storage:
+    Events, revisioned binary trees, and other storage methods.
+visualization:
+    All sources to do with the visualization of data.

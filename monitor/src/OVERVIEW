@@ -1,0 +1,32 @@
+The source code for the monitor is split into several directories. A list of
+these directories and their respective functions is provided. Note that the
+namespace name is identical to the name of the directory. (No namespace is
+used for the root directory.)
+
+.:
+    Generic source files, those not specific to any one port of the program
+monitor.
+
+./analyzer:
+    Libraries to parse executable files, to produce useful information such as
+symbol addresses.
+
+./event:
+    Serialization and event queuing libraries.
+./exception:
+    Exception header files.
+./misc:
+    Generic source files not specific to an implementation of Aesalon, such as
+a Singleton class, etc.
+./overload:
+    Platform-specific source files for the overload library implementation of
+the monitor.
+./ptrace:
+    Interface to ptrace, the POSIX trace library. In essence, this contains
+anything pertaining to a running process.
+./tcp:
+    TCP library, used to send the serialized events from the Event::
+namespace.
+./tracker:
+    Tracks what each connected GUI knows about, sending information on-demand,
+such as scope information.
