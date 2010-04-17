@@ -41,7 +41,7 @@ NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 
 }
 
 NetworkReceiver::~NetworkReceiver() {
-    device_reader->quit();
+    tcp_socket->close();
     device_reader->wait();
 }
 
@@ -84,12 +84,10 @@ void NetworkReceiver::prepend_quint64(quint64 data) {
 }
 
 void NetworkReceiver::data_received(QByteArray data) {
-    qDebug("Received data . . .");
     unprocessed += data;
 }
 
 void NetworkReceiver::process_queue() {
-    qDebug("process_queue called, unprocessed size is %i", unprocessed.size());
     while(unprocessed.size()) {
         quint8 header = unprocessed.at(0);
         unprocessed.remove(0, 1);

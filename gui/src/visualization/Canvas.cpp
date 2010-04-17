@@ -2,7 +2,7 @@
 #include "Canvas.h"
 #include "CoordinateMapper.h"
 
-Canvas::Canvas(const DataRange &range) : range(range), head(NULL), insertion_point(NULL), termination_point(NULL) {
+Canvas::Canvas(const DataRange &range) : range(range), head(NULL), termination_point(NULL) {
     
 }
 
@@ -40,17 +40,17 @@ void Canvas::add_object(CanvasObject *object) {
     /*qDebug("Adding object to canvas, address is %p . . .", (void *)object);*/
     if(head == NULL) {
         head = object;
-        insertion_point = head;
+        head->set_next(NULL);
+        head->set_prev(head);
     }
     else {
-        insertion_point->set_next(object);
-        insertion_point = object;
+        head->get_prev()->set_next(object);
+        head->set_prev(object);
     }
 }
 
 void Canvas::clear() {
     head = NULL;
-    insertion_point = NULL;
     termination_point = NULL;
 }
 
@@ -68,13 +68,17 @@ void Canvas::combine_with(const Canvas &canvas) {
         qWarning("Cannot merge with a canvas that has a termination point.");
         return;
     }
-    if(insertion_point != NULL) {
-        insertion_point->set_next(canvas.head);
+    if(canvas.get_head() == NULL) return;
+    CanvasObject *last = canvas.head->get_prev();
+    if(head != NULL) {
+        canvas.get_head()->set_prev(head->get_prev());
+        head->get_prev()->set_next(canvas.head);
     }
     else {
+        qDebug("Copying content from remote canvas into local canvas . . .");
         head = canvas.head;
     }
-    insertion_point = canvas.insertion_point;
+    head->set_prev(last);
 }
 
 void Canvas::paint_onto(RenderedCanvas &canvas) {
@@ -88,6 +92,7 @@ void Canvas::paint_onto(RenderedCanvas &canvas) {
 }
 
 void Canvas::paint_onto(RenderedCanvas &canvas, const DataRange &range) {
+    qDebug("Canvas::paint_onto(RenderedCanvas &, const DataRange &) . . .");
     QPainter painter(&canvas.get_image());
     CoordinateMapper mapper(canvas.get_size(), range);
     CanvasObject *object = head;
@@ -100,7 +105,6 @@ void Canvas::paint_onto(RenderedCanvas &canvas, const DataRange &range) {
 Canvas *Canvas::clone() const {
     Canvas *cloned = new Canvas(get_range());
     cloned->head = head;
-    cloned->insertion_point = insertion_point;
-    cloned->termination_point = insertion_point;
+    if(head) cloned->termination_point = head->get_prev();
     return cloned;
 }

@@ -17,7 +17,7 @@ void DensityRenderer::begin_rendering(const DataRange &render_range, Snapshot *s
     assemble_blocks(snapshot->get_head_node());
 }
 
-Canvas* DensityRenderer::end_rendering() {
+Canvas *DensityRenderer::end_rendering() {
     foreach(DataRange range, blocks) {
         range.get_end().set_time_element(canvas->get_range().get_end().get_time_element());
         canvas->add_object(new CanvasDensityObject(range, qRgb(0, 0, 0)));

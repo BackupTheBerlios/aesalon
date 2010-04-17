@@ -4,6 +4,7 @@ Monitor:
 - Implement 32-bit support
 - Add support for executing shell scripts
 - Add support for executing 32-bit programs on 64-bit platforms (generate 32-bit overload)
+- Investigate why the monitor terminates when the TCP connection is lost
 GUI:
 - Embed Konsole inside Session for LaunchSources?
 - Add "temporary sessions", e.g. sessions that aren't saved

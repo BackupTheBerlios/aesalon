@@ -183,7 +183,10 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     qreal y_percentage = (mouse_position.get_data_element() - y_start) / qreal(y_range);
     
     qreal scale_amount = 1.0 - ((event->delta() / 120.0) / 10.0);
-    
+    if(scale_amount < 0.1) scale_amount = 0.1;
+    else if(scale_amount > 10.0) scale_amount = 10.0;
+
+#if 0
     qint64 new_x;
     qint64 new_x_range;
     qreal new_y;
@@ -212,6 +215,27 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     range.get_begin().set_data_element(new_y);
     range.get_end().set_time_element(Timestamp(new_x + new_x_range));
     range.get_end().set_data_element(new_y + new_y_range);
+#endif
+    qint64 x_change;
+    qreal y_change;
+    
+    if(event->modifiers() & Qt::ControlModifier) {
+        x_change = x_range - (x_range * scale_amount);
+        y_change = 0.0;
+    }
+    else if(event->modifiers() & Qt::ShiftModifier) {
+        x_change = 0.0;
+        y_change = y_range - (y_range * scale_amount);
+    }
+    else {
+        x_change = x_range - (x_range * scale_amount);
+        y_change = y_range - (y_range * scale_amount);
+    }
+    
+    range.get_begin().set_time_element(x_start + (x_change / 2));
+    range.get_end().set_time_element(x_start + (x_range - (x_change / 2)));
+    range.get_begin().set_data_element(y_start + (y_change / 2));
+    range.get_end().set_data_element(y_start + (y_range - (y_change / 2)));
     
     set_canvas_range(range);
     force_render();

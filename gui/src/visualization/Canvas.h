@@ -11,7 +11,6 @@ class Canvas {
 private:
     DataRange range;
     CanvasObject *head;
-    CanvasObject *insertion_point;
     CanvasObject *termination_point;
 public:
     Canvas(const DataRange &range = DataRange());
@@ -28,6 +27,9 @@ public:
     
     void combine_with(const Canvas &canvas);
     
+    
+    CanvasObject *get_head() const { return head; }
+    CanvasObject *get_termination_point() const { return termination_point; }
     void paint_onto(RenderedCanvas &canvas);
     void paint_onto(RenderedCanvas &canvas, const DataRange &range);
     
