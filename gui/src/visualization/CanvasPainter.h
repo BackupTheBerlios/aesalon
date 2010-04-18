@@ -11,9 +11,6 @@
 class CanvasPainter : public QThread { Q_OBJECT
 private:
     bool processing;
-    CanvasMap maps[2];
-    CanvasMap *last_map;
-    CanvasMap *new_map;
 public:
     CanvasPainter();
     virtual ~CanvasPainter();

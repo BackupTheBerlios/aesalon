@@ -23,8 +23,10 @@
 #include <QThread>
 #include <QTimer>
 #include <QQueue>
+#include <QSet>
 
 #include "storage/SnapshotList.h"
+#include "storage/EventVisitor.h"
 #include "data/DataSource.h"
 
 class DataThread : public QThread { Q_OBJECT
@@ -36,11 +38,15 @@ private:
     Snapshot *current_snapshot;
     QTimer *snapshot_timer;
     
+    QSet<EventVisitor *> event_visitors;
+    
     Timestamp *start_time, *finish_time;
 public:
     DataThread(QObject *parent, DataSource *data_source);
     virtual ~DataThread();
-    
+
+    void register_observer(EventVisitor *visitor);
+    void remove_observer(EventVisitor *visitor);
     void event_received(Event *event);
     
     const Timestamp *get_start_time() const { return start_time; }

@@ -8,8 +8,8 @@ DensityFactory::DensityFactory(DataThread *data_thread) : VisualizationFactory(d
 }
 
 
-Renderer *DensityFactory::create_renderer() const {
-    return new DensityRenderer();
+Renderer *DensityFactory::create_renderer(Canvas *canvas) const {
+    return new DensityRenderer(canvas);
 }
 
 AxisFormatter *DensityFactory::create_formatter() const {

@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-Renderer::Renderer() {
+Renderer::Renderer(Canvas *canvas) : canvas(canvas) {
 
 }
 

@@ -4,7 +4,7 @@
 #include "storage/FreeEvent.h"
 #include "CanvasGraphObject.h"
 
-BlockCountRenderer::BlockCountRenderer() {
+BlockCountRenderer::BlockCountRenderer(Canvas *canvas) : Renderer(canvas) {
 
 }
 
@@ -15,18 +15,19 @@ BlockCountRenderer::~BlockCountRenderer() {
 void BlockCountRenderer::begin_rendering(const DataRange &render_range, Snapshot *snapshot) {
     block_count = 0;
     count_blocks(snapshot->get_head_node());
-    canvas = new Canvas(render_range);
     point = DataPoint(render_range.get_begin().get_time_element(), block_count);
     canvas->add_object(new CanvasLineObject(point, DataPoint(render_range.get_begin().get_time_element(), 0), qRgb(0, 0, 0)));
 }
 
 Canvas *BlockCountRenderer::end_rendering() {
-    
+    qDebug("stub: BlockCountRenderer::end_rendering()");
+#if 0
     canvas->add_object(new CanvasLineObject(
         DataPoint(canvas->get_range().get_end().get_time_element(), block_count),
         DataPoint(canvas->get_range().get_end().get_time_element(), 0), qRgb(0, 0, 0)));
     canvas->add_object(new CanvasLineObject(DataPoint(canvas->get_range().get_end().get_time_element(), block_count),
         point, qRgb(0, 0, 0)));
+#endif
     return canvas;
 }
 

@@ -1,5 +1,6 @@
 #include "CanvasDensityObject.h"
 #include <QPaintEngine>
+#include <QDebug>
 
 CanvasDensityObject::CanvasDensityObject(const DataRange &rectangle, QColor line_colour)
     : CanvasObject(rectangle), line_colour(line_colour) {
@@ -31,5 +32,6 @@ void CanvasDensityObject::paint_onto(QPainter *painter, const CoordinateMapper &
     QRectF rect = mapper.map_to(get_bounding_rect());
     /*qDebug("CanvasDensityObject::paint_onto(): rect is (%f, %f), (%f, %f)", rect.left(), rect.top(), rect.right(), rect.bottom());
     qDebug("painter->size() is (%i, %i)", painter->device()->width(), painter->device()->height());*/
+    qDebug() << "Rectangle: " << rect;
     painter->drawRect(rect);
 }

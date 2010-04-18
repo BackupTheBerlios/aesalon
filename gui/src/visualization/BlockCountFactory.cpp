@@ -11,6 +11,6 @@ AxisFormatter *BlockCountFactory::create_formatter() const {
     return new BlockCountFormatter();
 }
 
-Renderer *BlockCountFactory::create_renderer() const {
-    return new BlockCountRenderer();
+Renderer *BlockCountFactory::create_renderer(Canvas *canvas) const {
+    return new BlockCountRenderer(canvas);
 }

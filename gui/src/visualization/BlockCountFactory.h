@@ -8,7 +8,7 @@ public:
     BlockCountFactory(DataThread* data_thread);
 
     virtual AxisFormatter *create_formatter() const;
-    virtual Renderer *create_renderer() const;
+    virtual Renderer *create_renderer(Canvas *canvas) const;
 };
 
 #endif

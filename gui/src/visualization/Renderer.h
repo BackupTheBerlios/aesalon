@@ -8,12 +8,17 @@
 #include "storage/EventVisitor.h"
 
 class Renderer : public EventVisitor {
+protected:
+    Canvas *canvas;
+    SnapshotID last_snapshot;
 public:
-    Renderer();
+    Renderer(Canvas *canvas);
     virtual ~Renderer();
     
-    virtual void begin_rendering(const DataRange &render_range, Snapshot *snapshot) = 0;
-    virtual Canvas *end_rendering() = 0;
+    Canvas *get_canvas() const { return canvas; }
+    
+    SnapshotID get_last_snapshot() const { return last_snapshot; }
+    void update_last_snapshot(SnapshotID snapshot) { last_snapshot = snapshot; }
 };
 
 #endif

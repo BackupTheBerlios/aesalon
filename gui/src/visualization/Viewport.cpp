@@ -4,8 +4,10 @@
 #include <QTimer>
 #include "Viewport.h"
 #include "Viewport.moc"
+#include "CanvasGenerator.h"
 
-Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(parent), rendered_canvas(size(), DataRange()) {
+Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *parent)
+    : QWidget(parent), canvas(canvas), rendered_canvas(size(), DataRange()) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMouseTracking(true);
     setCursor(QCursor(Qt::CrossCursor));
@@ -18,39 +20,50 @@ Viewport::Viewport(VisualizationFactory *factory, QWidget *parent): QWidget(pare
     
     formatter = factory->create_formatter();
     click_handler = factory->create_click_handler();
+    
+    
+    data_thread = factory->get_data_thread();
 }
 
 Viewport::~Viewport() {
 
 }
 
-void Viewport::merge_canvas(Canvas* canvas) {
-    local_canvas.combine_with(*canvas);
-    force_render();
-    delete canvas;
-}
-
-void Viewport::clear_canvas() {
-    local_canvas.clear();
-}
-
 void Viewport::set_canvas_range(const DataRange &new_range) {
-    local_canvas.set_range(new_range);
     rendered_canvas.set_range(new_range);
 }
 
 void Viewport::shift_range_to(const Timestamp &high_time) {
-    DataRange range = local_canvas.get_range();
+    qDebug("NYI: shift_range_to()");
+    /*DataRange range = local_canvas.get_range();
     qint64 time_difference = range.get_begin().get_time_element().ns_until(range.get_end().get_time_element());
     range.get_end().set_time_element(high_time);
     Timestamp timestamp = high_time;
     timestamp.add_ns(-time_difference);
     range.get_begin().set_time_element(timestamp);
-    set_canvas_range(range);
+    set_canvas_range(range);*/
 }
 
 void Viewport::force_render() {
-    emit paint_canvas(size(), local_canvas.clone());
+    emit paint_canvas(size(), canvas, rendered_canvas.get_range());
+}
+
+void Viewport::set_full_view() {
+    DataRange new_range = canvas->calculate_data_range();
+    qint64 end_time;
+    if(data_thread->get_finish_time()) end_time = data_thread->get_start_time()->ns_until(*data_thread->get_finish_time());
+    else end_time = (Timestamp() - *data_thread->get_start_time()).to_ns();
+    new_range.get_end().set_time_element(end_time);
+    qDebug("end_time: %lli", end_time);
+    rendered_canvas.set_range(new_range);
+    
+    force_render();
+    
+    qDebug("The new range is from (%s, %f) to (%s, %f).",
+        qPrintable(rendered_canvas.get_range().get_begin().get_time_element().to_string()),
+        rendered_canvas.get_range().get_begin().get_data_element(),
+        qPrintable(rendered_canvas.get_range().get_end().get_time_element().to_string()),
+        rendered_canvas.get_range().get_end().get_data_element());
 }
 
 void Viewport::merge_canvas(RenderedCanvas canvas) {
@@ -60,7 +73,7 @@ void Viewport::merge_canvas(RenderedCanvas canvas) {
 
 void Viewport::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
-    CoordinateMapper mapper(size(), local_canvas.get_range());
+    CoordinateMapper mapper(size(), rendered_canvas.get_range());
     painter.drawImage(0, 0, rendered_canvas.get_image());
     
     QPen pen(Qt::DotLine);
@@ -91,14 +104,14 @@ void Viewport::paintEvent(QPaintEvent *event) {
 }
 
 void Viewport::mouseMoveEvent(QMouseEvent *event) {
-    CoordinateMapper mapper(size(), local_canvas.get_range());
+    CoordinateMapper mapper(size(), rendered_canvas.get_range());
     DataPoint point = mapper.map_to(event->posF());
     
     if(event->buttons() & Qt::LeftButton) {
         /*old_mouse_pos.setX(event->posF().x());*/
         /*old_mouse_pos.setY(old_mouse_pos.y() - 2.0);*/
         
-        DataRange local_range = local_canvas.get_range();
+        DataRange local_range = rendered_canvas.get_range();
         QPointF movement_delta = event->posF() - old_mouse_pos;
         /*DataPoint old_point = mapper.map_to(old_mouse_pos);*/
         /*DataPoint move_by = DataPoint(point.get_time_element() - old_point.get_time_element(), point.get_data_element() - old_point.get_data_element());*/
@@ -109,7 +122,6 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
         
         rendered_canvas.shift(move_by);
         rendered_canvas.shift(movement_delta);
-        local_canvas.shift_range(move_by);
         
         /*qDebug("move_by: time is %lli, data is %f", move_by.get_time_element().to_ns(), move_by.get_data_element());*/
         DataRange exposed_range;
@@ -122,7 +134,7 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
             exposed_range.get_begin().set_data_element(local_range.get_end().get_data_element() - move_by.get_data_element());
             exposed_range.get_end().set_data_element(local_range.get_end().get_data_element() + move_by.get_data_element());
             
-            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), local_canvas.clone(), exposed_range);
+            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
         }
         else if(move_by.get_data_element() < 0.0) {
             exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
@@ -130,26 +142,26 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
             
             exposed_range.get_begin().set_data_element(local_range.get_begin().get_data_element() + move_by.get_data_element());
             exposed_range.get_end().set_data_element(local_range.get_begin().get_data_element() - move_by.get_data_element());
-            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), local_canvas.clone(), exposed_range);
+            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
         }
         
         if(move_by.get_time_element().to_ns() > 0) {
-            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
-            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
+            exposed_range.get_begin().set_data_element(rendered_canvas.get_range().get_begin().get_data_element());
+            exposed_range.get_end().set_data_element(rendered_canvas.get_range().get_end().get_data_element());
             
             exposed_range.get_begin().set_time_element(local_range.get_end().get_time_element() - move_by.get_time_element());
             exposed_range.get_end().set_time_element(local_range.get_end().get_time_element() + move_by.get_time_element());
             
-            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), local_canvas.clone(), exposed_range);
+            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
         }
         else if(move_by.get_time_element().to_ns() < 0) {
-            exposed_range.get_begin().set_data_element(local_canvas.get_range().get_begin().get_data_element());
-            exposed_range.get_end().set_data_element(local_canvas.get_range().get_end().get_data_element());
+            exposed_range.get_begin().set_data_element(rendered_canvas.get_range().get_begin().get_data_element());
+            exposed_range.get_end().set_data_element(rendered_canvas.get_range().get_end().get_data_element());
             
             exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element() + move_by.get_time_element());
             exposed_range.get_end().set_time_element(local_range.get_begin().get_time_element() - move_by.get_time_element());
             
-            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), local_canvas.clone(), exposed_range);
+            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
         }
         
         old_mouse_pos = event->posF();
@@ -160,8 +172,8 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
 void Viewport::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton) old_mouse_pos = event->posF();
     else if(event->button() == Qt::RightButton) {
-        CoordinateMapper mapper(size(), local_canvas.get_range());
-        click_handler->handle_click(&local_canvas, mapper.map_to(event->posF()));
+        CoordinateMapper mapper(size(), rendered_canvas.get_range());
+        click_handler->handle_click(canvas, mapper.map_to(event->posF()));
     }
 }
 
@@ -171,7 +183,7 @@ void Viewport::resizeEvent(QResizeEvent *event) {
 }
 
 void Viewport::wheelEvent(QWheelEvent *event) {
-    DataRange range = local_canvas.get_range();
+    DataRange range = rendered_canvas.get_range();
     CoordinateMapper mapper(size(), range);
     
     DataPoint mouse_position = mapper.map_to(event->pos());

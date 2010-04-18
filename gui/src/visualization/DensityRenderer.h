@@ -7,19 +7,13 @@
 
 class DensityRenderer : public Renderer {
 private:
-    Canvas *canvas;
-    QMap<qint64, DataRange> blocks;
+    QMap<qint64, CanvasObject *> blocks;
 public:
-    DensityRenderer();
+    DensityRenderer(Canvas *canvas);
     virtual ~DensityRenderer();
 
-    virtual void begin_rendering(const DataRange &render_range, Snapshot *snapshot);
-    virtual Canvas* end_rendering();
-    
     virtual void visit(AllocEvent *event);
     virtual void visit(FreeEvent *event);
-private:
-    void assemble_blocks(BiTreeNode *node);
 };
 
 #endif

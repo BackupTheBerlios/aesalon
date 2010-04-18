@@ -2,31 +2,20 @@
 #include "Canvas.h"
 #include "CoordinateMapper.h"
 
-Canvas::Canvas(const DataRange &range) : range(range), head(NULL), termination_point(NULL) {
-    object_count = 0;
+Canvas::Canvas() : head(NULL) {
 }
 
 Canvas::~Canvas() {
-    /*this->clear();*/
+    this->clear();
 }
 
-void Canvas::set_range(const DataRange &new_range) {
-    range = new_range;
-}
-
-void Canvas::shift_range(const DataPoint &by) {
-    range.get_begin().set_data_element(range.get_begin().get_data_element() + by.get_data_element());
-    range.get_begin().set_time_element(Timestamp(range.get_begin().get_time_element().to_ns() + by.get_time_element().to_ns()));
-    range.get_end().set_data_element(range.get_end().get_data_element() + by.get_data_element());
-    range.get_end().set_time_element(Timestamp(range.get_end().get_time_element().to_ns() + by.get_time_element().to_ns()));
-}
-
-void Canvas::calculate_data_range() {
-    if(!head) return;
+DataRange Canvas::calculate_data_range() {
+    if(!head) return DataRange();
+    DataRange range;
     range.get_begin().set_data_element(head->get_bounding_rect().get_begin().get_data_element());
     range.get_end().set_data_element(head->get_bounding_rect().get_end().get_data_element());
     CanvasObject *object = head;
-    while(object && object != termination_point) {
+    while(object) {
         if(object->get_bounding_rect().get_begin().get_data_element() < range.get_begin().get_data_element())
             range.get_begin().set_data_element(object->get_bounding_rect().get_begin().get_data_element());
         if(object->get_bounding_rect().get_end().get_data_element() > range.get_end().get_data_element())
@@ -34,6 +23,7 @@ void Canvas::calculate_data_range() {
         
         object = object->get_next();
     }
+    return range;
 }
 
 void Canvas::add_object(CanvasObject *object) {
@@ -47,18 +37,20 @@ void Canvas::add_object(CanvasObject *object) {
         head->get_prev()->set_next(object);
         head->set_prev(object);
     }
-    object_count ++;
 }
 
 void Canvas::clear() {
-    head = NULL;
-    termination_point = NULL;
-    object_count = 0;
+    CanvasObject *object = head;
+    while(object) {
+        CanvasObject *next = object->get_next();
+        delete object;
+        object = next;
+    }
 }
 
-CanvasObject *Canvas::object_at(const DataPoint& point) {
+CanvasObject *Canvas::object_at(const DataPoint &point) {
     CanvasObject *object = head;
-    while(object && object != termination_point) {
+    while(object) {
         if(object->get_bounding_rect().contains(point)) return object;
         object = object->get_next();
     }
@@ -66,10 +58,6 @@ CanvasObject *Canvas::object_at(const DataPoint& point) {
 }
 
 void Canvas::combine_with(const Canvas &canvas) {
-    if(termination_point != NULL || canvas.termination_point != NULL) {
-        qWarning("Cannot merge with a canvas that has a termination point.");
-        return;
-    }
     if(canvas.get_head() == NULL) return;
     CanvasObject *last = canvas.head->get_prev();
     if(head != NULL) {
@@ -80,32 +68,4 @@ void Canvas::combine_with(const Canvas &canvas) {
         head = canvas.head;
     }
     head->set_prev(last);
-    inc_object_count(canvas.get_object_count());
-}
-
-void Canvas::paint_onto(RenderedCanvas &canvas) {
-    QPainter painter(&canvas.get_image());
-    CoordinateMapper mapper(canvas.get_size(), range);
-    CanvasObject *object = head;
-    while(object && object != termination_point) {
-        object->paint_onto(&painter, mapper);
-        object = object->get_next();
-    }
-}
-
-void Canvas::paint_onto(RenderedCanvas &canvas, const DataRange &range) {
-    QPainter painter(&canvas.get_image());
-    CoordinateMapper mapper(canvas.get_size(), range);
-    CanvasObject *object = head;
-    while(object && object != termination_point) {
-        if(object->get_bounding_rect().intersects(range)) object->paint_onto(&painter, mapper);
-        object = object->get_next();
-    }
-}
-
-Canvas *Canvas::clone() const {
-    Canvas *cloned = new Canvas(get_range());
-    cloned->head = head;
-    if(head) cloned->termination_point = head->get_prev();
-    return cloned;
 }

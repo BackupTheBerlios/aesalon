@@ -4,10 +4,8 @@
 #include "Renderer.h"
 
 class BlockCountRenderer : public Renderer {
-private:
-    Canvas *canvas;
 public:
-    BlockCountRenderer();
+    BlockCountRenderer(Canvas *canvas);
     virtual ~BlockCountRenderer();
     virtual void begin_rendering(const DataRange &render_range, Snapshot *snapshot);
     virtual Canvas *end_rendering();

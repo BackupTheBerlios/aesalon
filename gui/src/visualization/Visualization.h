@@ -10,7 +10,6 @@
 #include <QMenu>
 
 #include "Viewport.h"
-#include "Controller.h"
 #include "Renderer.h"
 #include "session/DataThread.h"
 
@@ -22,21 +21,15 @@ private:
     QPushButton *request_button;
     QMenu *request_menu;
     Viewport *viewport;
-    Controller *controller;
+    Renderer *renderer;
+    Canvas *canvas;
 public:
     Visualization(VisualizationFactory *factory);
     virtual ~Visualization();
 private slots:
     void set_position(QString formatted);
-    
-    void send_begin_rt();
-    void send_end_rt();
-    void send_render_full();
 signals:
     void cycle_time_changed(int new_delay);
-    void begin_rt();
-    void end_rt();
-    void render_full();
 };
 
 #endif

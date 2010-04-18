@@ -56,6 +56,8 @@ public:
     void add_ns(qint64 ns);
     qint64 to_ns() const;
     QString to_string() const;
+    
+    static qint64 NOW;
 };
 
 Q_DECLARE_METATYPE(Timestamp)

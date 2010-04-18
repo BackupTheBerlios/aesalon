@@ -47,15 +47,25 @@ void DataThread::run() {
     delete snapshot_timer;
 }
 
+void DataThread::register_observer(EventVisitor *visitor) {
+    event_visitors.insert(visitor);
+}
+
+void DataThread::remove_observer(EventVisitor *visitor) {
+    event_visitors.remove(visitor);
+}
+
 void DataThread::event_received(Event *event) {
     Snapshot *last = get_snapshot_list()->get_snapshot(current_snapshot->get_snapshot_id()-1);
     if(last->get_event_list()->get_event_list().size() > 1000) create_new_snapshot();
     last->add_event(event);
     event->apply_to(current_snapshot);
+    foreach(EventVisitor *visitor, event_visitors) {
+        event->accept(*visitor);
+    }
 }
 
 void DataThread::create_new_snapshot() {
-    /*current_snapshot->update_timestamp(start_time->ns_until(Timestamp()));*/
     current_snapshot = snapshot_list.append_snapshot();
 }
 
@@ -63,15 +73,12 @@ void DataThread::started(Timestamp *time) {
     /* NOTE: get this from somewhere else . . . hardcoding it is a bad idea. */
     snapshot_timer->start(5000);
     start_time = time;
-    /*snapshot_list.get_snapshot(1)->update_timestamp(*start_time);*/
-    /*current_snapshot->update_timestamp(*start_time);*/
     emit data_started();
 }
 
 void DataThread::finished(Timestamp *time) {
     if(finish_time) return;
     snapshot_timer->stop();
-    /*current_snapshot = snapshot_list.append_snapshot();*/
     finish_time = time;
     emit data_finished();
 }

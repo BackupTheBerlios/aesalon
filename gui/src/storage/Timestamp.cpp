@@ -18,7 +18,10 @@
 */
 
 #include <time.h>
+#include <limits.h>
 #include "Timestamp.h"
+
+qint64 Timestamp::NOW = Q_INT64_C(-9223372036854775807);
 
 Timestamp::Timestamp() {
     struct timespec internal_time;
@@ -32,22 +35,22 @@ Timestamp::Timestamp(quint64 ns) : ns(ns) {
 }
 
 bool Timestamp::operator<(const Timestamp &other) const {
-    if(ns < other.ns) return true;
+    if(ns < other.ns && ns != NOW) return true;
     else return false;
 }
 
 bool Timestamp::operator<=(const Timestamp &other) const {
-    if(ns <= other.ns) return true;
+    if(ns <= other.ns && ns != NOW) return true;
     else return false;
 }
 
 bool Timestamp::operator>(const Timestamp &other) const {
-    if(ns > other.ns) return true;
+    if(ns > other.ns && other.ns != NOW) return true;
     else return false;
 }
 
 bool Timestamp::operator>=(const Timestamp &other) const {
-    if(ns >= other.ns) return true;
+    if(ns >= other.ns && other.ns != NOW) return true;
     else return false;
 }
 
@@ -109,6 +112,7 @@ qint64 Timestamp::to_ns() const {
 }
 
 QString Timestamp::to_string() const {
+    if(ns == NOW) return Timestamp().to_string();
     qint64 seconds = ns / NS_PER_SEC;
     return QString().sprintf("%s%02lli:%02lli.%03lli.%03lli", ns < 0?"-":"", qAbs(seconds / 60),
         qAbs(seconds % 60), qAbs(ns / NS_PER_MS) % 1000, qAbs((ns / 1000) % 1000));

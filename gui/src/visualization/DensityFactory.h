@@ -7,7 +7,7 @@ class DensityFactory : public VisualizationFactory {
 public:
     DensityFactory(DataThread *data_thread);
 
-    virtual Renderer *create_renderer() const;
+    virtual Renderer *create_renderer(Canvas *canvas) const;
     virtual AxisFormatter *create_formatter() const;
     virtual ClickHandler *create_click_handler() const;
 };

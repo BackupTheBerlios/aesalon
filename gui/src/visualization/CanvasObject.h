@@ -19,6 +19,7 @@ public:
     virtual ~CanvasObject();
     
     const DataRange &get_bounding_rect() const { return bounding_rect; }
+    DataRange &get_bounding_rect() { return bounding_rect; }
     
     virtual void paint_onto(QPainter *painter, const CoordinateMapper &mapper) = 0;
     

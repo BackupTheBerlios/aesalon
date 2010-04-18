@@ -1,5 +1,6 @@
 #include "Visualization.h"
 #include "Visualization.moc"
+#include "CanvasGenerator.h"
 
 Visualization::Visualization(VisualizationFactory *factory) {
     QVBoxLayout *main_layout = new QVBoxLayout();
@@ -19,52 +20,39 @@ Visualization::Visualization(VisualizationFactory *factory) {
     upper_layout->addWidget(cycle_time, 1);
     
     request_button = new QPushButton(tr("&Request"));
-    request_menu = new QMenu();
-    request_menu->addAction(tr("Real-&time visualization"), this, SLOT(send_begin_rt()));
-    request_menu->addAction(tr("&Stop real-time updating"), this, SLOT(send_end_rt()));
-    request_menu->addAction(tr("&Full visualization"), this, SLOT(send_render_full()));
-    
-    request_button->setMenu(request_menu);
     upper_layout->addWidget(request_button);
     
     main_layout->addLayout(upper_layout);
     
-    controller = new Controller(factory);
-    connect(this, SIGNAL(cycle_time_changed(int)), controller, SLOT(change_update_time(int)));
-    viewport = new Viewport(factory, this);
-    connect(this, SIGNAL(begin_rt()), controller, SLOT(begin_rt()), Qt::QueuedConnection);
-    connect(this, SIGNAL(end_rt()), controller, SLOT(end_rt()), Qt::QueuedConnection);
-    connect(this, SIGNAL(render_full()), controller, SLOT(render_full()), Qt::QueuedConnection);
-    connect(controller, SIGNAL(canvas_update(Canvas*)), viewport, SLOT(merge_canvas(Canvas*)), Qt::QueuedConnection);
-    connect(controller, SIGNAL(clear_canvas()), viewport, SLOT(clear_canvas()), Qt::QueuedConnection);
-    connect(controller, SIGNAL(change_range(DataRange)), viewport, SLOT(set_canvas_range(DataRange)), Qt::QueuedConnection);
-    connect(controller, SIGNAL(shift_range_to(Timestamp)), viewport, SLOT(shift_range_to(Timestamp)), Qt::QueuedConnection);
-    connect(controller, SIGNAL(force_repaint()), viewport, SLOT(force_render()), Qt::QueuedConnection);
+    canvas = new Canvas();
+    renderer = factory->create_renderer(canvas);
+    CanvasGenerator *generator = new CanvasGenerator(factory->get_data_thread(), renderer);
+    generator->exec();
+    generator->deleteLater();
+    
+    factory->get_data_thread()->register_observer(renderer);
+    
+    viewport = new Viewport(canvas, factory, this);
     connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)), Qt::QueuedConnection);
     main_layout->addWidget(viewport);
     
-    setLayout(main_layout);
+    request_menu = new QMenu();
+    QAction *action = new QAction(tr("&Attach"), request_menu);
+    request_menu->addAction(action);
     
-    controller->start();
+    action = new QAction(tr("&Full view"), request_menu);
+    connect(action, SIGNAL(triggered(bool)), viewport, SLOT(set_full_view()), Qt::QueuedConnection);
+    request_menu->addAction(action);
+    
+    request_button->setMenu(request_menu);
+    
+    setLayout(main_layout);
 }
 
 Visualization::~Visualization() {
-    controller->quit();
-    controller->wait();
+
 }
 
 void Visualization::set_position(QString formatted) {
     position_label->setText(formatted);
-}
-
-void Visualization::send_begin_rt() {
-    emit begin_rt();
-}
-
-void Visualization::send_end_rt() {
-    emit end_rt();
-}
-
-void Visualization::send_render_full() {
-    emit render_full();
 }

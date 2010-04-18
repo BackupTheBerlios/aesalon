@@ -14,7 +14,7 @@ public:
 
     DataThread *get_data_thread() const { return data_thread; }
 
-    virtual Renderer *create_renderer() const = 0;
+    virtual Renderer *create_renderer(Canvas *canvas) const = 0;
     virtual AxisFormatter *create_formatter() const = 0;
     virtual ClickHandler *create_click_handler() const;
 };
