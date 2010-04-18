@@ -53,6 +53,7 @@ void Viewport::force_render() {
 }
 
 void Viewport::set_full_view() {
+    if(!data_thread->get_start_time()) return;
     DataRange new_range = canvas->calculate_data_range();
     qint64 end_time;
     if(data_thread->get_finish_time()) end_time = data_thread->get_start_time()->ns_until(*data_thread->get_finish_time());

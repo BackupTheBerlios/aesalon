@@ -1,6 +1,7 @@
 add_definitions(-DDEFAULT_PORT=${DEFAULT_PORT})
 add_definitions(-W -Wall -pedantic -Wno-long-long)
 add_definitions(-DAESALON_MAJOR_VERSION="${AESALON_MAJOR_VERSION}" -DAESALON_MINOR_VERSION="${AESALON_MINOR_VERSION}" -DAESALON_PATCHLEVEL="${AESALON_PATCHLEVEL}" -DAESALON_PLATFORM=${AESALON_PLATFORM})
+add_definitions(-O3)
 
 if(PROFILE_BUILD)
     add_definitions(-pg)
