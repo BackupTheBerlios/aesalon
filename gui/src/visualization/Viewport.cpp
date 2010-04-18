@@ -94,12 +94,9 @@ void Viewport::request_paint(DataRange range) {
 }
 
 void Viewport::paintEvent(QPaintEvent *event) {
-    qDebug("beginning paintEvent() . . .");
     QPainter painter(this);
     CoordinateMapper mapper(size(), rendered_canvas.get_range());
     if(!rendered_canvas.get_image().isNull()) painter.drawImage(0, 0, rendered_canvas.get_image());
-    
-    qDebug("paintEvent(): finished blitting image . . .");
     
     QPen pen(Qt::DotLine);
     pen.setColor(qRgba(128, 128, 128, 64));
@@ -117,8 +114,6 @@ void Viewport::paintEvent(QPaintEvent *event) {
     for(int y = 0; y <= 12; y ++) {
         painter.drawLine(0, y * y_step, width()-1, y * y_step);
     }
-    
-    qDebug("paintEvent(): finished drawing grid . . .");
     
     DataPoint point = mapper.map_to(QPointF(0, 0));
     static QFont grid_font = QFont("DejaVu Sans", 8);

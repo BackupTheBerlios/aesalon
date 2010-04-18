@@ -4,49 +4,28 @@
 #include "storage/FreeEvent.h"
 #include "CanvasGraphObject.h"
 
-BlockCountRenderer::BlockCountRenderer(Canvas *canvas) : Renderer(canvas) {
-
+BlockCountRenderer::BlockCountRenderer(Canvas *canvas) : Renderer(canvas), block_count(0.0) {
 }
 
 BlockCountRenderer::~BlockCountRenderer() {
 
 }
 
-void BlockCountRenderer::begin_rendering(const DataRange &render_range, Snapshot *snapshot) {
-    block_count = 0;
-    count_blocks(snapshot->get_head_node());
-    point = DataPoint(render_range.get_begin().get_time_element(), block_count);
-    canvas->add_object(new CanvasLineObject(point, DataPoint(render_range.get_begin().get_time_element(), 0), qRgb(0, 0, 0)));
-}
-
-Canvas *BlockCountRenderer::end_rendering() {
-    qDebug("stub: BlockCountRenderer::end_rendering()");
-#if 0
-    canvas->add_object(new CanvasLineObject(
-        DataPoint(canvas->get_range().get_end().get_time_element(), block_count),
-        DataPoint(canvas->get_range().get_end().get_time_element(), 0), qRgb(0, 0, 0)));
-    canvas->add_object(new CanvasLineObject(DataPoint(canvas->get_range().get_end().get_time_element(), block_count),
-        point, qRgb(0, 0, 0)));
-#endif
-    return canvas;
-}
-
 void BlockCountRenderer::visit(AllocEvent *event) {
     block_count += 1.0;
-    canvas->add_object(new CanvasLineObject(DataPoint(event->get_timestamp(), block_count), DataPoint(event->get_timestamp(), 0), qRgb(0, 0, 0)));
-    canvas->add_object(new CanvasLineObject(DataPoint(event->get_timestamp(), block_count), point, qRgb(0, 0, 0)));
+    /*canvas->add_object(new CanvasLineObject(DataPoint(event->get_timestamp(), block_count), DataPoint(event->get_timestamp(), 0), qRgb(0, 0, 0)));*/
+    DataRange line = DataRange(DataPoint(event->get_timestamp(), block_count), point);
+    canvas->add_object(new CanvasLineObject(line.get_begin(), line.get_end(), qRgb(0, 0, 0)));
+    canvas->add_updated_range(line);
+    
     point = DataPoint(event->get_timestamp(), block_count);
 }
 
 void BlockCountRenderer::visit(FreeEvent *event) {
     block_count -= 1.0;
-    canvas->add_object(new CanvasLineObject(DataPoint(event->get_timestamp(), block_count), DataPoint(event->get_timestamp(), 0), qRgb(0, 0, 0)));
-    canvas->add_object(new CanvasLineObject(DataPoint(event->get_timestamp(), block_count), point, qRgb(0, 0, 0)));
+    /*canvas->add_object(new CanvasLineObject(DataPoint(event->get_timestamp(), block_count), DataPoint(event->get_timestamp(), 0), qRgb(0, 0, 0)));*/
+    DataRange line = DataRange(DataPoint(event->get_timestamp(), block_count), point);
+    canvas->add_object(new CanvasLineObject(line.get_begin(), line.get_end(), qRgb(0, 0, 0)));
+    canvas->add_updated_range(line);
     point = DataPoint(event->get_timestamp(), block_count);
-}
-
-void BlockCountRenderer::count_blocks(BiTreeNode *node) {
-    if(node->get_left()) count_blocks(node->get_left());
-    if(node->get_right()) count_blocks(node->get_right());
-    block_count += node->get_block_list_size();
 }

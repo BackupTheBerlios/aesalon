@@ -22,6 +22,9 @@ void DensityRenderer::visit(AllocEvent *event) {
 
 void DensityRenderer::visit(FreeEvent *event) {
     CanvasObject *object = blocks.take(event->get_address());
+    if(object == NULL) return;
     object->get_bounding_rect().get_end().set_time_element(event->get_timestamp());
-    canvas->add_updated_range(object->get_bounding_rect());
+    DataRange updated_range = object->get_bounding_rect();
+    updated_range.get_end().set_time_element(Timestamp::NOW);
+    canvas->add_updated_range(updated_range);
 }
