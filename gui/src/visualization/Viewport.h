@@ -2,6 +2,7 @@
 #define AESALON_VISUALIZATION_VIEWPORT_H
 
 #include <QWidget>
+#include <QTimer>
 
 #include "Canvas.h"
 #include "CanvasPainter.h"
@@ -18,6 +19,7 @@ private:
     ClickHandler *click_handler;
     QPointF old_mouse_pos;
     DataThread *data_thread;
+    QTimer *update_timer;
 public:
     Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *parent);
     virtual ~Viewport();
@@ -28,6 +30,9 @@ public slots:
     void set_full_view();
 private slots:
     void merge_canvas(RenderedCanvas canvas);
+    void repaint_regions();
+private:
+    void request_paint(DataRange range);
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);

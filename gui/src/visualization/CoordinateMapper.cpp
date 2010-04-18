@@ -12,10 +12,7 @@ CoordinateMapper::~CoordinateMapper() {
 QPointF CoordinateMapper::map_to(const DataPoint &point) const {
     qreal total_time = data_range.get_begin().get_time_element().ns_until(data_range.get_end().get_time_element());
     qreal time_percentage = qreal(data_range.get_begin().get_time_element().ns_until(point.get_time_element())) / total_time;
-    if(point.get_time_element() == Timestamp::NOW) {
-        qDebug("Limiting time_percentage!");
-        time_percentage = 1.0;
-    }
+    if(point.get_time_element() == Timestamp::NOW) time_percentage = 1.0;
     /* Bind it to slightly more than the total size of the surface . . . */
     /*time_percentage = qBound(-0.01, 1.01, time_percentage);*/
     
@@ -26,6 +23,7 @@ QPointF CoordinateMapper::map_to(const DataPoint &point) const {
     /*data_percentage = 1.0 - qBound(-0.01, 1.01, data_percentage);*/
     data_percentage = 1.0 - data_percentage;
     
+#if 0
     qDebug("mapped DataPoint:");
     qDebug("\ttime_element: %s", qPrintable(point.get_time_element().to_string()));
     if(point.get_time_element().to_ns() < -600000000000LL) {
@@ -34,6 +32,7 @@ QPointF CoordinateMapper::map_to(const DataPoint &point) const {
     }
     qDebug("\tdata_element: %f", point.get_data_element());
     qDebug("\tpoint: %f, %f", surface_size.width() * time_percentage, surface_size.height() * data_percentage);
+#endif
     
     return QPointF(surface_size.width() * time_percentage, surface_size.height() * data_percentage);
 }

@@ -1,7 +1,8 @@
 #include <QWhatsThis>
 #include <QMouseEvent>
 #include <QWheelEvent>
-#include <QTimer>
+#include <QDebug>
+
 #include "Viewport.h"
 #include "Viewport.moc"
 #include "CanvasGenerator.h"
@@ -21,8 +22,11 @@ Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *paren
     formatter = factory->create_formatter();
     click_handler = factory->create_click_handler();
     
-    
     data_thread = factory->get_data_thread();
+    
+    update_timer = new QTimer();
+    connect(update_timer, SIGNAL(timeout()), SLOT(repaint_regions()));
+    update_timer->start(500);
 }
 
 Viewport::~Viewport() {
@@ -54,16 +58,16 @@ void Viewport::set_full_view() {
     if(data_thread->get_finish_time()) end_time = data_thread->get_start_time()->ns_until(*data_thread->get_finish_time());
     else end_time = (Timestamp() - *data_thread->get_start_time()).to_ns();
     new_range.get_end().set_time_element(end_time);
-    qDebug("end_time: %lli", end_time);
+    /*qDebug("end_time: %lli", end_time);*/
     rendered_canvas.set_range(new_range);
     
     force_render();
     
-    qDebug("The new range is from (%s, %f) to (%s, %f).",
+    /*qDebug("The new range is from (%s, %f) to (%s, %f).",
         qPrintable(rendered_canvas.get_range().get_begin().get_time_element().to_string()),
         rendered_canvas.get_range().get_begin().get_data_element(),
         qPrintable(rendered_canvas.get_range().get_end().get_time_element().to_string()),
-        rendered_canvas.get_range().get_end().get_data_element());
+        rendered_canvas.get_range().get_end().get_data_element());*/
 }
 
 void Viewport::merge_canvas(RenderedCanvas canvas) {
@@ -71,10 +75,31 @@ void Viewport::merge_canvas(RenderedCanvas canvas) {
     update();
 }
 
+void Viewport::repaint_regions() {
+    /*qDebug("repaint_regions called . . .");*/
+    QList<DataRange> ranges = canvas->take_updated_ranges();
+    CoordinateMapper mapper(size(), rendered_canvas.get_range());
+    foreach(DataRange range, ranges) {
+        QRectF rect = mapper.map_to(range);
+        /*qDebug("Asking to update rect: (%f, %f) to (%f, %f)", rect.left(), rect.top(), rect.right(), rect.bottom());*/
+        request_paint(range);
+    }
+    update();
+}
+
+void Viewport::request_paint(DataRange range) {
+    CoordinateMapper mapper(size(), rendered_canvas.get_range());
+    
+    emit paint_canvas(mapper.map_to(range).size().toSize(), canvas, range);
+}
+
 void Viewport::paintEvent(QPaintEvent *event) {
+    qDebug("beginning paintEvent() . . .");
     QPainter painter(this);
     CoordinateMapper mapper(size(), rendered_canvas.get_range());
-    painter.drawImage(0, 0, rendered_canvas.get_image());
+    if(!rendered_canvas.get_image().isNull()) painter.drawImage(0, 0, rendered_canvas.get_image());
+    
+    qDebug("paintEvent(): finished blitting image . . .");
     
     QPen pen(Qt::DotLine);
     pen.setColor(qRgba(128, 128, 128, 64));
@@ -92,6 +117,8 @@ void Viewport::paintEvent(QPaintEvent *event) {
     for(int y = 0; y <= 12; y ++) {
         painter.drawLine(0, y * y_step, width()-1, y * y_step);
     }
+    
+    qDebug("paintEvent(): finished drawing grid . . .");
     
     DataPoint point = mapper.map_to(QPointF(0, 0));
     static QFont grid_font = QFont("DejaVu Sans", 8);

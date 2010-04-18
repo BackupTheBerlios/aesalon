@@ -12,6 +12,7 @@
 class Canvas {
 private:
     CanvasObject *head;
+    QList<DataRange> ranges;
 public:
     Canvas();
     virtual ~Canvas();
@@ -21,6 +22,10 @@ public:
     void add_object(CanvasObject *object);
     void clear();
     CanvasObject *object_at(const DataPoint &point);
+    
+    QList<DataRange> take_updated_ranges() { QList<DataRange> ranges = this->ranges; this->ranges.clear(); return ranges; }
+    void add_updated_range(const DataRange &range) { ranges.append(range); }
+    void clear_updated_ranges() { ranges.clear(); }
     
     void combine_with(const Canvas &canvas);
     

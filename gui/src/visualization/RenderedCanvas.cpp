@@ -3,6 +3,7 @@
 #include "CoordinateMapper.h"
 
 RenderedCanvas::RenderedCanvas() {
+    image = QImage(QSize(1, 1), QImage::Format_RGB32);
     clear();
 }
 

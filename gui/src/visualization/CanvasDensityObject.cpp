@@ -31,7 +31,7 @@ void CanvasDensityObject::paint_onto(QPainter *painter, const CoordinateMapper &
     painter->setBrush(QBrush(fill_colour));
     QRectF rect = mapper.map_to(get_bounding_rect());
     /*qDebug("CanvasDensityObject::paint_onto(): rect is (%f, %f), (%f, %f)", rect.left(), rect.top(), rect.right(), rect.bottom());
-    qDebug("painter->size() is (%i, %i)", painter->device()->width(), painter->device()->height());*/
-    qDebug() << "Rectangle: " << rect;
+    qDebug("painter->size() is (%i, %i)", painter->device()->width(), painter->device()->height());
+    qDebug() << "Rectangle: " << rect;*/
     painter->drawRect(rect);
 }
