@@ -1,7 +1,5 @@
 Monitor:
-- Implement proper taint-tracking so references can be calculated
 - Figure out why select() in ServerSocket::accept_connections mistakenly detects a connection
-- Implement 32-bit support
 - Add support for executing shell scripts
 - Add support for executing 32-bit programs on 64-bit platforms (generate 32-bit overload)
 - Investigate why the monitor terminates when the TCP connection is lost
@@ -14,3 +12,4 @@ GUI:
 - Add other DataSources (LaunchSource, etc.)
 - Generic polishing
 - Partial painting in Viewport::paintEvent()
+- Fix the off-by-one errors in the Viewport painting

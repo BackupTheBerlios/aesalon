@@ -32,7 +32,8 @@ public:
     };
 private:
     scope_event_type_e scope_type;
-    Word scope_id;
+    Word32 scope_id;
+    Word32 offset;
     std::string name;
 public:
     ScopeEvent(scope_event_type_e scope_type, Word id, std::string name);
@@ -41,7 +42,7 @@ public:
     Word get_scope_id() const { return scope_id; }
     std::string get_name() const { return name; }
     
-    virtual Block* serialize(int bits);
+    virtual Block *serialize(int bits);
 };
 
 } // namespace Event

@@ -37,15 +37,25 @@ void __attribute__((destructor)) aesalon_destructor();
 
 void *get_scope_address();
 
+/* Prototypes copied from respective man pages. */
+
 void *calloc(size_t nmemb, size_t size);
 void *malloc(size_t size);
 void free(void *ptr);
 void *realloc(void *ptr, size_t size);
 
+int posix_memalign(void **memptr, size_t alignment, size_t size);
+void *valloc(size_t size);
+void *memalign(size_t boundary, size_t size);
+
 void *(*original_calloc)(size_t nmemb, size_t size);
 void *(*original_malloc)(size_t size);
 void *(*original_free)(void *ptr);
 void *(*original_realloc)(void *ptr, size_t size);
+
+int (*original_posix_memalign)(void **memptr, size_t alignment, size_t size);
+void *(*original_valloc)(size_t size);
+void *(*original_memalign)(size_t boundary, size_t size);
 
 unsigned long get_libc_offset(char *libc_path);
 
@@ -166,6 +176,18 @@ void *realloc(void *ptr, size_t size) {
     return (void *)data.data.new_address;
 }
 
+int posix_memalign(void** memptr, size_t alignment, size_t size) {
+    printf("{aesalon} overloaded posix_memalign() called . . .\n");
+}
+
+void *valloc(size_t size) {
+    printf("{aesalon} overloaded valloc() called . . .\n");
+}
+
+void *memalign(size_t boundary, size_t size) {
+    printf("{aesalon} overloaded memalign() called . . .\n");
+}
+
 long unsigned int get_libc_offset(char *libc_path) {
     char buffer[1024];
     
@@ -226,6 +248,9 @@ void initialize_overload() {
     *(void **) (&original_calloc) = dlsym(RTLD_NEXT, "calloc");
     *(void **) (&original_free) = dlsym(RTLD_NEXT, "free");
     *(void **) (&original_realloc) = dlsym(RTLD_NEXT, "realloc");
+    *(void **) (&original_memalign) = dlsym(RTLD_NEXT, "posix_memalign");
+    *(void **) (&original_valloc) = dlsym(RTLD_NEXT, "valloc");
+    *(void **) (&original_memalign) = dlsym(RTLD_NEXT, "memalign");
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Resolved symbols.\n");
     printf("{aesalon} Overload library initialization completed.\n");

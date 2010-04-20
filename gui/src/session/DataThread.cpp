@@ -63,6 +63,8 @@ void DataThread::event_received(Event *event) {
     foreach(EventVisitor *visitor, event_visitors) {
         event->accept(*visitor);
     }
+    static int count = 0;
+    if((++count % 1000) == 0) qDebug("Event count: %i", count);
 }
 
 void DataThread::create_new_snapshot() {

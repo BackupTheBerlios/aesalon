@@ -21,6 +21,8 @@ public:
     
     const Analyzer::Object &get_object(Word address);
     std::string get_filename(Word address) const;
+private:
+    void parse_map();
 };
 
 } // namespace PTrace

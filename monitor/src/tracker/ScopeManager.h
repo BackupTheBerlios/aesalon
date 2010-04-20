@@ -14,9 +14,11 @@ class ScopeManager {
 protected:
     typedef std::map<Word, Analyzer::Object> scope_map_t;
     typedef std::vector<Analyzer::Object> scope_vector_t;
+    typedef std::map<Word, std::string> scope_id_map_t;
 private:
     scope_map_t scope_map;
     scope_vector_t scope_vector;
+    scope_id_map_t scope_id_map;
     
     PTrace::MapParser *map_parser;
 public:
