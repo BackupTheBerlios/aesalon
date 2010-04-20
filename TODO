@@ -8,7 +8,6 @@ GUI:
 - Add "temporary sessions", e.g. sessions that aren't saved
 - Find a way to store the snapshot intervals -- perhaps in DataSource?
 - Store the maximum tree depth inside the DataSource
-- Add the ability to create new DataSources
 - Add other DataSources (LaunchSource, etc.)
 - Generic polishing
 - Partial painting in Viewport::paintEvent()

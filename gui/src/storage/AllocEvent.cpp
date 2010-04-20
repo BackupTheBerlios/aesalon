@@ -21,6 +21,8 @@
 #include "EventVisitor.h"
 
 void AllocEvent::apply_to(Snapshot *snapshot) {
+    qDebug("Applying allocation event.");
+    qDebug("\tAddress: %llx", get_address());
     if(get_size() == 0 || get_address() == 0) {
         /* If the size is zero, or the address is NULL, then tracking is not required.*/
         return;
