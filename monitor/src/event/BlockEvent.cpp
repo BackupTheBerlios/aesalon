@@ -21,6 +21,8 @@
 #include "BlockEvent.h"
 #include "exception/EventException.h"
 #include "misc/StreamAsString.h"
+#include "Initializer.h"
+#include "ScopeEvent.h"
 
 namespace Event {
 
@@ -33,10 +35,17 @@ namespace Event {
 */
 Block *BlockEvent::serialize(int bits) {
     Block *serialized = BasicEvent::serialize(bits);
+    Word32 scope_id;
+    ScopeEvent *event = Initializer::get_instance()->get_scope_manager()->get_scope(scope, scope_id);
+    if(event) {
+        Block *block = event->serialize(bits);
+        serialized->prepend(block);
+        delete block;
+    }
     
     serialized->get_data()[0] |= (block_type << 2) & 0x0c;
     
-    serialized->push_word(scope, bits);
+    serialized->push_word(scope_id, 32);
     serialized->push_word(address, bits);
 
     switch(get_block_type()) {

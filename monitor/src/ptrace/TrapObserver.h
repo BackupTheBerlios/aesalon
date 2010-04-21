@@ -25,8 +25,10 @@
 namespace PTrace {
 
 class TrapObserver : public SignalObserver {
+private:
+    bool first;
 public:
-    TrapObserver() : SignalObserver() {}
+    TrapObserver() : SignalObserver(), first(true) {}
     virtual ~TrapObserver() {}
     
     virtual bool handle_signal(int signal, int status);

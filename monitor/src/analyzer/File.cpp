@@ -41,6 +41,19 @@ Object File::get_symbol(const char *name) const {
         storage_manager->dereference_attribute(storage_manager->get_child(offset, "size"))->value);
 }
 
+Object File::get_symbol_for(Word address) {
+    StorageOffset offset = symbols;
+    while(offset != -1) {
+        Word addr = storage_manager->dereference_attribute(storage_manager->get_child(offset, "address"))->value;
+        Word size = storage_manager->dereference_attribute(storage_manager->get_child(offset, "size"))->value;
+        if(address >= addr && address <= (addr + size)) {
+            return Object(storage_manager->dereference_string(storage_manager->dereference_attribute(offset)->name), addr, size);
+        }
+        offset = storage_manager->dereference_attribute(offset)->next;
+    }
+    return Object("", 0, 0);
+}
+
 StorageOffset File::get_section_offset(const char *name) const {
     StorageOffset offset = section_cache[name];
     if(offset == 0) {

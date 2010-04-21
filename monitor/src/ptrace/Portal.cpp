@@ -243,7 +243,6 @@ Breakpoint *Portal::get_breakpoint_by_address(Word address) const {
     return NULL;
 }
 
-
 void Portal::handle_signal() {
     int status;
     if(wait_for_signal(status) == 0) return;

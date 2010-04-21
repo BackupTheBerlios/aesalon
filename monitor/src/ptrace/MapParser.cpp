@@ -1,5 +1,7 @@
 #include <fstream>
 #include <cstring>
+#include <iostream>
+#include <algorithm>
 
 #include "MapParser.h"
 #include "misc/StreamAsString.h"
@@ -14,39 +16,22 @@ MapParser::~MapParser() {
 
 }
 
-/*long unsigned int get_libc_offset(char *libc_path) {
-    char buffer[1024];
-    
-    sprintf(buffer, "/proc/%i/maps", getpid());
-    
-    int fd = open(buffer, O_RDONLY);
-    unsigned long address = 0;
-    
-    int ret = 1;
-    while(ret > 0) {
-        char c = 0;
-        int pos = 0;
-        while(c != '\n' && (ret = read(fd, &c, sizeof(c)))) buffer[pos++] = c;
-        buffer[pos] = 0;
-        
-        char str[128];
-        sscanf(buffer, "%lx-%*lx %*s %*s %*s %*s %s", &address, str, str, str, str, str, str);
-
-        if(strcmp(str, libc_path) == 0) {
-            break;
-        }
+const Analyzer::Object &MapParser::get_object(Word address) {
+    static Analyzer::Object invalid("", 0, 0);
+    object_vector_t::iterator i = std::lower_bound(objects.begin(), objects.end(), address);
+    if(i == objects.end()) {
+        parse_maps();
+        i = std::lower_bound(objects.begin(), objects.end(), address);
+        if(i == objects.end()) return invalid;
     }
-    
-    close(fd);
-    
-    return address;
-}*/
+    return *i;
+}
 
-std::string MapParser::get_filename(Word address) const {
-    /* TODO: implement cached lookup . . . */
-    
-    
-    
+std::string MapParser::get_filename(Word address) {
+    return get_object(address).get_name();
+}
+
+void MapParser::parse_maps() {
     std::string map_filename = Misc::StreamAsString() << "/proc/" << pid << "/maps";
     std::ifstream map_stream(map_filename.c_str());
     
@@ -59,22 +44,20 @@ std::string MapParser::get_filename(Word address) const {
         char mode[5];
         char filename[1024];
         
-        std::sscanf(buffer, "%lx-%lx %s %s %s %s %s", &start_address, &end_address, mode, filename, filename, filename, filename);
+        std::cout << "parsing memory map, buffer is \"" << buffer << "\"\n";
+        
+        if(std::sscanf(buffer, "%lx-%lx %s %s %s %s %s", &start_address, &end_address, mode, filename, filename, filename, filename) == -1) break;
         
         /* Only interested in the .text executable sections. */
         if(std::strncmp(mode, "r-xp", 4) != 0) continue;
         
-        /* TODO: store file in cache . . . */
-        
-        /* Check the address . . . */
-        if(address >= start_address && address <= end_address) {
-            return filename;
-        }
+        object_vector_t::iterator i = std::lower_bound(objects.begin(), objects.end(), start_address);
+        Analyzer::Object object = Analyzer::Object(filename, start_address, end_address - start_address);
+        if(i == objects.end()) objects.push_back(object);
+        else if(i->get_address() != start_address) objects.insert(i, object);
     }
     
     map_stream.close();
-    
-    return "";
 }
 
 } // namespace PTrace

@@ -24,8 +24,8 @@ File *Interface::parse_file(std::string filename) {
     return file;
 }
 
-File *Interface::get_file(std::string filename) const {
-    return file_map.at(filename);
+File *Interface::get_file(std::string filename) {
+    return file_map[filename];
 }
 
 File *Interface::get_file() const {

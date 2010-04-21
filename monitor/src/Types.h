@@ -107,6 +107,11 @@ public:
         @param bits How many bits of data to push.
     */
     void push_word(Word64 data, int bits);
+    
+    /** Prepends another Block object.
+        @param block The block to prepend.
+    */
+    void prepend(Block *block);
 };
 
 #endif

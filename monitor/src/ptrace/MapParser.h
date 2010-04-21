@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 
-#include <map>
+#include <vector>
 #include <string>
 
 #include "Types.h"
@@ -12,17 +12,19 @@
 namespace PTrace {
 
 class MapParser {
+protected:
+    typedef std::vector<Analyzer::Object> object_vector_t;
 private:
     pid_t pid;
-    std::map<Word, Analyzer::Object> name_map;
+    object_vector_t objects;
 public:
     MapParser(pid_t pid);
     ~MapParser();
     
     const Analyzer::Object &get_object(Word address);
-    std::string get_filename(Word address) const;
-private:
-    void parse_map();
+    std::string get_filename(Word address);
+    
+    void parse_maps();
 };
 
 } // namespace PTrace

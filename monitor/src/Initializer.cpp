@@ -54,6 +54,7 @@ void Initializer::initialize() {
     event_queue = NULL;
     analyzer_interface = NULL;
     return_value = 0;
+    scope_manager = NULL;
     
     config_parser = new Misc::ConfigParser();
     
@@ -121,12 +122,15 @@ void Initializer::initialize() {
         }
     }
     
+    scope_manager = new Tracker::ScopeManager();
+    
     run();
     
     server_socket->disconnect_all();
 }
 
 void Initializer::deinitialize() {
+    if(scope_manager) delete scope_manager;
     if(analyzer_interface) delete analyzer_interface;
     if(config_parser) delete config_parser;
     if(argument_parser) delete argument_parser;

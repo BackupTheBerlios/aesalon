@@ -71,3 +71,9 @@ void Block::push_word(Word64 data, int bits) {
         this->data[offset+i] = (data >> (i * 8)) & 0xff;
     }
 }
+
+void Block::prepend(Block *block) {
+    resize(data_size + block->data_size);
+    memmove(data + block->data_size, data, data_size);
+    memcpy(data, block->data, block->data_size);
+}

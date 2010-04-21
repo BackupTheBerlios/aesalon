@@ -18,6 +18,9 @@ public:
     const std::string &get_name() const { return name; }
     Word get_address() const { return address; }
     Word get_size() const { return size; }
+    
+    bool operator<(const Object &other) const;
+    bool operator<(Word address) const;
 };
 
 } // namespace Analyzer

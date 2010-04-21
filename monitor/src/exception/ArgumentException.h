@@ -17,8 +17,8 @@
     @file exception/ArgumentException.h
 */
 
-#ifndef AESALON_EVENT_EXCEPTION_H
-#define AESALON_EVENT_EXCEPTION_H
+#ifndef AESALON_ARGUMENT_EXCEPTION_H
+#define AESALON_ARGUMENT_EXCEPTION_H
 
 #include <string>
 

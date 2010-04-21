@@ -28,6 +28,7 @@
 #include "misc/ArgumentParser.h"
 #include "misc/ConfigParser.h"
 #include "analyzer/Interface.h"
+#include "tracker/ScopeManager.h"
 
 /** Initializer class. Basically, handles initialization of the Monitor. */
 class Initializer : public Misc::Singleton<Initializer> {
@@ -46,6 +47,8 @@ private:
     Misc::ConfigParser *config_parser;
     
     Analyzer::Interface *analyzer_interface;
+    
+    Tracker::ScopeManager *scope_manager;
     
     /** Initialize the aesalon monitor. */
     void initialize();
@@ -79,6 +82,7 @@ public:
     Event::Queue *get_event_queue() const { return event_queue; }
     Misc::ArgumentParser *get_argument_parser() const { return argument_parser; }
     Analyzer::Interface *get_analyzer_interface() const { return analyzer_interface; }
+    Tracker::ScopeManager *get_scope_manager() const { return scope_manager; }
     
     int get_return_value() const { return return_value; }
     void set_return_value(int new_return_value) { return_value = new_return_value; }

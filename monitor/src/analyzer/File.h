@@ -28,6 +28,7 @@ public:
     
     Object get_section(const char *name) const;
     Object get_symbol(const char *name) const;
+    Object get_symbol_for(Word address);
     
     /*StorageOffset *get_section(std::string name) const;*/
     

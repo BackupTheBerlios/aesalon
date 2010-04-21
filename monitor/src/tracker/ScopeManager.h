@@ -8,26 +8,42 @@
 #include "analyzer/Interface.h"
 #include "ptrace/MapParser.h"
 
+namespace Event {
+class ScopeEvent;
+} // namespace Event
+
 namespace Tracker {
+
+class Scope : public Analyzer::Object {
+private:
+    Word32 id;
+public:
+    Scope(const std::string &name, Word address, Word size, Word32 id);
+    
+    Word32 get_id() const { return id; }
+    
+    bool operator<(const Scope &other) const;
+    bool operator<(Word address) const;
+};
 
 class ScopeManager {
 protected:
-    typedef std::map<Word, Analyzer::Object> scope_map_t;
-    typedef std::vector<Analyzer::Object> scope_vector_t;
-    typedef std::map<Word, std::string> scope_id_map_t;
+    typedef std::vector<Scope> scope_vector_t;
 private:
-    scope_map_t scope_map;
     scope_vector_t scope_vector;
-    scope_id_map_t scope_id_map;
+    
+    Word32 last_id;
     
     PTrace::MapParser *map_parser;
+    Analyzer::Interface *interface;
 public:
     ScopeManager();
     ~ScopeManager();
     
     Word32 get_scope_id(Word address);
+    Event::ScopeEvent *get_scope(Word address, Word32 &id);
 };
 
-} // namespace
+} // namespace Tracker
 
 #endif

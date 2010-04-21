@@ -22,7 +22,7 @@ public:
     ~Interface();
     
     File *parse_file(std::string filename);
-    File *get_file(std::string filename) const;
+    File *get_file(std::string filename);
     File *get_file() const;
     
     Object get_symbol(const char *name);
