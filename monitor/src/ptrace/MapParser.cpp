@@ -18,13 +18,14 @@ MapParser::~MapParser() {
 
 const Analyzer::Object &MapParser::get_object(Word address) {
     static Analyzer::Object invalid("", 0, 0);
-    object_vector_t::iterator i = std::lower_bound(objects.begin(), objects.end(), address);
-    if(i == objects.end()) {
-        parse_maps();
-        i = std::lower_bound(objects.begin(), objects.end(), address);
-        if(i == objects.end()) return invalid;
+    for(object_vector_t::iterator i = objects.begin(); i != objects.end(); i ++) {
+        if(i->get_address() <= address && (i->get_address() + i->get_size()) >= address) return *i;
     }
-    return *i;
+    parse_maps();
+    for(object_vector_t::iterator i = objects.begin(); i != objects.end(); i ++) {
+        if(i->get_address() <= address && (i->get_address() + i->get_size()) >= address) return *i;
+    }
+    return invalid;
 }
 
 std::string MapParser::get_filename(Word address) {
@@ -44,10 +45,8 @@ void MapParser::parse_maps() {
         char mode[5];
         char filename[1024];
         
-        std::cout << "parsing memory map, buffer is \"" << buffer << "\"\n";
-        
         if(std::sscanf(buffer, "%lx-%lx %s %s %s %s %s", &start_address, &end_address, mode, filename, filename, filename, filename) == -1) break;
-        
+
         /* Only interested in the .text executable sections. */
         if(std::strncmp(mode, "r-xp", 4) != 0) continue;
         

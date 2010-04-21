@@ -117,11 +117,11 @@ void NetworkReceiver::process_queue() {
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
-            quint64 scope_address = pop_word(word_size);
+            quint64 scope_id = pop_word(32);
             quint64 address = pop_word(word_size);
             if(block_type == 0) {
                 quint64 size = pop_word(word_size);
-                event_received(new AllocEvent(timestamp, address, size, scope_address));
+                event_received(new AllocEvent(timestamp, address, size, scope_id));
             }
             else if(block_type == 1) {
                 quint64 new_address = pop_word(word_size);
@@ -129,11 +129,11 @@ void NetworkReceiver::process_queue() {
                 /* From the man page for realloc: "If ptr is NULL, then the call is equivalent to malloc(size),
                     for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)."
                     Ergo, don't emit free/alloc events for such cases. */
-                if(address != 0) event_received(new FreeEvent(timestamp, address, scope_address));
-                if(new_size != 0) event_received(new AllocEvent(timestamp, new_address, new_size, scope_address));
+                if(address != 0) event_received(new FreeEvent(timestamp, address, scope_id));
+                if(new_size != 0) event_received(new AllocEvent(timestamp, new_address, new_size, scope_id));
             }
             else if(block_type == 2) {
-                event_received(new FreeEvent(timestamp, address, scope_address));
+                event_received(new FreeEvent(timestamp, address, scope_id));
             }
         }
         else if((header & 0x03) == 2) {
@@ -150,8 +150,24 @@ void NetworkReceiver::process_queue() {
             }
             else emit finished(timestamp);
         }
+        else if((header & 0x03) == 3) {
+            if(unprocessed.size() < 1) {
+                unprocessed.prepend(header);
+                break;
+            }
+            qint8 size = unprocessed.at(0);
+            if(unprocessed.size() < size) {
+                unprocessed.prepend(header);
+                break;
+            }
+            unprocessed.remove(0, 1);
+            QByteArray scope_name;
+            scope_name = unprocessed.left(size);
+            unprocessed.remove(0, size);
+            qDebug("found scope name: %s", scope_name.constData());
+        }
         else {
-            qDebug("Invalid event type encountered . . .");
+            qDebug("Invalid event type encountered (%i). Data corruption is likely to follow.", (header & 0x03));
         }
     }
 }
