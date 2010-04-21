@@ -11,10 +11,11 @@ Canvas::~Canvas() {
 
 DataRange Canvas::calculate_data_range() {
     if(!head) return DataRange();
+    CanvasObject *object = head->get_next();
+    if(!object) return DataRange();
     DataRange range;
-    range.get_begin().set_data_element(head->get_bounding_rect().get_begin().get_data_element());
-    range.get_end().set_data_element(head->get_bounding_rect().get_end().get_data_element());
-    CanvasObject *object = head;
+    range.get_begin().set_data_element(object->get_bounding_rect().get_begin().get_data_element());
+    range.get_end().set_data_element(object->get_bounding_rect().get_end().get_data_element());
     while(object) {
         if(object->get_bounding_rect().get_begin().get_data_element() < range.get_begin().get_data_element())
             range.get_begin().set_data_element(object->get_bounding_rect().get_begin().get_data_element());

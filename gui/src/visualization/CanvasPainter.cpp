@@ -18,6 +18,8 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas) {
     
     CanvasObject *object;
     object = canvas->get_head();
+    object->paint_onto(&painter, mapper);
+    object = object->get_next();
     while(object) {
         object->paint_onto(&painter, mapper);
         object = object->get_next();
@@ -41,13 +43,9 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas, DataRange ra
     
     CanvasObject *object;
     object = canvas->get_head();
+    object->paint_onto(&painter, mapper);
+    object = object->get_next();
     while(object) {
-        qDebug("object address: %p", object);
-        qDebug("object bounding rectangle: (%lli, %f),(%lli, %f)",
-            object->get_bounding_rect().get_begin().get_time_element().to_ns(),
-            object->get_bounding_rect().get_begin().get_data_element(),
-            object->get_bounding_rect().get_end().get_time_element().to_ns(),
-            object->get_bounding_rect().get_end().get_data_element());
         if(object->get_bounding_rect().intersects(range)) object->paint_onto(&painter, mapper);
         object = object->get_next();
     }
