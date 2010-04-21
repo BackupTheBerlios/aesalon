@@ -19,8 +19,12 @@ Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *paren
     connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)), Qt::DirectConnection);
     connect(canvas_painter, SIGNAL(done(RenderedCanvas)), SLOT(merge_canvas(RenderedCanvas)), Qt::DirectConnection);
     
+    info_box = new QDialog();
+    info_box->setModal(false);
+    info_box->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
+    
     formatter = factory->create_formatter();
-    click_handler = factory->create_click_handler();
+    click_handler = factory->create_click_handler(info_box);
     
     data_thread = factory->get_data_thread();
     
@@ -279,4 +283,19 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     
     set_canvas_range(range);
     force_render();
+}
+
+void Viewport::showEvent(QShowEvent *event) {
+    if(info_box->isEnabled()) {
+        info_box->show();
+        QVariant pos = info_box->property("position");
+        if(!pos.isNull()) info_box->move(pos.toPoint());
+    }
+    QWidget::showEvent(event);
+}
+
+void Viewport::hideEvent(QHideEvent *event) {
+    info_box->setProperty("position", info_box->pos());
+    info_box->hide();
+    QWidget::hideEvent(event);
 }

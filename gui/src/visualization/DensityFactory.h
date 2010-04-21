@@ -9,7 +9,7 @@ public:
 
     virtual Renderer *create_renderer(Canvas *canvas) const;
     virtual AxisFormatter *create_formatter() const;
-    virtual ClickHandler *create_click_handler() const;
+    virtual ClickHandler *create_click_handler(QDialog *info_box) const;
 };
 
 #endif

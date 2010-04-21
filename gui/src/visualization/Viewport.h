@@ -20,6 +20,7 @@ private:
     QPointF old_mouse_pos;
     DataThread *data_thread;
     QTimer *update_timer;
+    QDialog *info_box;
 public:
     Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *parent);
     virtual ~Viewport();
@@ -39,6 +40,8 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void resizeEvent(QResizeEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
+    virtual void showEvent(QShowEvent *event);
+    virtual void hideEvent(QHideEvent *event);
 signals:
     void paint_canvas(QSize render_size, Canvas *canvas);
     void paint_canvas(QSize render_size, Canvas *canvas, DataRange range);

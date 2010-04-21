@@ -2,10 +2,31 @@
 #include <QTextStream>
 #include "DensityClickHandler.h"
 
-DensityClickHandler::DensityClickHandler(DataThread *data_thread) : ClickHandler(), data_thread(data_thread) {
+DensityClickHandler::DensityClickHandler(DataThread *data_thread, QDialog *info_box) : ClickHandler(info_box), data_thread(data_thread) {
+    info_box->setEnabled(true);
+    info_box->setMinimumSize(300, 50);
+    QFormLayout *layout = new QFormLayout();
+    
+    address = new QLabel(QObject::tr("N/A"));
+    layout->addRow(QObject::tr("Address:"), address);
+    size = new QLabel(QObject::tr("N/A"));
+    layout->addRow(QObject::tr("Size:"), size);
+    
+    alloc_time = new QLabel(QObject::tr("N/A"));
+    layout->addRow(QObject::tr("Allocation time:"), alloc_time);
+    alloc_scope = new QLabel(QObject::tr("N/A"));
+    layout->addRow(QObject::tr("Allocation scope:"), alloc_scope);
+    
+    release_time = new QLabel(QObject::tr("N/A"));
+    layout->addRow(QObject::tr("Release time:"), release_time);
+    release_scope = new QLabel(QObject::tr("N/A"));
+    layout->addRow(QObject::tr("Release scope:"), release_scope);
+    
+    info_box->setLayout(layout);
 }
 
 DensityClickHandler::~DensityClickHandler() {
+    
 }
 
 void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
@@ -24,6 +45,21 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     
     /*display.sprintf("Address:\t\t0x%llx\nSize:\t\t%lli\nAllocation time:\t%s\nAllocation scope:\t0x%llx\n",
         block->get_address(), block->get_size(), qPrintable(block->get_allocation_time().to_string()), block->get_allocation_scope());*/
+    
+    address->setText(QString("0x") + QString().setNum(block->get_address(), 16));
+    size->setText(QString().setNum(block->get_size(), 10));
+    
+    alloc_time->setText(block->get_allocation_time().to_string());
+    alloc_scope->setText(QString("0x") + QString().setNum(block->get_allocation_scope(), 16));
+    
+    if(block->get_release_time() == Timestamp::NOW) {
+        release_time->setText(QObject::tr("Still active"));
+        release_scope->setText(QObject::tr("Still active"));
+    }
+    else {
+        release_time->setText(block->get_release_time().to_string());
+        release_scope->setText(QString("0x") + QString().setNum(block->get_release_scope(), 16));
+    }
     
     stream << "Address:\t\t0x" << hex << block->get_address() << "\n";
     stream << "Size:\t\t" << dec << block->get_size() << "\n";
@@ -51,5 +87,5 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     
     /*display.sprintf("Allocated at: %s\nAllocation scope: %llx",
         qPrintable(block->get_allocation_time().to_string()), block->get_allocation_scope());*/
-    QWhatsThis::showText(QPoint(0, 0), display);
+    /*QWhatsThis::showText(QPoint(0, 0), display);*/
 }
