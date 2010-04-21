@@ -11,7 +11,6 @@ class Renderer : public EventVisitor {
 protected:
     Canvas *canvas;
     SnapshotID last_snapshot;
-    CanvasObject *timeline;
 public:
     Renderer(Canvas *canvas);
     virtual ~Renderer();
@@ -20,8 +19,6 @@ public:
     
     SnapshotID get_last_snapshot() const { return last_snapshot; }
     void update_last_snapshot(SnapshotID snapshot) { last_snapshot = snapshot; }
-    
-    void update_timeline(const Timestamp &timestamp);
 };
 
 #endif

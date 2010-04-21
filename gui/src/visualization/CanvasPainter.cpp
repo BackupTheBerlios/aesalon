@@ -1,11 +1,14 @@
+#include <QDebug>
+
 #include "CanvasPainter.h"
 #include "CanvasPainter.moc"
 
-CanvasPainter::CanvasPainter(): QThread(NULL) {
+CanvasPainter::CanvasPainter(DataThread *data_thread) : QThread(NULL), data_thread(data_thread) {
+    
 }
 
 CanvasPainter::~CanvasPainter() {
-
+    
 }
 
 void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas) {
@@ -16,10 +19,18 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas) {
     QPainter painter(&rendered.get_image());
     CoordinateMapper mapper(render_size, range);
     
+    
+    QRect rect = mapper.map_to(DataRange(Timestamp(0), 0, data_thread->get_last_time(), 0)).toRect();
+    rect.setTop(0);
+    rect.setBottom(render_size.height() - 1);
+    painter.setPen(Qt::NoPen);
+    QBrush brush;
+    brush.setColor(qRgb(240, 240, 240));
+    painter.setBrush(brush);
+    painter.drawRect(rect);
+    
     CanvasObject *object;
     object = canvas->get_head();
-    object->paint_onto(&painter, mapper);
-    object = object->get_next();
     while(object) {
         object->paint_onto(&painter, mapper);
         object = object->get_next();
@@ -41,10 +52,17 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas, DataRange ra
         return;
     }
     
-    CanvasObject *object;
-    object = canvas->get_head();
-    object->paint_onto(&painter, mapper);
-    object = object->get_next();
+    QRect rect = mapper.map_to(DataRange(Timestamp(0), 0, data_thread->get_last_time(), 0)).toRect();
+    rect.setTop(0);
+    rect.setBottom(render_size.height() - 1);
+    painter.setPen(Qt::NoPen);
+    QBrush brush(Qt::lightGray);
+    /*brush.setColor(qRgb(0, 240, 240));*/
+    painter.setBrush(brush);
+    qDebug() << "Drawing rect: " << rect;
+    painter.drawRect(rect);
+    
+    CanvasObject *object = canvas->get_head();
     while(object) {
         if(object->get_bounding_rect().intersects(range)) object->paint_onto(&painter, mapper);
         object = object->get_next();

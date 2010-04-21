@@ -13,7 +13,9 @@ Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *paren
     setMouseTracking(true);
     setCursor(QCursor(Qt::CrossCursor));
 
-    canvas_painter = new CanvasPainter();
+    data_thread = factory->get_data_thread();
+
+    canvas_painter = new CanvasPainter(data_thread);
     
     connect(this, SIGNAL(paint_canvas(QSize,Canvas*)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*)), Qt::DirectConnection);
     connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)), Qt::DirectConnection);
@@ -25,8 +27,6 @@ Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *paren
     
     formatter = factory->create_formatter();
     click_handler = factory->create_click_handler(info_box);
-    
-    data_thread = factory->get_data_thread();
     
     update_timer = new QTimer();
     connect(update_timer, SIGNAL(timeout()), SLOT(repaint_regions()));

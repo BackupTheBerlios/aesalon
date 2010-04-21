@@ -67,6 +67,12 @@ void DataThread::event_received(Event *event) {
     if((++count % 1000) == 0) qDebug("Event count: %i", count);
 }
 
+Timestamp DataThread::get_last_time() const {
+    if(!start_time) return Timestamp(0);
+    else if(!finish_time) return start_time->ns_until(Timestamp());
+    else return start_time->ns_until(*finish_time);
+}
+
 void DataThread::create_new_snapshot() {
     current_snapshot = snapshot_list.append_snapshot();
 }

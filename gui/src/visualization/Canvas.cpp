@@ -11,8 +11,7 @@ Canvas::~Canvas() {
 
 DataRange Canvas::calculate_data_range() {
     if(!head) return DataRange();
-    CanvasObject *object = head->get_next();
-    if(!object) return DataRange();
+    CanvasObject *object = head;
     DataRange range;
     range.get_begin().set_data_element(object->get_bounding_rect().get_begin().get_data_element());
     range.get_end().set_data_element(object->get_bounding_rect().get_end().get_data_element());

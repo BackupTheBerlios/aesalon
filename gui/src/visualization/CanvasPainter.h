@@ -7,12 +7,14 @@
 #include "Canvas.h"
 #include "RenderedCanvas.h"
 #include "CanvasMap.h"
+#include "session/DataThread.h"
 
 class CanvasPainter : public QThread { Q_OBJECT
 private:
     bool processing;
+    DataThread *data_thread;
 public:
-    CanvasPainter();
+    CanvasPainter(DataThread *data_thread);
     virtual ~CanvasPainter();
     
     bool is_processing() const { return processing; }

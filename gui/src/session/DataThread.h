@@ -51,6 +51,7 @@ public:
     
     const Timestamp *get_start_time() const { return start_time; }
     const Timestamp *get_finish_time() const { return finish_time; }
+    Timestamp get_last_time() const;
     
     SnapshotList *get_snapshot_list() { return &snapshot_list; }
 private slots:
