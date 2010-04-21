@@ -177,15 +177,52 @@ void *realloc(void *ptr, size_t size) {
 }
 
 int posix_memalign(void** memptr, size_t alignment, size_t size) {
-    printf("{aesalon} overloaded posix_memalign() called . . .\n");
+    if(!overload_initialized) initialize_overload();
+    allocation_data_u data;
+    static unsigned char type = ALLOC_TYPE;
+    int result = original_posix_memalign(memptr, alignment, size);
+    
+    retrieve_scope();
+    
+    data.data.address = (unsigned long)*memptr;
+    data.data.size = size;
+    
+    write(pipe_fd, &type, sizeof(type));
+    write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    return result;
 }
 
 void *valloc(size_t size) {
-    printf("{aesalon} overloaded valloc() called . . .\n");
+    if(!overload_initialized) initialize_overload();
+    allocation_data_u data;
+    static unsigned char type = ALLOC_TYPE;
+    
+    retrieve_scope();
+    
+    data.data.address = (unsigned long)original_valloc(size);
+    data.data.size = size;
+    
+    write(pipe_fd, &type, sizeof(type));
+    write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    return (void *)data.data.address;
 }
 
 void *memalign(size_t boundary, size_t size) {
-    printf("{aesalon} overloaded memalign() called . . .\n");
+    if(!overload_initialized) initialize_overload();
+    allocation_data_u data;
+    static unsigned char type = ALLOC_TYPE;
+    
+    retrieve_scope();
+    
+    data.data.address = (unsigned long)original_memalign(boundary, size);
+    data.data.size = size;
+    
+    write(pipe_fd, &type, sizeof(type));
+    write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    return (void *)data.data.address;
 }
 
 long unsigned int get_libc_offset(char *libc_path) {
