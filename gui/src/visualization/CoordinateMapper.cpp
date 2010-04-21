@@ -12,7 +12,9 @@ CoordinateMapper::~CoordinateMapper() {
 QPointF CoordinateMapper::map_to(const DataPoint &point) const {
     qreal total_time = data_range.get_begin().get_time_element().ns_until(data_range.get_end().get_time_element());
     qreal time_percentage = qreal(data_range.get_begin().get_time_element().ns_until(point.get_time_element())) / total_time;
-    if(point.get_time_element() == Timestamp::NOW) time_percentage = 1.0;
+    if(point.get_time_element() == Timestamp::NOW) {
+        time_percentage = 1.0;
+    }
     /* Bind it to slightly more than the total size of the surface . . . */
     /*time_percentage = qBound(-0.01, 1.01, time_percentage);*/
     

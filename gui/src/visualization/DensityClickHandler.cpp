@@ -15,6 +15,8 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
         return;
     }
     
+    qDebug("The object at (%s, %f) has an address of %p . . .", qPrintable(at.get_time_element().to_string()), at.get_data_element(), object);
+    
     Block *block = data_thread->get_snapshot_list()->get_block(at.get_time_element(), quint64(object->get_bounding_rect().get_begin().get_data_element()));
     /*Block *block = data_thread->get_snapshot_list()->get_block(at.get_time_element(), quint64(at.get_data_element()));*/
     if(block == NULL) {
@@ -30,7 +32,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     stream << "Allocation time:\t" << block->get_allocation_time().to_string() << "\n";
     stream << "Allocation scope:\t0x" << hex << block->get_allocation_scope() << "\n";
     
-    if(block->get_release_time().to_ns() != 0) {
+    if(block->get_release_time().to_ns() != Timestamp::NOW) {
         stream << "Release time:\t" << block->get_release_time().to_string() << "\n";
     }
     else {
@@ -42,7 +44,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     else {
         stream << "Release scope:\tN/A\n";
     }
-    if(block->get_release_time().to_ns() != 0) {
+    if(block->get_release_time().to_ns() != Timestamp::NOW) {
         stream << "Total time allocated:\t" << Timestamp(block->get_allocation_time().ns_until(block->get_release_time())).to_string() << "\n";
     }
     else {

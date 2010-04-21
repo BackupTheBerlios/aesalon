@@ -24,6 +24,7 @@
 #include <QTcpSocket>
 
 #include "DataReceiver.h"
+#include "DeviceReader.h"
 
 class NetworkReceiver : public DataReceiver { Q_OBJECT
 private:
@@ -33,18 +34,16 @@ private:
     QTimer *recv_timer;
     QByteArray unprocessed;
     Timestamp start_time;
-    
-    int position;
-    int word_size;
+    DeviceReader *device_reader;
 public:
     NetworkReceiver(DataThread *data_thread, QString host, quint16 port);
     virtual ~NetworkReceiver();
 private:
     quint64 pop_quint64();
-    quint64 pop_word();
-    inline int remaining();
+    quint64 pop_word(int bytes);
+    void prepend_quint64(quint64 data);
 private slots:
-    void data_received();
+    void data_received(QByteArray data);
     void process_queue();
     void connected();
     void disconnected();

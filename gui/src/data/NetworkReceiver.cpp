@@ -26,57 +26,72 @@
 
 NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 port) : DataReceiver(data_thread), host(host), port(port), start_time(0) {
     tcp_socket = new QTcpSocket(this);
-    connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));
+    /*connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));*/
+    recv_timer = new QTimer();
+    connect(recv_timer, SIGNAL(timeout()), this, SLOT(process_queue()));
+    recv_timer->start(100);
     /* NOTE: may want to do something with the disconnected signal . . . */
+    
+    device_reader = new DeviceReader(tcp_socket);
+    connect(device_reader, SIGNAL(data_ready(QByteArray)), SLOT(data_received(QByteArray)), Qt::QueuedConnection);
+    
+    device_reader->start(QThread::HighestPriority);
     
     tcp_socket->connectToHost(host, port);
 }
 
 NetworkReceiver::~NetworkReceiver() {
     tcp_socket->close();
+    device_reader->wait();
 }
 
 quint64 NetworkReceiver::pop_quint64() {
     quint64 ret = 0;
-    ret |= unprocessed.at(position) & 0xff;
-    ret |= quint64(quint8(unprocessed.at(position + 1)) & 0xff) << 8;
-    ret |= quint64(quint8(unprocessed.at(position + 2)) & 0xff) << 16;
-    ret |= quint64(quint8(unprocessed.at(position + 3)) & 0xff) << 24;
-    ret |= quint64(quint8(unprocessed.at(position + 4)) & 0xff) << 32;
-    ret |= quint64(quint8(unprocessed.at(position + 5)) & 0xff) << 40;
-    ret |= quint64(quint8(unprocessed.at(position + 6)) & 0xff) << 48;
-    ret |= quint64(quint8(unprocessed.at(position + 7)) & 0xff) << 56;
-    position += 8;
+    if(unprocessed.size() < 8) {
+        return 0;
+    }
+    ret |= unprocessed.at(0) & 0xff;
+    ret |= quint64(quint8(unprocessed.at(1)) & 0xff) << 8;
+    ret |= quint64(quint8(unprocessed.at(2)) & 0xff) << 16;
+    ret |= quint64(quint8(unprocessed.at(3)) & 0xff) << 24;
+    ret |= quint64(quint8(unprocessed.at(4)) & 0xff) << 32;
+    ret |= quint64(quint8(unprocessed.at(5)) & 0xff) << 40;
+    ret |= quint64(quint8(unprocessed.at(6)) & 0xff) << 48;
+    ret |= quint64(quint8(unprocessed.at(7)) & 0xff) << 56;
+    unprocessed.remove(0, 8);
     return ret;
 }
 
-quint64 NetworkReceiver::pop_word() {
+quint64 NetworkReceiver::pop_word(int bytes) {
     quint64 value = 0;
-    if(unprocessed.size() < word_size) return 0;
-    for(int i = 0; i < word_size; i ++) {
-        value |= quint64(quint8(unprocessed.at(i + position) & 0xff)) << (i * 8);
+    if(unprocessed.size() < bytes) return 0;
+    for(int i = 0; i < bytes; i ++) {
+        value |= quint64(quint8(unprocessed.at(i) & 0xff)) << (i * 8);
     }
-    position += word_size;
+    unprocessed.remove(0, bytes);
     return value;
 }
 
-int NetworkReceiver::remaining() {
-    return unprocessed.size() - position;
+void NetworkReceiver::prepend_quint64(quint64 data) {
+    unprocessed.prepend(char((data << 56) & 0xff));
+    unprocessed.prepend(char((data << 48) & 0xff));
+    unprocessed.prepend(char((data << 40) & 0xff));
+    unprocessed.prepend(char((data << 32) & 0xff));
+    unprocessed.prepend(char((data << 24) & 0xff));
+    unprocessed.prepend(char((data << 16) & 0xff));
+    unprocessed.prepend(char((data << 8) & 0xff));
+    unprocessed.prepend(char(data & 0xff));
 }
 
-void NetworkReceiver::data_received() {
-    unprocessed += tcp_socket->readAll();
-    process_queue();
+void NetworkReceiver::data_received(QByteArray data) {
+    unprocessed += data;
 }
 
 void NetworkReceiver::process_queue() {
-    position = 0;
-    
-    while(remaining() > 0) {
-        quint8 header = unprocessed.at(position);
-        position ++;
-        /* Find the word size . . . */
-        word_size = (header & 0x80)?8:4;
+    while(unprocessed.size()) {
+        quint8 header = unprocessed.at(0);
+        unprocessed.remove(0, 1);
+        int word_size = (header & 0x80)?8:4;
         /* If the first bit is set, and the second is not, then it's a block event . . . */
         if((header & 0x03) == 1) {
             quint8 block_type = (header & 0x0c) >> 2;
@@ -94,23 +109,23 @@ void NetworkReceiver::process_queue() {
                     + scope
                     + address
             */
-            const quint8 block_type_sizes[] = {word_size * 3, word_size * 4, word_size * 2};
+            quint8 block_type_sizes[] = {word_size * 3, word_size * 4, word_size * 2};
             /* Check the size of the waiting data. The extra 8 bytes is for the timestamp. */
-            if(remaining() < (block_type_sizes[block_type]+8)) {
-                position --;
+            if(unprocessed.size() < (block_type_sizes[block_type]+8)) {
+                unprocessed.prepend(header);
                 break;
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
-            quint64 scope_address = pop_word();
-            quint64 address = pop_word();
+            quint64 scope_address = pop_word(word_size);
+            quint64 address = pop_word(word_size);
             if(block_type == 0) {
-                quint64 size = pop_word();
+                quint64 size = pop_word(word_size);
                 event_received(new AllocEvent(timestamp, address, size, scope_address));
             }
             else if(block_type == 1) {
-                quint64 new_address = pop_word();
-                quint64 new_size = pop_word();
+                quint64 new_address = pop_word(word_size);
+                quint64 new_size = pop_word(word_size);
                 /* From the man page for realloc: "If ptr is NULL, then the call is equivalent to malloc(size),
                     for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)."
                     Ergo, don't emit free/alloc events for such cases. */
@@ -122,9 +137,8 @@ void NetworkReceiver::process_queue() {
             }
         }
         else if((header & 0x03) == 2) {
-            /* At least eight bytes should be left for a timestamp . . . */
-            if(remaining() < 8) {
-                position --;
+            if(unprocessed.size() < 8) {
+                unprocessed.prepend(header);
                 break;
             }
             quint64 raw_timestamp = pop_quint64();
@@ -137,12 +151,8 @@ void NetworkReceiver::process_queue() {
             else emit finished(timestamp);
         }
         else {
-            qCritical("Invalid event type encountered: %x. Be warned: data corruption is likely to follow.", header & 0x03);
-            position ++;
+            qDebug("Invalid event type encountered . . .");
         }
-    }
-    if(remaining()) {
-        unprocessed.remove(0, position + 1);
     }
 }
 
@@ -151,5 +161,6 @@ void NetworkReceiver::connected() {
 }
 
 void NetworkReceiver::disconnected() {
+    device_reader->quit();
     emit finished(new Timestamp());
 }
