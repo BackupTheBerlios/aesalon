@@ -56,12 +56,12 @@ typedef SWord32 SWord;
 /** A block of data, presumably from an executable file. Custom version of std::vector&lt;Byte&gt;.*/
 class Block {
 private:
-    Byte *data;
+    Byte *data_buffer;
     std::size_t allocated_size;
     std::size_t data_size;
 public:
     /** Generic constructor, sets data and data_size to NULL and zero, respectively. */
-    Block() : data(NULL), allocated_size(0), data_size(0) {}
+    Block() : data_buffer(NULL), allocated_size(0), data_size(0) {}
     /** Constructor that takes a pointer and a std::size_t, for data and data_size.
         Creates a copy of the given data. */
     Block(Byte *data, std::size_t data_size);
@@ -73,7 +73,7 @@ public:
         No out-of-bounds checking is done.
         @return A pointer to the beginning of the block data.
     */
-    inline Byte *get_data() { return data; }
+    inline Byte *get_data() const { return data_buffer; }
     
     /** Retrieves the size of the current data.
         @return The current size of the referenced data.

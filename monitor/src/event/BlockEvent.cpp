@@ -41,6 +41,7 @@ Block *BlockEvent::serialize(int bits) {
         Block *block = event->serialize(bits);
         serialized->prepend(block);
         delete block;
+        delete event;
     }
     
     serialized->get_data()[0] |= (block_type << 2) & 0x0c;

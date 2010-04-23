@@ -23,6 +23,7 @@ bool Scope::operator<(Word address) const {
 ScopeManager::ScopeManager() {
     interface = Initializer::get_instance()->get_analyzer_interface();
     last_id = 0;
+    map_parser = NULL;
 }
 
 ScopeManager::~ScopeManager() {
