@@ -30,9 +30,13 @@ private:
     void setup_menus();
     
     QMenu *aesalon_menu;
+    
+    QMenu *help_menu;
 public:
     MainWindow(QWidget *parent = 0);
     virtual ~MainWindow() {}
+private slots:
+    void about();
 public slots:
     void open_configuration();
 };

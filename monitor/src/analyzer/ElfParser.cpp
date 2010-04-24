@@ -6,6 +6,8 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <cxxabi.h>
+#include <stdlib.h>
 
 #include <iostream>
 
@@ -152,7 +154,15 @@ void ElfParser::parse_32() {
             memcpy(&symbol, sm->dereference_string(symtab_content_offset) + offset, sizeof(symbol));
             
             StorageOffset symbol_offset = sm->new_attribute();
-            sm->dereference_attribute(symbol_offset)->name = strtab_content_offset + symbol.st_name;
+            char *demangled;
+            int status;
+            
+            demangled = abi::__cxa_demangle(sm->dereference_string(strtab_content_offset) + symbol.st_name, NULL, NULL, &status);
+            if(demangled) {
+                sm->dereference_attribute(symbol_offset)->name = sm->new_string(demangled);
+                free(demangled);
+            }
+            else sm->dereference_attribute(symbol_offset)->name = strtab_content_offset + symbol.st_name;
             sm->create_child(symbol_offset, "address")->value = symbol.st_value;
             sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
@@ -182,7 +192,15 @@ void ElfParser::parse_32() {
             memcpy(&symbol, sm->dereference_string(dynsym_content_offset) + offset, sizeof(symbol));
             
             StorageOffset symbol_offset = sm->new_attribute();
-            sm->dereference_attribute(symbol_offset)->name = dynstr_content_offset + symbol.st_name;
+            char *demangled;
+            int status;
+            
+            demangled = abi::__cxa_demangle(sm->dereference_string(dynstr_content_offset) + symbol.st_name, NULL, NULL, &status);
+            if(demangled) {
+                sm->dereference_attribute(symbol_offset)->name = sm->new_string(demangled);
+                free(demangled);
+            }
+            else sm->dereference_attribute(symbol_offset)->name = dynstr_content_offset + symbol.st_name;
             sm->create_child(symbol_offset, "address")->value = symbol.st_value;
             sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
@@ -282,7 +300,16 @@ void ElfParser::parse_64() {
             memcpy(&symbol, sm->dereference_string(symtab_content_offset) + offset, sizeof(symbol));
             
             StorageOffset symbol_offset = sm->new_attribute();
-            sm->dereference_attribute(symbol_offset)->name = strtab_content_offset + symbol.st_name;
+            char *demangled;
+            int status;
+            
+            demangled = abi::__cxa_demangle(sm->dereference_string(strtab_content_offset) + symbol.st_name, NULL, NULL, &status);
+            if(demangled) {
+                sm->dereference_attribute(symbol_offset)->name = sm->new_string(demangled);
+                free(demangled);
+            }
+            else sm->dereference_attribute(symbol_offset)->name = strtab_content_offset + symbol.st_name;
+            
             sm->create_child(symbol_offset, "address")->value = symbol.st_value;
             sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             
@@ -312,7 +339,17 @@ void ElfParser::parse_64() {
             memcpy(&symbol, sm->dereference_string(dynsym_content_offset) + offset, sizeof(symbol));
             
             StorageOffset symbol_offset = sm->new_attribute();
-            sm->dereference_attribute(symbol_offset)->name = dynstr_content_offset + symbol.st_name;
+            
+            char *demangled;
+            int status;
+            
+            demangled = abi::__cxa_demangle(sm->dereference_string(dynstr_content_offset) + symbol.st_name, NULL, NULL, &status);
+            if(demangled) {
+                sm->dereference_attribute(symbol_offset)->name = sm->new_string(demangled);
+                free(demangled);
+            }
+            else sm->dereference_attribute(symbol_offset)->name = dynstr_content_offset + symbol.st_name;
+            
             sm->create_child(symbol_offset, "address")->value = symbol.st_value;
             sm->create_child(symbol_offset, "size")->value = symbol.st_size;
             

@@ -3,6 +3,7 @@ Monitor:
 - Add support for executing shell scripts
 - Add support for executing 32-bit programs on 64-bit platforms (generate 32-bit overload)
 - Investigate why the monitor terminates when the TCP connection is lost
+- Implement demangling in the symbol resolution code
 GUI:
 - Embed Konsole inside Session for LaunchSources?
 - Add "temporary sessions", e.g. sessions that aren't saved
@@ -12,3 +13,4 @@ GUI:
 - Generic polishing
 - Partial painting in Viewport::paintEvent()
 - Fix the off-by-one errors in the Viewport painting
+- Add proper support for realloc'd blocks (e.g. show link to "next" block)

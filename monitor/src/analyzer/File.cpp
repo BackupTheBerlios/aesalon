@@ -133,7 +133,10 @@ void File::parse() {
             if(errno == EINVAL) break;
             throw Exception::AnalyzerException(Misc::StreamAsString() << "Couldn't resolve symlink \"" << filename << "\": " << strerror(errno));
         }
-        else filename = buffer;
+        else {
+            buffer[ret] = NULL;
+            filename = buffer;
+        }
     }
     
     /* Fix the path if it's not an absolute path . . . */

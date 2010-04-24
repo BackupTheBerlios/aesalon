@@ -19,6 +19,7 @@
 
 #include <QApplication>
 #include <QMetaType>
+#include <QMessageBox>
 
 #include "MainWindow.h"
 #include "MainWindow.moc"
@@ -42,9 +43,19 @@ void MainWindow::setup_menus() {
     /*aesalon_menu->addAction("&Configuration . . .", this, SLOT(open_configuration()));*/
     aesalon_menu->addAction("&Quit", this, SLOT(close()));
     menuBar()->addMenu(aesalon_menu);
+    
+    help_menu = new QMenu(tr("&Help"));
+    help_menu->addAction("&About", this, SLOT(about()));
+    menuBar()->addMenu(help_menu);
 }
 
 void MainWindow::open_configuration() {
     Configuration *config = new Configuration(this);
     config->exec();
+}
+
+void MainWindow::about() {
+    QMessageBox about_box;
+    about_box.addButton(QMessageBox::Ok);
+    about_box.exec();
 }

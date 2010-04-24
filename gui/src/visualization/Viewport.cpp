@@ -120,14 +120,24 @@ void Viewport::paintEvent(QPaintEvent *event) {
         painter.drawLine(0, y * y_step, width()-1, y * y_step);
     }
     
+    pen.setColor(qRgba(255, 128, 0, 64));
+    painter.setPen(pen);
+    
     DataPoint point = mapper.map_to(QPointF(0, 0));
-    static QFont grid_font = QFont("DejaVu Sans", 8);
+    static QFont grid_font = QFont("DejaVu Sans", 10, QFont::Bold);
     QFontMetrics metrics(grid_font);
     painter.setFont(grid_font);
     painter.drawText(5, metrics.height() + 5, formatter->format_point(point));
     point = mapper.map_to(QPointF(width()-1, height()-1));
     QString formatted = formatter->format_point(point);
     painter.drawText(width() - (metrics.width(formatted)+5), height()-6, formatted);
+    
+    QString label = "Time";
+    painter.drawText((width()/2) - (metrics.width(label) / 2), height()-6, label);
+    
+    label = "Address space";
+    painter.rotate(90.0);
+    painter.drawText((height() / 2) - (metrics.width(label) / 2), -6, label);
 }
 
 void Viewport::mouseMoveEvent(QMouseEvent *event) {
