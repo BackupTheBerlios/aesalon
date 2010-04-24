@@ -18,6 +18,7 @@
 */
 
 #include <iostream>
+#include <cstdlib>
 #include "BlockEvent.h"
 #include "exception/EventException.h"
 #include "misc/StreamAsString.h"
@@ -25,6 +26,10 @@
 #include "ScopeEvent.h"
 
 namespace Event {
+
+BlockEvent::~BlockEvent() {
+    if(scope) std::free(scope);
+}
 
 /* serialization format:
     first two bits are taken by BasicEvent
@@ -37,16 +42,6 @@ Block *BlockEvent::serialize(int bits) {
     Block *serialized = BasicEvent::serialize(bits);
     serialized->get_data()[0] |= (block_type << 2) & 0x0c;
     
-    Word32 scope_id;
-    ScopeEvent *event = Initializer::get_instance()->get_scope_manager()->get_scope(scope, scope_id);
-    if(event) {
-        Block *block = event->serialize(bits);
-        serialized->prepend(block);
-        delete block;
-        delete event;
-    }
-    
-    serialized->push_word(scope_id, 32);
     serialized->push_word(address, bits);
 
     switch(get_block_type()) {
@@ -62,6 +57,12 @@ Block *BlockEvent::serialize(int bits) {
         default:
             throw Exception::EventException("Asked to serialize invalid Block event");
     }
+    
+    std::cout << "before pushing scopes: " << serialized->get_size() << std::endl;
+    
+    Initializer::get_instance()->get_scope_manager()->push_scope(serialized, scope, scope_size);
+    
+    std::cout << "after pushing scopes: " << serialized->get_size() << std::endl;
     
     return serialized;
 }

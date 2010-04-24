@@ -61,7 +61,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     size->setText(QString().setNum(block->get_size(), 10));
     
     alloc_time->setText(block->get_allocation_time().to_string());
-    alloc_scope->setText(block->get_allocation_scope().get_name());
+    /*alloc_scope->setText(block->get_allocation_scope().get_name());*/
     
     if(block->get_release_time() == Timestamp::NOW) {
         release_time->setText(QObject::tr("Still active"));
@@ -69,7 +69,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     }
     else {
         release_time->setText(block->get_release_time().to_string());
-        release_scope->setText(block->get_release_scope().get_name());
+        /*release_scope->setText(block->get_release_scope().get_name());*/
     }
     
     /*

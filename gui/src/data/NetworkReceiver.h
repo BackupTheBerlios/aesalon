@@ -41,7 +41,8 @@ public:
 private:
     quint64 pop_quint64();
     quint64 pop_word(int bytes);
-    void prepend_quint64(quint64 data);
+    void prepend_word(quint64 data, int bytes);
+    Backtrace assemble_backtrace();
 private slots:
     void data_received(QByteArray data);
     void process_queue();

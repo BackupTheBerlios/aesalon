@@ -33,12 +33,17 @@ private:
     
     PTrace::MapParser *map_parser;
     Analyzer::Interface *interface;
+    bool full_backtrace;
+    int platform_bits;
 public:
     ScopeManager();
     ~ScopeManager();
     
     Word32 get_scope_id(Word address);
     Event::ScopeEvent *get_scope(Word address, Word32 &id);
+    
+    void push_scope(Block *block, Word *scope, Word scope_size);
+    void push_scope(Block *block, Word address);
 };
 
 } // namespace Tracker

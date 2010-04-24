@@ -73,8 +73,12 @@ void Initializer::initialize() {
     argument_parser->add_argument(new Misc::Argument("libc-path", 0, Misc::Argument::REQUIRED_ARGUMENT, libc_path));
     std::string overload_path = config_parser->get_config_item("overload-path");
     argument_parser->add_argument(new Misc::Argument("overload-path", 'o', Misc::Argument::REQUIRED_ARGUMENT, overload_path));
+    
+    argument_parser->add_argument(new Misc::Argument("no-backtrace", 0, Misc::Argument::NO_ARGUMENT, ""));
 
     argument_parser->parse();
+
+    if(argument_parser->get_argument("help")->is_found()) std::cout << "!!!" << std::endl;
 
     if(argument_parser->get_argument("help")->is_found()) {
         usage();
@@ -155,6 +159,7 @@ void Initializer::usage() {
 #ifdef USE_OVERLOAD
     std::cout << "\t--overload-path\t\tThe directory containing the overload libraries. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
 #endif
+    std::cout << "\t--no-backtrace\t\tForces the monitor to only consider the current scope, rather than the full backtrace." << std::endl;
     std::cout << "\t--\t\t\tOptional, denotes the end of the argument list." << std::endl;
 }
 

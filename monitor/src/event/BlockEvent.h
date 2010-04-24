@@ -35,16 +35,23 @@ public:
 private:
     block_event_type_e block_type;
     
-    Word scope, address, size, new_address;
+    Word *scope;
+    Word scope_size;
+    Word address, size, new_address;
 public:
-    BlockEvent(block_event_type_e type, Word scope, Word address, Word size = 0,
+    BlockEvent(block_event_type_e type, Word address, Word size = 0,
         Word new_address = 0, Word new_size = 0) : BasicEvent(BLOCK_EVENT), block_type(type),
-        scope(scope), address(address), size(size), new_address(new_address) {}
-    virtual ~BlockEvent() {}
+        scope(NULL), scope_size(0), address(address), size(size), new_address(new_address) {}
+    virtual ~BlockEvent();
     
     block_event_type_e get_block_type() const { return block_type; }
     
-    Word get_scope() const { return scope; }
+    Word *get_scope() const { return scope; }
+    void set_scope(Word *new_scope) { scope = new_scope; }
+    
+    Word get_scope_size() const { return scope_size; }
+    void set_scope_size(Word new_size) { scope_size = new_size; }
+    
     Word get_address() const { return address; }
     Word get_size() const { return size; }
     Word get_new_address() const { return new_address; }

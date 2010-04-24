@@ -91,6 +91,8 @@ void *calloc(size_t nmemb, size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
+    write_bt_info();
+    
     return (void *)data.data.address;
 }
 
@@ -121,6 +123,8 @@ void free(void *ptr) {
     int ret = 0;
     ret = write(pipe_fd, &type, sizeof(type));
     ret = write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    write_bt_info();
 }
 
 void *realloc(void *ptr, size_t size) {
@@ -137,6 +141,8 @@ void *realloc(void *ptr, size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
+    write_bt_info();
+    
     return (void *)data.data.new_address;
 }
 
@@ -152,6 +158,8 @@ int posix_memalign(void** memptr, size_t alignment, size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
+    write_bt_info();
+    
     return result;
 }
 
@@ -166,6 +174,8 @@ void *valloc(size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
+    write_bt_info();
+    
     return (void *)data.data.address;
 }
 
@@ -179,6 +189,8 @@ void *memalign(size_t boundary, size_t size) {
     
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    write_bt_info();
     
     return (void *)data.data.address;
 }
@@ -295,6 +307,8 @@ void write_bt_info() {
     
     write(pipe_fd, &buffer_size, sizeof(u_int32_t));
     write(pipe_fd, buffer, (buffer_size - 1) * sizeof(u_int32_t));
+    
+    original_free(buffer);
 }
 
 #ifdef __cplusplus

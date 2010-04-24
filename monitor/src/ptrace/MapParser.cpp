@@ -29,7 +29,9 @@ const Analyzer::Object &MapParser::get_object(Word address) {
 }
 
 std::string MapParser::get_filename(Word address) {
-    return get_object(address).get_name();
+    const Analyzer::Object &object = get_object(address);
+    std::cout << "MapParser object name: \"" << object.get_name() << "\"\n";
+    return object.get_name();
 }
 
 void MapParser::parse_maps() {

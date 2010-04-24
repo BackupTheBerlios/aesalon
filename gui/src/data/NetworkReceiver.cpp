@@ -73,15 +73,31 @@ quint64 NetworkReceiver::pop_word(int bytes) {
     return value;
 }
 
-void NetworkReceiver::prepend_quint64(quint64 data) {
-    unprocessed.prepend(char((data << 56) & 0xff));
-    unprocessed.prepend(char((data << 48) & 0xff));
-    unprocessed.prepend(char((data << 40) & 0xff));
-    unprocessed.prepend(char((data << 32) & 0xff));
-    unprocessed.prepend(char((data << 24) & 0xff));
-    unprocessed.prepend(char((data << 16) & 0xff));
-    unprocessed.prepend(char((data << 8) & 0xff));
-    unprocessed.prepend(char(data & 0xff));
+void NetworkReceiver::prepend_word(quint64 data, int bytes) {
+    for(int i = bytes-1; i >= 0; i --) {
+        unprocessed.prepend(char((data << (i * 8)) & 0xff));
+    }
+}
+
+Backtrace NetworkReceiver::assemble_backtrace() {
+    qDebug("assemble_backtrace: remaining is %i", unprocessed.size());
+    if(unprocessed.size() < 2) return Backtrace(NULL, 0);
+    /*quint16 count = pop_word(2);*/
+    quint16 count = 0;
+    count = unprocessed.at(0);
+    count |= quint16(unprocessed.at(1)) << 8;
+    qDebug("count: %i remaining: %i", count, unprocessed.size());
+    if(unprocessed.size() < count * 4) {
+        return Backtrace(NULL, 0);
+    }
+    unprocessed.remove(0, 2);
+    Scope *scopes = new Scope[count];
+    
+    for(quint16 i = 0; i < count; i ++) {
+        scopes[i] = get_data_thread()->get_scope_mapper()->get_scope(pop_word(32));
+    }
+    
+    return Backtrace(scopes, count);
 }
 
 void NetworkReceiver::data_received(QByteArray data) {
@@ -91,6 +107,7 @@ void NetworkReceiver::data_received(QByteArray data) {
 
 void NetworkReceiver::process_queue() {
     while(unprocessed.size()) {
+        qDebug("0. remaining is %i", unprocessed.size());
         quint8 header = unprocessed.at(0);
         unprocessed.remove(0, 1);
         int word_size = (header & 0x80)?8:4;
@@ -111,34 +128,42 @@ void NetworkReceiver::process_queue() {
                     + scope
                     + address
             */
-            /* NOTE: the extra 4 bytes is for the scope ID. */
-            quint8 block_type_sizes[] = {(word_size * 2) + 4, (word_size * 3) + 4, (word_size * 1) + 4};
-            /* Check the size of the waiting data. The extra 8 bytes is for the timestamp. */
-            if(unprocessed.size() < (block_type_sizes[block_type]+8)) {
+            quint8 block_type_sizes[] = {2, 3, 1};
+            qDebug("1. remaining is %i", unprocessed.size());
+            /* Check the size of the waiting data.
+                8 extra bytes for the timestamp. */
+            if(unprocessed.size() < ((block_type_sizes[block_type] * word_size)+8)) {
                 unprocessed.prepend(header);
                 break;
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
-            quint32 scope_id = pop_word(4);
-            const Scope &scope = get_data_thread()->get_scope_mapper()->get_scope(scope_id);
-            quint64 address = pop_word(word_size);
+            qDebug("2. remaining is %i", unprocessed.size());
+            quint64 words[3];
+            for(int i = 0; i < block_type_sizes[block_type]; i ++) words[i] = pop_word(word_size);
+            
+            qDebug("3. remaining is %i", unprocessed.size());
+            
+            Backtrace backtrace = assemble_backtrace();
+            if(backtrace.get_scope_list() == NULL) {
+                for(int i = 0; i < block_type_sizes[block_type]; i ++) prepend_word(words[i], word_size);
+                break;
+            }
+            
             if(block_type == 0) {
-                quint64 size = pop_word(word_size);
-                event_received(new AllocEvent(timestamp, address, size, scope));
+                event_received(new AllocEvent(timestamp, words[0], words[1], backtrace));
             }
             else if(block_type == 1) {
-                quint64 new_address = pop_word(word_size);
-                quint64 new_size = pop_word(word_size);
                 /* From the man page for realloc: "If ptr is NULL, then the call is equivalent to malloc(size),
                     for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)."
                     Ergo, don't emit free/alloc events for such cases. */
-                if(address != 0) event_received(new FreeEvent(timestamp, address, scope));
-                if(new_size != 0) event_received(new AllocEvent(timestamp, new_address, new_size, scope));
+                if(words[0] != 0) event_received(new FreeEvent(timestamp, words[0], backtrace));
+                if(words[2] != 0) event_received(new AllocEvent(timestamp, words[1], words[2], backtrace));
             }
             else if(block_type == 2) {
-                event_received(new FreeEvent(timestamp, address, scope));
+                event_received(new FreeEvent(timestamp, words[0], backtrace));
             }
+            qDebug("Processed block event, remaining: %i", unprocessed.size());
         }
         else if((header & 0x03) == 2) {
             if(unprocessed.size() < 8) {

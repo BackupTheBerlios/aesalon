@@ -27,15 +27,15 @@ class AllocEvent : public Event {
 private:
     MemoryAddress address;
     MemorySize size;
-    const Scope &scope;
+    const Backtrace scope;
 public:
-    AllocEvent(const Timestamp &timestamp, MemoryAddress address, MemorySize size, const Scope &scope)
+    AllocEvent(const Timestamp &timestamp, MemoryAddress address, MemorySize size, const Backtrace &scope)
         : Event(timestamp), address(address), size(size), scope(scope) {}
     virtual ~AllocEvent() {}
     
     MemoryAddress get_address() const { return address; }
     MemorySize get_size() const { return size; }
-    const Scope &get_scope() const { return scope; }
+    const Backtrace &get_scope() const { return scope; }
     
     virtual void apply_to(Snapshot *snapshot);
     
