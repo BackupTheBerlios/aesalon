@@ -1,7 +1,6 @@
 #include "ClickHandler.h"
 
-ClickHandler::ClickHandler(QDialog *info_box) {
-    info_box->setEnabled(false);
+ClickHandler::ClickHandler(QWidget *info_widget) {
 }
 
 ClickHandler::~ClickHandler() {

@@ -16,7 +16,7 @@ public:
 
     virtual Renderer *create_renderer(Canvas *canvas) const = 0;
     virtual AxisFormatter *create_formatter() const = 0;
-    virtual ClickHandler *create_click_handler(QDialog *info_box) const;
+    virtual ClickHandler *create_click_handler(QWidget *info_widget) const;
 };
 
 #endif

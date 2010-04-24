@@ -1,3 +1,5 @@
+#include <QLayout>
+
 #include "Visualization.h"
 #include "Visualization.moc"
 #include "CanvasGenerator.h"
@@ -22,7 +24,15 @@ Visualization::Visualization(VisualizationFactory *factory) {
     request_button = new QPushButton(tr("&Request"));
     upper_layout->addWidget(request_button);
     
+    lock_box = new QCheckBox();
+    lock_box->setEnabled(false);
+    
+    upper_layout->addWidget(lock_box);
+    
     main_layout->addLayout(upper_layout);
+    
+    info_widget = new QWidget();
+    main_layout->addWidget(info_widget);
     
     canvas = new Canvas();
     renderer = factory->create_renderer(canvas);
@@ -32,8 +42,9 @@ Visualization::Visualization(VisualizationFactory *factory) {
     
     factory->get_data_thread()->register_observer(renderer);
     
-    viewport = new Viewport(canvas, factory, this);
+    viewport = new Viewport(canvas, factory, info_widget, this);
     connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)), Qt::QueuedConnection);
+    connect(viewport, SIGNAL(lock_change(bool)), lock_box, SLOT(setChecked(bool)));
     main_layout->addWidget(viewport);
     
     request_menu = new QMenu();

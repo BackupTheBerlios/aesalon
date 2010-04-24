@@ -7,8 +7,8 @@
 #include "Viewport.moc"
 #include "CanvasGenerator.h"
 
-Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *parent)
-    : QWidget(parent), canvas(canvas), rendered_canvas(size(), DataRange()) {
+Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *info_widget, QWidget *parent)
+    : QWidget(parent), canvas(canvas), rendered_canvas(size(), DataRange()), info_widget(info_widget) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMouseTracking(true);
     setCursor(QCursor(Qt::CrossCursor));
@@ -21,16 +21,14 @@ Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *paren
     connect(this, SIGNAL(paint_canvas(QSize,Canvas*,DataRange)), canvas_painter, SLOT(paint_canvas(QSize,Canvas*,DataRange)), Qt::DirectConnection);
     connect(canvas_painter, SIGNAL(done(RenderedCanvas)), SLOT(merge_canvas(RenderedCanvas)), Qt::DirectConnection);
     
-    info_box = new QDialog();
-    info_box->setModal(false);
-    info_box->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
-    
     formatter = factory->create_formatter();
-    click_handler = factory->create_click_handler(info_box);
+    click_handler = factory->create_click_handler(info_widget);
     
     update_timer = new QTimer();
     connect(update_timer, SIGNAL(timeout()), SLOT(repaint_regions()));
     update_timer->start(500);
+    
+    click_lock = false;
 }
 
 Viewport::~Viewport() {
@@ -144,6 +142,8 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     CoordinateMapper mapper(size(), rendered_canvas.get_range());
     DataPoint point = mapper.map_to(event->posF());
     
+    if(!click_lock) click_handler->handle_click(canvas, mapper.map_to(event->posF()));
+    
     if(event->buttons() & Qt::LeftButton) {
         /*old_mouse_pos.setX(event->posF().x());*/
         /*old_mouse_pos.setY(old_mouse_pos.y() - 2.0);*/
@@ -209,8 +209,8 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
 void Viewport::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton) old_mouse_pos = event->posF();
     else if(event->button() == Qt::RightButton) {
-        CoordinateMapper mapper(size(), rendered_canvas.get_range());
-        click_handler->handle_click(canvas, mapper.map_to(event->posF()));
+        click_lock = !click_lock;
+        emit lock_change(click_lock);
     }
 }
 
@@ -296,16 +296,9 @@ void Viewport::wheelEvent(QWheelEvent *event) {
 }
 
 void Viewport::showEvent(QShowEvent *event) {
-    if(info_box->isEnabled()) {
-        info_box->show();
-        QVariant pos = info_box->property("position");
-        if(!pos.isNull()) info_box->move(pos.toPoint());
-    }
     QWidget::showEvent(event);
 }
 
 void Viewport::hideEvent(QHideEvent *event) {
-    info_box->setProperty("position", info_box->pos());
-    info_box->hide();
     QWidget::hideEvent(event);
 }

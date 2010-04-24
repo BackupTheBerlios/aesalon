@@ -9,12 +9,12 @@
 
 class ClickHandler {
 private:
-    QDialog *info_box;
+    QWidget *info_widget;
 public:
-    ClickHandler(QDialog *info_box);
+    ClickHandler(QWidget *info_widget);
     virtual ~ClickHandler();
     
-    QDialog *get_info_box() const { return info_box; }
+    QWidget *get_info_widget() const { return info_widget; }
     
     virtual void handle_click(Canvas *canvas, DataPoint at);
 };

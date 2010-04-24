@@ -16,7 +16,7 @@ private:
     QLabel *release_time;
     QLabel *release_scope;
 public:
-    DensityClickHandler(DataThread *data_thread, QDialog *info_box);
+    DensityClickHandler(DataThread *data_thread, QWidget *info_widget);
     virtual ~DensityClickHandler();
     
     virtual void handle_click(Canvas *canvas, DataPoint at);

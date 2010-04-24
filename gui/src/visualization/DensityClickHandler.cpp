@@ -1,28 +1,39 @@
 #include <QWhatsThis>
 #include <QTextStream>
+#include <QFrame>
 #include "DensityClickHandler.h"
 
-DensityClickHandler::DensityClickHandler(DataThread *data_thread, QDialog *info_box) : ClickHandler(info_box), data_thread(data_thread) {
-    info_box->setEnabled(true);
-    info_box->setMinimumSize(300, 50);
-    QFormLayout *layout = new QFormLayout();
+DensityClickHandler::DensityClickHandler(DataThread *data_thread, QWidget *info_widget) : ClickHandler(info_widget), data_thread(data_thread) {
+    QHBoxLayout *main_layout = new QHBoxLayout();
+    
+    QFormLayout *generic = new QFormLayout();
     
     address = new QLabel(QObject::tr("N/A"));
-    layout->addRow(QObject::tr("Address:"), address);
+    generic->addRow(QObject::tr("Address:"), address);
     size = new QLabel(QObject::tr("N/A"));
-    layout->addRow(QObject::tr("Size:"), size);
+    generic->addRow(QObject::tr("Size:"), size);
+    
+    main_layout->addLayout(generic);
+    
+    QFormLayout *allocation = new QFormLayout();
     
     alloc_time = new QLabel(QObject::tr("N/A"));
-    layout->addRow(QObject::tr("Allocation time:"), alloc_time);
+    allocation->addRow(QObject::tr("Allocation time:"), alloc_time);
     alloc_scope = new QLabel(QObject::tr("N/A"));
-    layout->addRow(QObject::tr("Allocation scope:"), alloc_scope);
+    allocation->addRow(QObject::tr("Allocation scope:"), alloc_scope);
+    
+    main_layout->addLayout(allocation);
+    
+    QFormLayout *release = new QFormLayout();
     
     release_time = new QLabel(QObject::tr("N/A"));
-    layout->addRow(QObject::tr("Release time:"), release_time);
+    release->addRow(QObject::tr("Release time:"), release_time);
     release_scope = new QLabel(QObject::tr("N/A"));
-    layout->addRow(QObject::tr("Release scope:"), release_scope);
+    release->addRow(QObject::tr("Release scope:"), release_scope);
     
-    info_box->setLayout(layout);
+    main_layout->addLayout(release);
+    
+    info_widget->setLayout(main_layout);
 }
 
 DensityClickHandler::~DensityClickHandler() {

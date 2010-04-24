@@ -16,6 +16,6 @@ AxisFormatter *DensityFactory::create_formatter() const {
     return new DensityFormatter();
 }
 
-ClickHandler *DensityFactory::create_click_handler(QDialog *info_box) const {
-    return new DensityClickHandler(get_data_thread(), info_box);
+ClickHandler *DensityFactory::create_click_handler(QWidget *info_widget) const {
+    return new DensityClickHandler(get_data_thread(), info_widget);
 }

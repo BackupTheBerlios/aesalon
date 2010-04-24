@@ -63,6 +63,7 @@ int pipe_fd;
 
 void initialize_overload();
 void deinitialize_overload();
+void write_bt_info();
 
 int overload_initialized = 0;
 
@@ -75,32 +76,11 @@ void __attribute__((destructor)) aesalon_destructor() {
     deinitialize_overload();
 }
 
-void* get_scope_address() {
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    asm("mov rax, [rbp + 16]");
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-    asm("mov eax, [ebp + 8]");
-#endif
-}
-
-#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    #define retrieve_scope() \
-        asm("push [rbp + 8]"); \
-        data.data.scope = (unsigned long)get_scope_address(); \
-        asm("add rsp, 8");
-#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-    #define retrieve_scope() \
-        asm("push [ebp + 4]"); \
-        data.data.scope = (unsigned long)get_scope_address(); \
-        asm("add esp, 4");
-#endif
-
 void *calloc(size_t nmemb, size_t size) {
     if(!overload_initialized) initialize_overload();
     allocation_data_u data;    
     static unsigned char type = ALLOC_TYPE;
     
-    retrieve_scope();
     data.data.size = nmemb * size;
     if(original_calloc != NULL) data.data.address = (unsigned long)original_calloc(nmemb, size);
     else {
@@ -118,26 +98,14 @@ void *malloc(size_t size) {
     if(!overload_initialized) initialize_overload();
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
-
-    /*void *bp = NULL;
-    asm("mov qword [rbp-0x18], rbp");
-    
-    unsigned long bt_address = 0x0;
-    
-    do {
-        printf("bp: %p\n", bp);
-        bt_address = *((unsigned long *)(bp + 8));
-        printf("backtrace address: %p\n", bt_address);
-        bp = (void *)*((unsigned long *)bp);
-    } while(bp != NULL && bt_address != 0);*/
-    
-    retrieve_scope();
     
     data.data.address = (unsigned long)original_malloc(size);
     data.data.size = size;
     
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
+    
+    write_bt_info();
     
     return (void *)data.data.address;
 }
@@ -146,8 +114,6 @@ void free(void *ptr) {
     if(!overload_initialized) initialize_overload();
     free_data_u data;
     static unsigned char type = FREE_TYPE;
-    
-    retrieve_scope();
     
     data.data.address = (unsigned long)ptr;
     original_free(ptr);
@@ -161,8 +127,6 @@ void *realloc(void *ptr, size_t size) {
     if(!overload_initialized) initialize_overload();
     reallocation_data_u data;
     static unsigned char type = REALLOC_TYPE;
-    
-    retrieve_scope();
     
     data.data.original_address = (unsigned long)ptr;
     
@@ -182,8 +146,6 @@ int posix_memalign(void** memptr, size_t alignment, size_t size) {
     static unsigned char type = ALLOC_TYPE;
     int result = original_posix_memalign(memptr, alignment, size);
     
-    retrieve_scope();
-    
     data.data.address = (unsigned long)*memptr;
     data.data.size = size;
     
@@ -198,8 +160,6 @@ void *valloc(size_t size) {
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
     
-    retrieve_scope();
-    
     data.data.address = (unsigned long)original_valloc(size);
     data.data.size = size;
     
@@ -213,8 +173,6 @@ void *memalign(size_t boundary, size_t size) {
     if(!overload_initialized) initialize_overload();
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
-    
-    retrieve_scope();
     
     data.data.address = (unsigned long)original_memalign(boundary, size);
     data.data.size = size;
@@ -299,6 +257,44 @@ void deinitialize_overload() {
     printf("{aesalon} Overload library self-destructing . . .\n");
 #endif
     if(pipe_fd) close(pipe_fd);    
+}
+
+void write_bt_info() {
+    void *bp = NULL;
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+    asm("mov qword [rbp-0x28], rbp");
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    asm("mov qword [ebp-0x0c], ebp");
+#endif
+    
+    u_int32_t buffer_alloc = 1;
+    u_int32_t buffer_size = 0;
+
+    unsigned char *buffer = NULL;
+
+    int address_size = sizeof(unsigned long);
+    
+    unsigned long bt_address = 0x0;
+    
+    bp = (void *)*((unsigned long *)bp);
+    
+    do {
+        printf("bp: %p\n", bp);
+        bt_address = *((unsigned long *)(bp + 8));
+        if((buffer_size + address_size) > buffer_alloc) {
+            while((buffer_size + address_size) > buffer_alloc) buffer_alloc *= 2;
+            buffer = original_realloc(buffer, buffer_alloc);
+            memcpy(buffer + buffer_size, &bt_address, address_size);
+            buffer_size += address_size;
+        }
+        printf("backtrace address: %p\n", bt_address);
+        bp = (void *)*((unsigned long *)bp);
+    } while(bp != NULL && bt_address != 0);
+    
+    buffer_size /= 4;
+    
+    write(pipe_fd, &buffer_size, sizeof(u_int32_t));
+    write(pipe_fd, buffer, (buffer_size - 1) * sizeof(u_int32_t));
 }
 
 #ifdef __cplusplus

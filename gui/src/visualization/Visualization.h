@@ -8,6 +8,7 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QMenu>
+#include <QCheckBox>
 
 #include "Viewport.h"
 #include "Renderer.h"
@@ -20,9 +21,11 @@ private:
     QSpinBox *cycle_time;
     QPushButton *request_button;
     QMenu *request_menu;
+    QWidget *info_widget;
     Viewport *viewport;
     Renderer *renderer;
     Canvas *canvas;
+    QCheckBox *lock_box;
 public:
     Visualization(VisualizationFactory *factory);
     virtual ~Visualization();

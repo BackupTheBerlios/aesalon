@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QCheckBox>
 
 #include "Canvas.h"
 #include "CanvasPainter.h"
@@ -20,9 +21,11 @@ private:
     QPointF old_mouse_pos;
     DataThread *data_thread;
     QTimer *update_timer;
-    QDialog *info_box;
+    QWidget *info_widget;
+    
+    bool click_lock;
 public:
-    Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *parent);
+    Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *info_widget, QWidget *parent);
     virtual ~Viewport();
 public slots:
     void set_canvas_range(const DataRange &new_range);
@@ -46,6 +49,7 @@ signals:
     void paint_canvas(QSize render_size, Canvas *canvas);
     void paint_canvas(QSize render_size, Canvas *canvas, DataRange range);
     void mouse_position(QString formatted);
+    void lock_change(bool new_lock);
 };
 
 #endif

@@ -5,6 +5,6 @@ VisualizationFactory::VisualizationFactory(DataThread *data_thread) : data_threa
 
 }
 
-ClickHandler *VisualizationFactory::create_click_handler(QDialog *info_box) const {
-    return new ClickHandler(info_box);
+ClickHandler *VisualizationFactory::create_click_handler(QWidget *info_widget) const {
+    return new ClickHandler(info_widget);
 }
