@@ -22,17 +22,18 @@
 
 #include "Event.h"
 #include "MemoryTypes.h"
+#include "storage/Scope.h"
 
 class FreeEvent : public Event {
 private:
     MemoryAddress address;
-    MemoryAddress scope;
+    const Scope &scope;
 public:
-    FreeEvent(const Timestamp &timestamp, MemoryAddress address, MemoryAddress scope) : Event(timestamp), address(address), scope(scope) {}
+    FreeEvent(const Timestamp &timestamp, MemoryAddress address, const Scope &scope) : Event(timestamp), address(address), scope(scope) {}
     virtual ~FreeEvent() {}
     
     MemoryAddress get_address() const { return address; }
-    MemoryAddress get_scope() const { return scope; }
+    const Scope &get_scope() const { return scope; }
     
     virtual void apply_to(Snapshot *snapshot);  
     

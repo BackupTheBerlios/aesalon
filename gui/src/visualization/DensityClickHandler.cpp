@@ -50,7 +50,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     size->setText(QString().setNum(block->get_size(), 10));
     
     alloc_time->setText(block->get_allocation_time().to_string());
-    alloc_scope->setText(QString("0x") + QString().setNum(block->get_allocation_scope(), 16));
+    alloc_scope->setText(block->get_allocation_scope().get_name());
     
     if(block->get_release_time() == Timestamp::NOW) {
         release_time->setText(QObject::tr("Still active"));
@@ -58,13 +58,14 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     }
     else {
         release_time->setText(block->get_release_time().to_string());
-        release_scope->setText(QString("0x") + QString().setNum(block->get_release_scope(), 16));
+        release_scope->setText(block->get_release_scope().get_name());
     }
     
+    /*
     stream << "Address:\t\t0x" << hex << block->get_address() << "\n";
     stream << "Size:\t\t" << dec << block->get_size() << "\n";
     stream << "Allocation time:\t" << block->get_allocation_time().to_string() << "\n";
-    stream << "Allocation scope:\t0x" << hex << block->get_allocation_scope() << "\n";
+    stream << "Allocation scope:\t0x" << hex << block->get_allocation_scope().get_name() << "\n";
     
     if(block->get_release_time().to_ns() != Timestamp::NOW) {
         stream << "Release time:\t" << block->get_release_time().to_string() << "\n";
@@ -73,7 +74,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
         stream << "Release time:\tN/A\n";
     }
     if(block->get_release_scope()) {
-        stream << "Release scope:\t" << hex << block->get_release_scope() << "\n";
+        stream << "Release scope:\t" << hex << block->get_release_scope().get_name() << "\n";
     }
     else {
         stream << "Release scope:\tN/A\n";
@@ -83,7 +84,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     }
     else {
         stream << "Total time allocated:\t" << Timestamp(block->get_allocation_time().ns_until(object->get_bounding_rect().get_end().get_time_element())).to_string() << "\n";
-    }
+    }*/
     
     /*display.sprintf("Allocated at: %s\nAllocation scope: %llx",
         qPrintable(block->get_allocation_time().to_string()), block->get_allocation_scope());*/

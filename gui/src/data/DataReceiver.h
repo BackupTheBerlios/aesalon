@@ -32,6 +32,8 @@ public:
     DataReceiver(DataThread *data_thread) : QObject(NULL), data_thread(data_thread) {}
     virtual ~DataReceiver() {}
     
+    DataThread *get_data_thread() const { return data_thread; }
+    
     void event_received(Event *event);
 signals:
     void started(Timestamp *time);

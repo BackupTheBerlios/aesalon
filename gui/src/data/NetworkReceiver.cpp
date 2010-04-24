@@ -23,6 +23,7 @@
 #include "NetworkReceiver.moc"
 #include "storage/AllocEvent.h"
 #include "storage/FreeEvent.h"
+#include "session/DataThread.h"
 
 NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 port) : DataReceiver(data_thread), host(host), port(port), start_time(0) {
     tcp_socket = new QTcpSocket(this);
@@ -92,7 +93,6 @@ void NetworkReceiver::process_queue() {
     while(unprocessed.size()) {
         quint8 header = unprocessed.at(0);
         unprocessed.remove(0, 1);
-        qDebug("header & 0x03: %i", header & 0x03);
         int word_size = (header & 0x80)?8:4;
         /* If the first bit is set, and the second is not, then it's a block event . . . */
         if((header & 0x03) == 1) {
@@ -111,7 +111,8 @@ void NetworkReceiver::process_queue() {
                     + scope
                     + address
             */
-            quint8 block_type_sizes[] = {word_size * 3, word_size * 4, word_size * 2};
+            /* NOTE: the extra 4 bytes is for the scope ID. */
+            quint8 block_type_sizes[] = {(word_size * 2) + 4, (word_size * 3) + 4, (word_size * 1) + 4};
             /* Check the size of the waiting data. The extra 8 bytes is for the timestamp. */
             if(unprocessed.size() < (block_type_sizes[block_type]+8)) {
                 unprocessed.prepend(header);
@@ -119,11 +120,12 @@ void NetworkReceiver::process_queue() {
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
-            quint64 scope_id = pop_word(8);
+            quint32 scope_id = pop_word(4);
+            const Scope &scope = get_data_thread()->get_scope_mapper()->get_scope(scope_id);
             quint64 address = pop_word(word_size);
             if(block_type == 0) {
                 quint64 size = pop_word(word_size);
-                event_received(new AllocEvent(timestamp, address, size, scope_id));
+                event_received(new AllocEvent(timestamp, address, size, scope));
             }
             else if(block_type == 1) {
                 quint64 new_address = pop_word(word_size);
@@ -131,11 +133,11 @@ void NetworkReceiver::process_queue() {
                 /* From the man page for realloc: "If ptr is NULL, then the call is equivalent to malloc(size),
                     for all values of size; if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)."
                     Ergo, don't emit free/alloc events for such cases. */
-                if(address != 0) event_received(new FreeEvent(timestamp, address, scope_id));
-                if(new_size != 0) event_received(new AllocEvent(timestamp, new_address, new_size, scope_id));
+                if(address != 0) event_received(new FreeEvent(timestamp, address, scope));
+                if(new_size != 0) event_received(new AllocEvent(timestamp, new_address, new_size, scope));
             }
             else if(block_type == 2) {
-                event_received(new FreeEvent(timestamp, address, scope_id));
+                event_received(new FreeEvent(timestamp, address, scope));
             }
         }
         else if((header & 0x03) == 2) {
@@ -153,7 +155,6 @@ void NetworkReceiver::process_queue() {
             else emit finished(timestamp);
         }
         else if((header & 0x03) == 3) {
-            qDebug("unprocessed.size() before: %i", unprocessed.size());
             /* there should be at least 9 bytes left: 8 for timestamp, 1 for name size. */
             if(unprocessed.size() < 9) {
                 unprocessed.prepend(header);
@@ -161,7 +162,6 @@ void NetworkReceiver::process_queue() {
             }
             /* ignore the timestamp . . . */
             quint8 size = unprocessed.at(8);
-            qDebug("scope name size: %i", size);
             if(unprocessed.size() < size + 9) {
                 unprocessed.prepend(header);
                 break;
@@ -170,12 +170,12 @@ void NetworkReceiver::process_queue() {
             QByteArray scope_name;
             scope_name = unprocessed.left(size);
             unprocessed.remove(0, size);
-            qDebug("found scope name: %s", scope_name.constData());
-            qDebug("unprocessed.size() after: %i", unprocessed.size());
+            get_data_thread()->get_scope_mapper()->add_scope(Scope(scope_name));
         }
         else {
-            qDebug("Invalid event type encountered (%i). Data corruption is likely to follow.", (header & 0x03));
-            qDebug(". . . and an infinite loop, too.");
+            qCritical(
+                "Invalid event type encountered (%i). Since said event is an unknown size,\n"
+                "all further processing has been halted.", (header & 0x03));
             unprocessed.prepend(header);
             break;
         }

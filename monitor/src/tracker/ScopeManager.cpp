@@ -51,7 +51,6 @@ Event::ScopeEvent *ScopeManager::get_scope(Word address, Word32 &id) {
     
     if(scope_vector.size() && iterator != scope_vector.end() && iterator->get_address() <= address && (iterator->get_address() + iterator->get_size()) >= address) {
         id = iterator->get_id();
-        std::cout << "ScopeManager: found properly, id is " << id << std::endl;
         return NULL;
     }
     
@@ -64,7 +63,6 @@ Event::ScopeEvent *ScopeManager::get_scope(Word address, Word32 &id) {
     if(!file) {
         file = interface->parse_file(file_object.get_name());
         if(!file) {
-            std::cout << "ScopeManager: couldn't parse file to get information" << std::endl;
             return NULL;
         }
     }
@@ -73,7 +71,6 @@ Event::ScopeEvent *ScopeManager::get_scope(Word address, Word32 &id) {
     Analyzer::Object symbol = file->get_symbol_for(address);
     
     if(symbol.get_address() == 0 && symbol.get_size() == 0) {
-        std::cout << "ScopeManager: NULL object given for address " << std::hex << address << std::endl;
         return NULL;
     }
     
@@ -96,8 +93,6 @@ Event::ScopeEvent *ScopeManager::get_scope(Word address, Word32 &id) {
     }
     
     scope_vector.insert(iterator, scope);
-    
-    std::cout << "ScopeManager: returning new ScopeEvent" << std::endl;
     
     return new Event::ScopeEvent(Event::ScopeEvent::NEW_SCOPE, scope.get_id(), scope.get_name());
 }

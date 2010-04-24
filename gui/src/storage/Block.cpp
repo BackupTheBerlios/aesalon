@@ -19,7 +19,7 @@
 
 #include "Block.h"
 
-Block::Block(const Timestamp &allocation_time, MemoryAddress address, MemorySize size, MemoryAddress alloc_scope)
+Block::Block(const Timestamp &allocation_time, MemoryAddress address, MemorySize size, const Scope &alloc_scope)
     : allocation_time(allocation_time), release_time(0), address(address), size(size), allocation_scope(alloc_scope),
     release_scope(0) {
 

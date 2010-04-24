@@ -40,7 +40,6 @@ Block *BlockEvent::serialize(int bits) {
     Word32 scope_id;
     ScopeEvent *event = Initializer::get_instance()->get_scope_manager()->get_scope(scope, scope_id);
     if(event) {
-        std::cout << "Prepending serialized scope event(s) . . ." << std::endl;
         Block *block = event->serialize(bits);
         serialized->prepend(block);
         delete block;
@@ -63,8 +62,6 @@ Block *BlockEvent::serialize(int bits) {
         default:
             throw Exception::EventException("Asked to serialize invalid Block event");
     }
-    
-    std::cout << "BlockEvent: serialized size is " << serialized->get_size() << std::endl;
     
     return serialized;
 }

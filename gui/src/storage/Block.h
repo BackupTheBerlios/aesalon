@@ -22,6 +22,7 @@
 
 #include "MemoryTypes.h"
 #include "Timestamp.h"
+#include "Scope.h"
 
 class Block {
 private:
@@ -29,10 +30,10 @@ private:
     Timestamp release_time;
     MemoryAddress address;
     MemorySize size;
-    MemoryAddress allocation_scope;
-    MemoryAddress release_scope;
+    Scope allocation_scope;
+    Scope release_scope;
 public:
-    Block(const Timestamp &allocation_time, MemoryAddress address, MemorySize size, MemoryAddress alloc_scope);
+    Block(const Timestamp &allocation_time, MemoryAddress address, MemorySize size, const Scope &alloc_scope);
     
     Block *clone();
     
@@ -41,10 +42,10 @@ public:
     void set_release_time(const Timestamp &time) { release_time = time; }
     MemoryAddress get_address() const { return address; }
     MemorySize get_size() const { return size; }
-    MemoryAddress get_allocation_scope() const { return allocation_scope; }
-    void set_allocation_scope(MemoryAddress new_scope) { allocation_scope = new_scope; }
-    MemoryAddress get_release_scope() const { return release_scope; }
-    void set_release_scope(MemoryAddress new_scope) { release_scope = new_scope; }
+    const Scope &get_allocation_scope() const { return allocation_scope; }
+    void set_allocation_scope(const Scope &new_scope) { allocation_scope = new_scope; }
+    const Scope &get_release_scope() const { return release_scope; }
+    void set_release_scope(const Scope &new_scope) { release_scope = new_scope; }
 };
 
 #endif

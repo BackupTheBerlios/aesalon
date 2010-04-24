@@ -28,6 +28,7 @@
 #include "storage/SnapshotList.h"
 #include "storage/EventVisitor.h"
 #include "data/DataSource.h"
+#include "ScopeMapper.h"
 
 class DataThread : public QThread { Q_OBJECT
 private:
@@ -41,6 +42,8 @@ private:
     QSet<EventVisitor *> event_visitors;
     
     Timestamp *start_time, *finish_time;
+    
+    ScopeMapper *scope_mapper;
 public:
     DataThread(QObject *parent, DataSource *data_source);
     virtual ~DataThread();
@@ -54,6 +57,7 @@ public:
     Timestamp get_last_time() const;
     
     SnapshotList *get_snapshot_list() { return &snapshot_list; }
+    ScopeMapper *get_scope_mapper() const { return scope_mapper; }
 private slots:
     void create_new_snapshot();
     void started(Timestamp *time);

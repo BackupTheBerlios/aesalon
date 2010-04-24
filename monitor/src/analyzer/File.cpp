@@ -131,7 +131,7 @@ void File::parse() {
         if(ret == -1) {
             /* errno will be EINVAL when filename is not a symlink, so break. */
             if(errno == EINVAL) break;
-            throw Exception::AnalyzerException(Misc::StreamAsString() << "Couldn't resolve symlink: " << strerror(errno));
+            throw Exception::AnalyzerException(Misc::StreamAsString() << "Couldn't resolve symlink \"" << filename << "\": " << strerror(errno));
         }
         else filename = buffer;
     }

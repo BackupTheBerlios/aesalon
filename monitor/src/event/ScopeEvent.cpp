@@ -44,8 +44,6 @@ Block *ScopeEvent::serialize(int bits) {
         length = name.length();
     }
     
-    std::cout << "scope name length is " << length << std::endl;
-    
     const char *data = name.c_str();
     
     std::size_t pos = serialized->get_size();

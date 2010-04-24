@@ -28,9 +28,11 @@ DataThread::DataThread(QObject *parent, DataSource *data_source) : QThread(paren
     current_snapshot->update_timestamp(Timestamp(0));
     start_time = NULL;
     finish_time = NULL;
+    scope_mapper = new ScopeMapper();
 }
 
 DataThread::~DataThread() {
+    delete scope_mapper;
     if(start_time) delete start_time;
     if(finish_time) delete finish_time;
 }
