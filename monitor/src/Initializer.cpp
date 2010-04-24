@@ -78,8 +78,6 @@ void Initializer::initialize() {
 
     argument_parser->parse();
 
-    if(argument_parser->get_argument("help")->is_found()) std::cout << "!!!" << std::endl;
-
     if(argument_parser->get_argument("help")->is_found()) {
         usage();
         return;

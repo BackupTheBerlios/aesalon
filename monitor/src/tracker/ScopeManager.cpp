@@ -19,7 +19,6 @@ ScopeManager::ScopeManager() {
     map_parser = NULL;
     
     full_backtrace = !Initializer::get_instance()->get_argument_parser()->get_argument("no-backtrace")->is_found();
-    std::cout << "full_backtrace: " << full_backtrace << std::endl;
     platform_bits = Initializer::get_instance()->get_analyzer_interface()->get_file()->get_attribute("platform_bits");
 }
 
@@ -111,15 +110,11 @@ Event::ScopeEvent *ScopeManager::get_scope(Word address, Word32 &id) {
 void ScopeManager::push_scope(Block *block, Word *scope, Word scope_size) {
     Word x = 0;
     
-    std::cout << "scope_size: " << scope_size << std::endl;
-    std::cout << "full_backtrace: " << full_backtrace << std::endl;
-    
     if(scope_size > 65535) scope_size = 65535;
     if(!full_backtrace) block->push_word(1, 16);
     else block->push_word(scope_size, 16);
     
     do {
-        std::cout << "pushing scope . . ." << std::endl;
         push_scope(block, scope[x]);
     } while(++x < scope_size && full_backtrace);
 }

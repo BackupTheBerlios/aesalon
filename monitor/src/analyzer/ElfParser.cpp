@@ -159,7 +159,8 @@ void ElfParser::parse_32() {
             
             demangled = abi::__cxa_demangle(sm->dereference_string(strtab_content_offset) + symbol.st_name, NULL, NULL, &status);
             if(demangled) {
-                sm->dereference_attribute(symbol_offset)->name = sm->new_string(demangled);
+                StorageOffset name = sm->new_string(demangled);
+                sm->dereference_attribute(symbol_offset)->name = name;
                 free(demangled);
             }
             else sm->dereference_attribute(symbol_offset)->name = strtab_content_offset + symbol.st_name;
@@ -197,7 +198,8 @@ void ElfParser::parse_32() {
             
             demangled = abi::__cxa_demangle(sm->dereference_string(dynstr_content_offset) + symbol.st_name, NULL, NULL, &status);
             if(demangled) {
-                sm->dereference_attribute(symbol_offset)->name = sm->new_string(demangled);
+                StorageOffset name = sm->new_string(demangled);
+                sm->dereference_attribute(symbol_offset)->name = name;
                 free(demangled);
             }
             else sm->dereference_attribute(symbol_offset)->name = dynstr_content_offset + symbol.st_name;
@@ -305,7 +307,8 @@ void ElfParser::parse_64() {
             
             demangled = abi::__cxa_demangle(sm->dereference_string(strtab_content_offset) + symbol.st_name, NULL, NULL, &status);
             if(demangled) {
-                sm->dereference_attribute(symbol_offset)->name = sm->new_string(demangled);
+                StorageOffset name = sm->new_string(demangled);
+                sm->dereference_attribute(symbol_offset)->name = name;
                 free(demangled);
             }
             else sm->dereference_attribute(symbol_offset)->name = strtab_content_offset + symbol.st_name;
@@ -345,7 +348,8 @@ void ElfParser::parse_64() {
             
             demangled = abi::__cxa_demangle(sm->dereference_string(dynstr_content_offset) + symbol.st_name, NULL, NULL, &status);
             if(demangled) {
-                sm->dereference_attribute(symbol_offset)->name = sm->new_string(demangled);
+                StorageOffset name = sm->new_string(demangled);
+                sm->dereference_attribute(symbol_offset)->name = name;
                 free(demangled);
             }
             else sm->dereference_attribute(symbol_offset)->name = dynstr_content_offset + symbol.st_name;

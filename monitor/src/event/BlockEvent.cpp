@@ -58,11 +58,7 @@ Block *BlockEvent::serialize(int bits) {
             throw Exception::EventException("Asked to serialize invalid Block event");
     }
     
-    std::cout << "before pushing scopes: " << serialized->get_size() << std::endl;
-    
     Initializer::get_instance()->get_scope_manager()->push_scope(serialized, scope, scope_size);
-    
-    std::cout << "after pushing scopes: " << serialized->get_size() << std::endl;
     
     return serialized;
 }

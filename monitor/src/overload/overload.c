@@ -274,7 +274,7 @@ void deinitialize_overload() {
 void write_bt_info() {
     void *bp = NULL;
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    asm("mov qword [rbp-0x28], rbp");
+    asm("mov qword [rbp-0x30], rbp");
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86
     asm("mov qword [ebp-0x0c], ebp");
 #endif
@@ -282,7 +282,7 @@ void write_bt_info() {
     u_int32_t buffer_alloc = 1;
     u_int32_t buffer_size = 0;
 
-    unsigned char *buffer = NULL;
+    unsigned long *buffer = NULL;
 
     int address_size = sizeof(unsigned long);
     
@@ -292,21 +292,19 @@ void write_bt_info() {
     
     do {
         printf("bp: %p\n", bp);
-        bt_address = *((unsigned long *)(bp + 8));
-        if((buffer_size + address_size) > buffer_alloc) {
-            while((buffer_size + address_size) > buffer_alloc) buffer_alloc *= 2;
-            buffer = original_realloc(buffer, buffer_alloc);
-            memcpy(buffer + buffer_size, &bt_address, address_size);
-            buffer_size += address_size;
+        bt_address = *((unsigned long *)(bp + address_size));
+        if((buffer_size + 1) * address_size > buffer_alloc) {
+            while(((buffer_size + 1) * address_size) > buffer_alloc) buffer_alloc *= 2;
+            buffer = original_realloc(buffer, buffer_alloc * address_size);
+            printf("buffer: %p\n", buffer);
         }
-        printf("backtrace address: %p\n", bt_address);
+        buffer[buffer_size] = bt_address;
+        buffer_size ++;
         bp = (void *)*((unsigned long *)bp);
     } while(bp != NULL && bt_address != 0);
     
-    buffer_size /= 4;
-    
     write(pipe_fd, &buffer_size, sizeof(u_int32_t));
-    write(pipe_fd, buffer, (buffer_size - 1) * sizeof(u_int32_t));
+    write(pipe_fd, buffer, (buffer_size - 1) * sizeof(unsigned long));
     
     original_free(buffer);
 }

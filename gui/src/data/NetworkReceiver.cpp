@@ -80,13 +80,11 @@ void NetworkReceiver::prepend_word(quint64 data, int bytes) {
 }
 
 Backtrace NetworkReceiver::assemble_backtrace() {
-    qDebug("assemble_backtrace: remaining is %i", unprocessed.size());
     if(unprocessed.size() < 2) return Backtrace(NULL, 0);
     /*quint16 count = pop_word(2);*/
     quint16 count = 0;
     count = unprocessed.at(0);
     count |= quint16(unprocessed.at(1)) << 8;
-    qDebug("count: %i remaining: %i", count, unprocessed.size());
     if(unprocessed.size() < count * 4) {
         return Backtrace(NULL, 0);
     }
@@ -94,7 +92,7 @@ Backtrace NetworkReceiver::assemble_backtrace() {
     Scope *scopes = new Scope[count];
     
     for(quint16 i = 0; i < count; i ++) {
-        scopes[i] = get_data_thread()->get_scope_mapper()->get_scope(pop_word(32));
+        scopes[i] = get_data_thread()->get_scope_mapper()->get_scope(pop_word(4));
     }
     
     return Backtrace(scopes, count);
@@ -107,7 +105,6 @@ void NetworkReceiver::data_received(QByteArray data) {
 
 void NetworkReceiver::process_queue() {
     while(unprocessed.size()) {
-        qDebug("0. remaining is %i", unprocessed.size());
         quint8 header = unprocessed.at(0);
         unprocessed.remove(0, 1);
         int word_size = (header & 0x80)?8:4;
@@ -129,7 +126,6 @@ void NetworkReceiver::process_queue() {
                     + address
             */
             quint8 block_type_sizes[] = {2, 3, 1};
-            qDebug("1. remaining is %i", unprocessed.size());
             /* Check the size of the waiting data.
                 8 extra bytes for the timestamp. */
             if(unprocessed.size() < ((block_type_sizes[block_type] * word_size)+8)) {
@@ -138,11 +134,8 @@ void NetworkReceiver::process_queue() {
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
-            qDebug("2. remaining is %i", unprocessed.size());
             quint64 words[3];
             for(int i = 0; i < block_type_sizes[block_type]; i ++) words[i] = pop_word(word_size);
-            
-            qDebug("3. remaining is %i", unprocessed.size());
             
             Backtrace backtrace = assemble_backtrace();
             if(backtrace.get_scope_list() == NULL) {
@@ -163,7 +156,6 @@ void NetworkReceiver::process_queue() {
             else if(block_type == 2) {
                 event_received(new FreeEvent(timestamp, words[0], backtrace));
             }
-            qDebug("Processed block event, remaining: %i", unprocessed.size());
         }
         else if((header & 0x03) == 2) {
             if(unprocessed.size() < 8) {
@@ -199,7 +191,7 @@ void NetworkReceiver::process_queue() {
         }
         else {
             qCritical(
-                "Invalid event type encountered (%i). Since said event is an unknown size,\n"
+                "Invalid event type encountered (%i). Since said event is an unknown size, "
                 "all further processing has been halted.", (header & 0x03));
             unprocessed.prepend(header);
             break;

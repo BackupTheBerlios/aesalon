@@ -9,7 +9,7 @@
 namespace PTrace {
 
 MapParser::MapParser(pid_t pid) : pid(pid) {
-
+    parse_maps();
 }
 
 MapParser::~MapParser() {
@@ -25,6 +25,7 @@ const Analyzer::Object &MapParser::get_object(Word address) {
     for(object_vector_t::iterator i = objects.begin(); i != objects.end(); i ++) {
         if(i->get_address() <= address && (i->get_address() + i->get_size()) >= address) return *i;
     }
+    std::cout << "Couldn't find 0x" << std::hex << address << " . . ." << std::endl;
     return invalid;
 }
 
