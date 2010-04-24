@@ -41,6 +41,7 @@
 #include "ExitObserver.h"
 #include "TrapObserver.h"
 #include "SegfaultObserver.h"
+#include "MainObserver.h"
 
 #include "misc/String.h"
 
@@ -75,9 +76,8 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
     if(pid == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));
     else if(pid == 0) {
-#ifndef USE_OVERLOAD
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
-#else
+#ifdef USE_OVERLOAD
         char *current_preload = getenv("LD_PRELOAD");
         std::string preload_string;
         if(current_preload) preload_string = current_preload;
@@ -102,9 +102,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
 #endif
     
     /* Trap signals are the most common, so add the TrapObserver on first. */
-#ifndef USE_OVERLOAD
     add_signal_observer(new TrapObserver());
-#endif
     add_signal_observer(new ExitObserver());
     add_signal_observer(new SegfaultObserver());
     
@@ -271,8 +269,8 @@ void Portal::continue_execution(int signal) {
 void Portal::single_step() {
     if(ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL) == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Couldn't single-step program:" << strerror(errno));
-    int status;
-    wait_for_signal(status); /* ptrace(PTRACE_SINGLESTEP throws a SIGTRAP when it's done, so wait for it. */
+    /* ptrace(PTRACE_SINGLESTEP throws a SIGTRAP when it's done, so wait for it. */
+    waitpid(pid, NULL, 0);
 }
 
 int Portal::wait_for_signal(int &status) {
@@ -296,6 +294,7 @@ void Portal::handle_breakpoint() {
         /*Message(Message::DEBUG_MESSAGE, "handle_breakpoint() called on non-breakpoint");*/
         return;
     }
+    
     if(breakpoint->get_original() != 0xcc) {
         /* ip is currently ($rip - 1), to use gdb notation. In other words, back up one byte. */
         

@@ -23,6 +23,8 @@
 #include "ProgramManager.h"
 #include "Initializer.h"
 
+#include "ptrace/MainObserver.h"
+
 ProgramManager::ProgramManager(Misc::ArgumentList *argument_list)
     : argument_list(argument_list), running(false), ptrace_portal(NULL) {
     
@@ -49,7 +51,10 @@ void ProgramManager::wait() {
 }
 
 void ProgramManager::setup() {
-    
+    Word main_address = Initializer::get_instance()->get_analyzer_interface()->get_file()->get_symbol_address("main");
+    if(main_address != 0) {
+        ptrace_portal->place_breakpoint(main_address, new PTrace::MainObserver());
+    }
 }
 
 void ProgramManager::process_backlog() {

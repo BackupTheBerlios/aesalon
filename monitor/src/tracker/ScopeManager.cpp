@@ -4,6 +4,8 @@
 #include "ScopeManager.h"
 #include "Initializer.h"
 #include "event/ScopeEvent.h"
+#include "exception/AnalyzerException.h"
+#include "misc/Message.h"
 
 namespace Tracker {
 
@@ -49,7 +51,9 @@ Event::ScopeEvent *ScopeManager::get_scope(Word address, Word32 &id) {
         else break;
     }
     
-    if(scope_vector.size() && iterator != scope_vector.end() && iterator->get_address() <= address && (iterator->get_address() + iterator->get_size()) >= address) {
+    if(scope_vector.size() && iterator != scope_vector.end() && iterator->get_address() <= address
+        && (iterator->get_address() + iterator->get_size()) >= address) {
+        
         id = iterator->get_id();
         return NULL;
     }
@@ -61,8 +65,11 @@ Event::ScopeEvent *ScopeManager::get_scope(Word address, Word32 &id) {
     Analyzer::Object file_object = map_parser->get_object(address);
     Analyzer::File *file = interface->get_file(file_object.get_name());
     if(!file) {
-        file = interface->parse_file(file_object.get_name());
-        if(!file) {
+        try {
+            file = interface->parse_file(file_object.get_name());
+        }
+        catch(Exception::AnalyzerException exception) {
+            Misc::Message(Misc::Message::WARNING_MESSAGE, "Couldn't open file referenced by process map . . .");
             return NULL;
         }
     }

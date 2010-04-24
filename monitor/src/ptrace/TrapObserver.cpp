@@ -27,14 +27,15 @@ namespace PTrace {
 
 bool TrapObserver::handle_signal(int signal, int status) {
     if(signal != SIGTRAP) return false;
+    
+    ProgramManager *program_manager = Initializer::get_instance()->get_program_manager();
     if(first) {
         Initializer::get_instance()->get_program_manager()->get_ptrace_portal()->get_map_parser()->parse_maps();
+        Initializer::get_instance()->get_program_manager()->setup();
         first = false;
-        return true;
     }
-    ProgramManager *program_manager = Initializer::get_instance()->get_program_manager();
+    else program_manager->get_ptrace_portal()->handle_breakpoint();
     
-    program_manager->get_ptrace_portal()->handle_breakpoint();
     program_manager->get_ptrace_portal()->continue_execution();
     return true;
 }
