@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Interface.h"
 
 namespace Analyzer {
@@ -16,10 +18,12 @@ Interface::~Interface() {
 }
 
 File *Interface::parse_file(std::string filename) {
-    if(file_map[filename]) return file_map[filename];
+    if(file_map[filename] != NULL) return file_map[filename];
     
     File *file = new File(filename, storage_manager);
-    file_map[filename] = file;
+    /* the get_filename() is there because the File parser can change
+        the filename to account for relative paths, symlinks, etc. */
+    file_map[file->get_filename()] = file;
     if(first_file == NULL) first_file = file;
     return file;
 }

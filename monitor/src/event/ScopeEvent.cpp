@@ -27,7 +27,6 @@ namespace Event {
 
 ScopeEvent::ScopeEvent(scope_event_type_e scope_type, Word id, std::string name)
     : BasicEvent(BasicEvent::SCOPE_EVENT), scope_type(scope_type), scope_id(id), name(name) {
-    std::cout << "constructing ScopeEvent . . ." << std::endl;
 }
 
 ScopeEvent::~ScopeEvent() {
@@ -37,7 +36,6 @@ ScopeEvent::~ScopeEvent() {
 Block *ScopeEvent::serialize(int bits) {
     Block *serialized = BasicEvent::serialize(bits);
     serialized->get_data()[0] |= 0x03;
-    std::cout << "serialized->get_data()[0]: " << int(serialized->get_data()[0]) << std::endl;
     
     std::size_t length = name.length();
     if(length > 256) {
@@ -45,6 +43,8 @@ Block *ScopeEvent::serialize(int bits) {
         name.erase(255);
         length = name.length();
     }
+    
+    std::cout << "scope name length is " << length << std::endl;
     
     const char *data = name.c_str();
     

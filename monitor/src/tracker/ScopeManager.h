@@ -21,9 +21,6 @@ public:
     Scope(const std::string &name, Word address, Word size, Word32 id);
     
     Word32 get_id() const { return id; }
-    
-    bool operator<(const Scope &other) const;
-    bool operator<(Word address) const;
 };
 
 class ScopeManager {

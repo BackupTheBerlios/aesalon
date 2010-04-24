@@ -56,9 +56,7 @@ void Block::resize(size_t new_size) {
     if(new_size > allocated_size) {
         if(allocated_size == 0) allocated_size = 1;
         while(allocated_size < new_size) allocated_size *= 2;
-        std::cout << "originally, data_buffer is " << (void *)data_buffer << std::endl;
         data_buffer = (Byte *)(std::realloc(data_buffer, allocated_size));
-        std::cout << "data_buffer is now " << (void *)data_buffer << std::endl;
         if(data_buffer == NULL) throw Exception::OutOfMemoryException();
     }
     data_size = new_size;
@@ -78,6 +76,8 @@ void Block::push_word(Word64 data, int bits) {
 void Block::prepend(Block *block) {
     std::size_t original_size = data_size;
     resize(data_size + (block->data_size));
-    memmove(data_buffer + block->data_size, data_buffer, original_size);
+    for(int i = (original_size-1); i >= 0; i --) {
+        data_buffer[block->data_size + i] = data_buffer[i];
+    }
     memcpy(data_buffer, block->data_buffer, block->data_size);
 }

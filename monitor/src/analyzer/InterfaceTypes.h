@@ -21,6 +21,7 @@ public:
     
     bool operator<(const Object &other) const;
     bool operator<(Word address) const;
+    bool operator>(Word address) const;
 };
 
 } // namespace Analyzer

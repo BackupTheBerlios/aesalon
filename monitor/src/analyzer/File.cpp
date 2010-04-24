@@ -2,6 +2,8 @@
 #include <errno.h>
 #include <cstring>
 #include <iostream>
+#include <unistd.h>
+#include <cstddef>
 
 #include "File.h"
 #include "Initializer.h"
@@ -122,6 +124,28 @@ void File::add_attribute(StorageOffset attribute) {
 }
 
 void File::parse() {
+    /* check for symlinks . . . */
+    while(true) {
+        char buffer[1024];
+        ssize_t ret = readlink(filename.c_str(), buffer, sizeof(buffer));
+        if(ret == -1) {
+            /* errno will be EINVAL when filename is not a symlink, so break. */
+            if(errno == EINVAL) break;
+            throw Exception::AnalyzerException(Misc::StreamAsString() << "Couldn't resolve symlink: " << strerror(errno));
+        }
+        else filename = buffer;
+    }
+    
+    /* Fix the path if it's not an absolute path . . . */
+    if(filename[0] != '/') {
+#ifdef PATH_MAX
+        char pwd[PATH_MAX];
+#else
+        char pwd[1024];
+#endif
+        filename.insert(0, "/");
+        filename.insert(0, getcwd(pwd, sizeof(pwd)));
+    }
     int file_fd = open(filename.c_str(), O_RDONLY);
     if(file_fd == -1) {
         throw Exception::AnalyzerException(Misc::StreamAsString() << "Couldn't open file for parsing: " << strerror(errno));

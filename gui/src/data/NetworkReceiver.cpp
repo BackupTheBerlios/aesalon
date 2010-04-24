@@ -27,9 +27,9 @@
 NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 port) : DataReceiver(data_thread), host(host), port(port), start_time(0) {
     tcp_socket = new QTcpSocket(this);
     /*connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));*/
-    recv_timer = new QTimer();
+    /*recv_timer = new QTimer();
     connect(recv_timer, SIGNAL(timeout()), this, SLOT(process_queue()));
-    recv_timer->start(100);
+    recv_timer->start(100);*/
     /* NOTE: may want to do something with the disconnected signal . . . */
     
     device_reader = new DeviceReader(tcp_socket);
@@ -85,12 +85,14 @@ void NetworkReceiver::prepend_quint64(quint64 data) {
 
 void NetworkReceiver::data_received(QByteArray data) {
     unprocessed += data;
+    process_queue();
 }
 
 void NetworkReceiver::process_queue() {
     while(unprocessed.size()) {
         quint8 header = unprocessed.at(0);
         unprocessed.remove(0, 1);
+        qDebug("header & 0x03: %i", header & 0x03);
         int word_size = (header & 0x80)?8:4;
         /* If the first bit is set, and the second is not, then it's a block event . . . */
         if((header & 0x03) == 1) {
@@ -117,7 +119,7 @@ void NetworkReceiver::process_queue() {
             }
             quint64 raw_timestamp = pop_quint64();
             Timestamp timestamp = Timestamp(start_time.ns_until(Timestamp(raw_timestamp)));
-            quint64 scope_id = pop_word(32);
+            quint64 scope_id = pop_word(8);
             quint64 address = pop_word(word_size);
             if(block_type == 0) {
                 quint64 size = pop_word(word_size);
@@ -151,23 +153,31 @@ void NetworkReceiver::process_queue() {
             else emit finished(timestamp);
         }
         else if((header & 0x03) == 3) {
-            if(unprocessed.size() < 1) {
+            qDebug("unprocessed.size() before: %i", unprocessed.size());
+            /* there should be at least 9 bytes left: 8 for timestamp, 1 for name size. */
+            if(unprocessed.size() < 9) {
                 unprocessed.prepend(header);
                 break;
             }
-            qint8 size = unprocessed.at(0);
-            if(unprocessed.size() < size) {
+            /* ignore the timestamp . . . */
+            quint8 size = unprocessed.at(8);
+            qDebug("scope name size: %i", size);
+            if(unprocessed.size() < size + 9) {
                 unprocessed.prepend(header);
                 break;
             }
-            unprocessed.remove(0, 1);
+            unprocessed.remove(0, 9);
             QByteArray scope_name;
             scope_name = unprocessed.left(size);
             unprocessed.remove(0, size);
             qDebug("found scope name: %s", scope_name.constData());
+            qDebug("unprocessed.size() after: %i", unprocessed.size());
         }
         else {
             qDebug("Invalid event type encountered (%i). Data corruption is likely to follow.", (header & 0x03));
+            qDebug(". . . and an infinite loop, too.");
+            unprocessed.prepend(header);
+            break;
         }
     }
 }

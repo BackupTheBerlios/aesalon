@@ -18,5 +18,8 @@ bool Object::operator<(Word address) const {
     return this->address < address;
 }
 
+bool Object::operator>(Word address) const {
+    return this->address > address;
+}
 
 } // namespace Analyzer

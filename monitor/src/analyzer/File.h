@@ -24,6 +24,7 @@ public:
     File(std::string filename, StorageManager *storage_manager);
     ~File();
     
+    const std::string &get_filename() const { return filename; }
     StorageManager *get_storage_manager() const { return storage_manager; }
     
     Object get_section(const char *name) const;
