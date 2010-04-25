@@ -6,11 +6,12 @@
 class OverloadParser {
 private:
     int pipe_fd;
+    bool full_backtraces;
     pthread_t thread;
     
     static void *parse(void *pipe_fd);
 public:
-    OverloadParser(int pipe_fd);
+    OverloadParser(int pipe_fd, bool full_backtraces);
     ~OverloadParser();
 };
 

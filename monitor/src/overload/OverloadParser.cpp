@@ -9,7 +9,7 @@
 #include "event/BlockEvent.h"
 #include "misc/Message.h"
 
-OverloadParser::OverloadParser(int pipe_fd) : pipe_fd(pipe_fd) {
+OverloadParser::OverloadParser(int pipe_fd, bool full_backtraces) : pipe_fd(pipe_fd), full_backtraces(full_backtraces) {
     pthread_create(&thread, NULL, parse, (void *)pipe_fd);
 }
 

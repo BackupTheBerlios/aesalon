@@ -64,6 +64,7 @@ void *(*original_memalign)(size_t boundary, size_t size);
 unsigned long get_libc_offset(char *libc_path);
 
 int pipe_fd;
+int gather_backtraces;
 
 void initialize_overload();
 void deinitialize_overload();
@@ -71,6 +72,22 @@ void write_bt_info();
 uint64_t get_timestamp();
 
 int overload_initialized = 0;
+
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+#define write_scope_info() \
+    if(gather_backtraces) write_bt_info(); \
+    else { \
+        uint32_t one = 1; \
+        write(pipe_fd, &one, sizeof(one)); \
+        unsigned long scope; \
+        asm("push [rbp + 8]"); \
+        scope = (unsigned long) get_scope_address(); \
+        asm("add rsp, 8"); \
+        write(pipe_fd, &scope, sizeof(scope)); \
+    }
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    #error NYI
+#endif
 
 void __attribute__((constructor)) aesalon_constructor() {
     /* NOTE: the constructor may be called after other libs if there is more than one preload. */
@@ -81,11 +98,20 @@ void __attribute__((destructor)) aesalon_destructor() {
     deinitialize_overload();
 }
 
+void *get_scope_address() {
+#if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
+    asm("mov rax, [rbp + 16]");
+#elif AESALON_PLATFORM == AESALON_PLATFORM_x86
+    asm("mov eax, [ebp + 8]");
+#endif
+}
+
 void *calloc(size_t nmemb, size_t size) {
     if(!overload_initialized) initialize_overload();
     allocation_data_u data;    
     static unsigned char type = ALLOC_TYPE;
     static uint32_t zero = 0;
+    static char first = 1;
     
     data.data.timestamp = get_timestamp();
     data.data.size = nmemb * size;
@@ -95,12 +121,16 @@ void *calloc(size_t nmemb, size_t size) {
         memset((void *)data.data.address, 0, data.data.size);
     }
     
-    write(pipe_fd, &type, sizeof(type));
-    write(pipe_fd, data.buffer, sizeof(data.buffer));
-    
-    if(original_calloc) write_bt_info();
-    else {
-        write(pipe_fd, &zero, sizeof(zero));
+    if(!first) {
+        write(pipe_fd, &type, sizeof(type));
+        write(pipe_fd, data.buffer, sizeof(data.buffer));
+        
+        if(original_calloc) {
+            write_scope_info();
+        }
+        else {
+            write(pipe_fd, &zero, sizeof(zero));
+        }
     }
     
     return (void *)data.data.address;
@@ -118,7 +148,7 @@ void *malloc(size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
-    write_bt_info();
+    write_scope_info();
     
     return (void *)data.data.address;
 }
@@ -136,7 +166,7 @@ void free(void *ptr) {
     ret = write(pipe_fd, &type, sizeof(type));
     ret = write(pipe_fd, data.buffer, sizeof(data.buffer));
     
-    write_bt_info();
+    write_scope_info();
 }
 
 void *realloc(void *ptr, size_t size) {
@@ -154,7 +184,7 @@ void *realloc(void *ptr, size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
-    write_bt_info();
+    write_scope_info();
     
     return (void *)data.data.new_address;
 }
@@ -172,7 +202,7 @@ int posix_memalign(void** memptr, size_t alignment, size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
-    write_bt_info();
+    write_scope_info();
     
     return result;
 }
@@ -189,7 +219,7 @@ void *valloc(size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
-    write_bt_info();
+    write_scope_info();
     
     return (void *)data.data.address;
 }
@@ -207,7 +237,7 @@ void *memalign(size_t boundary, size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
-    write_bt_info();
+    write_scope_info();
     
     return (void *)data.data.address;
 }
@@ -264,6 +294,8 @@ void initialize_overload() {
         fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_libc_path environment variable not set.\n");
         exit(1);
     }
+    char *backtraces = getenv("aesalon_gather_backtraces");
+    if(backtraces) gather_backtraces = 1;
     unsigned long libc_offset = get_libc_offset(libc_path);
     original_malloc += libc_offset;
 #ifdef DEVELOPMENT_BUILD
@@ -290,6 +322,7 @@ void deinitialize_overload() {
 
 void write_bt_info() {
     void *bp = NULL;
+    
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
     asm("mov qword [rbp-0x20], rbp");
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86
@@ -298,7 +331,7 @@ void write_bt_info() {
     
     u_int32_t buffer_alloc = 1;
     u_int32_t buffer_size = 0;
-
+    
     /* NOTE: there's probably a better way of doing this . . . */
     unsigned long buffer[65536];
 

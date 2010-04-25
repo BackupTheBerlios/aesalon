@@ -88,6 +88,10 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
         setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
         setenv("aesalon_malloc_offset", (Misc::StreamAsString() << std::hex << malloc_offset).operator std::string().c_str(), 1);
         setenv("aesalon_libc_path", Initializer::get_instance()->get_argument_parser()->get_argument("libc-path")->get_data().c_str(), 1);
+        if(Initializer::get_instance()->get_argument_parser()->get_argument("no-backtrace")->is_found() == false)
+            setenv("aesalon_full_backtrace", "yes", 1);
+        else unsetenv("aesalon_full_backtrace");
+        
         close(fds[0]);
         fcntl(fds[1], F_SETFL, fcntl(fds[1], F_GETFL) & ~O_NONBLOCK);
 #endif

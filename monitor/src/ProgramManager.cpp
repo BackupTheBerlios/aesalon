@@ -42,7 +42,8 @@ void ProgramManager::execute() {
     running = true;
     ptrace_portal = new PTrace::Portal(get_argument_list());
 #ifdef USE_OVERLOAD
-    overload_parser = new OverloadParser(ptrace_portal->get_pipe_fd());
+    overload_parser = new OverloadParser(ptrace_portal->get_pipe_fd(),
+        !Initializer::get_instance()->get_argument_parser()->get_argument("no-backtrace")->is_found());
 #endif
 }
 
