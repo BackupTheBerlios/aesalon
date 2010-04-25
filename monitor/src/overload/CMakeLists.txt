@@ -4,7 +4,7 @@
 #add_custom_command(OUTPUT overload.so COMMAND cp overload.o overload.so DEPENDS overload.o WORKING_DIRECTORY src/monitor/overload)
 #add_custom_target(Overload /usr/bin/nasm -f elf64 overload.asm -o overload.o COMMAND gcc -shared overload.o -o overload.so)
 if(DEVELOPMENT_BUILD)
-    add_custom_command(OUTPUT aesalon_overload_32.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_32.so -ldl -masm=intel
+    add_custom_command(OUTPUT aesalon_overload_32.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_32.so -ldl -lrt -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
         -DDEVELOPMENT_BUILD
         -DAESALON_PLATFORM=${AESALON_PLATFORM}
@@ -12,7 +12,7 @@ if(DEVELOPMENT_BUILD)
         -DAESALON_PLATFORM_x86_64=1
         DEPENDS overload.c)
     if(AESALON_PLATFORM EQUAL 1)
-    add_custom_command(OUTPUT aesalon_overload_64.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_64.so -ldl -masm=intel
+    add_custom_command(OUTPUT aesalon_overload_64.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_64.so -ldl -lrt -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
         -DDEVELOPMENT_BUILD
         -DAESALON_PLATFORM=${AESALON_PLATFORM}
@@ -21,14 +21,14 @@ if(DEVELOPMENT_BUILD)
         DEPENDS overload.c)
     endif(AESALON_PLATFORM EQUAL 1)
 else(DEVELOPMENT_BUILD)
-    add_custom_command(OUTPUT aesalon_overload_32.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_32.so -ldl -masm=intel
+    add_custom_command(OUTPUT aesalon_overload_32.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_32.so -ldl -lrt -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
         -DAESALON_PLATFORM=${AESALON_PLATFORM}
         -DAESALON_PLATFORM_x86=0
         -DAESALON_PLATFORM_x86_64=1
         DEPENDS overload.c)
     if(AESALON_PLATFORM EQUAL 1)
-    add_custom_command(OUTPUT aesalon_overload_64.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_64.so -ldl -masm=intel
+    add_custom_command(OUTPUT aesalon_overload_64.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_64.so -ldl -lrt -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
         -DAESALON_PLATFORM=${AESALON_PLATFORM}
         -DAESALON_PLATFORM_x86=0

@@ -114,6 +114,8 @@ void ScopeManager::push_scope(Block *block, Word *scope, Word scope_size) {
     if(!full_backtrace) block->push_word(1, 16);
     else block->push_word(scope_size, 16);
     
+    if(scope == NULL) return;
+    
     do {
         push_scope(block, scope[x]);
     } while(++x < scope_size && full_backtrace);

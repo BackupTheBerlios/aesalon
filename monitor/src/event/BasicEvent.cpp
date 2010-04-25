@@ -32,6 +32,9 @@ BasicEvent::BasicEvent(BasicEvent::event_type_e type) : type(type) {
     timestamp += time.tv_nsec;
 }
 
+BasicEvent::BasicEvent(BasicEvent::event_type_e type, Word64 timestamp) : type(type), timestamp(timestamp) {
+}
+
 /* Serialization format:
     first bit defines the event type, BLOCK_EVENT or REFERENCE_EVENT
 */

@@ -17,9 +17,12 @@
     @file overload/overload.c
 */
 
+#ifndef _GNU_SOURCE
+    #define _GNU_SOURCE
+#endif
+
 #include "common.h"
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -27,6 +30,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,6 +68,7 @@ int pipe_fd;
 void initialize_overload();
 void deinitialize_overload();
 void write_bt_info();
+uint64_t get_timestamp();
 
 int overload_initialized = 0;
 
@@ -80,7 +85,9 @@ void *calloc(size_t nmemb, size_t size) {
     if(!overload_initialized) initialize_overload();
     allocation_data_u data;    
     static unsigned char type = ALLOC_TYPE;
+    static uint32_t zero = 0;
     
+    data.data.timestamp = get_timestamp();
     data.data.size = nmemb * size;
     if(original_calloc != NULL) data.data.address = (unsigned long)original_calloc(nmemb, size);
     else {
@@ -91,7 +98,10 @@ void *calloc(size_t nmemb, size_t size) {
     write(pipe_fd, &type, sizeof(type));
     write(pipe_fd, data.buffer, sizeof(data.buffer));
     
-    write_bt_info();
+    if(original_calloc) write_bt_info();
+    else {
+        write(pipe_fd, &zero, sizeof(zero));
+    }
     
     return (void *)data.data.address;
 }
@@ -101,6 +111,7 @@ void *malloc(size_t size) {
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
     
+    data.data.timestamp = get_timestamp();
     data.data.address = (unsigned long)original_malloc(size);
     data.data.size = size;
     
@@ -117,6 +128,7 @@ void free(void *ptr) {
     free_data_u data;
     static unsigned char type = FREE_TYPE;
     
+    data.data.timestamp = get_timestamp();
     data.data.address = (unsigned long)ptr;
     original_free(ptr);
     
@@ -132,6 +144,7 @@ void *realloc(void *ptr, size_t size) {
     reallocation_data_u data;
     static unsigned char type = REALLOC_TYPE;
     
+    data.data.timestamp = get_timestamp();
     data.data.original_address = (unsigned long)ptr;
     
     data.data.new_size = size;
@@ -152,6 +165,7 @@ int posix_memalign(void** memptr, size_t alignment, size_t size) {
     static unsigned char type = ALLOC_TYPE;
     int result = original_posix_memalign(memptr, alignment, size);
     
+    data.data.timestamp = get_timestamp();
     data.data.address = (unsigned long)*memptr;
     data.data.size = size;
     
@@ -168,6 +182,7 @@ void *valloc(size_t size) {
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
     
+    data.data.timestamp = get_timestamp();
     data.data.address = (unsigned long)original_valloc(size);
     data.data.size = size;
     
@@ -184,6 +199,8 @@ void *memalign(size_t boundary, size_t size) {
     allocation_data_u data;
     static unsigned char type = ALLOC_TYPE;
     
+    
+    data.data.timestamp = get_timestamp();
     data.data.address = (unsigned long)original_memalign(boundary, size);
     data.data.size = size;
     
@@ -253,8 +270,8 @@ void initialize_overload() {
     printf("{aesalon} Resolving symbols . . .\n");
 #endif
     *(void **) (&original_calloc) = dlsym(RTLD_NEXT, "calloc");
-    *(void **) (&original_free) = dlsym(RTLD_NEXT, "free");
     *(void **) (&original_realloc) = dlsym(RTLD_NEXT, "realloc");
+    *(void **) (&original_free) = dlsym(RTLD_NEXT, "free");
     *(void **) (&original_memalign) = dlsym(RTLD_NEXT, "posix_memalign");
     *(void **) (&original_valloc) = dlsym(RTLD_NEXT, "valloc");
     *(void **) (&original_memalign) = dlsym(RTLD_NEXT, "memalign");
@@ -274,7 +291,7 @@ void deinitialize_overload() {
 void write_bt_info() {
     void *bp = NULL;
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64
-    asm("mov qword [rbp-0x30], rbp");
+    asm("mov qword [rbp-0x20], rbp");
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86
     asm("mov qword [ebp-0x0c], ebp");
 #endif
@@ -282,31 +299,27 @@ void write_bt_info() {
     u_int32_t buffer_alloc = 1;
     u_int32_t buffer_size = 0;
 
-    unsigned long *buffer = NULL;
+    /* NOTE: there's probably a better way of doing this . . . */
+    unsigned long buffer[65536];
 
-    int address_size = sizeof(unsigned long);
-    
     unsigned long bt_address = 0x0;
     
     bp = (void *)*((unsigned long *)bp);
     
     do {
-        printf("bp: %p\n", bp);
-        bt_address = *((unsigned long *)(bp + address_size));
-        if((buffer_size + 1) * address_size > buffer_alloc) {
-            while(((buffer_size + 1) * address_size) > buffer_alloc) buffer_alloc *= 2;
-            buffer = original_realloc(buffer, buffer_alloc * address_size);
-            printf("buffer: %p\n", buffer);
-        }
-        buffer[buffer_size] = bt_address;
-        buffer_size ++;
+        bt_address = *((unsigned long *)(bp + sizeof(unsigned long)));
+        buffer[buffer_size++] = bt_address;
         bp = (void *)*((unsigned long *)bp);
     } while(bp != NULL && bt_address != 0);
     
     write(pipe_fd, &buffer_size, sizeof(u_int32_t));
-    write(pipe_fd, buffer, (buffer_size - 1) * sizeof(unsigned long));
-    
-    original_free(buffer);
+    write(pipe_fd, buffer, (buffer_size) * sizeof(unsigned long));
+}
+
+uint64_t get_timestamp() {
+    struct timespec t;
+    clock_gettime(CLOCK_REALTIME, &t);
+    return ((uint64_t)t.tv_sec * 1000000000) + (uint64_t)t.tv_nsec;
 }
 
 #ifdef __cplusplus

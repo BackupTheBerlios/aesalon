@@ -45,6 +45,7 @@ public:
     /** Constructor, takes a type. All other stored data is in the derived
         types. */
     BasicEvent(event_type_e type);
+    BasicEvent(event_type_e type, Word64 timestamp);
     virtual ~BasicEvent() {}
     
     /** Returns the type of the current event.

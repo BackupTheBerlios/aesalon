@@ -39,8 +39,8 @@ private:
     Word scope_size;
     Word address, size, new_address;
 public:
-    BlockEvent(block_event_type_e type, Word address, Word size = 0,
-        Word new_address = 0, Word new_size = 0) : BasicEvent(BLOCK_EVENT), block_type(type),
+    BlockEvent(block_event_type_e type, Word64 timestamp, Word address, Word size = 0,
+        Word new_address = 0, Word new_size = 0) : BasicEvent(BLOCK_EVENT, timestamp), block_type(type),
         scope(NULL), scope_size(0), address(address), size(size), new_address(new_address) {}
     virtual ~BlockEvent();
     
