@@ -5,6 +5,7 @@
 #include <string>
 
 #include "StorageOffset.h"
+#include "StorageAttribute.h"
 #include "Parser.h"
 #include "InterfaceTypes.h"
 
@@ -16,9 +17,9 @@ class File {
 private:
     std::string filename;
     
-    StorageOffset sections, symbols, attributes;
-    StorageOffset last_section, last_symbol, last_attribute;
-    mutable std::map<std::string, StorageOffset> section_cache, symbol_cache, attribute_cache;
+    StorageAttribute *sections, *symbols, *attributes;
+    StorageAttribute *last_section, *last_symbol, *last_attribute;
+    mutable std::map<std::string, StorageAttribute *> section_cache, symbol_cache, attribute_cache;
     StorageManager *storage_manager;
 public:
     File(std::string filename, StorageManager *storage_manager);
@@ -34,15 +35,15 @@ public:
     /*StorageOffset *get_section(std::string name) const;*/
     
     /*Symbol *get_symbol(std::string name) const;*/
-    StorageOffset get_section_offset(const char *name) const;
+    StorageAttribute *get_section_attribute(const char *name) const;
     
-    StorageOffset get_symbol_offset(const char *name) const;
+    StorageAttribute *get_symbol_attribute(const char *name) const;
     Word get_symbol_address(const char *name) const;
     Word get_attribute(const char *name) const;
     
-    void set_sections(StorageOffset sections);
-    void add_symbol(StorageOffset section);
-    void add_attribute(StorageOffset section);
+    void set_sections(StorageAttribute *sections);
+    void add_symbol(StorageAttribute *symbol);
+    void add_attribute(StorageAttribute *attribute);
 private:
     void parse();
 };

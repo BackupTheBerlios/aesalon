@@ -75,6 +75,9 @@ void Initializer::initialize() {
     argument_parser->add_argument(new Misc::Argument("overload-path", 'o', Misc::Argument::REQUIRED_ARGUMENT, overload_path));
     
     argument_parser->add_argument(new Misc::Argument("no-backtrace", 0, Misc::Argument::NO_ARGUMENT, ""));
+    std::string chunk_size = config_parser->get_config_item("chunk-size");
+    if(chunk_size == "") chunk_size = (Misc::StreamAsString() << CHUNK_SIZE);
+    argument_parser->add_argument(new Misc::Argument("chunk-size", 0, Misc::Argument::REQUIRED_ARGUMENT, chunk_size));
 
     argument_parser->parse();
 
@@ -158,6 +161,7 @@ void Initializer::usage() {
     std::cout << "\t--overload-path\t\tThe directory containing the overload libraries. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
 #endif
     std::cout << "\t--no-backtrace\t\tForces the monitor to only consider the current scope, rather than the full backtrace." << std::endl;
+    std::cout << "\t--chunk-size\t\tThe size of the storage chunks. The larger, the more memory used. The smaller, the more processing power used. Currently is " << argument_parser->get_argument("chunk-size")->get_data() << "." << std::endl;
     std::cout << "\t--\t\t\tOptional, denotes the end of the argument list." << std::endl;
 }
 

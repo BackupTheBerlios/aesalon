@@ -1,6 +1,8 @@
 #ifndef AESALON_ANALYZER_STORAGE_MANAGER_H
+#define AESALON_ANALYZER_STORAGE_MANAGER_H
 
 #include <string>
+#include <vector>
 
 #include "StorageOffset.h"
 #include "StorageAttribute.h"
@@ -9,26 +11,39 @@ namespace Analyzer {
 
 class StorageManager {
 private:
-    Byte *storage;
-    StorageOffset storage_size;
-    StorageOffset used_storage;
+    class Chunk {
+    private:
+        Byte *storage;
+        StorageOffset used;
+        StorageOffset total_size;
+    public:
+        Chunk(StorageOffset size);
+        ~Chunk();
+        
+        Byte *get_storage() const { return storage; }
+        
+        Byte *reserve(StorageOffset size);
+        
+        StorageOffset get_used() const { return used; }
+        StorageOffset get_free() const { return CHUNK_SIZE - used; }
+    };
+    typedef std::vector<Chunk *> chunk_list_t;
+    chunk_list_t chunk_list;
+    StorageOffset chunk_size;
 public:
     StorageManager();
     ~StorageManager();
     
-    StorageOffset new_attribute();
-    StorageOffset new_string(std::string string);
-    StorageOffset new_string(const char *string);
-    StorageOffset new_string(StorageOffset size);
+    StorageAttribute *new_attribute();
+    char *new_string(std::string string);
+    char *new_string(const char *string);
+    char *new_string(StorageOffset size);
     
-    StorageAttribute *dereference_attribute(StorageOffset offset) const;
-    char *dereference_string(StorageOffset offset) const;
-    
-    StorageAttribute *create_child(StorageOffset offset, const char *name);
-    StorageOffset get_child(StorageOffset offset, const char *name) const;
-    StorageOffset get_from_list(StorageOffset offset, const char *name) const;
+    StorageAttribute *create_child(StorageAttribute *parent, const char *name);
+    StorageAttribute *get_child(StorageAttribute *parent, const char *name) const;
+    StorageAttribute *get_from_list(StorageAttribute *head, const char *name) const;
 private:
-    StorageOffset reserve(StorageOffset size);
+    Byte *reserve(StorageOffset size);
 };
 
 } // namespace Analyzer

@@ -16,8 +16,8 @@
 namespace Analyzer {
 
 File::File(std::string filename, StorageManager *storage_manager) : filename(filename), storage_manager(storage_manager) {
-    sections = symbols = attributes = -1;
-    last_section = last_symbol = last_attribute = -1;
+    sections = symbols = attributes = NULL;
+    last_section = last_symbol = last_attribute = NULL;
     parse();
 }
 
@@ -26,99 +26,92 @@ File::~File() {
 }
 
 Object File::get_section(const char *name) const {
-    StorageOffset offset = get_section_offset(name);
-    if(offset == -1) return Object("", 0, 0);
-    StorageAttribute *object = storage_manager->dereference_attribute(offset);
-    return Object(storage_manager->dereference_string(object->name),
-        storage_manager->dereference_attribute(storage_manager->get_child(offset, "address"))->value,
-        storage_manager->dereference_attribute(storage_manager->get_child(offset, "size"))->value);
+    StorageAttribute *attribute = get_section_attribute(name);
+    if(attribute == NULL) return Object("", 0, 0);
+    return Object(attribute->get_name(),
+        storage_manager->get_child(attribute, "address")->get_value(),
+        storage_manager->get_child(attribute, "size")->get_value());
 }
 
 Object File::get_symbol(const char *name) const {
-    StorageOffset offset = get_symbol_offset(name);
-    if(offset == -1) return Object("", 0, 0);
-    StorageAttribute *object = storage_manager->dereference_attribute(offset);
-    return Object(storage_manager->dereference_string(object->name),
-        storage_manager->dereference_attribute(storage_manager->get_child(offset, "address"))->value,
-        storage_manager->dereference_attribute(storage_manager->get_child(offset, "size"))->value);
+    StorageAttribute *attribute = get_symbol_attribute(name);
+    if(attribute == NULL) return Object("", 0, 0);
+    return Object(attribute->get_name(),
+        storage_manager->get_child(attribute, "address")->get_value(),
+        storage_manager->get_child(attribute, "size")->get_value());
 }
 
 Object File::get_symbol_for(Word address) {
-    StorageOffset offset = symbols;
-    while(offset != -1) {
-        Word addr = storage_manager->dereference_attribute(storage_manager->get_child(offset, "address"))->value;
-        Word size = storage_manager->dereference_attribute(storage_manager->get_child(offset, "size"))->value;
+    StorageAttribute *attribute = symbols;
+    while(attribute != NULL) {
+        Word addr = storage_manager->get_child(attribute, "address")->get_value();
+        Word size = storage_manager->get_child(attribute, "size")->get_value();
         if(address >= addr && address <= (addr + size)) {
-            return Object(storage_manager->dereference_string(storage_manager->dereference_attribute(offset)->name), addr, size);
+            return Object(attribute->get_name(), addr, size);
         }
-        offset = storage_manager->dereference_attribute(offset)->next;
+        attribute = attribute->get_next();
     }
     return Object("", 0, 0);
 }
 
-StorageOffset File::get_section_offset(const char *name) const {
-    StorageOffset offset = section_cache[name];
-    if(offset == 0) {
-        offset = storage_manager->get_from_list(sections, name);
-        section_cache[name] = offset;
+StorageAttribute *File::get_section_attribute(const char *name) const {
+    StorageAttribute *attribute = section_cache[name];
+    if(attribute == NULL) {
+        attribute = storage_manager->get_from_list(sections, name);
+        symbol_cache[name] = attribute;
     }
-    return offset;
+    return attribute;
 }
 
-StorageOffset File::get_symbol_offset(const char *name) const {
-    StorageOffset offset = symbol_cache[name];
-    if(offset == 0) {
-        offset = storage_manager->get_from_list(symbols, name);
-        symbol_cache[name] = offset;
+StorageAttribute *File::get_symbol_attribute(const char *name) const {
+    StorageAttribute *attribute = symbol_cache[name];
+    if(attribute == NULL) {
+        attribute = storage_manager->get_from_list(symbols, name);
+        symbol_cache[name] = attribute;
     }
-    return offset;
+    return attribute;
 }
 
 Word File::get_symbol_address(const char *name) const {
-    StorageOffset offset = get_symbol_offset(name);
-    if(offset == -1) return 0;
-    StorageOffset address_offset = storage_manager->get_child(offset, "address");
-    if(address_offset == -1) return 0;
+    StorageAttribute *attribute = get_symbol_attribute(name);
+    if(attribute == NULL) return 0;
     
-    return storage_manager->dereference_attribute(address_offset)->value;
+    return storage_manager->get_child(attribute, "address")->get_value();
 }
 
 Word File::get_attribute(const char *name) const {
-    StorageOffset offset = attribute_cache[name];
-    StorageAttribute *attribute = NULL;
-    if(offset == 0) {
-        offset = storage_manager->get_from_list(attributes, name);
+    StorageAttribute *attribute = attribute_cache[name];
+    if(attribute == NULL) {
+        attribute = storage_manager->get_from_list(attributes, name);
+        attribute_cache[name] = attribute;
     }
-    if(offset == -1) {
+    if(attribute == NULL) {
         return 0;
     }
-    attribute = storage_manager->dereference_attribute(offset);
     
-    return attribute->value;
+    return attribute->get_value();
 }
 
-void File::set_sections(StorageOffset sections) {
+void File::set_sections(StorageAttribute *sections) {
     this->sections = sections;
 }
 
-void File::add_symbol(StorageOffset symbol) {
-    if(last_symbol == -1) {
+void File::add_symbol(StorageAttribute *symbol) {
+    if(last_symbol == NULL) {
         symbols = symbol;
     }
     else {
-        StorageAttribute *last = storage_manager->dereference_attribute(last_symbol);
-        last->next = symbol;
+        last_symbol->set_next(symbol);
     }
     last_symbol = symbol;
 }
 
-void File::add_attribute(StorageOffset attribute) {
-    if(last_attribute == -1) {
+void File::add_attribute(StorageAttribute *attribute) {
+    if(last_attribute == NULL) {
         attributes = attribute;
     }
     else {
-        StorageAttribute *last = storage_manager->dereference_attribute(last_attribute);
-        last->next = attribute;
+        last_attribute->set_next(attribute);
     }
     last_attribute = attribute;
 }

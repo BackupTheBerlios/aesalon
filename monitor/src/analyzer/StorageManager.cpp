@@ -2,109 +2,117 @@
 #include <cstring>
 #include <iostream>
 #include "StorageManager.h"
+#include "Initializer.h"
+
+#ifndef CHUNK_SIZE
+    #define CHUNK_SIZE 10485760
+#endif
 
 namespace Analyzer {
 
+StorageManager::Chunk::Chunk(StorageOffset size) : total_size(size) {
+    storage = static_cast<Byte *>(mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
+    used = 0;
+}
+
+StorageManager::Chunk::~Chunk() {
+    munmap(storage, total_size);
+}
+
+Byte *StorageManager::Chunk::reserve(StorageOffset size) {
+    Byte *ret = storage + used;
+    used += size;
+    return ret;
+}
+
 StorageManager::StorageManager() {
-    storage_size = 1048576;
-    storage = static_cast<Byte *>(mmap(NULL, storage_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
-    
-    used_storage = 1;
+    std::stringstream stream;
+    stream << Initializer::get_instance()->get_argument_parser()->get_argument("chunk-size")->get_data();
+    stream >> chunk_size;
+    if(chunk_size == 0) chunk_size = CHUNK_SIZE;
 }
 
 StorageManager::~StorageManager() {
-    munmap(storage, storage_size);
-}
-
-StorageOffset StorageManager::new_attribute() {
-    StorageOffset offset = reserve(sizeof(StorageAttribute));
-    StorageAttribute *attribute = reinterpret_cast<StorageAttribute *>(storage + offset);
-    attribute->offset = offset;
-    attribute->next = -1;
-    attribute->child = -1;
-    attribute->name = 0;
-    attribute->value = 0;
-    return offset;
-}
-
-StorageOffset StorageManager::new_string(std::string string) {
-    std::size_t length = string.length() * sizeof(char);
-    StorageOffset offset = reserve(length + sizeof(char));
-    std::memcpy(storage + offset, string.c_str(), length + 1);
-    return offset;
-}
-
-StorageOffset StorageManager::new_string(const char *string) {
-    std::size_t length = strlen(string) * sizeof(char);
-    StorageOffset offset = reserve(length + sizeof(char));
-    std::memcpy(storage + offset, string, length + 1);
-    return offset;
-}
-
-StorageOffset StorageManager::new_string(StorageOffset size) {
-    StorageOffset offset = reserve(size);
-    return offset;
-}
-
-StorageAttribute *StorageManager::dereference_attribute(StorageOffset offset) const {
-    return reinterpret_cast<StorageAttribute *>(storage + offset);
-}
-
-char *StorageManager::dereference_string(StorageOffset offset) const {
-    return reinterpret_cast<char *>(storage + offset);
-}
-
-StorageAttribute *StorageManager::create_child(StorageOffset offset, const char *name) { 
-    StorageOffset attribute_offset = new_attribute();
-    StorageOffset string = new_string(name);
-    dereference_attribute(attribute_offset)->name = string;
     
-    StorageAttribute *attribute = dereference_attribute(offset);
-    offset = attribute->child;
-    if(offset == -1) {
-        attribute->child = attribute_offset;
+}
+
+StorageAttribute *StorageManager::new_attribute() {
+    Byte *storage = reserve(sizeof(StorageAttribute));
+    
+    StorageAttribute *attribute = reinterpret_cast<StorageAttribute *>(new(storage) StorageAttribute());
+    return attribute;
+}
+
+char *StorageManager::new_string(std::string string) {
+    std::size_t length = string.length() * sizeof(char);
+    
+    Byte *storage = reserve(length + sizeof(char));
+    std::memcpy(storage, string.c_str(), length + 1);
+    return reinterpret_cast<char *>(storage);
+}
+
+char *StorageManager::new_string(const char *string) {
+    std::size_t length = strlen(string) * sizeof(char);
+    
+    char *storage = (char *)reserve(length + sizeof(char));
+    std::memcpy(storage, string, length + 1);
+    return storage;
+}
+
+char *StorageManager::new_string(StorageOffset size) {
+    Byte *storage = reserve(size);
+    return reinterpret_cast<char *>(storage);
+}
+
+StorageAttribute *StorageManager::create_child(StorageAttribute *parent, const char *name) { 
+    const char *string = new_string(name);
+    
+    StorageAttribute *attribute = new_attribute();
+    attribute->set_name(string);
+    
+    StorageAttribute *child = parent->get_child();
+    if(child == NULL) {
+        parent->set_child(attribute);
     }
     else {
-        while(offset != -1) {
-            attribute = dereference_attribute(offset);
-            offset = attribute->next;
+        while(child->get_next() != NULL) {
+            child = child->get_next();
         }
-        attribute->next = attribute_offset;
+        child->set_next(attribute);
     }
     
-    return dereference_attribute(attribute_offset);
+    return attribute;
 }
 
-StorageOffset StorageManager::get_child(StorageOffset offset, const char *name) const {
-    return get_from_list(dereference_attribute(offset)->child, name);
+StorageAttribute *StorageManager::get_child(StorageAttribute *parent, const char *name) const {
+    return get_from_list(parent->get_child(), name);
 }
 
-StorageOffset StorageManager::get_from_list(StorageOffset offset, const char *name) const {
-    if(offset == -1) {
-        return -1;
+StorageAttribute *StorageManager::get_from_list(StorageAttribute *head, const char *name) const {
+    if(head == NULL) {
+        return NULL;
     }
-    while(offset != -1) {
-        StorageAttribute *attribute = dereference_attribute(offset);
-        char *attribute_name = dereference_string(attribute->name);
-        if(strcmp(attribute_name, name) == 0) {
-            return offset;
+    while(head != NULL) {
+        if(strcmp(head->get_name(), name) == 0) {
+            return head;
         }
         
-        offset = attribute->next;
+        head = head->get_next();
     }
-    return -1;
+    return NULL;
 }
 
-StorageOffset StorageManager::reserve(StorageOffset size) {
-    StorageOffset final_offset = used_storage + size;
-    StorageOffset original_offset = used_storage;
-    if(final_offset > storage_size) {
-        StorageOffset original_size = storage_size;
-        while(storage_size < final_offset) storage_size *= 2;
-        storage = static_cast<Byte *>(mremap(storage, original_size, storage_size, MREMAP_MAYMOVE));
+Byte *StorageManager::reserve(StorageOffset size) {
+    if(size > chunk_size) {
+        chunk_list.push_back(new Chunk(size));
+        return chunk_list.back()->reserve(size);
     }
-    used_storage = final_offset;
-    return original_offset;
+    for(chunk_list_t::iterator i = chunk_list.begin(); i != chunk_list.end(); i ++) {
+        if((*i)->get_free() >= size) return (*i)->reserve(size);
+    }
+    
+    chunk_list.push_back(new Chunk(chunk_size));
+    return chunk_list.back()->reserve(size);
 }
 
 } // namespace Analyzer

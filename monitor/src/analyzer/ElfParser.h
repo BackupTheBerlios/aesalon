@@ -5,6 +5,7 @@
 
 #include "StorageOffset.h"
 #include "Parser.h"
+#include "StorageAttribute.h"
 
 namespace Analyzer {
 
@@ -20,7 +21,7 @@ private:
     void parse_32();
     void parse_64();
     
-    StorageOffset read_content(StorageOffset section);
+    Byte *read_content(StorageAttribute *section);
 };
 
 } // namespace Analyzer
