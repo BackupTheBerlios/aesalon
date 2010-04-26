@@ -132,6 +132,7 @@ void *calloc(size_t nmemb, size_t size) {
             write(pipe_fd, &zero, sizeof(zero));
         }
     }
+    else first = 0;
     
     return (void *)data.data.address;
 }
@@ -282,7 +283,6 @@ void initialize_overload() {
         exit(1);
     }
     sscanf(pipe_str, "%i", &pipe_fd);
-    unsigned long malloc_offset;
     char *malloc_offset_str = getenv("aesalon_malloc_offset");
     if(pipe_str == NULL) {
         fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_malloc_offset environment variable not set.\n");
@@ -294,10 +294,10 @@ void initialize_overload() {
         fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_libc_path environment variable not set.\n");
         exit(1);
     }
-    char *backtraces = getenv("aesalon_gather_backtraces");
-    if(backtraces) gather_backtraces = 1;
     unsigned long libc_offset = get_libc_offset(libc_path);
     original_malloc += libc_offset;
+    char *backtraces = getenv("aesalon_gather_backtraces");
+    if(backtraces) gather_backtraces = 1;
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Resolving symbols . . .\n");
 #endif

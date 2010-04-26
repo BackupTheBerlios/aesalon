@@ -184,7 +184,7 @@ void ElfParser::parse_64() {
     /* Now try the dynamic symbols . . . */
     StorageAttribute *dynsym_offset = file->get_section_attribute(".dynsym");
     StorageAttribute *dynstr_offset = file->get_section_attribute(".dynstr");
-    if(symtab_offset != NULL && strtab_offset != NULL) {
+    if(dynsym_offset != NULL && dynstr_offset != NULL) {
         char *dynsym_content = (char *)read_content(dynsym_offset);
         char *dynstr_content = (char *)read_content(dynstr_offset);
         

@@ -58,7 +58,7 @@ StorageAttribute *File::get_section_attribute(const char *name) const {
     StorageAttribute *attribute = section_cache[name];
     if(attribute == NULL) {
         attribute = storage_manager->get_from_list(sections, name);
-        symbol_cache[name] = attribute;
+        section_cache[name] = attribute;
     }
     return attribute;
 }
@@ -97,7 +97,7 @@ void File::set_sections(StorageAttribute *sections) {
 }
 
 void File::add_symbol(StorageAttribute *symbol) {
-    if(last_symbol == NULL) {
+    if(symbols == NULL) {
         symbols = symbol;
     }
     else {
