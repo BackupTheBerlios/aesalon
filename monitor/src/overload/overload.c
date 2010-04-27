@@ -277,14 +277,8 @@ void initialize_overload() {
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Initializing overload library . . .\n");
 #endif
-    char *pipe_str = getenv("aesalon_pipe_fd");
-    if(pipe_str == NULL) {
-        fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_pipe_fd environment variable not set.\n");
-        exit(1);
-    }
-    sscanf(pipe_str, "%i", &pipe_fd);
     char *malloc_offset_str = getenv("aesalon_malloc_offset");
-    if(pipe_str == NULL) {
+    if(malloc_offset_str == NULL) {
         fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_malloc_offset environment variable not set.\n");
         exit(1);
     }
@@ -309,6 +303,10 @@ void initialize_overload() {
     *(void **) (&original_memalign) = dlsym(RTLD_NEXT, "memalign");
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Resolved symbols.\n");
+    printf("{aesalon} Opening pipe . . .\n");
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), TEMP_PATH "/aesalon-%lli", getpid());
+    pipe_fd = open(buffer, O_WRONLY);
     printf("{aesalon} Overload library initialization completed.\n");
 #endif
 }
