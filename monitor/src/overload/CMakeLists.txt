@@ -6,7 +6,6 @@
 if(DEVELOPMENT_BUILD)
     add_custom_command(OUTPUT aesalon_overload_32.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_32.so -ldl -lrt -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
-        -DTEMP_PATH='"${MONITOR_TEMP_PATH}"'
         -DDEVELOPMENT_BUILD
         -DAESALON_PLATFORM=${AESALON_PLATFORM}
         -DAESALON_PLATFORM_x86=0
@@ -15,7 +14,6 @@ if(DEVELOPMENT_BUILD)
     if(AESALON_PLATFORM EQUAL 1)
     add_custom_command(OUTPUT aesalon_overload_64.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_64.so -ldl -lrt -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
-        -DTEMP_PATH='"${MONITOR_TEMP_PATH}"'
         -DDEVELOPMENT_BUILD
         -DAESALON_PLATFORM=${AESALON_PLATFORM}
         -DAESALON_PLATFORM_x86=0
@@ -25,7 +23,6 @@ if(DEVELOPMENT_BUILD)
 else(DEVELOPMENT_BUILD)
     add_custom_command(OUTPUT aesalon_overload_32.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_32.so -ldl -lrt -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
-        -DTEMP_PATH='"${MONITOR_TEMP_PATH}"'
         -DAESALON_PLATFORM=${AESALON_PLATFORM}
         -DAESALON_PLATFORM_x86=0
         -DAESALON_PLATFORM_x86_64=1
@@ -33,7 +30,6 @@ else(DEVELOPMENT_BUILD)
     if(AESALON_PLATFORM EQUAL 1)
     add_custom_command(OUTPUT aesalon_overload_64.so COMMAND /usr/bin/gcc -fPIC -g -shared overload.c -o aesalon_overload_64.so -ldl -lrt -masm=intel
         -DLIBC_PATH='"${LIBC_PATH}"'
-        -DTEMP_PATH='"${MONITOR_TEMP_PATH}"'
         -DAESALON_PLATFORM=${AESALON_PLATFORM}
         -DAESALON_PLATFORM_x86=0
         -DAESALON_PLATFORM_x86_64=1

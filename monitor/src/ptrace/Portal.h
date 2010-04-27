@@ -53,6 +53,9 @@ private:
     int wait_for_signal(int &status);
 
     MapParser *map_parser;
+#ifdef USE_OVERLOAD
+    int pipe_fd;
+#endif
 public:
     /** Generic constructor for PTracePortal.
         @param argument_list The arguments to spawn the child with.
@@ -146,8 +149,9 @@ public:
     */
     Word get_lib_offset(std::string unique_identifer);
     
-    pid_t get_pid() const { return pid; }
-    
+#ifdef USE_OVERLOAD
+    int get_pipe_fd() const { return pipe_fd; }
+#endif
 };
 
 } // namespace PTrace
