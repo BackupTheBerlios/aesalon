@@ -32,6 +32,7 @@ public slots:
     void shift_range_to(const Timestamp &high_time);
     void force_render();
     void set_full_view();
+    void save_screenshot();
 private slots:
     void merge_canvas(RenderedCanvas canvas);
     void repaint_regions();

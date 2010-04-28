@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QDebug>
+#include <QFileDialog>
 
 #include "Viewport.h"
 #include "Viewport.moc"
@@ -71,6 +72,58 @@ void Viewport::set_full_view() {
         rendered_canvas.get_range().get_begin().get_data_element(),
         qPrintable(rendered_canvas.get_range().get_end().get_time_element().to_string()),
         rendered_canvas.get_range().get_end().get_data_element());*/
+}
+
+void Viewport::save_screenshot() {
+    QImage saved(size(), QImage::Format_RGB32);
+    QPainter painter(&saved);
+    CoordinateMapper mapper(size(), rendered_canvas.get_range());
+    if(!rendered_canvas.get_image().isNull()) painter.drawImage(0, 0, rendered_canvas.get_image());
+    
+    QPen pen(Qt::DotLine);
+    pen.setColor(qRgba(128, 128, 128, 64));
+    
+    painter.setPen(pen);
+    
+    qreal x_step = (width()-1) / 12.0;
+    
+    for(int x = 0; x <= 12; x ++) {
+        painter.drawLine(x * x_step, 0, x * x_step, height()-1);
+    }
+    
+    qreal y_step = (height()-1) / 12.0;
+    
+    for(int y = 0; y <= 12; y ++) {
+        painter.drawLine(0, y * y_step, width()-1, y * y_step);
+    }
+    
+    pen.setColor(qRgba(255, 128, 0, 64));
+    painter.setPen(pen);
+    
+    DataPoint point = mapper.map_to(QPointF(0, 0));
+    static QFont grid_font = QFont("DejaVu Sans", 10, QFont::Bold);
+    QFontMetrics metrics(grid_font);
+    painter.setFont(grid_font);
+    painter.drawText(5, metrics.height() + 5, formatter->format_point(point));
+    point = mapper.map_to(QPointF(width()-1, height()-1));
+    QString formatted = formatter->format_point(point);
+    painter.drawText(width() - (metrics.width(formatted)+5), height()-6, formatted);
+    
+    QString label = "Time";
+    painter.drawText((width()/2) - (metrics.width(label) / 2), height()-6, label);
+    
+    label = "Address space";
+    painter.rotate(90.0);
+    painter.drawText((height() / 2) - (metrics.width(label) / 2), -6, label);
+    
+    QString filename = QFileDialog::getSaveFileName(this, "Select file name", QString(), "PNG images (*.png)");
+    
+    qDebug("filename: \"%s\"", qPrintable(filename));
+    
+    if(filename.isEmpty()) return;
+    if(!filename.endsWith(".png")) filename.append(".png");
+    
+    saved.save(filename);
 }
 
 void Viewport::merge_canvas(RenderedCanvas canvas) {

@@ -55,6 +55,10 @@ Visualization::Visualization(VisualizationFactory *factory) {
     connect(action, SIGNAL(triggered(bool)), viewport, SLOT(set_full_view()), Qt::QueuedConnection);
     request_menu->addAction(action);
     
+    action = new QAction(tr("&Save screenshot"), request_menu);
+    connect(action, SIGNAL(triggered(bool)), viewport, SLOT(save_screenshot()), Qt::QueuedConnection);
+    request_menu->addAction(action);
+    
     request_button->setMenu(request_menu);
     
     setLayout(main_layout);
