@@ -1,4 +1,5 @@
 #include <QLayout>
+#include <QSplitter>
 
 #include "Visualization.h"
 #include "Visualization.moc"
@@ -31,9 +32,6 @@ Visualization::Visualization(VisualizationFactory *factory) {
     
     main_layout->addLayout(upper_layout);
     
-    info_widget = new QWidget();
-    main_layout->addWidget(info_widget);
-    
     canvas = new Canvas();
     renderer = factory->create_renderer(canvas);
     CanvasGenerator *generator = new CanvasGenerator(factory->get_data_thread(), renderer);
@@ -42,10 +40,16 @@ Visualization::Visualization(VisualizationFactory *factory) {
     
     factory->get_data_thread()->register_observer(renderer);
     
+    QSplitter *splitter = new QSplitter;
+    info_widget = new QWidget();
+    splitter->addWidget(info_widget);
+    
     viewport = new Viewport(canvas, factory, info_widget, this);
     connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)), Qt::QueuedConnection);
     connect(viewport, SIGNAL(lock_change(bool)), lock_box, SLOT(setChecked(bool)));
-    main_layout->addWidget(viewport);
+    
+    splitter->addWidget(viewport);
+    main_layout->addWidget(splitter);
     
     request_menu = new QMenu();
     QAction *action = new QAction(tr("&Attach"), request_menu);

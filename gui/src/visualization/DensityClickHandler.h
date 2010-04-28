@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include <QFormLayout>
+#include <QListWidget>
 
 #include "ClickHandler.h"
 
@@ -12,9 +13,9 @@ private:
     QLabel *address;
     QLabel *size;
     QLabel *alloc_time;
-    QLabel *alloc_scope;
+    QListWidget *alloc_scope;
     QLabel *release_time;
-    QLabel *release_scope;
+    QListWidget *release_scope;
 public:
     DensityClickHandler(DataThread *data_thread, QWidget *info_widget);
     virtual ~DensityClickHandler();
