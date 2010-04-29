@@ -9,7 +9,6 @@
 namespace PTrace {
 
 MapParser::MapParser(pid_t pid) : pid(pid) {
-    parse_maps();
 }
 
 MapParser::~MapParser() {
@@ -31,7 +30,6 @@ const Analyzer::Object &MapParser::get_object(Word address) {
 
 std::string MapParser::get_filename(Word address) {
     const Analyzer::Object &object = get_object(address);
-    std::cout << "MapParser object name: \"" << object.get_name() << "\"\n";
     return object.get_name();
 }
 

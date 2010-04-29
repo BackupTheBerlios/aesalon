@@ -119,6 +119,7 @@ void ScopeManager::push_scope(Block *block, Word *scope, Word scope_size) {
     do {
         push_scope(block, scope[x]);
     } while(++x < scope_size && full_backtrace);
+    if(!full_backtrace) std::cout << "limiting backtrace due to arguments . . .\n";
 }
 
 void ScopeManager::push_scope(Block *block, Word address) {
@@ -167,7 +168,9 @@ void ScopeManager::push_scope(Block *block, Word address) {
         }
     }
     
-    if(file != interface->get_file()) address -= file_object.get_address();
+    if(file != interface->get_file()) {
+        address -= file_object.get_address();
+    }
     Analyzer::Object symbol = file->get_symbol_for(address);
     
     if(symbol.get_address() == 0 && symbol.get_size() == 0) {

@@ -85,7 +85,6 @@ Backtrace NetworkReceiver::assemble_backtrace() {
     quint16 count = 0;
     count = unprocessed.at(0);
     count |= quint16(unprocessed.at(1)) << 8;
-    /*qDebug("count: %i", count);*/
     if(unprocessed.size() < count * 4) {
         return Backtrace(NULL, 0);
     }

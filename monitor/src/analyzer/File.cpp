@@ -51,6 +51,7 @@ Object File::get_symbol_for(Word address) {
         }
         attribute = attribute->get_next();
     }
+    std::cout << "couldn't find symbol for 0x" << std::hex << address << std::endl;
     return Object("", 0, 0);
 }
 

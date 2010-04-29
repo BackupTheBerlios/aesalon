@@ -54,7 +54,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
     alloc_scope->clear();
     Backtrace allocation = block->get_allocation_scope();
     for(int i = 0; i < allocation.get_scope_list_size(); i ++) {
-        alloc_scope->addItem(allocation.get_scope_list()[i].get_name());
+        alloc_scope->insertItem(0, allocation.get_scope_list()[i].get_name());
     }
     
     if(block->get_release_time() == Timestamp::NOW) {

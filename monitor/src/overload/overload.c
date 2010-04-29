@@ -284,7 +284,7 @@ void initialize_overload() {
     }
     sscanf(pipe_str, "%i", &pipe_fd);
     char *malloc_offset_str = getenv("aesalon_malloc_offset");
-    if(pipe_str == NULL) {
+    if(malloc_offset_str == NULL) {
         fprintf(stderr, "{aesalon} Failed to initialize overload: aesalon_malloc_offset environment variable not set.\n");
         exit(1);
     }
@@ -297,7 +297,7 @@ void initialize_overload() {
     unsigned long libc_offset = get_libc_offset(libc_path);
     original_malloc += libc_offset;
     char *backtraces = getenv("aesalon_gather_backtraces");
-    if(backtraces) gather_backtraces = 1;
+    if(backtraces != NULL) gather_backtraces = 1;
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Resolving symbols . . .\n");
 #endif
@@ -340,7 +340,7 @@ void write_bt_info() {
     bp = (void *)*((unsigned long *)bp);
     
     do {
-        bt_address = *((unsigned long *)(bp + sizeof(unsigned long)));
+        bt_address = *((unsigned long *)(bp)+1);
         buffer[buffer_size++] = bt_address;
         bp = (void *)*((unsigned long *)bp);
     } while(bp != NULL && bt_address != 0);
