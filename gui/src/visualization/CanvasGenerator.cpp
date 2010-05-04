@@ -27,7 +27,8 @@ CanvasGenerator::CanvasGenerator(DataThread *data_thread, Renderer *renderer)
     
     progress_bar->setRange(0, data_thread->get_snapshot_list()->get_last_id());
     
-    open();
+    setWindowModality(Qt::WindowModal);
+    show();
 }
 
 CanvasGenerator::~CanvasGenerator() {

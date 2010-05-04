@@ -3,9 +3,9 @@ Monitor:
 - Add support for executing shell scripts
 - Add support for executing 32-bit programs on 64-bit platforms (generate 32-bit overload)
 - Investigate why the monitor terminates when the TCP connection is lost
-- Implement demangling in the symbol resolution code
 - Convert push_word() to use byte sizes rather than bit sizes
 - Implement support for relative pathnames (e.g. eliminate ../ from path)
+- Replace the ugly linear-time scope lookup in ScopeManager::push_scope(Block *, Word).
 GUI:
 - Embed Konsole inside Session for LaunchSources?
 - Add "temporary sessions", e.g. sessions that aren't saved

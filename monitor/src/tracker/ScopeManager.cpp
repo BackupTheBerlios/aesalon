@@ -125,9 +125,10 @@ void ScopeManager::push_scope(Block *block, Word address) {
     scope_vector_t::iterator iterator;
     int size = scope_vector.size();
     int lower_range = 0, upper_range = size-1;
-    
+
     scope_vector_t::iterator begin = scope_vector.begin();
     iterator = begin;
+#if 0
     
     while(size) {
         iterator = begin + lower_range + (size / 2);
@@ -141,13 +142,25 @@ void ScopeManager::push_scope(Block *block, Word address) {
         }
         else break;
     }
+
+    std::cout << scope_vector.size() << std::endl;
     
-    if(scope_vector.size() && iterator != scope_vector.end() && iterator->get_address() <= address
-        && (iterator->get_address() + iterator->get_size()) >= address) {
-        
-        block->push_word(iterator->get_id(), 32);
-        return;
+    if(scope_vector.size() && iterator != scope_vector.end()) {
+        std::cout << "found iterator, address is 0x" << std::hex << iterator->get_address() << " - 0x" << iterator->get_address() + iterator->get_size() << std::endl;
+        if(iterator->get_address() <= address && (iterator->get_address() + iterator->get_size()) >= address) {
+            
+            block->push_word(iterator->get_id(), 32);
+            return;
+        }
     }
+#endif
+    
+    /*for(; iterator != scope_vector.end(); iterator ++) {
+        if(iterator->get_address() <= address && (iterator->get_address() + iterator->get_size()) >= address) {
+            block->push_word(iterator->get_id(), 32);
+            return;
+        }
+    }*/
     
     if(map_parser == NULL) {
         map_parser = Initializer::get_instance()->get_program_manager()->get_ptrace_portal()->get_map_parser();
@@ -167,17 +180,16 @@ void ScopeManager::push_scope(Block *block, Word address) {
         }
     }
     
-    if(file != interface->get_file()) {
-        address -= file_object.get_address();
-    }
-    Analyzer::Object symbol = file->get_symbol_for(address);
+    bool static_symbol = (file == interface->get_file());
+    
+    Analyzer::Object symbol = file->get_symbol_for(address - (static_symbol?0:file_object.get_address()));
     
     if(symbol.get_address() == 0 && symbol.get_size() == 0) {
         block->push_word(0, 32);
         return;
     }
     
-    Scope scope(symbol.get_name(), symbol.get_address(), symbol.get_size(), ++last_id);
+    Scope scope(symbol.get_name(), symbol.get_address() + (static_symbol?0:file_object.get_address()), symbol.get_size(), ++last_id);
     
     iterator = begin;
     while(size) {
