@@ -67,7 +67,7 @@ void DensityClickHandler::handle_click(Canvas *canvas, DataPoint at) {
         release_time->setText(block->get_release_time().to_string());
         release_scope->clear();
         Backtrace release = block->get_release_scope();
-        for(int i = 0; i < release.get_scope_list_size(); i ++) {
+        for(int i = (release.get_scope_list_size()-1); i >= 0; i --) {
             release_scope->addItem(release.get_scope_list()[i].get_name());
         }
     }

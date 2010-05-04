@@ -119,7 +119,6 @@ void ScopeManager::push_scope(Block *block, Word *scope, Word scope_size) {
     do {
         push_scope(block, scope[x]);
     } while(++x < scope_size && full_backtrace);
-    if(!full_backtrace) std::cout << "limiting backtrace due to arguments . . .\n";
 }
 
 void ScopeManager::push_scope(Block *block, Word address) {

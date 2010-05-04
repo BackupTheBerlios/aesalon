@@ -81,11 +81,10 @@ void NetworkReceiver::prepend_word(quint64 data, int bytes) {
 
 Backtrace NetworkReceiver::assemble_backtrace() {
     if(unprocessed.size() < 2) return Backtrace(NULL, 0);
-    /*quint16 count = pop_word(2);*/
     quint16 count = 0;
     count = unprocessed.at(0);
     count |= quint16(unprocessed.at(1)) << 8;
-    if(unprocessed.size() < count * 4) {
+    if(unprocessed.size() < (count * 4)) {
         return Backtrace(NULL, 0);
     }
     unprocessed.remove(0, 2);
@@ -140,6 +139,7 @@ void NetworkReceiver::process_queue() {
             Backtrace backtrace = assemble_backtrace();
             if(backtrace.get_scope_list() == NULL) {
                 for(int i = 0; i < block_type_sizes[block_type]; i ++) prepend_word(words[i], word_size);
+                unprocessed.prepend(header);
                 break;
             }
             

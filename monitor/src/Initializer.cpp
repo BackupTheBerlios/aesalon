@@ -178,14 +178,10 @@ void Initializer::run() {
         usleep(300);
 #endif
     }
-    Event::MonitorEvent *finish_event = new Event::MonitorEvent(Event::MonitorEvent::PROGRAM_FINISHED);
 #ifdef USE_OVERLOAD
     Misc::Message(Misc::Message::DEBUG_MESSAGE, "Processing backlog . . .");
     program_manager->process_backlog();
 #endif
-    get_event_queue()->lock_mutex();
-    get_event_queue()->push_event(finish_event);
-    get_event_queue()->unlock_mutex();
     /* Now send off the backlog . . . */
     get_socket()->send_data(event_queue);
 }
