@@ -29,8 +29,6 @@ void OverloadParser::do_read(int fd, void *data, int wanted_size) {
         if(bytes == 0) {
             /* Hence, stop the thread. */
             
-            std::cout << "Stopping OverloadParser thread . . ." << std::endl;
-            
             Event::BasicEvent *event = new Event::MonitorEvent(Event::MonitorEvent::PROGRAM_FINISHED);
             
             Initializer::get_instance()->get_event_queue()->lock_mutex();

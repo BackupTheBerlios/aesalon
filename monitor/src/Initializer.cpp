@@ -161,7 +161,7 @@ void Initializer::usage() {
     std::cout << "\t--overload-path\t\tThe directory containing the overload libraries. Currently is " << argument_parser->get_argument("overload-path")->get_data() << "." << std::endl;
 #endif
     std::cout << "\t--no-backtrace\t\tForces the monitor to only consider the current scope, rather than the full backtrace." << std::endl;
-    std::cout << "\t--chunk-size\t\tThe size of the storage chunks. The larger, the more memory used. The smaller, the more processing power used. Currently is " << argument_parser->get_argument("chunk-size")->get_data() << "." << std::endl;
+    std::cout << "\t--chunk-size\t\tThe size of the storage chunks. The larger, the more memory used. The smaller, the more processing power used and memory wasted. Currently is " << argument_parser->get_argument("chunk-size")->get_data() << "." << std::endl;
     std::cout << "\t--\t\t\tOptional, denotes the end of the argument list." << std::endl;
 }
 
