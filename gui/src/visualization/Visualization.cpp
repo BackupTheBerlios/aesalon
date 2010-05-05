@@ -47,6 +47,7 @@ Visualization::Visualization(VisualizationFactory *factory) {
     viewport = new Viewport(canvas, factory, info_widget, this);
     connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)), Qt::QueuedConnection);
     connect(viewport, SIGNAL(lock_change(bool)), lock_box, SLOT(setChecked(bool)));
+    connect(cycle_time, SIGNAL(valueChanged(int)), viewport, SLOT(set_update_time(int)), Qt::QueuedConnection);
     
     splitter->addWidget(viewport);
     main_layout->addWidget(splitter);

@@ -75,3 +75,10 @@ DataPoint CoordinateMapper::find_offset(const QPointF &point) const {
     
     return DataPoint(Timestamp(total_time * time_percentage), total_data * data_percentage);
 }
+
+QPointF CoordinateMapper::find_offset(const DataPoint &point) const {
+    DataPoint delta = point;
+    delta.set_time_element(data_range.get_begin().get_time_element() + point.get_time_element());
+    delta.set_data_element(data_range.get_end().get_data_element() + point.get_data_element());
+    return map_to(delta);
+}

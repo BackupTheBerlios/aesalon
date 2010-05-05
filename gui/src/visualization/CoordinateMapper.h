@@ -16,7 +16,7 @@ public:
     virtual ~CoordinateMapper();
     
     QSize get_surface_size() const { return surface_size; }
-    void set_surfce_size(QSize new_size) { surface_size = new_size; }
+    void set_surface_size(QSize new_size) { surface_size = new_size; }
     
     QPointF map_to(const DataPoint &point) const;
     QRectF map_to(const DataRange &rect) const;
@@ -24,6 +24,7 @@ public:
     DataRange map_to(const QRectF &rect) const;
     
     DataPoint find_offset(const QPointF &point) const;
+    QPointF find_offset(const DataPoint &point) const;
 };
 
 #endif

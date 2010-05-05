@@ -26,10 +26,11 @@ Viewport::Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *info_
     click_handler = factory->create_click_handler(info_widget);
     
     update_timer = new QTimer();
-    connect(update_timer, SIGNAL(timeout()), SLOT(repaint_regions()));
-    update_timer->start(500);
+    connect(update_timer, SIGNAL(timeout()), SLOT(update_timer_timeout()));
+    update_timer->start(1000);
     
     click_lock = false;
+    rt_attached = false;
 }
 
 Viewport::~Viewport() {
@@ -41,15 +42,9 @@ void Viewport::set_canvas_range(const DataRange &new_range) {
 }
 
 void Viewport::shift_range_to(const Timestamp &high_time) {
-    
-    qDebug("NYI: shift_range_to()");
-    /*DataRange range = local_canvas.get_range();
-    qint64 time_difference = range.get_begin().get_time_element().ns_until(range.get_end().get_time_element());
-    range.get_end().set_time_element(high_time);
-    Timestamp timestamp = high_time;
-    timestamp.add_ns(-time_difference);
-    range.get_begin().set_time_element(timestamp);
-    set_canvas_range(range);*/
+    Timestamp previous_high = rendered_canvas.get_range().get_end().get_time_element();
+    qint64 diff = previous_high.ns_until(high_time);
+    shift_range(DataPoint(-diff, 0.0));
 }
 
 void Viewport::force_render() {
@@ -63,16 +58,9 @@ void Viewport::set_full_view() {
     if(data_thread->get_finish_time()) end_time = data_thread->get_start_time()->ns_until(*data_thread->get_finish_time());
     else end_time = (Timestamp() - *data_thread->get_start_time()).to_ns();
     new_range.get_end().set_time_element(end_time);
-    /*qDebug("end_time: %lli", end_time);*/
     rendered_canvas.set_range(new_range);
     
     force_render();
-    
-    /*qDebug("The new range is from (%s, %f) to (%s, %f).",
-        qPrintable(rendered_canvas.get_range().get_begin().get_time_element().to_string()),
-        rendered_canvas.get_range().get_begin().get_data_element(),
-        qPrintable(rendered_canvas.get_range().get_end().get_time_element().to_string()),
-        rendered_canvas.get_range().get_end().get_data_element());*/
 }
 
 void Viewport::save_screenshot() {
@@ -119,7 +107,7 @@ void Viewport::save_screenshot() {
     
     QString filename = QFileDialog::getSaveFileName(this, "Select file name", QString(), "PNG images (*.png)");
     
-    qDebug("filename: \"%s\"", qPrintable(filename));
+    /*qDebug("filename: \"%s\"", qPrintable(filename));*/
     
     if(filename.isEmpty()) return;
     if(!filename.endsWith(".png")) filename.append(".png");
@@ -128,7 +116,11 @@ void Viewport::save_screenshot() {
 }
 
 void Viewport::toggle_attach(bool attached) {
-    
+    this->rt_attached = attached;
+}
+
+void Viewport::set_update_time(int new_time) {
+    update_timer->setInterval(new_time);
 }
 
 void Viewport::merge_canvas(RenderedCanvas canvas) {
@@ -137,18 +129,19 @@ void Viewport::merge_canvas(RenderedCanvas canvas) {
 }
 
 void Viewport::repaint_regions() {
-    /*qDebug("repaint_regions called . . .");*/
     QList<DataRange> ranges = canvas->take_updated_ranges();
     CoordinateMapper mapper(size(), rendered_canvas.get_range());
     foreach(DataRange range, ranges) {
         QRectF rect = mapper.map_to(range);
-        /*qDebug("Asking to update rect: (%f, %f) to (%f, %f)", rect.left(), rect.top(), rect.right(), rect.bottom());*/
         request_paint(range);
     }
     update();
 }
 
 void Viewport::shift_range(const DataPoint &amount) {
+    CoordinateMapper mapper(size(), rendered_canvas.get_range());
+    QPointF offset = mapper.find_offset(amount);
+    shift_range(offset);
 }
 
 void Viewport::shift_range(const QPointF &amount) {
@@ -195,6 +188,13 @@ void Viewport::shift_range(const QPointF &amount) {
         exposed_range.get_end().set_time_element(local_range.get_begin().get_time_element() - move_by.get_time_element());
         
         emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
+    }
+}
+
+void Viewport::update_timer_timeout() {
+    repaint_regions();
+    if(rt_attached) {
+        shift_range_to(data_thread->get_last_time());
     }
 }
 
@@ -291,39 +291,6 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     if(scale_amount < 0.1) scale_amount = 0.1;
     else if(scale_amount > 10.0) scale_amount = 10.0;
 
-#if 0
-    qreal x_percentage = (mouse_position.get_time_element().to_ns() - x_start) / qreal(x_range);
-    qreal y_percentage = (mouse_position.get_data_element() - y_start) / qreal(y_range);
-
-    qint64 new_x;
-    qint64 new_x_range;
-    qreal new_y;
-    qreal new_y_range;
-    
-    if(event->modifiers() & Qt::ControlModifier) {
-        new_x = x_start + (x_percentage*x_range / scale_amount) - (x_percentage*x_range);
-        new_x_range = x_range * scale_amount;
-        new_y = y_start;
-        new_y_range = y_range;
-    }
-    else if(event->modifiers() & Qt::ShiftModifier) {
-        new_x = x_start;
-        new_x_range = x_range;
-        new_y = y_start + (y_percentage*y_range / scale_amount) - (y_percentage*y_range);
-        new_y_range = y_range * scale_amount;
-    }
-    else {
-        new_x = x_start + (x_percentage*x_range / scale_amount) - (x_percentage*x_range);
-        new_x_range = x_range * scale_amount;
-        new_y = y_start + (y_percentage*y_range / scale_amount) - (y_percentage*y_range);
-        new_y_range = y_range * scale_amount;
-    }
-    
-    range.get_begin().set_time_element(Timestamp(new_x));
-    range.get_begin().set_data_element(new_y);
-    range.get_end().set_time_element(Timestamp(new_x + new_x_range));
-    range.get_end().set_data_element(new_y + new_y_range);
-#endif
     qint64 x_change;
     qreal y_change;
     

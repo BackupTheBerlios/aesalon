@@ -24,6 +24,7 @@ private:
     QWidget *info_widget;
     
     bool click_lock;
+    bool rt_attached;
 public:
     Viewport(Canvas *canvas, VisualizationFactory *factory, QWidget *info_widget, QWidget *parent);
     virtual ~Viewport();
@@ -34,12 +35,13 @@ public slots:
     void set_full_view();
     void save_screenshot();
     void toggle_attach(bool attached);
+    void set_update_time(int new_time);
 private slots:
     void merge_canvas(RenderedCanvas canvas);
     void repaint_regions();
     void shift_range(const DataPoint &amount);
     void shift_range(const QPointF &amount);
-private:
+    void update_timer_timeout();
     void request_paint(DataRange range);
 protected:
     virtual void paintEvent(QPaintEvent *event);
