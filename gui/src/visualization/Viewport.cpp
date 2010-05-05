@@ -41,6 +41,7 @@ void Viewport::set_canvas_range(const DataRange &new_range) {
 }
 
 void Viewport::shift_range_to(const Timestamp &high_time) {
+    
     qDebug("NYI: shift_range_to()");
     /*DataRange range = local_canvas.get_range();
     qint64 time_difference = range.get_begin().get_time_element().ns_until(range.get_end().get_time_element());
@@ -112,7 +113,7 @@ void Viewport::save_screenshot() {
     QString label = "Time";
     painter.drawText((width()/2) - (metrics.width(label) / 2), height()-6, label);
     
-    label = "Address space";
+    label = canvas->get_vertical_axis_label();
     painter.rotate(90.0);
     painter.drawText((height() / 2) - (metrics.width(label) / 2), -6, label);
     
@@ -124,6 +125,10 @@ void Viewport::save_screenshot() {
     if(!filename.endsWith(".png")) filename.append(".png");
     
     saved.save(filename);
+}
+
+void Viewport::toggle_attach(bool attached) {
+    
 }
 
 void Viewport::merge_canvas(RenderedCanvas canvas) {
@@ -141,6 +146,56 @@ void Viewport::repaint_regions() {
         request_paint(range);
     }
     update();
+}
+
+void Viewport::shift_range(const DataPoint &amount) {
+}
+
+void Viewport::shift_range(const QPointF &amount) {
+    CoordinateMapper mapper(size(), rendered_canvas.get_range());
+    DataRange local_range = rendered_canvas.get_range();
+    DataPoint move_by = mapper.find_offset(amount);
+    
+    rendered_canvas.shift(move_by);
+    rendered_canvas.shift(amount);
+    
+    DataRange exposed_range;
+    if(move_by.get_data_element() > 0.0) {
+        exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
+        exposed_range.get_end().set_time_element(local_range.get_end().get_time_element());
+        
+        exposed_range.get_begin().set_data_element(local_range.get_end().get_data_element() - move_by.get_data_element());
+        exposed_range.get_end().set_data_element(local_range.get_end().get_data_element() + move_by.get_data_element());
+        
+        emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
+    }
+    else if(move_by.get_data_element() < 0.0) {
+        exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
+        exposed_range.get_end().set_time_element(local_range.get_end().get_time_element());
+        
+        exposed_range.get_begin().set_data_element(local_range.get_begin().get_data_element() + move_by.get_data_element());
+        exposed_range.get_end().set_data_element(local_range.get_begin().get_data_element() - move_by.get_data_element());
+        emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
+    }
+    
+    if(move_by.get_time_element().to_ns() > 0) {
+        exposed_range.get_begin().set_data_element(rendered_canvas.get_range().get_begin().get_data_element());
+        exposed_range.get_end().set_data_element(rendered_canvas.get_range().get_end().get_data_element());
+        
+        exposed_range.get_begin().set_time_element(local_range.get_end().get_time_element() - move_by.get_time_element());
+        exposed_range.get_end().set_time_element(local_range.get_end().get_time_element() + move_by.get_time_element());
+        
+        emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
+    }
+    else if(move_by.get_time_element().to_ns() < 0) {
+        exposed_range.get_begin().set_data_element(rendered_canvas.get_range().get_begin().get_data_element());
+        exposed_range.get_end().set_data_element(rendered_canvas.get_range().get_end().get_data_element());
+        
+        exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element() + move_by.get_time_element());
+        exposed_range.get_end().set_time_element(local_range.get_begin().get_time_element() - move_by.get_time_element());
+        
+        emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
+    }
 }
 
 void Viewport::request_paint(DataRange range) {
@@ -186,7 +241,7 @@ void Viewport::paintEvent(QPaintEvent *event) {
     QString label = "Time";
     painter.drawText((width()/2) - (metrics.width(label) / 2), height()-6, label);
     
-    label = "Address space";
+    label = canvas->get_vertical_axis_label();
     painter.rotate(90.0);
     painter.drawText((height() / 2) - (metrics.width(label) / 2), -6, label);
 }
@@ -198,61 +253,7 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     if(!click_lock) click_handler->handle_click(canvas, mapper.map_to(event->posF()));
     
     if(event->buttons() & Qt::LeftButton) {
-        /*old_mouse_pos.setX(event->posF().x());*/
-        /*old_mouse_pos.setY(old_mouse_pos.y() - 2.0);*/
-        
-        DataRange local_range = rendered_canvas.get_range();
-        QPointF movement_delta = event->posF() - old_mouse_pos;
-        /*DataPoint old_point = mapper.map_to(old_mouse_pos);*/
-        /*DataPoint move_by = DataPoint(point.get_time_element() - old_point.get_time_element(), point.get_data_element() - old_point.get_data_element());*/
-        /*DataPoint move_by = mapper.map_to(movement_delta);
-        move_by.set_time_element(move_by.get_time_element() - local_range.get_begin().get_time_element());
-        move_by.set_data_element(move_by.get_data_element() - local_range.get_begin().get_data_element());*/
-        DataPoint move_by = mapper.find_offset(movement_delta);
-        
-        rendered_canvas.shift(move_by);
-        rendered_canvas.shift(movement_delta);
-        
-        /*qDebug("move_by: time is %lli, data is %f", move_by.get_time_element().to_ns(), move_by.get_data_element());*/
-        DataRange exposed_range;
-        /*qDebug("Checking for movement-exposed regions . . .");*/
-        if(move_by.get_data_element() > 0.0) {
-            /*qDebug("Shifting upwards . . .");*/
-            exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
-            exposed_range.get_end().set_time_element(local_range.get_end().get_time_element());
-            
-            exposed_range.get_begin().set_data_element(local_range.get_end().get_data_element() - move_by.get_data_element());
-            exposed_range.get_end().set_data_element(local_range.get_end().get_data_element() + move_by.get_data_element());
-            
-            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
-        }
-        else if(move_by.get_data_element() < 0.0) {
-            exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element());
-            exposed_range.get_end().set_time_element(local_range.get_end().get_time_element());
-            
-            exposed_range.get_begin().set_data_element(local_range.get_begin().get_data_element() + move_by.get_data_element());
-            exposed_range.get_end().set_data_element(local_range.get_begin().get_data_element() - move_by.get_data_element());
-            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
-        }
-        
-        if(move_by.get_time_element().to_ns() > 0) {
-            exposed_range.get_begin().set_data_element(rendered_canvas.get_range().get_begin().get_data_element());
-            exposed_range.get_end().set_data_element(rendered_canvas.get_range().get_end().get_data_element());
-            
-            exposed_range.get_begin().set_time_element(local_range.get_end().get_time_element() - move_by.get_time_element());
-            exposed_range.get_end().set_time_element(local_range.get_end().get_time_element() + move_by.get_time_element());
-            
-            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
-        }
-        else if(move_by.get_time_element().to_ns() < 0) {
-            exposed_range.get_begin().set_data_element(rendered_canvas.get_range().get_begin().get_data_element());
-            exposed_range.get_end().set_data_element(rendered_canvas.get_range().get_end().get_data_element());
-            
-            exposed_range.get_begin().set_time_element(local_range.get_begin().get_time_element() + move_by.get_time_element());
-            exposed_range.get_end().set_time_element(local_range.get_begin().get_time_element() - move_by.get_time_element());
-            
-            emit paint_canvas(mapper.map_to(exposed_range).size().toSize(), canvas, exposed_range);
-        }
+        shift_range(event->posF() - old_mouse_pos);
         
         old_mouse_pos = event->posF();
     }

@@ -2,7 +2,8 @@
 #include "Canvas.h"
 #include "CoordinateMapper.h"
 
-Canvas::Canvas() : head(NULL) {
+Canvas::Canvas(QString vertical_axis_label) : head(NULL), vertical_axis_label(vertical_axis_label) {
+
 }
 
 Canvas::~Canvas() {

@@ -32,7 +32,7 @@ Visualization::Visualization(VisualizationFactory *factory) {
     
     main_layout->addLayout(upper_layout);
     
-    canvas = new Canvas();
+    canvas = new Canvas(factory->get_vertical_axis_label());
     renderer = factory->create_renderer(canvas);
     CanvasGenerator *generator = new CanvasGenerator(factory->get_data_thread(), renderer);
     generator->exec();
@@ -53,6 +53,9 @@ Visualization::Visualization(VisualizationFactory *factory) {
     
     request_menu = new QMenu();
     QAction *action = new QAction(tr("&Attach"), request_menu);
+    action->setCheckable(true);
+    action->setChecked(false);
+    connect(action, SIGNAL(triggered(bool)), viewport, SLOT(toggle_attach(bool)), Qt::QueuedConnection);
     request_menu->addAction(action);
     
     action = new QAction(tr("&Full view"), request_menu);

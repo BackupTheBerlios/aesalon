@@ -13,11 +13,14 @@ class Canvas {
 private:
     CanvasObject *head;
     QList<DataRange> ranges;
+    QString vertical_axis_label;
 public:
-    Canvas();
+    Canvas(QString vertical_axis_label);
     virtual ~Canvas();
     
     DataRange calculate_data_range();
+    
+    const QString &get_vertical_axis_label() const { return vertical_axis_label; }
     
     void add_object(CanvasObject *object);
     void clear();

@@ -33,9 +33,12 @@ public slots:
     void force_render();
     void set_full_view();
     void save_screenshot();
+    void toggle_attach(bool attached);
 private slots:
     void merge_canvas(RenderedCanvas canvas);
     void repaint_regions();
+    void shift_range(const DataPoint &amount);
+    void shift_range(const QPointF &amount);
 private:
     void request_paint(DataRange range);
 protected:

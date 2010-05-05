@@ -9,6 +9,8 @@ public:
 
     virtual AxisFormatter *create_formatter() const;
     virtual Renderer *create_renderer(Canvas *canvas) const;
+    
+    virtual QString get_vertical_axis_label() const { return "Block count"; }
 };
 
 #endif

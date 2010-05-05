@@ -17,6 +17,8 @@ public:
     virtual Renderer *create_renderer(Canvas *canvas) const = 0;
     virtual AxisFormatter *create_formatter() const = 0;
     virtual ClickHandler *create_click_handler(QWidget *info_widget) const;
+    
+    virtual QString get_vertical_axis_label() const = 0;
 };
 
 #endif
