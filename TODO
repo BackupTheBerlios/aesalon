@@ -6,6 +6,7 @@ Monitor:
 - Convert push_word() to use byte sizes rather than bit sizes
 - Implement support for relative pathnames (e.g. eliminate ../ from path)
 - Replace the ugly linear-time scope lookup in ScopeManager::push_scope(Block *, Word).
+- Find why the even uglier hack in DensityRenderer::visit(FreeEvent *) is required . . .
 GUI:
 - Embed Konsole inside Session for LaunchSources?
 - Add "temporary sessions", e.g. sessions that aren't saved

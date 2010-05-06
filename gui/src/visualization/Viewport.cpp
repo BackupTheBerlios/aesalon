@@ -253,7 +253,9 @@ void Viewport::mouseMoveEvent(QMouseEvent *event) {
     if(!click_lock) click_handler->handle_click(canvas, mapper.map_to(event->posF()));
     
     if(event->buttons() & Qt::LeftButton) {
-        shift_range(event->posF() - old_mouse_pos);
+        QPointF shift = event->posF() - old_mouse_pos;
+        if(rt_attached) shift.setX(0.0);
+        shift_range(shift);
         
         old_mouse_pos = event->posF();
     }
@@ -308,7 +310,12 @@ void Viewport::wheelEvent(QWheelEvent *event) {
     }
     
     range.get_begin().set_time_element(x_start + (x_change / 2));
-    range.get_end().set_time_element(x_start + (x_range - (x_change / 2)));
+    if(rt_attached == false) {
+        range.get_end().set_time_element(x_start + (x_range - (x_change / 2)));
+    }
+    else {
+        range.get_end().set_time_element(x_end);
+    }
     range.get_begin().set_data_element(y_start + (y_change / 2));
     range.get_end().set_data_element(y_start + (y_range - (y_change / 2)));
     

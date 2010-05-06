@@ -52,7 +52,8 @@ Object File::get_symbol_for(Word address) {
         }
         attribute = attribute->get_next();
     }
-    Misc::Message(Misc::Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Couldn't find symbol for 0x" << std::hex << address << "; should be in file \"" << get_filename() << "\"");
+    Misc::Message(Misc::Message::DEBUG_MESSAGE,
+        Misc::StreamAsString() << "Couldn't find symbol for 0x" << std::hex << address << "; should be in file \"" << get_filename() << "\"");
     return Object("", 0, 0);
 }
 

@@ -19,7 +19,6 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas) {
     QPainter painter(&rendered.get_image());
     CoordinateMapper mapper(render_size, range);
     
-    
     QRect rect = mapper.map_to(DataRange(Timestamp(0), 0, data_thread->get_last_time(), 0)).toRect();
     rect.setTop(0);
     rect.setBottom(render_size.height() - 1);
@@ -57,7 +56,7 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas, DataRange ra
     rect.setBottom(render_size.height() - 1);
     painter.setPen(Qt::NoPen);
     QBrush brush(Qt::lightGray);
-    /*brush.setColor(qRgb(0, 240, 240));*/
+    brush.setColor(qRgb(0, 240, 240));
     painter.setBrush(brush);
     painter.drawRect(rect);
     

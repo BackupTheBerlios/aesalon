@@ -25,6 +25,8 @@ void DensityRenderer::visit(FreeEvent *event) {
     if(object == NULL) return;
     object->get_bounding_rect().get_end().set_time_element(event->get_timestamp());
     DataRange updated_range = object->get_bounding_rect();
-    updated_range.get_end().set_time_element(Timestamp::NOW);
+    
+    /* NOTE: Very hack-ish approach to this . . . Timestamp::NOW doesn't work for some reason. Fix this! */
+    updated_range.get_end().set_time_element(Timestamp());
     canvas->add_updated_range(updated_range);
 }
