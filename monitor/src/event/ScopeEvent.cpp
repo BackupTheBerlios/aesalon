@@ -38,18 +38,19 @@ Block *ScopeEvent::serialize(int bits) {
     serialized->get_data()[0] |= 0x03;
     
     std::size_t length = name.length();
-    if(length > 256) {
+    if(length > 65536) {
         Misc::Message(Misc::Message::WARNING_MESSAGE, "scope name length > 256 characters, truncating");
-        name.erase(255);
+        name.erase(65535);
         length = name.length();
     }
     
     const char *data = name.c_str();
     
     std::size_t pos = serialized->get_size();
-    serialized->resize(pos + length + 1);
-    serialized->get_data()[pos] = length;
-    memcpy(serialized->get_data()+pos+1, data, length);
+    serialized->resize(pos + length + 2);
+    serialized->get_data()[pos] = length & 0xff;
+    serialized->get_data()[pos+1] = (length & 0xff00) >> 8;
+    memcpy(serialized->get_data()+pos+2, data, length);
     
     return serialized;
 }

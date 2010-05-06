@@ -42,9 +42,13 @@ Visualization::Visualization(VisualizationFactory *factory) {
     
     QSplitter *splitter = new QSplitter;
     info_widget = new QWidget();
+    info_widget->setMinimumWidth(200);
+    info_widget->setMaximumWidth(600);
+    info_widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     splitter->addWidget(info_widget);
     
     viewport = new Viewport(canvas, factory, info_widget, this);
+    viewport->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     connect(viewport, SIGNAL(mouse_position(QString)), SLOT(set_position(QString)), Qt::QueuedConnection);
     connect(viewport, SIGNAL(lock_change(bool)), lock_box, SLOT(setChecked(bool)));
     connect(cycle_time, SIGNAL(valueChanged(int)), viewport, SLOT(set_update_time(int)), Qt::QueuedConnection);

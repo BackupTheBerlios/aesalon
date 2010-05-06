@@ -8,6 +8,7 @@
 #include "File.h"
 #include "Initializer.h"
 #include "exception/AnalyzerException.h"
+#include "misc/Message.h"
 
 #if AESALON_PLATFORM == AESALON_PLATFORM_x86_64 || AESALON_PLATFORM == AESALON_PLATFORM_x86
     #include "ElfParser.h"
@@ -51,7 +52,7 @@ Object File::get_symbol_for(Word address) {
         }
         attribute = attribute->get_next();
     }
-    std::cout << "couldn't find symbol for 0x" << std::hex << address << std::endl;
+    Misc::Message(Misc::Message::DEBUG_MESSAGE, Misc::StreamAsString() << "Couldn't find symbol for 0x" << std::hex << address << "; should be in file \"" << get_filename() << "\"");
     return Object("", 0, 0);
 }
 

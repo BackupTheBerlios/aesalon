@@ -172,18 +172,19 @@ void NetworkReceiver::process_queue() {
             else emit finished(timestamp);
         }
         else if((header & 0x03) == 3) {
-            /* there should be at least 9 bytes left: 8 for timestamp, 1 for name size. */
-            if(unprocessed.size() < 9) {
+            /* there should be at least 10 bytes left: 8 for timestamp, 2 for name size. */
+            if(unprocessed.size() < 10) {
                 unprocessed.prepend(header);
                 break;
             }
             /* ignore the timestamp . . . */
-            quint8 size = unprocessed.at(8);
-            if(unprocessed.size() < size + 9) {
+            quint16 size = unprocessed.at(8);
+            size |= unprocessed.at(9) << 8;
+            if(unprocessed.size() < size + 10) {
                 unprocessed.prepend(header);
                 break;
             }
-            unprocessed.remove(0, 9);
+            unprocessed.remove(0, 10);
             QByteArray scope_name;
             scope_name = unprocessed.left(size);
             unprocessed.remove(0, size);
