@@ -262,10 +262,10 @@ void Portal::handle_signal() {
     for(signal_observer_list_t::iterator i = signal_observer_list.begin(); i != signal_observer_list.end(); i ++) {
         if((*i)->handle_signal(signal, status)) return;
     }
-#ifndef USE_OVERLOAD
+/*#ifndef USE_OVERLOAD*/
     /* If the signal wasn't caught by one of the signal handlers, then we're not interested in it. Continue execution. */
     continue_execution(signal);
-#endif
+/*#endif*/
 }
 
 void Portal::continue_execution(int signal) {
