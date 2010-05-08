@@ -27,11 +27,7 @@
 
 NetworkReceiver::NetworkReceiver(DataThread *data_thread, QString host, quint16 port) : DataReceiver(data_thread), host(host), port(port), start_time(0) {
     tcp_socket = new QTcpSocket(this);
-    /*connect(tcp_socket, SIGNAL(readyRead()), this, SLOT(data_received()));*/
-    /*recv_timer = new QTimer();
-    connect(recv_timer, SIGNAL(timeout()), this, SLOT(process_queue()));
-    recv_timer->start(100);*/
-    /* NOTE: may want to do something with the disconnected signal . . . */
+    /* NOTE: probably should do something with the disconnected signal . . . */
     
     device_reader = new DeviceReader(tcp_socket);
     connect(device_reader, SIGNAL(data_ready(QByteArray)), SLOT(data_received(QByteArray)), Qt::QueuedConnection);
@@ -139,6 +135,7 @@ void NetworkReceiver::process_queue() {
             Backtrace backtrace = assemble_backtrace();
             if(backtrace.get_scope_list() == NULL) {
                 for(int i = 0; i < block_type_sizes[block_type]; i ++) prepend_word(words[i], word_size);
+                unprocessed.prepend(raw_timestamp);
                 unprocessed.prepend(header);
                 break;
             }
