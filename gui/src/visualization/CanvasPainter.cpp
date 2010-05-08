@@ -56,7 +56,7 @@ void CanvasPainter::paint_canvas(QSize render_size, Canvas *canvas, DataRange ra
     rect.setBottom(render_size.height() - 1);
     painter.setPen(Qt::NoPen);
     QBrush brush(Qt::lightGray);
-    brush.setColor(qRgb(0, 240, 240));
+    /*brush.setColor(qRgb(0, 240, 240));*/
     painter.setBrush(brush);
     painter.drawRect(rect);
     

@@ -9,3 +9,5 @@ add_executable(fib_benchmark fib_benchmark.c)
 target_link_libraries(fib_benchmark m)
 add_executable(calloc_test calloc_test.c)
 add_executable(automated_test automated_test.c)
+add_executable(random_test random_test.c)
+
