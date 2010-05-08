@@ -3,14 +3,18 @@
 
 #include <QDialog>
 #include <QTreeWidget>
+#include <QMap>
+#include <QMenu>
 
 #include "Filter.h"
 #include "BooleanAndFilter.h"
 #include "FilterEditor.h"
+#include "FilterFactory.h"
 
 class FilterManager : public QDialog { Q_OBJECT
 private:
     QTreeWidget *filter_tree;
+    QMenu *context_menu;
     BooleanAndFilter *root_filter;
     
     FilterEditor *editor;
@@ -33,6 +37,8 @@ public:
 private slots:
     void add_filter();
     void remove_filter();
+    
+    void popup_context_menu(QPoint point);
 };
 
 #endif

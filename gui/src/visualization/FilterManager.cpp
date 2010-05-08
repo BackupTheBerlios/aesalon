@@ -1,7 +1,6 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include <QLabel>
-#include <QMenu>
 
 #include "FilterManager.h"
 #include "FilterManager.moc"
@@ -33,17 +32,19 @@ FilterManager::FilterManager() {
     
     main_layout->addWidget(filter_tree);
     
-    QMenu *context_menu = new QMenu();
+    context_menu = new QMenu();
     QAction *action = new QAction(tr("&Add filter"), context_menu);
     action->setShortcut(Qt::Key_Insert);
     connect(action, SIGNAL(triggered(bool)), SLOT(add_filter()));
+    context_menu->addAction(action);
     
     action = new QAction(tr("&Remove filter"), context_menu);
     action->setShortcut(Qt::Key_Delete);
     connect(action, SIGNAL(triggered(bool)), SLOT(remove_filter()));
+    context_menu->addAction(action);
     
     filter_tree->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(filter_tree, SIGNAL(customContextMenuRequested(QPoint)), context_menu, SLOT(popup(QPoint)));
+    connect(filter_tree, SIGNAL(customContextMenuRequested(QPoint)), SLOT(popup_context_menu(QPoint)));
     
     setLayout(main_layout);
     
@@ -51,7 +52,7 @@ FilterManager::FilterManager() {
 }
 
 FilterManager::~FilterManager() {
-
+    
 }
 
 void FilterManager::add_filter() {
@@ -63,4 +64,9 @@ void FilterManager::add_filter() {
 
 void FilterManager::remove_filter() {
     
+}
+
+void FilterManager::popup_context_menu(QPoint point) {
+    point = filter_tree->mapToGlobal(point);
+    context_menu->popup(point);
 }
