@@ -29,6 +29,7 @@
 #include "main/MainWindow.h"
 #include "visualization/DataRange.h"
 #include "visualization/RenderedCanvas.h"
+#include "visualization/Filter.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -37,6 +38,7 @@ int main(int argc, char *argv[]) {
     qRegisterMetaType<DataRange>("DataRange");
     qRegisterMetaType<RenderedCanvas>("RenderedCanvas");
     qRegisterMetaType<Timestamp>("Timestamp");
+    qRegisterMetaType<Filter>("Filter");
     
     QCoreApplication::setOrganizationName("aesalon");
     QCoreApplication::setApplicationName("gui");

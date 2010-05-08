@@ -13,6 +13,7 @@
 #include "Viewport.h"
 #include "Renderer.h"
 #include "session/DataThread.h"
+#include "FilterManager.h"
 
 class Visualization : public QWidget { Q_OBJECT
 private:
@@ -26,6 +27,7 @@ private:
     Renderer *renderer;
     Canvas *canvas;
     QCheckBox *lock_box;
+    FilterManager *filter_manager;
 public:
     Visualization(VisualizationFactory *factory);
     virtual ~Visualization();
