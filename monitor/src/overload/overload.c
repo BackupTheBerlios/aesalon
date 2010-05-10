@@ -86,7 +86,17 @@ int overload_initialized = 0;
         write(pipe_fd, &scope, sizeof(scope)); \
     }
 #elif AESALON_PLATFORM == AESALON_PLATFORM_x86
-    #error NYI
+#define write_scope_info() \
+    if(gather_backtraces) write_bt_info(); \
+    else { \
+        uint32_t one = 1; \
+        write(pipe_fd, &one, sizeof(one)); \
+        unsigned long scope; \
+        asm("push [ebp + 4]"); \
+        scope = (unsigned long) get_scope_address(); \
+        asm("add esp, 4"); \
+        write(pipe_fd, &scope, sizeof(scope)); \
+    }
 #endif
 
 void __attribute__((constructor)) aesalon_constructor() {
