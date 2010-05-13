@@ -51,9 +51,6 @@ namespace PTrace {
 
 Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
 #ifdef USE_OVERLOAD
-    int fds[2];
-    if(pipe(fds) == -1)
-        throw Exception::PTraceException(Misc::StreamAsString() << "Could not create pipe: " << strerror(errno));
     Word malloc_offset = Initializer::get_instance()->get_analyzer_interface()->get_file(
         Initializer::get_instance()->get_argument_parser()->get_argument("libc-path")->get_data())->get_symbol_address("malloc");
     Analyzer::File *file = Initializer::get_instance()->get_analyzer_interface()->get_file();
@@ -85,7 +82,6 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
         preload_string += overload_filename;
         setenv("LD_PRELOAD", preload_string.c_str(), 1);
         
-        setenv("aesalon_pipe_fd", (Misc::StreamAsString() << fds[1]).operator std::string().c_str(), 1);
         setenv("aesalon_malloc_offset", (Misc::StreamAsString() << std::hex << malloc_offset).operator std::string().c_str(), 1);
         setenv("aesalon_libc_path", Initializer::get_instance()->get_argument_parser()->get_argument("libc-path")->get_data().c_str(), 1);
         if(Initializer::get_instance()->get_argument_parser()->get_argument("no-backtrace")->is_found() == false) {
@@ -102,12 +98,6 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
             throw Exception::PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
         }
     }
-#ifdef USE_OVERLOAD
-    fcntl(fds[0], F_SETFL, fcntl(fds[0], F_GETFL) & ~O_NONBLOCK);
-    close(fds[1]);
-    pipe_fd = fds[0];
-#endif
-    
     /* Trap signals are the most common, so add the TrapObserver on first. */
     add_signal_observer(new TrapObserver());
     add_signal_observer(new ExitObserver());

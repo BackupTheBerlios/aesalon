@@ -78,7 +78,11 @@ void Initializer::initialize() {
     std::string chunk_size = config_parser->get_config_item("chunk-size");
     if(chunk_size == "") chunk_size = (Misc::StreamAsString() << CHUNK_SIZE);
     argument_parser->add_argument(new Misc::Argument("chunk-size", 0, Misc::Argument::REQUIRED_ARGUMENT, chunk_size));
-
+    
+    std::string shm_size = config_parser->get_config_item("shm-size");
+    if(shm_size == "") shm_size = (Misc::StreamAsString() << SHM_SIZE);
+    argument_parser->add_argument(new Misc::Argument("shm-size", 0, Misc::Argument::REQUIRED_ARGUMENT, shm_size));
+    
     argument_parser->parse();
 
     if(argument_parser->get_argument("help")->is_found()) {

@@ -12,7 +12,9 @@ void release_buffer();
 int finished;
 
 void clear_terminal() {
-    system("clear");
+    int i = 0;
+/*    system("clear");*/
+    for(; i < 100; i ++) printf("\n");
 }
 
 void allocate_buffer() {
