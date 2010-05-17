@@ -71,6 +71,7 @@ void initialize_overload();
 void deinitialize_overload();
 void write_bt_info();
 uint64_t get_timestamp();
+void write_data(void *data, int size);
 
 /* NOTE: replace these with better versions; uint32_t for 32-bit platforms, etc. */
 uint8_t *shared_memory;
@@ -374,6 +375,24 @@ uint64_t get_timestamp() {
     struct timespec t;
     clock_gettime(CLOCK_REALTIME, &t);
     return ((uint64_t)t.tv_sec * 1000000000) + (uint64_t)t.tv_nsec;
+}
+
+void write_data(void *data, int size) {
+    /* If the memory is within normal bounds . . . */
+    if((*shared_memory_end + size) < shared_memory_size) {
+        /* A simple memcpy will suffice. */
+        memcpy(shared_memory + *shared_memory_end, data, size);
+        *shared_memory_end += size;
+    }
+    else {
+        /* Else two memcpy's are required. */
+        int over = (*shared_memory_end + size) - shared_memory_size;
+        memcpy(shared_memory + *shared_memory_end, data, size - over);
+        /* Now copy the end of the data to the beginning of the shared memory . . . */
+        /* NOTE: this is not portable . . . */
+        memcpy(shared_memory + 16, data + (size - over), over);
+        *shared_memory_end = 16 + over;
+    }
 }
 
 #ifdef __cplusplus

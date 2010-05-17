@@ -145,6 +145,8 @@ public:
         @return The address of the library, or 0 if no such library was found.
     */
     Word get_lib_offset(std::string unique_identifer);
+    
+    pid_t get_pid() const { return pid; }
 };
 
 } // namespace PTrace

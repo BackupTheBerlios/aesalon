@@ -90,9 +90,6 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
         else {
             unsetenv("aesalon_gather_backtraces");
         }
-        
-        close(fds[0]);
-        fcntl(fds[1], F_SETFL, fcntl(fds[1], F_GETFL) & ~O_NONBLOCK);
 #endif
         if(execv(argument_list->get_argument(0).c_str(), argument_list->get_as_argv()) == -1) {
             throw Exception::PTraceException(Misc::StreamAsString() << "Failed to execute process: " << strerror(errno));
