@@ -42,8 +42,8 @@ void ProgramManager::execute() {
     running = true;
     ptrace_portal = new PTrace::Portal(get_argument_list());
 #ifdef USE_OVERLOAD
-    overload_parser = new OverloadParser(ptrace_portal->get_pid(),
-        !Initializer::get_instance()->get_argument_parser()->get_argument("no-backtrace")->is_found());
+    /* NOTE: it is *essential* that the overload parser is set up before the event loop is ever reached! */
+    overload_parser = new OverloadParser(ptrace_portal->get_pid());
 #endif
 }
 

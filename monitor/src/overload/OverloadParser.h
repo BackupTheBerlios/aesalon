@@ -1,20 +1,27 @@
 #ifndef AESALON_OVERLOAD_PARSER_H
 #define AESALON_OVERLOAD_PARSER_H
 
+#include <sys/types.h>
 #include <pthread.h>
+
 #include "Types.h"
 
 class OverloadParser {
 private:
-    int pipe_fd;
+    pid_t pid;
     bool full_backtraces;
     pthread_t thread;
+    Byte *shared_memory;
+    Word shared_memory_size;
+    Word *shared_memory_begin;
+    Word *shared_memory_end;
 public:
-    OverloadParser(int pipe_fd, bool full_backtraces);
+    OverloadParser(pid_t pid);
     ~OverloadParser();
+    
+    void do_read(void *data, int wanted_size);
 private:
-    static void do_read(int fd, void *data, int wanted_size);
-    static void *parse(void *pipe_fd);
+    static void *parse(void *overload_parser);
 };
 
 #endif

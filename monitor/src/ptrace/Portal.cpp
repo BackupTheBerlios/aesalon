@@ -69,6 +69,7 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
         throw Exception::PTraceException("Platform is not 32- or 64-bits. This shouldn't happen!");
     }
 #endif
+    
     pid = fork();
     if(pid == -1)
         throw Exception::PTraceException(Misc::StreamAsString() << "Forking to create child process failed: " << strerror(errno));

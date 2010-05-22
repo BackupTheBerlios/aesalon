@@ -136,14 +136,14 @@ void *calloc(size_t nmemb, size_t size) {
     }
     
     if(!first) {
-        write(0, &type, sizeof(type));
-        write(0, data.buffer, sizeof(data.buffer));
+        write_data(&type, sizeof(type));
+        write_data(data.buffer, sizeof(data.buffer));
         
         if(original_calloc) {
             write_scope_info();
         }
         else {
-            write(0, &zero, sizeof(zero));
+            write_data(&zero, sizeof(zero));
         }
     }
     else first = 0;
@@ -160,8 +160,8 @@ void *malloc(size_t size) {
     data.data.address = (unsigned long)original_malloc(size);
     data.data.size = size;
     
-    write(0, &type, sizeof(type));
-    write(0, data.buffer, sizeof(data.buffer));
+    write_data(&type, sizeof(type));
+    write_data(data.buffer, sizeof(data.buffer));
     
     write_scope_info();
     
@@ -177,9 +177,8 @@ void free(void *ptr) {
     data.data.address = (unsigned long)ptr;
     original_free(ptr);
     
-    int ret = 0;
-    ret = write(0, &type, sizeof(type));
-    ret = write(0, data.buffer, sizeof(data.buffer));
+    write_data(&type, sizeof(type));
+    write_data(data.buffer, sizeof(data.buffer));
     
     write_scope_info();
 }
@@ -196,8 +195,8 @@ void *realloc(void *ptr, size_t size) {
     
     data.data.new_address = (unsigned long)original_realloc(ptr, size);
     
-    write(0, &type, sizeof(type));
-    write(0, data.buffer, sizeof(data.buffer));
+    write_data(&type, sizeof(type));
+    write_data(data.buffer, sizeof(data.buffer));
     
     write_scope_info();
     
@@ -214,8 +213,8 @@ int posix_memalign(void** memptr, size_t alignment, size_t size) {
     data.data.address = (unsigned long)*memptr;
     data.data.size = size;
     
-    write(0, &type, sizeof(type));
-    write(0, data.buffer, sizeof(data.buffer));
+    write_data(&type, sizeof(type));
+    write_data(data.buffer, sizeof(data.buffer));
     
     write_scope_info();
     
@@ -231,8 +230,8 @@ void *valloc(size_t size) {
     data.data.address = (unsigned long)original_valloc(size);
     data.data.size = size;
     
-    write(0, &type, sizeof(type));
-    write(0, data.buffer, sizeof(data.buffer));
+    write_data(&type, sizeof(type));
+    write_data(data.buffer, sizeof(data.buffer));
     
     write_scope_info();
     
@@ -249,8 +248,8 @@ void *memalign(size_t boundary, size_t size) {
     data.data.address = (unsigned long)original_memalign(boundary, size);
     data.data.size = size;
     
-    write(0, &type, sizeof(type));
-    write(0, data.buffer, sizeof(data.buffer));
+    write_data(&type, sizeof(type));
+    write_data(data.buffer, sizeof(data.buffer));
     
     write_scope_info();
     
@@ -367,8 +366,8 @@ void write_bt_info() {
         bp = (void *)*((unsigned long *)bp);
     } while(bp != NULL && bt_address != 0);
     
-    /*write(0, &buffer_size, sizeof(u_int32_t));
-    write(0, buffer, (buffer_size) * sizeof(unsigned long));*/
+    /*write_data(&buffer_size, sizeof(u_int32_t));
+    write_data(buffer, (buffer_size) * sizeof(unsigned long));*/
 }
 
 uint64_t get_timestamp() {
@@ -387,6 +386,10 @@ void write_data(void *data, int size) {
     else {
         /* Else two memcpy's are required. */
         int over = (*shared_memory_end + size) - shared_memory_size;
+        while(over > *shared_memory_begin) {
+            /* There's probably a better way. */
+            usleep(100);
+        }
         memcpy(shared_memory + *shared_memory_end, data, size - over);
         /* Now copy the end of the data to the beginning of the shared memory . . . */
         /* NOTE: this is not portable . . . */
