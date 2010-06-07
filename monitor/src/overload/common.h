@@ -2,6 +2,7 @@
 #define AESALON_OVERLOAD_COMMON_H
 
 #include <stdint.h>
+#include <semaphore.h>
 
 #define ALLOC_TYPE 1
 #define ALLOC_DATA_SIZE ((sizeof(unsigned long) * 2) + sizeof(uint64_t))
@@ -35,5 +36,13 @@ typedef union {
     } data;
     char buffer[FREE_DATA_SIZE];
 } free_data_u;
-    
+
+typedef struct {
+	uint32_t data_offset;
+	sem_t begin_sem;
+	uint32_t begin;
+	sem_t end_sem;
+	uint32_t end;
+} shm_header_t;
+
 #endif

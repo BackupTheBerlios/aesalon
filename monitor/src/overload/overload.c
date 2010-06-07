@@ -73,12 +73,12 @@ void deinitialize_overload();
 void write_bt_info();
 uint64_t get_timestamp();
 void write_data(void *data, int size);
+void lock_data();
+void unlock_data();
 
-/* NOTE: replace these with better versions; uint32_t for 32-bit platforms, etc. */
 uint8_t *shared_memory;
 uint64_t shared_memory_size;
-uint64_t *shared_memory_begin;
-uint64_t *shared_memory_end;
+shm_header_t *shm_header;
 
 int overload_initialized = 0;
 
@@ -288,8 +288,6 @@ long unsigned int get_libc_offset(char *libc_path) {
 void initialize_overload() {
     if(overload_initialized) return;
     overload_initialized = 1;
-    shared_memory_begin = 0;
-    shared_memory_end = 0;
 #ifdef DEVELOPMENT_BUILD
     printf("{aesalon} Initializing overload library . . .\n");
 #endif
@@ -378,6 +376,7 @@ uint64_t get_timestamp() {
 }
 
 void write_data(void *data, int size) {
+#if 0
     /* If the memory is within normal bounds . . . */
     if((*shared_memory_end + size) < shared_memory_size) {
         /* A simple memcpy will suffice. */
@@ -397,6 +396,7 @@ void write_data(void *data, int size) {
         memcpy(shared_memory + 16, data + (size - over), over);
         *shared_memory_end = 16 + over;
     }
+#endif
 }
 
 #ifdef __cplusplus

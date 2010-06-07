@@ -23,8 +23,13 @@ OverloadParser::OverloadParser(pid_t pid) : pid(pid), full_backtraces(false) {
     
     shared_memory = static_cast<Byte *>(mmap(NULL, shared_memory_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
     
-    shared_memory_begin = &(reinterpret_cast<Word *>(shared_memory))[0];
-    shared_memory_end = &(reinterpret_cast<Word *>(shared_memory))[1];
+    shared_memory_header = reinterpret_cast<shm_header_t *>(shared_memory);
+    
+    sem_init(&shared_memory_header->begin_sem, 1, 0);
+    shared_memory_header->begin = 0;
+    sem_init(&shared_memory_header->end_sem, 1, 1);
+    shared_memory_header->end = 0;
+    shared_memory_header->data_offset = sizeof(*shared_memory_header) + 1;
     
     full_backtraces = !Initializer::get_instance()->get_argument_parser()->get_argument("no-backtrace")->is_found();
     

@@ -83,6 +83,8 @@ Portal::Portal(Misc::ArgumentList *argument_list) : pid(0) {
         preload_string += overload_filename;
         setenv("LD_PRELOAD", preload_string.c_str(), 1);
         
+        setenv("aesalon_shm_size", Initializer::get_instance()->get_argument_parser()->get_argument("shm-size")->get_data().c_str(), 1);
+        
         setenv("aesalon_malloc_offset", (Misc::StreamAsString() << std::hex << malloc_offset).operator std::string().c_str(), 1);
         setenv("aesalon_libc_path", Initializer::get_instance()->get_argument_parser()->get_argument("libc-path")->get_data().c_str(), 1);
         if(Initializer::get_instance()->get_argument_parser()->get_argument("no-backtrace")->is_found() == false) {

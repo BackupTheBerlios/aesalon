@@ -5,6 +5,7 @@
 #include <pthread.h>
 
 #include "Types.h"
+#include "common.h"
 
 class OverloadParser {
 private:
@@ -13,8 +14,7 @@ private:
     pthread_t thread;
     Byte *shared_memory;
     Word shared_memory_size;
-    Word *shared_memory_begin;
-    Word *shared_memory_end;
+    shm_header_t *shared_memory_header;
 public:
     OverloadParser(pid_t pid);
     ~OverloadParser();
