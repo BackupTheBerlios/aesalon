@@ -1,3 +1,5 @@
-add_custom_target(monitor_doc /usr/bin/doxygen)
+# Use this file to add doxygen hooks.
 
 add_subdirectory(src)
+add_subdirectory(modules)
+
