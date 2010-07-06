@@ -7,5 +7,5 @@ project(aesalon C CXX)
 # Include the build configuration.
 include(build.config)
 
-#add_subdirectory(monitor build)
-add_subdirectory(modules build)
+add_subdirectory(monitor monitor/build)
+add_subdirectory(modules modules/build)
