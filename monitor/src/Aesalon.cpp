@@ -1,6 +1,7 @@
 #include <iostream>
+#include "Initializer.h"
 
 int main(int argc, char *argv[]) {
-    
-    return 0;
+    Initializer init(argv);
+    return init.run();
 }

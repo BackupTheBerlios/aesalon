@@ -1,6 +1,12 @@
+#define AesalonCollectorModule
+
 #include <stdio.h>
+#include "collectorInterface/Interface.h"
 
-void AesalonModuleInit() {
-
+void AesalonInitModule() {
+	
 }
 
+void AesalonQuitModule() {
+	
+}

@@ -1,0 +1,12 @@
+First off, to create a collector module, the header file "collectorInterface/Interface.h" must be included.
+
+The API is as follows:
+
+void AesalonCollectorRegisterModule():
+    Registers a module with the data-collection framework, allowing it to send
+    data to the monitor library. This should be called once per initialization
+    of the module. Using a library constructor would be a very, very good idea
+    here.
+    
+void AesalonCollectorSendPacket(DataPacket *packet):
+    
