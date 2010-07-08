@@ -14,12 +14,17 @@ extern "C" {
 	#define GLOBAL_EXPORT
 #endif
 
+/* Generic functions. Note that many of these are overloaded by non-implementation
+	macros. */
+void GLOBAL_EXPORT AesalonCollectorRegisterModule(uint16_t *id);
+void GLOBAL_EXPORT AesalonCollectorSendPacket(DataPacket *packet);
+void GLOBAL_EXPORT AesalonCollectorFillPacket(DataPacket *packet);
+uint64_t GLOBAL_EXPORT AesalonCollectorGetTimestamp();
+
 /* If AesalonCollectorImplementation is defined, then this header is included
 	from within the implementation of the library. */
 #ifndef AesalonCollectorImplementation
-/* These functions and macros are for global usage by other modules. */
-
-/* Macros */
+/* These macros are for global usage by other modules. */
 
 /* AesalonCollectorModule is defined in one -- ONE -- file within the module.
 	This is treated as the main file, and variable declarations go in there. */
@@ -27,15 +32,26 @@ extern "C" {
 	uint16_t AesalonModuleID;
 #endif // #ifdef AesalonCollectorModule
 
-#define AesalonCollectorPacketFill(packet) \
-	((packet)->moduleID = AesalonModuleID); \
+#define AesalonCollectorRegisterModule() \
+	AesalonCollectorRegisterModule(&AesalonModuleID)
 
-/* Functions */
-void GLOBAL_EXPORT AesalonCollectorRegisterModule();
-void GLOBAL_EXPORT AesalonCollectorSendPacket(DataPacket *packet);
+#define AesalonCollectorSendPacket(packet) \
+	AesalonCollectorFillPacket(packet); \
+	AesalonCollectorSendPacket(packet)
+
+#else
+/* These functions/macros are for internal use by the collector interface. */
+void __attribute__((constructor)) AesalonCollectorConstructor();
+void __attribute__((destructor)) AesalonCollectorDestructor();
+
+struct {
+	uint8_t *memory;
+	uint64_t memorySize;
+} AesalonMemoryMap;
 
 #endif // #ifndef AesalonCollectorImplementation
 
+extern uint16_t AesalonModuleID;
 
 #if __GNUC__ >= 4
 	#pragma GCC visibility pop

@@ -3,10 +3,7 @@
 #include <stdio.h>
 #include "collectorInterface/Interface.h"
 
-void AesalonInitModule() {
-	
+void __attribute__((constructor)) AesalonCpuTimeCollectorInitialize() {
+	AesalonCollectorRegisterModule();
 }
 
-void AesalonQuitModule() {
-	
-}
