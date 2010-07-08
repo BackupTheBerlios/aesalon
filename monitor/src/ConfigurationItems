@@ -1,8 +1,8 @@
-/* Syntax: item(name, type, default-value).
+/* Syntax: item(name, type, default-value, description).
     Examples:
-    item("help", Boolean, "false")
-    item("search-path", String, "modules/")
+    item("help", Boolean, "false", "Displays a help message.")
+    item("search-path", String, "modules/",
+    	"Sets the path to search for modules.")
 */
 
-item("help", Boolean, "false")
-
+item("help", Boolean, "false", "Displays this help message.")

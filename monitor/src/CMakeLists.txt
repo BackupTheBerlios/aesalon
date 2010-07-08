@@ -1,4 +1,4 @@
-add_definitions(-W -Wall)
+add_definitions(-W -Wall -g)
 
 include_directories(.)
 
@@ -9,6 +9,8 @@ elseif(aesalonPlatform EQUAL "x86_64")
 endif(aesalonPlatform EQUAL "x86")
 
 add_definitions(-DAesalonVersion="${aesalonVersion}")
+
+add_definitions(-DAesalonGlobalConfig="${globalConfig}" -DAesalonUserConfig="${userConfig}" -DAesalonLocalConfig="${localConfig}")
 
 aux_source_directory(. dotSources)
 aux_source_directory(misc miscSources)

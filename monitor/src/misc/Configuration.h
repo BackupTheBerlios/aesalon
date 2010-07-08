@@ -20,10 +20,12 @@ private:
 	ConfigItems m_configItems;
 public:
 	Configuration *singleton() const { return m_singleton; }
+	ConfigItems &configItems() { return m_configItems; }
 	const ConfigItems &configItems() const { return m_configItems; }
 private:
 	void addConfigItems();
 	void processConfigFiles();
+	void processConfigFile(std::string path);
 	void processArguments();
 };
 

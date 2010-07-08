@@ -8,6 +8,7 @@
 class LogSystem {
 public:
 	static void logModuleMessage(uint16_t moduleID, std::string message);
+	static void logConfigurationMessage(std::string message);
 };
 
 #endif

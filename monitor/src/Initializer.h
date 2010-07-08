@@ -18,6 +18,8 @@ private:
 	Module::ModuleMapper *m_moduleMapper;
 public:
 	int run();
+private:
+	void usage();
 };
 
 #endif
