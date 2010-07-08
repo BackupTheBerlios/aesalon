@@ -32,7 +32,6 @@ typedef struct {
 	int dataStartFutex;
 	uint64_t dataEnd;
 	int dataEndFutex;
-	
 } MemoryMapHeader;
 
 #endif

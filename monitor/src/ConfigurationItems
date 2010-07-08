@@ -1,0 +1,8 @@
+/* Syntax: item(name, type, default-value).
+    Examples:
+    item("help", Boolean, "false")
+    item("search-path", String, "modules/")
+*/
+
+item("help", Boolean, "false")
+
