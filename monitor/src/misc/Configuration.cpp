@@ -12,6 +12,7 @@ namespace Misc {
 Configuration::Configuration(char *argv[]) : m_argv(argv) {
 	addConfigItems();
 	processConfigFiles();
+	processArguments();
 }
 
 Configuration::~Configuration() {
@@ -77,7 +78,59 @@ void Configuration::processConfigFile(std::string path) {
 }
 
 void Configuration::processArguments() {
+	bool foundEoo = false;
 	
+	int index = 0;
+	while(m_argv[index]) {
+		std::string indexStr = m_argv[index]; 
+		if(indexStr[0] == '-' && indexStr[1] == '-' && !foundEoo) {
+			indexStr.erase(0, 2);
+			if(indexStr.length() == 0) {
+				foundEoo = true;
+				continue;
+			}
+			std::string configName;
+			std::string configValue;
+			if(indexStr.find('=') != std::string::npos) {
+				configName = indexStr.substr(0, indexStr.find('='));
+				configValue = indexStr.substr(indexStr.find('=')+1);
+			}
+			else {
+				configName = indexStr;
+				configValue = "true";
+			}
+			ConfigurationItem *item = m_configItems[configName];
+			
+			switch(item->type()) {
+				case ConfigurationItem::Boolean: {
+					if(configValue == "true") item->setValue(true);
+					else if(configValue == "false") item->setValue(false);
+					else {
+						LogSystem::logConfigurationMessage(StreamAsString() << "Unknown boolean value in " << configName
+							<< " (" << configValue << "). Defaulting to false.");
+						item->setValue(false);
+					}
+					break;
+				}
+				case ConfigurationItem::String: {
+					item->setValue(configValue);
+					break;
+				}
+				case ConfigurationItem::Integer: {
+					int value;
+					std::istringstream converter(configValue);
+					converter >> value;
+					item->setValue(value);
+					break;
+				}
+			}
+		}
+		else {
+			m_programArguments.push_back(indexStr);
+		}
+		index ++;
+	}
+	m_filename = m_programArguments[0];
 }
 
 } // namespace Misc

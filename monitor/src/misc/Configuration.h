@@ -32,6 +32,7 @@ private:
 	void processConfigFiles();
 	void processConfigFile(std::string path);
 	void processArguments();
+	void processOption(char *argument);
 };
 
 } // namespace Misc
