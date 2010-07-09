@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+typedef unsigned long Address;
+
 /** Structure used to transfer data from collectors to the monitor. */
 typedef struct {
 	/** Module ID is filled in automatically by the collector interface. */

@@ -16,6 +16,8 @@ Initializer::~Initializer() {
 
 int Initializer::run() {
 	if(m_configuration->configItems()["help"]->boolValue() || m_configuration->programArguments().size() == 0) {
+		if(m_configuration->programArguments().size() == 0)
+			LogSystem::logConfigurationMessage("No filename specified. Displaying usage information.");
 		usage();
 		return 0;
 	}
@@ -23,8 +25,6 @@ int Initializer::run() {
 	m_launcher = new Program::Launcher();
 	
 	m_controller = new Program::Controller(m_launcher->childPid());
-	
-	
 	
 	delete m_controller;
 	delete m_launcher;

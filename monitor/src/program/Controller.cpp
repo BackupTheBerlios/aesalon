@@ -20,5 +20,4 @@ int Controller::checkForSignal(int *status) const {
 	return waitpid(m_childPid, status, WNOHANG);
 }
 
-
 } // namespace Program
