@@ -29,6 +29,9 @@ typedef struct {
 	/** Futex controlling latestModule. */
 	int latestModuleFutex;
 	
+	/** 0 if the program is still initializing, 1 if main() has been reached. */
+	uint8_t isMainReached;
+	
 	/** The size of the memory map. */
 	uint64_t dataSize;
 	

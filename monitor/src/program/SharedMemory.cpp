@@ -8,7 +8,7 @@
 namespace Program {
 
 SharedMemory::SharedMemory(pid_t monitoredPid) : m_monitoredPid(monitoredPid) {
-	m_shmPath = Misc::StreamAsString() << "aesalon-collector-" << monitoredPid;
+	m_shmPath = Misc::StreamAsString() << "AesalonCollector-" << monitoredPid;
 	m_shmFd = shm_open(m_shmPath.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 	
 	int shmSize = Initializer::singleton()->configuration()->configItems()["shm-size"]->intValue();

@@ -89,7 +89,7 @@ void Configuration::processArguments() {
 	bool foundEoo = false;
 	
 	int index = 0;
-	while(m_argv[index]) {
+	while(m_argv[++index]) {
 		std::string indexStr = m_argv[index]; 
 		if(indexStr[0] == '-' && indexStr[1] == '-' && !foundEoo) {
 			indexStr.erase(0, 2);
@@ -136,9 +136,8 @@ void Configuration::processArguments() {
 		else {
 			m_programArguments.push_back(indexStr);
 		}
-		index ++;
 	}
-	m_filename = m_programArguments[0];
+	if(m_programArguments.size()) m_filename = m_programArguments[0];
 }
 
 } // namespace Misc

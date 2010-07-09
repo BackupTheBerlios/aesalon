@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <sys/ptrace.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <iostream>
+#include <errno.h>
+#include <signal.h>
 
 #include "Launcher.h"
 #include "Initializer.h"
@@ -24,13 +28,13 @@ void Launcher::assembleArgv() {
 	std::string filename = config->filename();
 	const std::vector<std::string> &programArguments = config->programArguments();
 	
-	m_argv = new char *[programArguments.size() + 2];
+	m_argv = static_cast<char **>(malloc(sizeof(char *) * (programArguments.size() + 2)));
 	
 	for(int i = 0; i < (int)programArguments.size(); i ++) {
-		m_argv[i] = new char[programArguments[i].length() + 1];
+		m_argv[i] = static_cast<char *>(malloc(sizeof(char) * (programArguments[i].length() + 1)));
 		strcpy(m_argv[i], programArguments[i].c_str());
 	}
-	m_argv[programArguments.size() - 1] = 0;
+	m_argv[programArguments.size()] = 0;
 }
 
 void Launcher::startProcess() {
@@ -39,6 +43,8 @@ void Launcher::startProcess() {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
 		execv(m_argv[0], m_argv);
+		std::cout << "Failed to execv(): " << strerror(errno) << std::endl;
+		exit(0);
 	}
 	m_sharedMemory = new SharedMemory(m_childPid);
 }
@@ -54,9 +60,12 @@ std::string Launcher::preload() {
 	
 	std::string moduleList = Initializer::singleton()->configuration()->configItems()["modules"]->stringValue();
 	
-	std::string preload = getenv("LD_PRELOAD");
-	
-	if(preload.length()) preload += ":";
+	char *oldPreload = getenv("LD_PRELOAD");
+	std::string preload;
+	if(oldPreload) {
+		preload = oldPreload;
+		preload += ":";
+	}
 	
 	do {
 		std::string moduleName = moduleList.substr(0, moduleList.find(","));
@@ -64,16 +73,22 @@ std::string Launcher::preload() {
 		
 		for(std::vector<std::string>::iterator i = searchPaths.begin(); i != searchPaths.end(); i ++) {
 			struct stat possibleStat;
-			std::string possiblePath = Misc::StreamAsString() << *i << "/lib" << moduleName << ".so";
+			std::string possiblePath = Misc::StreamAsString() << *i << "/lib" << moduleName << "Collector.so";
 			if(stat(possiblePath.c_str(), &possibleStat) == 0) {
 				preload += possiblePath;
 				preload += ":";
 				break;
 			}
+			else {
+				std::cout << "Launcher::preload(): Couldn't open \"" << possiblePath << "\"; trying next search path.\n";
+			}
 		}
 	} while(pathList.find(",") != std::string::npos);
 	
-	preload.erase(preload.length()-1, 1);
+	if(preload.length()) {
+		/* TODO: make this path non hard-coded. */
+		preload += "modules/build/libcollectorInterface.so";
+	}
 	return preload;
 }
 

@@ -20,6 +20,7 @@ void GLOBAL_EXPORT AesalonCollectorRegisterModule(uint16_t *id);
 void GLOBAL_EXPORT AesalonCollectorSendPacket(DataPacket *packet);
 void GLOBAL_EXPORT AesalonCollectorFillPacket(DataPacket *packet);
 uint64_t GLOBAL_EXPORT AesalonCollectorGetTimestamp();
+uint8_t AesalonCollectorCollectionStatus();
 
 /* If AesalonCollectorImplementation is defined, then this header is included
 	from within the implementation of the library. */
@@ -45,8 +46,9 @@ void __attribute__((constructor)) AesalonCollectorConstructor();
 void __attribute__((destructor)) AesalonCollectorDestructor();
 
 struct {
+	int fd;
 	uint8_t *memory;
-	uint64_t memorySize;
+	MemoryMapHeader *header;
 } AesalonMemoryMap;
 
 #endif // #ifndef AesalonCollectorImplementation

@@ -6,6 +6,7 @@ include_directories(.)
 
 aux_source_directory(collectorInterface collectorInterfaceSources)
 add_library(collectorInterface SHARED ${collectorInterfaceSources})
+target_link_libraries(collectorInterface rt)
 
 foreach(module ${aesalonModules})
     aux_source_directory(${module}/collector moduleSources)

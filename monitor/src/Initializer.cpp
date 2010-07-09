@@ -15,10 +15,19 @@ Initializer::~Initializer() {
 }
 
 int Initializer::run() {
-	if(m_configuration->configItems()["help"]->boolValue()) {
+	if(m_configuration->configItems()["help"]->boolValue() || m_configuration->programArguments().size() == 0) {
 		usage();
 		return 0;
 	}
+	
+	m_launcher = new Program::Launcher();
+	
+	m_controller = new Program::Controller(m_launcher->childPid());
+	
+	
+	
+	delete m_controller;
+	delete m_launcher;
 	return 0;
 }
 
