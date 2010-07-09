@@ -26,10 +26,10 @@ void Configuration::addConfigItems() {
 #define item(name, type, defaultValue, description) \
 	m_configItems[name] = new ConfigurationItem(name, type); \
 	m_configItems[name]->setValue(defaultValue); \
-	m_configItems[name]->setDescription(description);
-	
+	m_configItems[name]->setDescription(description); \
+
 #include "ConfigurationItems"
-	
+
 #undef String
 #undef Boolean
 #undef item
@@ -42,7 +42,7 @@ void Configuration::processConfigFiles() {
 }
 
 void Configuration::processConfigFile(std::string path) {
-	path = PathSanitizer::santize(path);
+	path = PathSanitizer::sanitize(path);
 	
 	std::ifstream file(path.c_str(), std::_S_in);
 	if(!file.is_open()) return;
@@ -62,7 +62,9 @@ void Configuration::processConfigFile(std::string path) {
 			LogSystem::logConfigurationMessage(StreamAsString() << "Unknown configuration item \"" << name << "\". Ignoring.");
 		}
 		else {
-			if(configItem->type() == ConfigurationItem::String) configItem->setValue(content);
+			if(configItem->type() == ConfigurationItem::String) {
+				configItem->setValue(content);
+			}
 			else if(configItem->type() == ConfigurationItem::Boolean) {
 				if(content == "true") configItem->setValue(true);
 				else if(content == "false") configItem->setValue(true);
@@ -71,6 +73,12 @@ void Configuration::processConfigFile(std::string path) {
 						StreamAsString() << "Unknown boolean value in " << name << " (" << content << "). Defaulting to false.");
 					configItem->setValue(false);
 				}
+			}
+			else if(configItem->type() == ConfigurationItem::Integer) {
+				int value;
+				std::istringstream converter(content);
+				converter >> value;
+				configItem->setValue(value);
 			}
 		}
 	}

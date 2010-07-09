@@ -31,6 +31,7 @@ public:
 	void setDescription(const std::string &description) { m_description = description; }
 	
 	void setValue(const std::string &value) { m_stringValue = value; }
+	void setValue(const char *value) { setValue(std::string(value)); }
 	void setValue(bool value) { m_boolValue = value; }
 	void setValue(int value) { m_intValue = value; }
 };

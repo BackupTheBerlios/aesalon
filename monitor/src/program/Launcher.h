@@ -21,6 +21,7 @@ public:
 private:
 	void assembleArgv();
 	void startProcess();
+	std::string preload();
 };
 
 } // namespace Program

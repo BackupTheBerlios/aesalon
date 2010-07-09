@@ -7,7 +7,7 @@ namespace Misc {
 
 class PathSanitizer {
 public:
-	static std::string santize(std::string path);
+	static std::string sanitize(std::string path);
 };
 
 } // namespace Misc

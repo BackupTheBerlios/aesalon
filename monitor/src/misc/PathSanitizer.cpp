@@ -4,7 +4,7 @@
 
 namespace Misc {
 
-std::string PathSanitizer::santize(std::string path) {
+std::string PathSanitizer::sanitize(std::string path) {
 	char *homeDirectory = getenv("HOME");
 	
 	if(path[0] == '~') path.replace(0, 1, homeDirectory);
@@ -12,4 +12,4 @@ std::string PathSanitizer::santize(std::string path) {
 	return path;
 }
 
-}
+} // namespace Misc

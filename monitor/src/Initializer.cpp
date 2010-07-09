@@ -23,7 +23,8 @@ int Initializer::run() {
 }
 
 void Initializer::usage() {
-	std::cout << "Aesalon version " << AesalonVersion << ". Copyright (C) 2010 strange." << std::endl;
+	std::cout << "Aesalon version " << AesalonVersion << ". Copyright (C) 2010 by strange." << std::endl;
+	std::cout << "This program is released under the GNU GPLv3. For more legal information, see the LICENSE file." << std::endl;
 	std::cout << "usage: " << m_argv[0] << " [options] [--] filename [arguments]" << std::endl;
 	std::cout << "Options:" << std::endl;
 	for(Misc::Configuration::ConfigItems::iterator i = m_configuration->configItems().begin();

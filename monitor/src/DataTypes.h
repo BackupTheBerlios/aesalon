@@ -24,15 +24,23 @@ typedef struct {
 /** Structure used for maintaining a header within the SHM used to transfer
 	data between the collector interface and the monitor. */
 typedef struct {
+	/** The latest-loaded collection module. */
 	uint16_t latestModule;
+	/** Futex controlling latestModule. */
 	int latestModuleFutex;
 	
+	/** The size of the memory map. */
 	uint64_t dataSize;
 	
+	/** The futex used to control data packet access without infinite sleep() loops. */
 	int dataFutex;
+	/** The offset at which the unprocessed data begins. Incremented by the monitor. */
 	uint64_t dataStart;
+	/** Futex (used as a mutex) controlling dataStart. */
 	int dataStartFutex;
+	/** The offset at which the unprocessed data ends. Incremented by the collection interface. */
 	uint64_t dataEnd;
+	/** Futex controlling dataEnd. */
 	int dataEndFutex;
 } MemoryMapHeader;
 
