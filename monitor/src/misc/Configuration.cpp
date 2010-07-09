@@ -21,6 +21,7 @@ Configuration::~Configuration() {
 void Configuration::addConfigItems() {
 #define String ConfigurationItem::String
 #define Boolean ConfigurationItem::Boolean
+#define Integer ConfigurationItem::Integer
 #define item(name, type, defaultValue, description) \
 	m_configItems[name] = new ConfigurationItem(name, type); \
 	m_configItems[name]->setValue(defaultValue); \

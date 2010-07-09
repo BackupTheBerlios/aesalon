@@ -1,4 +1,8 @@
-add_definitions(-W -Wall -g)
+add_definitions(-W -Wall)
+
+if(devBuild)
+    add_definitions(-g)
+endif(devBuild)
 
 include_directories(.)
 
@@ -15,9 +19,9 @@ add_definitions(-DAesalonGlobalConfig="${globalConfig}" -DAesalonUserConfig="${u
 aux_source_directory(. dotSources)
 aux_source_directory(misc miscSources)
 aux_source_directory(module moduleSources)
-aux_source_directory(environment environmentSources)
+aux_source_directory(program programSources)
 
-add_executable(aesalon ${dotSources} ${miscSources} ${moduleSources} ${environmentSources})
+add_executable(aesalon ${dotSources} ${miscSources} ${moduleSources} ${programSources})
 
 target_link_libraries(aesalon dl rt)
 

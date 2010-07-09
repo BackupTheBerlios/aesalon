@@ -28,6 +28,8 @@ typedef struct {
 	int latestModuleFutex;
 	
 	uint64_t dataSize;
+	
+	int dataFutex;
 	uint64_t dataStart;
 	int dataStartFutex;
 	uint64_t dataEnd;

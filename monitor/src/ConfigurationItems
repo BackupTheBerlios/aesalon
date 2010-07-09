@@ -1,4 +1,5 @@
 /* Syntax: item(name, type, default-value, description).
+    type can be Boolean, String, or Integer.
     Examples:
     item("help", Boolean, "false", "Displays a help message.")
     item("search-path", String, "modules/",
@@ -6,3 +7,4 @@
 */
 
 item("help", Boolean, "false", "Displays this help message.")
+item("shm-size", Integer, 4097152, "Size of the shared memory map used to transfer data between the collector interface and the monitor.")

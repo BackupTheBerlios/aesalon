@@ -3,7 +3,10 @@
 #include "Initializer.h"
 #include "LogSystem.h"
 
+Initializer *Initializer::m_singleton = 0;
+
 Initializer::Initializer(char *argv[]) : m_argv(argv) {
+	m_singleton = this;
 	m_configuration = new Misc::Configuration(m_argv);
 }
 
@@ -27,5 +30,21 @@ void Initializer::usage() {
 		i != m_configuration->configItems().end(); i ++) {
 		if(i->second == NULL) continue;
 		std::cout << "\t--" << i->second->name() << ": " << i->second->description() << std::endl;
+		std::cout << "\t\tCurrent value: ";
+		switch(i->second->type()) {
+			case Misc::ConfigurationItem::Boolean: {
+				std::cout << (i->second->boolValue() ? "true" : "false");
+				break;
+			}
+			case Misc::ConfigurationItem::String: {
+				std::cout << i->second->stringValue();
+				break;
+			}
+			case Misc::ConfigurationItem::Integer: {
+				std::cout << i->second->intValue();
+				break;
+			}
+		}
+		std::cout << std::endl;
 	}
 }
