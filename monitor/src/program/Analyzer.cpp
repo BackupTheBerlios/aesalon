@@ -10,11 +10,11 @@ static bool compareSymbols(Symbol *one, Symbol *two) {
 }
 
 Analyzer::Analyzer(std::string filename) : m_filename(filename) {
-
+	
 }
 
 Analyzer::~Analyzer() {
-
+	
 }
 
 Symbol *Analyzer::symbol(Address address) const {

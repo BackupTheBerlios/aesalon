@@ -6,11 +6,15 @@ endif(devBuild)
 
 include_directories(.)
 
-if(aesalonPlatform EQUAL "x86")
+message(STATUS "Building for platform: ${platform}")
+
+if(platform STREQUAL "x86")
     add_definitions(-DAesalonPlatform_x86)
-elseif(aesalonPlatform EQUAL "x86_64")
+elseif(platform STREQUAL "x86_64")
     add_definitions(-DAesalonPlatform_x86_64)
-endif(aesalonPlatform EQUAL "x86")
+else(platform STREQUAL "x86")
+    message(FATAL_ERROR "No known platform specified in build configuration. Given ${platform}.")
+endif(platform STREQUAL "x86")
 
 add_definitions(-DAesalonVersion="${aesalonVersion}")
 
