@@ -9,5 +9,5 @@
 item("help", Boolean, "false", "Displays this help message.")
 item("shm-size", Integer, 4097152, "Size of the shared memory map used to transfer data between the collector interface and the monitor.")
 item("search-path", String, "modules/", "The path to search for module libraries. Separate directories with colons.")
-item("modules", String, "cpuTime", "A comma-separated list of modules to load for data collection.")
+item("modules", String, "", "A comma-separated list of modules to load for data collection.")
 

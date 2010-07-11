@@ -25,26 +25,26 @@ void Controller::run() {
 	/* Wait for the SIGTRAP. */
 	std::cout << "Waiting for exec() sigtrap . . . " << std::endl;
 	waitForSigTrap();
-#if 0
+
 	Symbol *mainSymbol = m_analyzer->symbol("main");
 	if(mainSymbol == NULL) {
 		LogSystem::logProgramMessage(m_analyzer->filename(), "Cannot resolve main(). Program is probably stripped.");
 		return;
 	}
 	Address mainAddress = mainSymbol->address();
-	/*uint8_t originalContent = readData(mainAddress) & 0xff;*/
-	/*writeData(mainAddress, 0xcc);*/
-	/*std::cout << "new data at " << mainAddress << " is " << int(readData(mainAddress) & 0xff) << std::endl;
-	std::cout << "original data is " << int(originalContent & 0xff) << std::endl;*/
-#endif
+	uint8_t originalContent = readData(mainAddress) & 0xff;
+	writeData(mainAddress, 0xcc);
+	std::cout << "new data at " << mainAddress << " is " << int(readData(mainAddress) & 0xff) << std::endl;
+	std::cout << "original data is " << int(originalContent & 0xff) << std::endl;
+
 	std::cout << "IP: 0x" << std::hex << getIp() << std::endl;
 	continueExecution(SIGCONT);
 	std::cout << "Waiting for main() sigtrap . . . " << std::endl;
 	/* Wait for the second SIGTRAP . . .*/
 	waitForSigTrap();
 	
-	/*setIp(getIp() - 1);
-	writeData(mainAddress, originalContent);*/
+	setIp(getIp() - 1);
+	writeData(mainAddress, originalContent);
 	
 	continueExecution();
 	
