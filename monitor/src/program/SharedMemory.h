@@ -24,6 +24,14 @@ public:
 	int shmFd() const { return m_shmFd; }
 	uint8_t *shmMemory() const { return m_shmMemory; }
 	MemoryMapHeader *header() const { return m_header; }
+	
+	void setMainReached();
+	
+	/** Reads a packet from the shm.
+		@note This function is designed to be called from the parsing thread.
+		@return A received packet, or NULL if the monitored program has terminated.
+	*/
+	DataPacket *readPacket();
 };
 
 } // namespace Program

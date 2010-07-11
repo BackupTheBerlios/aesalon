@@ -94,9 +94,6 @@ std::string Launcher::preload() {
 				preload += ":";
 				break;
 			}
-			else {
-				std::cout << "Launcher::preload(): Couldn't open \"" << possiblePath << "\"; trying next search path.\n";
-			}
 		}
 	} while(pathList.find(",") != std::string::npos);
 	

@@ -10,15 +10,17 @@
 #include "Controller.h"
 #include "LogSystem.h"
 #include "Initializer.h"
+#include "module/Reader.h"
 
 namespace Program {
 
 Controller::Controller(pid_t childPid) : m_childPid(childPid) {
 	m_analyzer = Initializer::singleton()->launcher()->analyzer();
+	m_sharedMemory = Initializer::singleton()->launcher()->sharedMemory();
 }
 
 Controller::~Controller() {
-	
+	pthread_join(m_readerThread, NULL);
 }
 
 void Controller::run() {
@@ -34,33 +36,32 @@ void Controller::run() {
 	Address mainAddress = mainSymbol->address();
 	uint8_t originalContent = readData(mainAddress) & 0xff;
 	writeData(mainAddress, 0xcc);
-	std::cout << "new data at " << mainAddress << " is " << int(readData(mainAddress) & 0xff) << std::endl;
-	std::cout << "original data is " << int(originalContent & 0xff) << std::endl;
-
-	std::cout << "IP: 0x" << std::hex << getIp() << std::endl;
-	continueExecution(SIGCONT);
-	std::cout << "Waiting for main() sigtrap . . . " << std::endl;
+	
+	continueExecution();
+	
 	/* Wait for the second SIGTRAP . . .*/
 	waitForSigTrap();
 	
 	setIp(getIp() - 1);
 	writeData(mainAddress, originalContent);
 	
+	m_sharedMemory->setMainReached();
+	
+	createThreads();
+	
 	continueExecution();
 	
-	int status;
+	detachFromProcess();
 	
+	int status;
 	/* Now, wait for the termination signal. */
 	waitForSignal(&status);
-	
-	std::cout << "Received signal " << std::dec << signalFromStatus(status) << std::endl;
 }
 
 void Controller::waitForSigTrap() {
 	int status;
 	do {
 		waitForSignal(&status);
-		std::cout << "waitForSigTrap(): Received signal " << std::dec << signalFromStatus(status) << std::endl;
 	} while(!WIFSTOPPED(status) || WSTOPSIG(status) != SIGTRAP);
 }
 
@@ -107,13 +108,29 @@ Address Controller::readData(Address memoryAddress) const {
 	value = ptrace(PTRACE_PEEKDATA, m_childPid, memoryAddress);
 	if(value == Address(-1) && errno != 0) {
 		std::cout << "Error: " << strerror(errno) << std::endl;
+		return 0;
 	}
-	std::cout << std::hex << "value: " << value << std::endl;
 	return value;
 }
 
 void Controller::continueExecution(int signal) {
 	ptrace(PTRACE_CONT, m_childPid, NULL, signal);
+}
+
+void Controller::detachFromProcess() {
+	ptrace(PTRACE_DETACH, m_childPid);
+}
+
+static void *PacketReaderThread(void *unused) {
+	SharedMemory *shm = Initializer::singleton()->launcher()->sharedMemory();
+	Module::Reader *reader = new Module::Reader();
+	DataPacket *packet;
+	while((packet = shm->readPacket())) reader->processPacket(packet);
+	return NULL;
+}
+
+void Controller::createThreads() {
+	pthread_create(&m_readerThread, NULL, PacketReaderThread, NULL);
 }
 
 } // namespace Program

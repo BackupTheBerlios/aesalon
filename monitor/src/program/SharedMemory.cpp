@@ -1,5 +1,6 @@
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <linux/futex.h>
 
 #include "SharedMemory.h"
 #include "misc/StreamAsString.h"
@@ -22,6 +23,14 @@ SharedMemory::SharedMemory(pid_t monitoredPid) : m_monitoredPid(monitoredPid) {
 SharedMemory::~SharedMemory() {
 	munmap(m_shmMemory, m_header->dataSize);
 	shm_unlink(m_shmPath.c_str());
+}
+
+void SharedMemory::setMainReached() {
+	m_header->isMainReached = 1;
+}
+
+DataPacket *SharedMemory::readPacket() {
+	return NULL;
 }
 
 } // namespace Program

@@ -11,7 +11,6 @@
 #include "Interface.h"
 
 void __attribute__((constructor)) AesalonCollectorConstructor() {
-	printf("AesalonCollectorConstructor(): initializing . . .\n");
 	char filename[64];
 	sprintf(filename, "AesalonCollector-%i", getpid());
 	
@@ -53,6 +52,6 @@ uint64_t AesalonCollectorGetTimestamp() {
 	return ((uint64_t)t.tv_sec * 1000000000) + t.tv_nsec;
 }
 
-uint8_t AesalonCollectorCollectionStatus() {
+uint8_t AesalonCollectionStatus() {
 	return AesalonMemoryMap.header->isMainReached;
 }

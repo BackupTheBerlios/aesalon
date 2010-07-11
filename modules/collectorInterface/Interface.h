@@ -20,7 +20,7 @@ void GLOBAL_EXPORT AesalonCollectorRegisterModule(uint16_t *id);
 void GLOBAL_EXPORT AesalonCollectorSendPacket(DataPacket *packet);
 void GLOBAL_EXPORT AesalonCollectorFillPacket(DataPacket *packet);
 uint64_t GLOBAL_EXPORT AesalonCollectorGetTimestamp();
-uint8_t AesalonCollectorCollectionStatus();
+uint8_t AesalonCollectionStatus();
 
 /* If AesalonCollectorImplementation is defined, then this header is included
 	from within the implementation of the library. */
