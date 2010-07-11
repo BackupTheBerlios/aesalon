@@ -25,7 +25,6 @@ Controller::~Controller() {
 
 void Controller::run() {
 	/* Wait for the SIGTRAP. */
-	std::cout << "Waiting for exec() sigtrap . . . " << std::endl;
 	waitForSigTrap();
 
 	Symbol *mainSymbol = m_analyzer->symbol("main");
@@ -45,12 +44,16 @@ void Controller::run() {
 	setIp(getIp() - 1);
 	writeData(mainAddress, originalContent);
 	
+	/* Tell the collector libraries that main() has been reached. */
 	m_sharedMemory->setMainReached();
 	
+	/* Create the reading thread(s). */
 	createThreads();
 	
+	/* Continue execution of the monitored program. */
 	continueExecution();
 	
+	/* Detach from the process. */
 	detachFromProcess();
 	
 	int status;

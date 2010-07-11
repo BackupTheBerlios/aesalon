@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <linux/futex.h>
 
 #include "Interface.h"
 
@@ -33,8 +34,8 @@ void __attribute__((destructor)) AesalonCollectorDestructor() {
 	shm_unlink(filename);
 }
 
-void AesalonCollectorRegisterModule(uint16_t *id) {
-	printf("AesalonCollectorRegisterModule called. ID is %p, content is %i.\n", id, *id);
+void AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id) {
+	printf("AesalonCollectorRegisterModule called. Module name is \"%s\".\n", moduleName);
 }
 
 void AesalonCollectorFillPacket(DataPacket *packet) {
@@ -42,7 +43,15 @@ void AesalonCollectorFillPacket(DataPacket *packet) {
 	packet->dataSource.timestamp = AesalonCollectorGetTimestamp();
 }
 
+static void AesalonCollectorWriteData(void *data, int size) {
+	AesalonMemoryMap.header;
+}
+
 void AesalonCollectorSendPacket(DataPacket *packet) {
+	AesalonCollectorWriteData(&packet->dataSource, sizeof(packet->dataSource));
+	AesalonCollectorWriteData(&packet->dataSize, sizeof(packet->dataSize));
+	AesalonCollectorWriteData(packet->data, packet->dataSize);
+	
 	
 }
 

@@ -16,7 +16,7 @@ extern "C" {
 
 /* Generic functions. Note that many of these are overloaded by non-implementation
 	macros. */
-void GLOBAL_EXPORT AesalonCollectorRegisterModule(uint16_t *id);
+void GLOBAL_EXPORT AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id);
 void GLOBAL_EXPORT AesalonCollectorSendPacket(DataPacket *packet);
 void GLOBAL_EXPORT AesalonCollectorFillPacket(DataPacket *packet);
 uint64_t GLOBAL_EXPORT AesalonCollectorGetTimestamp();
@@ -33,8 +33,8 @@ uint8_t AesalonCollectionStatus();
 	uint16_t AesalonModuleID;
 #endif // #ifdef AesalonCollectorModule
 
-#define AesalonCollectorRegisterModule() \
-	AesalonCollectorRegisterModule(&AesalonModuleID)
+#define AesalonCollectorRegisterModule(moduleName) \
+	AesalonCollectorRegisterModule((moduleName), &AesalonModuleID)
 
 #define AesalonCollectorSendPacket(packet) \
 	AesalonCollectorFillPacket(packet); \

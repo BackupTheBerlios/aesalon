@@ -7,10 +7,10 @@ typedef unsigned long Address;
 
 /** Structure used to transfer data from collectors to the monitor. */
 typedef struct {
-	/** Module ID is filled in automatically by the collector interface. */
-	uint16_t moduleID;
-	/** Source information, also automatically filled in. */
+	/** Source information, automatically filled in. */
 	struct {
+		/** Module ID this packet was sent from. */
+		uint16_t moduleID;
 		/** The timestamp this collection occurred at. */
 		uint64_t timestamp;
 		/** The thread the event occurred in. */
@@ -47,6 +47,8 @@ typedef struct {
 	uint64_t dataEnd;
 	/** Futex controlling dataEnd. */
 	int dataEndFutex;
+	/** Data offset; how far from the beginning of the memory map the data begins. */
+	uint64_t dataOffset;
 } MemoryMapHeader;
 
 #endif

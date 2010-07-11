@@ -4,6 +4,6 @@
 #include "collectorInterface/Interface.h"
 
 void __attribute__((constructor)) AesalonCpuTimeCollectorInitialize() {
-	AesalonCollectorRegisterModule();
+	AesalonCollectorRegisterModule("cpuTime");
 }
 
