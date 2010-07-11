@@ -8,6 +8,7 @@
 #include "module/ModuleMapper.h"
 #include "program/Launcher.h"
 #include "program/Controller.h"
+#include "program/Analyzer.h"
 
 class Initializer {
 public:
@@ -22,6 +23,7 @@ private:
 	Module::ModuleMapper *m_moduleMapper;
 	Program::Launcher *m_launcher;
 	Program::Controller *m_controller;
+	Program::Analyzer *m_analyzer;
 public:
 	Misc::Configuration *configuration() const { return m_configuration; }
 	Module::ModuleMapper *moduleMapper() const { return m_moduleMapper; }

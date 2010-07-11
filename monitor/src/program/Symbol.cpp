@@ -1,9 +1,11 @@
+#include <iostream>
+
 #include "Symbol.h"
 
 namespace Program {
 
-Symbol::Symbol(Address address) : m_address(address) {
-
+Symbol::Symbol(Address address, Address size, const char *name) : m_address(address), m_size(size), m_name(name) {
+	/*std::cout << "Symbol(" << address << ", " << size << ", \"" << name << "\") . . ." << std::endl;*/
 }
 
 Symbol::~Symbol() {

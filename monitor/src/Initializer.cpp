@@ -2,6 +2,7 @@
 
 #include "Initializer.h"
 #include "LogSystem.h"
+#include "program/ElfAnalyzer.h"
 
 Initializer *Initializer::m_singleton = 0;
 
@@ -23,9 +24,15 @@ int Initializer::run() {
 	}
 	
 	m_launcher = new Program::Launcher();
-	
 	m_controller = new Program::Controller(m_launcher->childPid());
+	m_analyzer = new Program::ElfAnalyzer(m_launcher->filename());
 	
+	std::cout << m_launcher << std::endl;
+	std::cout << m_analyzer << std::endl;
+	
+	std::cout << ". . . " << std::endl;
+	
+	delete m_analyzer;
 	delete m_controller;
 	delete m_launcher;
 	return 0;

@@ -12,5 +12,9 @@ void LogSystem::logConfigurationMessage(std::string message) {
 }
 
 void LogSystem::logAnalyzerMessage(Program::Analyzer *analyzer, std::string message) {
-	std::cout << "[\"" << analyzer->filename() << "\"] " << message << std::endl;
+	std::cout << "[" << analyzer->filename() << "] " << message << std::endl;
+}
+
+void LogSystem::logProgramMessage(std::string filename, std::string message) {
+	std::cout << "[" << filename << "] " << message << std::endl;
 }

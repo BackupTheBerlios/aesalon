@@ -18,6 +18,7 @@ private:
 public:
 	SharedMemory *sharedMemory() const { return m_sharedMemory; }
 	pid_t childPid() const { return m_childPid; }
+	std::string filename() const { return m_argv[0]; }
 private:
 	void assembleArgv();
 	void startProcess();

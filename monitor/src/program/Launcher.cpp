@@ -10,6 +10,8 @@
 #include "Launcher.h"
 #include "Initializer.h"
 #include "misc/StreamAsString.h"
+#include "LogSystem.h"
+#include "misc/StreamAsString.h"
 
 namespace Program {
 
@@ -43,7 +45,7 @@ void Launcher::startProcess() {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
 		execv(m_argv[0], m_argv);
-		std::cout << "Failed to execv(): " << strerror(errno) << std::endl;
+		LogSystem::logProgramMessage(m_argv[0], Misc::StreamAsString() << "execv() failed: " << strerror(errno));
 		exit(0);
 	}
 	m_sharedMemory = new SharedMemory(m_childPid);
