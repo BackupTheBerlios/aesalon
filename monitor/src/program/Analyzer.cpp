@@ -30,6 +30,10 @@ Symbol *Analyzer::symbol(Address address) const {
 	return *std::lower_bound(m_symbolList.begin(), m_symbolList.end(), &s, compareSymbols);
 }
 
+Symbol *Analyzer::symbol(const char* name) {
+	return m_symbolMap[name];
+}
+
 Section *Analyzer::section(int index) const {
 	return m_sectionList[index];
 }
@@ -43,7 +47,7 @@ Section *Analyzer::section(const char *name) const {
 
 void Analyzer::addSymbol(Symbol *symbol) {
 	m_symbolList.insert(std::lower_bound(m_symbolList.begin(), m_symbolList.end(), symbol, compareSymbols), symbol);
-	
+	m_symbolMap[symbol->name()] = symbol;
 }
 
 void Analyzer::addSection(Section *section) {

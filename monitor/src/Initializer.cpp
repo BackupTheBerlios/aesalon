@@ -12,7 +12,7 @@ Initializer::Initializer(char *argv[]) : m_argv(argv) {
 }
 
 Initializer::~Initializer() {
-	
+	if(m_launcher) delete m_launcher;
 }
 
 int Initializer::run() {
@@ -24,18 +24,10 @@ int Initializer::run() {
 	}
 	
 	m_launcher = new Program::Launcher();
-	m_controller = new Program::Controller(m_launcher->childPid());
-	m_analyzer = new Program::ElfAnalyzer(m_launcher->filename());
 	
-	std::cout << m_launcher << std::endl;
-	std::cout << m_analyzer << std::endl;
+	m_launcher->start();
 	
-	std::cout << ". . . " << std::endl;
-	
-	delete m_analyzer;
-	delete m_controller;
-	delete m_launcher;
-	return 0;
+	return m_launcher->returnCode();
 }
 
 void Initializer::usage() {

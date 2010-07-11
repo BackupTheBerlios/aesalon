@@ -22,8 +22,6 @@ private:
 	Misc::Configuration *m_configuration;
 	Module::ModuleMapper *m_moduleMapper;
 	Program::Launcher *m_launcher;
-	Program::Controller *m_controller;
-	Program::Analyzer *m_analyzer;
 public:
 	Misc::Configuration *configuration() const { return m_configuration; }
 	Module::ModuleMapper *moduleMapper() const { return m_moduleMapper; }

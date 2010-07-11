@@ -12,16 +12,25 @@
 #include "misc/StreamAsString.h"
 #include "LogSystem.h"
 #include "misc/StreamAsString.h"
+#include "ElfAnalyzer.h"
 
 namespace Program {
 
 Launcher::Launcher() {
-	assembleArgv();
-	startProcess();
+	m_sharedMemory = NULL;
+	m_analyzer = NULL;
+	m_controller = NULL;
 }
 
 Launcher::~Launcher() {
-	
+	if(m_sharedMemory) delete m_sharedMemory;
+	if(m_analyzer) delete m_sharedMemory;
+	if(m_controller) delete m_controller;
+}
+
+void Launcher::start() {
+	assembleArgv();
+	startProcess();
 }
 
 void Launcher::assembleArgv() {
@@ -49,6 +58,10 @@ void Launcher::startProcess() {
 		exit(0);
 	}
 	m_sharedMemory = new SharedMemory(m_childPid);
+	m_analyzer = new ElfAnalyzer(m_argv[0]);
+	m_controller = new Controller(m_childPid);
+	
+	m_controller->run();
 }
 
 std::string Launcher::preload() {
