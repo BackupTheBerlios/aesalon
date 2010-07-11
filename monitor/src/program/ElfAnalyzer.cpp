@@ -84,7 +84,6 @@ uint8_t *ElfAnalyzer::readSection(Section *section) {
 		return NULL;
 	}
 	section->setData(data);
-	std::cout << "Read data, size is " << section->size() << std::endl;
 	return data;
 }
 

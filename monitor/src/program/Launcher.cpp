@@ -24,7 +24,7 @@ Launcher::Launcher() {
 
 Launcher::~Launcher() {
 	if(m_sharedMemory) delete m_sharedMemory;
-	if(m_analyzer) delete m_sharedMemory;
+	if(m_analyzer) delete m_analyzer;
 	if(m_controller) delete m_controller;
 }
 

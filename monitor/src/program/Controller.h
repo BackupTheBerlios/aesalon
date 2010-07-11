@@ -25,11 +25,12 @@ protected:
 	void waitForSigTrap();
 	int waitForSignal(int *status) const;
 	int checkForSignal(int *status) const;
+	int signalFromStatus(int status);
 	Address getIp() const;
 	void setIp(Address value) const;
 	void writeData(Address memoryAddress, uint8_t data) const;
 	Address readData(Address memoryAddress) const;
-	void continueExecution();
+	void continueExecution(int signal = 0);
 };
 
 } // namespace Program

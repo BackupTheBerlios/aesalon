@@ -1,0 +1,4 @@
+set(testList
+    malloc_test
+    log_test
+)

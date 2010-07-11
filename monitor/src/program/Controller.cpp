@@ -25,36 +25,43 @@ void Controller::run() {
 	/* Wait for the SIGTRAP. */
 	std::cout << "Waiting for exec() sigtrap . . . " << std::endl;
 	waitForSigTrap();
+#if 0
 	Symbol *mainSymbol = m_analyzer->symbol("main");
 	if(mainSymbol == NULL) {
 		LogSystem::logProgramMessage(m_analyzer->filename(), "Cannot resolve main(). Program is probably stripped.");
 		return;
 	}
 	Address mainAddress = mainSymbol->address();
-	uint8_t originalContent = readData(mainAddress) & 0xff;
-	writeData(mainAddress, 0xcc);
-	std::cout << "new data at " << mainAddress << " is " << int(readData(mainAddress) & 0xff) << std::endl;
-	std::cout << "original data is " << int(originalContent & 0xff) << std::endl;
-	continueExecution();
+	/*uint8_t originalContent = readData(mainAddress) & 0xff;*/
+	/*writeData(mainAddress, 0xcc);*/
+	/*std::cout << "new data at " << mainAddress << " is " << int(readData(mainAddress) & 0xff) << std::endl;
+	std::cout << "original data is " << int(originalContent & 0xff) << std::endl;*/
+#endif
+	std::cout << "IP: 0x" << std::hex << getIp() << std::endl;
+	continueExecution(SIGCONT);
 	std::cout << "Waiting for main() sigtrap . . . " << std::endl;
 	/* Wait for the second SIGTRAP . . .*/
 	waitForSigTrap();
 	
-	setIp(getIp() - 1);
-	writeData(mainAddress, originalContent);
+	/*setIp(getIp() - 1);
+	writeData(mainAddress, originalContent);*/
 	
 	continueExecution();
 	
+	int status;
+	
 	/* Now, wait for the termination signal. */
-	waitForSignal(NULL);
+	waitForSignal(&status);
+	
+	std::cout << "Received signal " << std::dec << signalFromStatus(status) << std::endl;
 }
 
 void Controller::waitForSigTrap() {
 	int status;
 	do {
-		std::cout << "Waiting for signal . . .\n" << std::endl;
 		waitForSignal(&status);
-	} while(!WIFSTOPPED(status) || !WSTOPSIG(status) == SIGTRAP);
+		std::cout << "waitForSigTrap(): Received signal " << std::dec << signalFromStatus(status) << std::endl;
+	} while(!WIFSTOPPED(status) || WSTOPSIG(status) != SIGTRAP);
 }
 
 int Controller::waitForSignal(int *status) const {
@@ -63,6 +70,14 @@ int Controller::waitForSignal(int *status) const {
 
 int Controller::checkForSignal(int *status) const {
 	return waitpid(m_childPid, status, WNOHANG);
+}
+
+int Controller::signalFromStatus(int status) {
+	if(WIFSTOPPED(status)) return WSTOPSIG(status);
+	else if(WIFSIGNALED(status)) return WTERMSIG(status);
+	else if(WIFEXITED(status)) return -1;
+	/* Unknown signal, ignore. */
+	return 0;
 }
 
 Address Controller::getIp() const {
@@ -97,8 +112,8 @@ Address Controller::readData(Address memoryAddress) const {
 	return value;
 }
 
-void Controller::continueExecution() {
-	ptrace(PTRACE_CONT, m_childPid);
+void Controller::continueExecution(int signal) {
+	ptrace(PTRACE_CONT, m_childPid, NULL, signal);
 }
 
 } // namespace Program

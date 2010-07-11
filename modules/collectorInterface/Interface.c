@@ -11,12 +11,17 @@
 #include "Interface.h"
 
 void __attribute__((constructor)) AesalonCollectorConstructor() {
+	printf("AesalonCollectorConstructor(): initializing . . .\n");
 	char filename[64];
 	sprintf(filename, "AesalonCollector-%i", getpid());
 	
 	AesalonMemoryMap.fd = shm_open(filename, O_RDWR, 0);
 	
 	char *shmSizeEnv = getenv("AesalonCollectorShmSize");
+	if(shmSizeEnv == NULL) {
+		printf("AesalonCollectorShmSize is not set. Aborting.\n");
+		exit(1);
+	}
 	int shmSize;
 	sscanf(shmSizeEnv, "%i", &shmSize);
 	
