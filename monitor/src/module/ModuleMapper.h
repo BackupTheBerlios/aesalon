@@ -21,7 +21,7 @@ public:
 	Module *module(uint16_t moduleID);
 	Module *module(const std::string &name);
 	
-	void registerModule(Module *module);
+	void loadModule(char *moduleName);
 };
 
 } // namespace Module

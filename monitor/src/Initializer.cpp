@@ -9,10 +9,12 @@ Initializer *Initializer::m_singleton = 0;
 Initializer::Initializer(char *argv[]) : m_argv(argv) {
 	m_singleton = this;
 	m_configuration = new Misc::Configuration(m_argv);
+	m_moduleMapper = new Module::ModuleMapper();
 }
 
 Initializer::~Initializer() {
 	if(m_launcher) delete m_launcher;
+	if(m_configuration) delete m_configuration;
 }
 
 int Initializer::run() {

@@ -39,6 +39,11 @@ void __attribute__((destructor)) AesalonCollectorDestructor() {
 void AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id) {
 	(*id) = ++AesalonMemoryMap.header->latestModule;
 	printf("AesalonCollectorRegisterModule: registering module %s as id %i.\n", moduleName, *id);
+	DataPacket packet;
+	packet.dataSource.moduleID = 0;
+	packet.dataSize = strlen(moduleName) + 1; /* Plus one for the NULL. */
+	packet.data = (void *)moduleName;
+	AesalonCollectorSendPacket(&packet);
 	/* TODO: send notification packet. */
 }
 

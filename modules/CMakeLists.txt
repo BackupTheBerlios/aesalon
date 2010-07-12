@@ -12,7 +12,7 @@ foreach(module ${aesalonModules})
     aux_source_directory(${module}/collector moduleSources)
     add_library(${module}Collector SHARED ${moduleSources})
 
-#    aux_source_directory(${module}/monitor monitorSources)
-#    add_library(${module}Monitor SHARED ${monitorSources})
+    aux_source_directory(${module}/monitor monitorSources)
+    add_library(${module}Monitor SHARED ${monitorSources})
 endforeach(module)
 

@@ -14,6 +14,7 @@
 #include "LogSystem.h"
 #include "misc/StreamAsString.h"
 #include "ElfAnalyzer.h"
+#include "misc/PathSanitizer.h"
 
 namespace Program {
 
@@ -90,20 +91,19 @@ std::string Launcher::preload() {
 		std::string moduleName = moduleList.substr(0, moduleList.find(","));
 		moduleList.erase(0, moduleList.find(",")+1);
 		
-		for(std::vector<std::string>::iterator i = searchPaths.begin(); i != searchPaths.end(); i ++) {
-			struct stat possibleStat;
-			std::string possiblePath = Misc::StreamAsString() << *i << "/lib" << moduleName << "Collector.so";
-			if(stat(possiblePath.c_str(), &possibleStat) == 0) {
-				preload += possiblePath;
-				preload += ":";
-				break;
-			}
+		moduleName.insert(0, "lib");
+		moduleName.append("Collector.so");
+		std::string found = Misc::PathSanitizer::findFromPaths(moduleName, pathList);
+		if(found.length()) {
+			preload += found;
+			preload += ':';
 		}
 	} while(pathList.find(",") != std::string::npos);
 	
 	if(preload.length()) {
-		/* TODO: make this path non hard-coded. */
-		preload += "modules/build/libcollectorInterface.so";
+		/*std::cout << "pathList: " << pathList << std::endl;
+		std::cout << "collector interface path: " << Misc::PathSanitizer::findFromPaths("libcollectorInterface.so", pathList) << std::endl;*/
+		preload += Misc::PathSanitizer::findFromPaths("libcollectorInterface.so", pathList);
 	}
 	return preload;
 }
