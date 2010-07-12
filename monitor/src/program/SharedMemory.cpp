@@ -62,7 +62,7 @@ DataPacket *SharedMemory::readPacket() {
 	
 	/* TODO: actually read packet . . . */
 	
-	sem_post(&m_header->dataOverflowSemaphore);
+	if(m_header->dataOverflow) sem_post(&m_header->dataOverflowSemaphore);
 	return NULL;
 }
 

@@ -48,12 +48,18 @@ void AesalonCollectorFillPacket(DataPacket *packet) {
 }
 
 int AesalonCollectorRemainingSpace() {
-	if(AesalonMemoryMap.header->dataStart < AesalonMemoryMap.header->dataEnd) {
-		return ((AesalonMemoryMap.header->dataEnd - AesalonMemoryMap.header->dataStart) - AesalonMemoryMap.header->dataOffset) + (AesalonMemoryMap.header->dataStart - AesalonMemoryMap.header->dataOffset);
+	int used = 0;
+	
+	if(AesalonMemoryMap.header->dataStart <= AesalonMemoryMap.header->dataEnd) {
+		
+		used = AesalonMemoryMap.header->dataEnd - AesalonMemoryMap.header->dataStart;
 	}
 	else {
-		return ((AesalonMemoryMap.header->dataSize) - AesalonMemoryMap.header->dataStart) + (AesalonMemoryMap.header->dataEnd - AesalonMemoryMap.header->dataOffset);
+		used = AesalonMemoryMap.header->dataSize - AesalonMemoryMap.header->dataStart;
+		used += AesalonMemoryMap.header->dataEnd;
 	}
+	printf("Calculated used memory is %i\n", used);
+	return (AesalonMemoryMap.header->dataSize - AesalonMemoryMap.header->dataOffset) - used;
 }
 
 void AesalonCollectorWriteData(void *data, int size) {
@@ -77,17 +83,21 @@ void AesalonCollectorWriteData(void *data, int size) {
 }
 
 void AesalonCollectorSendPacket(DataPacket *packet) {
-	printf("Asked to send packet . . .\n");
+	printf("Asked to send packet . . . thread ID is %u\n", pthread_self());
 	AesalonCollectorFillPacket(packet);
 	printf("Reserving semaphore . . .\n");
-	sem_wait(&AesalonMemoryMap.header->dataStartSemaphore);
+	int ret = sem_wait(&AesalonMemoryMap.header->dataStartSemaphore);
+	printf("ret: %i\n", ret);
 	printf("Reserving semaphore #2. . .\n");
 	sem_wait(&AesalonMemoryMap.header->dataEndSemaphore);
 	
 	printf("Ensuring enough data space . . .\n");
 	int size = sizeof(packet->dataSource) + sizeof(packet->dataSize) + packet->dataSize;
 	
+	printf("while() loop . . .\n");
+	printf("remaining space: %i\n", AesalonCollectorRemainingSpace());
 	while(AesalonCollectorRemainingSpace() < size) {
+		printf("Iteration . . .\n");
 		AesalonMemoryMap.header->dataOverflow = 1;
 		sem_wait(&AesalonMemoryMap.header->dataOverflowSemaphore);
 	}

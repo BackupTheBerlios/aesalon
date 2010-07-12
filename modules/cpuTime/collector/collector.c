@@ -35,11 +35,11 @@ void __attribute__((constructor)) AesalonCpuTimeCollectorInitialize() {
 	
 	struct itimerspec its;
 	
-	its.it_interval.tv_sec = 0;
-	its.it_interval.tv_nsec = 750000000;
+	its.it_interval.tv_sec = 2;
+	its.it_interval.tv_nsec = /*75000000*/0;
 	
-	its.it_value.tv_sec = 0;
-	its.it_value.tv_nsec = 750000000;
+	its.it_value.tv_sec = 2;
+	its.it_value.tv_nsec = /*75000000*/0;
 	
 	timer_settime(SendTimer, 0, &its, NULL);
 }
