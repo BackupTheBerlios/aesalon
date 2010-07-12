@@ -20,6 +20,7 @@ Controller::Controller(pid_t childPid) : m_childPid(childPid) {
 }
 
 Controller::~Controller() {
+	m_sharedMemory->setFinished();
 	pthread_join(m_readerThread, NULL);
 }
 

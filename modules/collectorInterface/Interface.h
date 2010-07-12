@@ -16,9 +16,17 @@ extern "C" {
 
 /* Generic functions. Note that many of these are overloaded by non-implementation
 	macros. */
+/** Registers a module with the monitor, assigning it a module ID so it can send data.
+	@param moduleName The name of the module, used to load the corresponding monitor library.
+	@param id A pointer to the global variable AesalonModuleID; automatically provided by the
+		macro with the same name as the function.
+*/
 void GLOBAL_EXPORT AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id);
+/** Sends a packet to the monitor. @a packet will be sent almost verbatim to the monitor
+	library.
+	@param packet The packet to send.
+*/
 void GLOBAL_EXPORT AesalonCollectorSendPacket(DataPacket *packet);
-void GLOBAL_EXPORT AesalonCollectorFillPacket(DataPacket *packet);
 uint64_t GLOBAL_EXPORT AesalonCollectorGetTimestamp();
 uint8_t AesalonCollectionStatus();
 
@@ -36,14 +44,28 @@ uint8_t AesalonCollectionStatus();
 #define AesalonCollectorRegisterModule(moduleName) \
 	AesalonCollectorRegisterModule((moduleName), &AesalonModuleID)
 
-#define AesalonCollectorSendPacket(packet) \
+/*#define AesalonCollectorSendPacket(packet) \
 	AesalonCollectorFillPacket(packet); \
-	AesalonCollectorSendPacket(packet)
+	AesalonCollectorSendPacket(packet)*/
 
 #else
 /* These functions/macros are for internal use by the collector interface. */
 void __attribute__((constructor)) AesalonCollectorConstructor();
 void __attribute__((destructor)) AesalonCollectorDestructor();
+
+/** Calculates the remaining data space inside the memory map.
+	@return The available space for data.
+*/
+int AesalonCollectorRemainingSpace();
+/** Writes @a data into the memory map. Assumes there is at least @a size bytes free.
+	@param data The data to write.
+	@param size The size, in bytes, of @a data.
+*/
+void AesalonCollectorWriteData(void *data, int size);
+/** Fills a packet with information about the current environment. Does not create a backtrace.
+	@param packet The packet to fill.
+*/
+void AesalonCollectorFillPacket(DataPacket *packet);
 
 struct {
 	int fd;

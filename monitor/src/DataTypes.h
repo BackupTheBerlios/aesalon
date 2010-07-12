@@ -2,6 +2,7 @@
 #define DataTypes_H
 
 #include <stdint.h>
+#include <semaphore.h>
 
 typedef unsigned long Address;
 
@@ -26,29 +27,34 @@ typedef struct {
 /** Structure used for maintaining a header within the SHM used to transfer
 	data between the collector interface and the monitor. */
 typedef struct {
-	/** The latest-loaded collection module. */
+	/** The latest-loaded collection module ID. */
 	uint16_t latestModule;
-	/** Futex controlling latestModule. */
-	int latestModuleFutex;
 	
 	/** 0 if the program is still initializing, 1 if main() has been reached. */
-	uint8_t isMainReached;
+	uint8_t mainReached;
+	/** 0 if data is still being generated, 1 if all child processes have terminated. */
+	uint8_t finished;
 	
 	/** The size of the memory map. */
 	uint64_t dataSize;
-	
-	/** The futex used to control data packet access without infinite sleep() loops. */
-	int dataFutex;
-	/** The offset at which the unprocessed data begins. Incremented by the monitor. */
-	uint64_t dataStart;
-	/** Futex (used as a mutex) controlling dataStart. */
-	int dataStartFutex;
-	/** The offset at which the unprocessed data ends. Incremented by the collection interface. */
-	uint64_t dataEnd;
-	/** Futex controlling dataEnd. */
-	int dataEndFutex;
 	/** Data offset; how far from the beginning of the memory map the data begins. */
 	uint64_t dataOffset;
+	
+	/** The semaphore used to control data packet access without infinite sleep() loops. */
+	sem_t dataSempahore;
+	/** The overflow semaphore, used to control access when the monitor is processing too slowly. */
+	sem_t dataOverflowSemaphore;
+	/** The overflow flag. When this is true, then the overflow semaphore is used. */
+	uint8_t dataOverflow;
+	
+	/** The offset at which the unprocessed data begins. Incremented by the monitor. */
+	uint64_t dataStart;
+	/** Semaphore (used as a mutex) controlling dataStart. */
+	sem_t dataStartSemaphore;
+	/** The offset at which the unprocessed data ends. Incremented by the collection interface. */
+	uint64_t dataEnd;
+	/** Semaphore controlling dataEnd. */
+	sem_t dataEndSemaphore;
 } MemoryMapHeader;
 
 #endif

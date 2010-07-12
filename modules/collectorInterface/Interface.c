@@ -36,6 +36,8 @@ void __attribute__((destructor)) AesalonCollectorDestructor() {
 
 void AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id) {
 	printf("AesalonCollectorRegisterModule called. Module name is \"%s\".\n", moduleName);
+	*id = ++AesalonMemoryMap.header->latestModule;
+	/* TODO: send notification packet. */
 }
 
 void AesalonCollectorFillPacket(DataPacket *packet) {
@@ -43,16 +45,51 @@ void AesalonCollectorFillPacket(DataPacket *packet) {
 	packet->dataSource.timestamp = AesalonCollectorGetTimestamp();
 }
 
-static void AesalonCollectorWriteData(void *data, int size) {
-	AesalonMemoryMap.header;
+int AesalonCollectorRemainingSpace() {
+	if(AesalonMemoryMap.header->dataStart < AesalonMemoryMap.header->dataEnd) {
+		return ((AesalonMemoryMap.header->dataEnd - AesalonMemoryMap.header->dataStart) - AesalonMemoryMap.header->dataOffset) + (AesalonMemoryMap.header->dataStart - AesalonMemoryMap.header->dataOffset);
+	}
+	else {
+		return ((AesalonMemoryMap.header->dataSize) - AesalonMemoryMap.header->dataStart) + (AesalonMemoryMap.header->dataEnd - AesalonMemoryMap.header->dataOffset);
+	}
+}
+
+void AesalonCollectorWriteData(void *data, int size) {
+	int remaining = AesalonMemoryMap.header->dataSize - AesalonMemoryMap.header->dataEnd;
+	if(remaining < size) {
+		/* If this is a simple copy . . . */
+		memcpy(AesalonMemoryMap.memory + AesalonMemoryMap.header->dataEnd, data, size);
+	}
+	else {
+		/* It's not a single copy. */
+		/* First copy . . . */
+		memcpy(AesalonMemoryMap.memory + AesalonMemoryMap.header->dataEnd, data, remaining);
+		
+		/* Second copy. */
+		memcpy(AesalonMemoryMap.memory + AesalonMemoryMap.header->dataOffset, data + remaining, size - remaining);
+	}
 }
 
 void AesalonCollectorSendPacket(DataPacket *packet) {
+	AesalonCollectorFillPacket(packet);
+	sem_wait(&AesalonMemoryMap.header->dataStartSemaphore);
+	sem_wait(&AesalonMemoryMap.header->dataEndSemaphore);
+	
+	int size = sizeof(packet->dataSource) + sizeof(packet->dataSize) + packet->dataSize;
+	
+	while(AesalonCollectorRemainingSpace() < size) {
+		AesalonMemoryMap.header->dataOverflow = 1;
+		sem_wait(&AesalonMemoryMap.header->dataOverflowSemaphore);
+	}
+	AesalonMemoryMap.header->dataOverflow = 0;
+	
 	AesalonCollectorWriteData(&packet->dataSource, sizeof(packet->dataSource));
 	AesalonCollectorWriteData(&packet->dataSize, sizeof(packet->dataSize));
 	AesalonCollectorWriteData(packet->data, packet->dataSize);
 	
-	
+	sem_post(&AesalonMemoryMap.header->dataStartSemaphore);
+	sem_post(&AesalonMemoryMap.header->dataEndSemaphore);
+	sem_post(&AesalonMemoryMap.header->dataSempahore);
 }
 
 uint64_t AesalonCollectorGetTimestamp() {
@@ -62,5 +99,5 @@ uint64_t AesalonCollectorGetTimestamp() {
 }
 
 uint8_t AesalonCollectionStatus() {
-	return AesalonMemoryMap.header->isMainReached;
+	return AesalonMemoryMap.header->mainReached;
 }

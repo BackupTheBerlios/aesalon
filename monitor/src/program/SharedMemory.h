@@ -26,6 +26,7 @@ public:
 	MemoryMapHeader *header() const { return m_header; }
 	
 	void setMainReached();
+	void setFinished();
 	
 	/** Reads a packet from the shm.
 		@note This function is designed to be called from the parsing thread.
