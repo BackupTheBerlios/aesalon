@@ -37,8 +37,8 @@ void __attribute__((destructor)) AesalonCollectorDestructor() {
 }
 
 void AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id) {
-	printf("AesalonCollectorRegisterModule called. Module name is \"%s\".\n", moduleName);
-	/*(*id) = ++AesalonMemoryMap.header->latestModule;*/
+	(*id) = ++AesalonMemoryMap.header->latestModule;
+	printf("AesalonCollectorRegisterModule: registering module %s as id %i.\n", moduleName, *id);
 	/* TODO: send notification packet. */
 }
 
@@ -58,16 +58,12 @@ int AesalonCollectorRemainingSpace() {
 		used = AesalonMemoryMap.header->dataSize - AesalonMemoryMap.header->dataStart;
 		used += AesalonMemoryMap.header->dataEnd;
 	}
-	printf("Calculated used memory is %i\n", used);
 	return (AesalonMemoryMap.header->dataSize - AesalonMemoryMap.header->dataOffset) - used;
 }
 
 void AesalonCollectorWriteData(void *data, int size) {
-	printf("Calculating remaining space on the end bit . . .\n");
 	int remaining = AesalonMemoryMap.header->dataSize - AesalonMemoryMap.header->dataEnd;
-	printf("Calculated. Remaining is %i.\n", remaining);
 	if(remaining > size) {
-		printf("Simple, single copy.\n");
 		/* If this is a simple copy . . . */
 		memcpy(AesalonMemoryMap.memory + AesalonMemoryMap.header->dataEnd, data, size);
 		AesalonMemoryMap.header->dataEnd += size;
@@ -83,38 +79,28 @@ void AesalonCollectorWriteData(void *data, int size) {
 }
 
 void AesalonCollectorSendPacket(DataPacket *packet) {
-	printf("Asked to send packet . . . thread ID is %u\n", pthread_self());
 	AesalonCollectorFillPacket(packet);
-	printf("Reserving semaphore . . .\n");
-	int ret = sem_wait(&AesalonMemoryMap.header->dataStartSemaphore);
-	printf("ret: %i\n", ret);
-	printf("Reserving semaphore #2. . .\n");
+	/*sem_wait(&AesalonMemoryMap.header->dataStartSemaphore);*/
 	sem_wait(&AesalonMemoryMap.header->dataEndSemaphore);
 	
-	printf("Ensuring enough data space . . .\n");
 	int size = sizeof(packet->dataSource) + sizeof(packet->dataSize) + packet->dataSize;
 	
-	printf("while() loop . . .\n");
-	printf("remaining space: %i\n", AesalonCollectorRemainingSpace());
 	while(AesalonCollectorRemainingSpace() < size) {
-		printf("Iteration . . .\n");
 		AesalonMemoryMap.header->dataOverflow = 1;
 		sem_wait(&AesalonMemoryMap.header->dataOverflowSemaphore);
 	}
 	AesalonMemoryMap.header->dataOverflow = 0;
 	
-	printf("Writing data . . .\n");
-	printf("\tWriting header . . .\n");
 	AesalonCollectorWriteData(&packet->dataSource, sizeof(packet->dataSource));
-	printf("\tWriting data size . . .\n");
 	AesalonCollectorWriteData(&packet->dataSize, sizeof(packet->dataSize));
-	printf("\tWriting data . . .\n");
 	AesalonCollectorWriteData(packet->data, packet->dataSize);
-	printf("Wrote data.\n");
 	
-	sem_post(&AesalonMemoryMap.header->dataStartSemaphore);
+	/*sem_post(&AesalonMemoryMap.header->dataStartSemaphore);*/
 	sem_post(&AesalonMemoryMap.header->dataEndSemaphore);
 	sem_post(&AesalonMemoryMap.header->dataSempahore);
+	
+	int value;
+	sem_getvalue(&AesalonMemoryMap.header->dataSempahore, &value);
 }
 
 uint64_t AesalonCollectorGetTimestamp() {

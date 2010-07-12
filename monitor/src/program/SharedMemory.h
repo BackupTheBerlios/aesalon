@@ -33,6 +33,7 @@ public:
 		@return A received packet, or NULL if the monitored program has terminated.
 	*/
 	DataPacket *readPacket();
+	void readData(void *buffer, int size);
 };
 
 } // namespace Program

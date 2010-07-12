@@ -26,6 +26,7 @@ SharedMemory::SharedMemory(pid_t monitoredPid) : m_monitoredPid(monitoredPid) {
 	memset(m_header, 0, shmSize);
 	m_header->dataSize = shmSize;
 	m_header->dataOffset = sizeof(MemoryMapHeader) + 16;
+	m_header->latestModule = 0;
 	
 	/* Set up semaphores. */
 	/* The two data semaphores have a default value of 0: nothing there. */
@@ -54,16 +55,32 @@ void SharedMemory::setFinished() {
 
 DataPacket *SharedMemory::readPacket() {
 	sem_wait(&m_header->dataSempahore);
+	sem_wait(&m_header->dataStartSemaphore);
 	if(m_header->finished) {
 		int left;
 		sem_getvalue(&m_header->dataSempahore, &left);
 		if(left == 0) return NULL;
 	}
 	
-	/* TODO: actually read packet . . . */
+	DataPacket *packet = new DataPacket;
+	memset(packet, 0, sizeof(DataPacket));
+	
+	readData(&packet->dataSource, sizeof(packet->dataSource));
+	readData(&packet->dataSize, sizeof(packet->dataSize));
+	packet->data = new char[packet->dataSize];
+	readData(packet->data, packet->dataSize);
 	
 	if(m_header->dataOverflow) sem_post(&m_header->dataOverflowSemaphore);
-	return NULL;
+	sem_post(&m_header->dataStartSemaphore);
+	
+	std::cout << "Received packet from module ID " << packet->dataSource.moduleID << ", size " << packet->dataSize << std::endl;
+	
+	return packet;
+}
+
+void SharedMemory::readData(void *buffer, int size) {
+	memcpy(buffer, m_shmMemory + m_header->dataStart, size);
+	m_header->dataStart += size;
 }
 
 } // namespace Program

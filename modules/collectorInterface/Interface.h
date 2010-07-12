@@ -44,9 +44,9 @@ uint8_t GLOBAL_EXPORT AesalonCollectionStatus();
 #define AesalonCollectorRegisterModule(moduleName) \
 	AesalonCollectorRegisterModule((moduleName), &AesalonModuleID)
 
-/*#define AesalonCollectorSendPacket(packet) \
-	AesalonCollectorFillPacket(packet); \
-	AesalonCollectorSendPacket(packet)*/
+#define AesalonCollectorSendPacket(packet) \
+	(packet)->dataSource.moduleID = AesalonModuleID; \
+	AesalonCollectorSendPacket(packet)
 
 #else
 /* These functions/macros are for internal use by the collector interface. */
