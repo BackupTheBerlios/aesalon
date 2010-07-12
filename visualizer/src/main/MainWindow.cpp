@@ -1,0 +1,46 @@
+#include <QMenu>
+#include <QMenuBar>
+#include <QStyle>
+#include <QSettings>
+#include <QMessageBox>
+#include <QApplication>
+
+#include "MainWindow.h"
+#include "MainWindow.moc"
+
+MainWindow::MainWindow() {
+	setMinimumSize(600, 400);
+	setGeometry(100, 100, 800, 600);
+	setupMenus();
+	setWindowTitle("Aesalon Visualizer");
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+}
+
+MainWindow::~MainWindow() {
+	
+}
+
+void MainWindow::setupMenus() {
+	QSettings settings;
+	QMenu *aesalonMenu = new QMenu(tr("&Aesalon"));
+	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DialogCloseButton),
+		tr("E&xit"), this, SLOT(close()), settings.value("shortcuts/quit", "Ctrl+Q").toString());
+	menuBar()->addMenu(aesalonMenu);
+	
+	QMenu *helpMenu = new QMenu(tr("&Help"));
+	helpMenu->addAction(tr("&About"), this, SLOT(about()));
+	helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
+	menuBar()->addMenu(helpMenu);
+}
+
+void MainWindow::about() {
+	QString aboutMessage;
+	aboutMessage += "<b>Aesalon</b><br /><br />";
+	aboutMessage += "Aesalon is a utility to display data on a running program. The types of data ";
+	aboutMessage += "collected vary depending on the modules loaded into memory, and modules can be written ";
+	aboutMessage += "easily to provide new types of data collection. This is the visualization component of Aesalon. <br /><br />";
+	aboutMessage += "Aesalon is copyrighted (C) 2009-2010 by strange. <br />";
+	aboutMessage += "Aesalon is released under the GNU General Public License, version 3. For more license information, ";
+	aboutMessage += "see the file LICENSE included in the distribution.";
+	QMessageBox::about(this, tr("About Aesalon"), aboutMessage);
+}

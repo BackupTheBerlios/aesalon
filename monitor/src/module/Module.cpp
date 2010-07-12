@@ -10,13 +10,13 @@
 namespace Module {
 
 Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleName) {
-	LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Loading new module:" << moduleName);
-	std::cout << "Asked to load module: " << moduleName << std::endl;
+	LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Loading new module: " << moduleName);
+	
 	std::string moduleFilename = "lib";
 	moduleFilename += moduleName;
 	moduleFilename += "Monitor.so";
 	std::string modulePath = Misc::PathSanitizer::findFromPaths(moduleFilename, Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue());
-	std::cout << "modulePath: " << modulePath << std::endl;
+	
 	m_monitorHandle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if(m_monitorHandle == NULL) {
 		LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Couldn't open monitor library: " << dlerror());

@@ -20,7 +20,6 @@ void Reader::processPacket(DataPacket *packet) {
 	}
 	else {
 		char *moduleName = (char *)packet->data;
-		std::cout << "New module registered, name is " << moduleName << " . . ." << std::endl;
 		m_mapper->loadModule(moduleName);
 	}
 }

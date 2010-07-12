@@ -101,8 +101,6 @@ std::string Launcher::preload() {
 	} while(pathList.find(",") != std::string::npos);
 	
 	if(preload.length()) {
-		/*std::cout << "pathList: " << pathList << std::endl;
-		std::cout << "collector interface path: " << Misc::PathSanitizer::findFromPaths("libcollectorInterface.so", pathList) << std::endl;*/
 		preload += Misc::PathSanitizer::findFromPaths("libcollectorInterface.so", pathList);
 	}
 	return preload;
