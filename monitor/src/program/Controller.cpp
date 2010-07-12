@@ -60,6 +60,8 @@ void Controller::run() {
 	int status;
 	/* Now, wait for the termination signal. */
 	waitForSignal(&status);
+	std::cout << "Received termination signal . . ." << std::endl;
+	std::cout << "\tSignal number: " << signalFromStatus(status) << std::endl;
 }
 
 void Controller::waitForSigTrap() {

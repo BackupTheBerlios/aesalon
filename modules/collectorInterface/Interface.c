@@ -26,6 +26,8 @@ void __attribute__((constructor)) AesalonCollectorConstructor() {
 	sscanf(shmSizeEnv, "%i", &shmSize);
 	
 	AesalonMemoryMap.memory = mmap(NULL, shmSize, PROT_READ | PROT_WRITE, MAP_SHARED, AesalonMemoryMap.fd, 0);
+	
+	AesalonMemoryMap.header = (MemoryMapHeader *)AesalonMemoryMap.memory;
 }
 
 void __attribute__((destructor)) AesalonCollectorDestructor() {
@@ -36,7 +38,7 @@ void __attribute__((destructor)) AesalonCollectorDestructor() {
 
 void AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id) {
 	printf("AesalonCollectorRegisterModule called. Module name is \"%s\".\n", moduleName);
-	*id = ++AesalonMemoryMap.header->latestModule;
+	/*(*id) = ++AesalonMemoryMap.header->latestModule;*/
 	/* TODO: send notification packet. */
 }
 
@@ -55,10 +57,14 @@ int AesalonCollectorRemainingSpace() {
 }
 
 void AesalonCollectorWriteData(void *data, int size) {
+	printf("Calculating remaining space on the end bit . . .\n");
 	int remaining = AesalonMemoryMap.header->dataSize - AesalonMemoryMap.header->dataEnd;
-	if(remaining < size) {
+	printf("Calculated. Remaining is %i.\n", remaining);
+	if(remaining > size) {
+		printf("Simple, single copy.\n");
 		/* If this is a simple copy . . . */
 		memcpy(AesalonMemoryMap.memory + AesalonMemoryMap.header->dataEnd, data, size);
+		AesalonMemoryMap.header->dataEnd += size;
 	}
 	else {
 		/* It's not a single copy. */
@@ -71,10 +77,14 @@ void AesalonCollectorWriteData(void *data, int size) {
 }
 
 void AesalonCollectorSendPacket(DataPacket *packet) {
+	printf("Asked to send packet . . .\n");
 	AesalonCollectorFillPacket(packet);
+	printf("Reserving semaphore . . .\n");
 	sem_wait(&AesalonMemoryMap.header->dataStartSemaphore);
+	printf("Reserving semaphore #2. . .\n");
 	sem_wait(&AesalonMemoryMap.header->dataEndSemaphore);
 	
+	printf("Ensuring enough data space . . .\n");
 	int size = sizeof(packet->dataSource) + sizeof(packet->dataSize) + packet->dataSize;
 	
 	while(AesalonCollectorRemainingSpace() < size) {
@@ -83,9 +93,14 @@ void AesalonCollectorSendPacket(DataPacket *packet) {
 	}
 	AesalonMemoryMap.header->dataOverflow = 0;
 	
+	printf("Writing data . . .\n");
+	printf("\tWriting header . . .\n");
 	AesalonCollectorWriteData(&packet->dataSource, sizeof(packet->dataSource));
+	printf("\tWriting data size . . .\n");
 	AesalonCollectorWriteData(&packet->dataSize, sizeof(packet->dataSize));
+	printf("\tWriting data . . .\n");
 	AesalonCollectorWriteData(packet->data, packet->dataSize);
+	printf("Wrote data.\n");
 	
 	sem_post(&AesalonMemoryMap.header->dataStartSemaphore);
 	sem_post(&AesalonMemoryMap.header->dataEndSemaphore);

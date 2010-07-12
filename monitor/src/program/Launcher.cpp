@@ -6,6 +6,7 @@
 #include <iostream>
 #include <errno.h>
 #include <signal.h>
+#include <stdio.h>
 
 #include "Launcher.h"
 #include "Initializer.h"
@@ -23,9 +24,9 @@ Launcher::Launcher() {
 }
 
 Launcher::~Launcher() {
-	if(m_sharedMemory) delete m_sharedMemory;
-	if(m_analyzer) delete m_analyzer;
 	if(m_controller) delete m_controller;
+	if(m_analyzer) delete m_analyzer;
+	if(m_sharedMemory) delete m_sharedMemory;
 }
 
 void Launcher::start() {
@@ -52,6 +53,9 @@ void Launcher::startProcess() {
 	m_childPid = fork();
 	if(m_childPid == 0) {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
+		char buffer[128];
+		sprintf(buffer, "%i", Initializer::singleton()->configuration()->configItems()["shm-size"]->intValue());
+		setenv("AesalonCollectorShmSize", buffer, 1);
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
 		execv(m_argv[0], m_argv);
 		LogSystem::logProgramMessage(m_argv[0], Misc::StreamAsString() << "execv() failed: " << strerror(errno));

@@ -34,6 +34,8 @@ SharedMemory::SharedMemory(pid_t monitoredPid) : m_monitoredPid(monitoredPid) {
 	/* The two pointer semaphores have a default value of 1: they are available for locking. */
 	sem_init(&m_header->dataStartSemaphore, 1, 1);
 	sem_init(&m_header->dataEndSemaphore, 1, 1);
+	
+	m_header->dataEnd = m_header->dataStart = m_header->dataOffset;
 }
 
 SharedMemory::~SharedMemory() {
