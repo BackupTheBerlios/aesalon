@@ -7,6 +7,7 @@
 
 #include "MainWindow.h"
 #include "MainWindow.moc"
+#include "SessionLauncher.h"
 
 MainWindow::MainWindow() {
 	setMinimumSize(600, 400);
@@ -14,15 +15,28 @@ MainWindow::MainWindow() {
 	setupMenus();
 	setWindowTitle("Aesalon Visualizer");
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	
+	m_centralWidget = new QTabWidget();
+#if QT_VERSION > 0x045000
+	m_centralWidget->setTabsClosable(true);
+#endif
+	setCentralWidget(m_centralWidget);
 }
 
 MainWindow::~MainWindow() {
 	
 }
 
+void MainWindow::addTab(QWidget *widget) {
+	m_centralWidget->addTab(widget, "Session");
+}
+
 void MainWindow::setupMenus() {
 	QSettings settings;
 	QMenu *aesalonMenu = new QMenu(tr("&Aesalon"));
+	
+	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DriveNetIcon),
+		tr("&Connect"), this, SLOT(createLauncher()), settings.value("shortcuts/connect", "Ctrl+E").toString());
 	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DialogCloseButton),
 		tr("E&xit"), this, SLOT(close()), settings.value("shortcuts/quit", "Ctrl+Q").toString());
 	menuBar()->addMenu(aesalonMenu);
@@ -31,6 +45,12 @@ void MainWindow::setupMenus() {
 	helpMenu->addAction(tr("&About"), this, SLOT(about()));
 	helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
 	menuBar()->addMenu(helpMenu);
+}
+
+void MainWindow::createLauncher() {
+	SessionLauncher *launcher = new SessionLauncher(this);
+	connect(launcher, SIGNAL(newTab(QWidget*)), SLOT(addTab(QWidget*)));
+	launcher->exec();
 }
 
 void MainWindow::about() {

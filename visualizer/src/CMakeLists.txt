@@ -6,10 +6,12 @@ include_directories(.)
 
 aux_source_directory(. dotSources)
 aux_source_directory(main mainSources)
+aux_source_directory(session sessionSources)
 
 set(sources
     ${dotSources}
     ${mainSources}
+    ${sessionSources}
 )
 
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
