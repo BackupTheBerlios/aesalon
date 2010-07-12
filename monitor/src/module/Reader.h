@@ -3,6 +3,7 @@
 
 #include "DataTypes.h"
 #include "ModuleMapper.h"
+#include "network/SocketManager.h"
 
 namespace Module {
 
@@ -12,6 +13,7 @@ public:
 	virtual ~Reader();
 private:
 	ModuleMapper *m_mapper;
+	Network::SocketManager *m_socketManager;
 public:
 	void processPacket(DataPacket *packet);
 };

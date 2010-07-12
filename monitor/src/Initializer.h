@@ -9,6 +9,7 @@
 #include "program/Launcher.h"
 #include "program/Controller.h"
 #include "program/Analyzer.h"
+#include "network/SocketManager.h"
 
 class Initializer {
 public:
@@ -22,10 +23,12 @@ private:
 	Misc::Configuration *m_configuration;
 	Module::ModuleMapper *m_moduleMapper;
 	Program::Launcher *m_launcher;
+	Network::SocketManager *m_socketManager;
 public:
 	Misc::Configuration *configuration() const { return m_configuration; }
 	Module::ModuleMapper *moduleMapper() const { return m_moduleMapper; }
 	Program::Launcher *launcher() const { return m_launcher; }
+	Network::SocketManager *socketManager() const { return m_socketManager; }
 	int run();
 private:
 	void usage();

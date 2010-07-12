@@ -11,8 +11,6 @@ public:
 	virtual ~TCPWrapper();
 private:
 	QTcpSocket *m_tcpSocket;
-public:
-	
 };
 
 #endif

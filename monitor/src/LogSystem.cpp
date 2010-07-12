@@ -18,3 +18,7 @@ void LogSystem::logAnalyzerMessage(Program::Analyzer *analyzer, std::string mess
 void LogSystem::logProgramMessage(std::string filename, std::string message) {
 	std::cout << "[" << filename << "] " << message << std::endl;
 }
+
+void LogSystem::logNetworkMessage(std::string message) {
+	std::cout << "[network] " << message << std::endl;
+}

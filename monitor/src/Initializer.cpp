@@ -3,6 +3,7 @@
 #include "Initializer.h"
 #include "LogSystem.h"
 #include "program/ElfAnalyzer.h"
+#include "network/TcpManager.h"
 
 Initializer *Initializer::m_singleton = 0;
 
@@ -10,10 +11,12 @@ Initializer::Initializer(char *argv[]) : m_argv(argv) {
 	m_singleton = this;
 	m_configuration = new Misc::Configuration(m_argv);
 	m_moduleMapper = new Module::ModuleMapper();
+	m_socketManager = NULL;
 }
 
 Initializer::~Initializer() {
 	if(m_launcher) delete m_launcher;
+	if(m_socketManager) delete m_socketManager;
 	if(m_configuration) delete m_configuration;
 }
 
@@ -24,6 +27,9 @@ int Initializer::run() {
 		usage();
 		return 0;
 	}
+	
+	m_socketManager = new Network::TcpManager(m_configuration->configItems()["tcp-port"]->intValue());
+	m_socketManager->waitForConnections(m_configuration->configItems()["network-wait"]->intValue());
 	
 	m_launcher = new Program::Launcher();
 	

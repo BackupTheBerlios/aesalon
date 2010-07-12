@@ -17,7 +17,7 @@ MainWindow::MainWindow() {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	
 	m_centralWidget = new QTabWidget();
-#if QT_VERSION > 0x045000
+#if QT_VERSION >= 0x045000
 	m_centralWidget->setTabsClosable(true);
 #endif
 	setCentralWidget(m_centralWidget);
@@ -55,12 +55,13 @@ void MainWindow::createLauncher() {
 
 void MainWindow::about() {
 	QString aboutMessage;
-	aboutMessage += "<b>Aesalon</b><br /><br />";
-	aboutMessage += "Aesalon is a utility to display data on a running program. The types of data ";
-	aboutMessage += "collected vary depending on the modules loaded into memory, and modules can be written ";
-	aboutMessage += "easily to provide new types of data collection. This is the visualization component of Aesalon. <br /><br />";
+	aboutMessage += "<div align=\"center\"><b>Aesalon</b> version " AesalonVersion "</div><hr />";
 	aboutMessage += "Aesalon is copyrighted (C) 2009-2010 by strange. <br />";
 	aboutMessage += "Aesalon is released under the GNU General Public License, version 3. For more license information, ";
-	aboutMessage += "see the file LICENSE included in the distribution.";
+	aboutMessage += "see the file LICENSE included in the distribution.<br /><br />";
+	aboutMessage += "Aesalon is a tool to display data on a running program. The types of data ";
+	aboutMessage += "collected vary depending on the modules loaded into memory, and modules can be written ";
+	aboutMessage += "easily to provide new types of data collection. <br /><br />This is the visualization component of Aesalon. <br /><br />";
+	
 	QMessageBox::about(this, tr("About Aesalon"), aboutMessage);
 }
