@@ -73,7 +73,7 @@ DataPacket *SharedMemory::readPacket() {
 	if(m_header->dataOverflow) sem_post(&m_header->dataOverflowSemaphore);
 	sem_post(&m_header->dataStartSemaphore);
 	
-	std::cout << "Received packet from module ID " << packet->dataSource.moduleID << ", size " << packet->dataSize << std::endl;
+	/*std::cout << "Received packet from module ID " << packet->dataSource.moduleID << ", size " << packet->dataSize << std::endl;*/
 	
 	return packet;
 }

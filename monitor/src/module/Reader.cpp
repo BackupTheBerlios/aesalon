@@ -8,10 +8,11 @@ namespace Module {
 Reader::Reader() {
 	m_mapper = Initializer::singleton()->moduleMapper();
 	m_socketManager = Initializer::singleton()->socketManager();
+	m_logger = new Program::Logger();
 }
 
 Reader::~Reader() {
-
+	delete m_logger;
 }
 
 void Reader::processPacket(DataPacket *packet) {
@@ -23,6 +24,7 @@ void Reader::processPacket(DataPacket *packet) {
 		char *moduleName = (char *)packet->data;
 		m_mapper->loadModule(moduleName);
 	}
+	m_logger->logPacket(packet);
 	m_socketManager->sendPacket(packet);
 }
 

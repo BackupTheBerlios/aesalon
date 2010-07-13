@@ -12,3 +12,5 @@ item("search-path", String, "modules/", "The path to search for module libraries
 item("modules", String, "", "A comma-separated list of modules to load for data collection.")
 item("tcp-port", Integer, 6321, "The TCP port to listen on, when TCP network communication is enabled.")
 item("network-wait", Integer, 1, "The amount of client connections to wait for. Execution will commence once all clients have connected.")
+item("log-file", String, "", "If specified, logs the data to this file so visualizations can be re-constructed. %p is replaced with the PID of the monitored program.")
+

@@ -12,6 +12,8 @@ Initializer::Initializer(char *argv[]) : m_argv(argv) {
 	m_configuration = new Misc::Configuration(m_argv);
 	m_moduleMapper = new Module::ModuleMapper();
 	m_socketManager = NULL;
+	m_launcher = NULL;
+	m_socketManager = NULL;
 }
 
 Initializer::~Initializer() {

@@ -4,6 +4,7 @@
 #include "DataTypes.h"
 #include "ModuleMapper.h"
 #include "network/SocketManager.h"
+#include "program/Logger.h"
 
 namespace Module {
 
@@ -14,6 +15,7 @@ public:
 private:
 	ModuleMapper *m_mapper;
 	Network::SocketManager *m_socketManager;
+	Program::Logger *m_logger;
 public:
 	void processPacket(DataPacket *packet);
 };
