@@ -16,6 +16,9 @@ MainWindow::MainWindow() {
 	setWindowTitle("Aesalon Visualizer");
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	
+	QSettings settings;
+	setWindowIcon(QIcon(settings.value("data-path", "visualizer/data/").toString() + "aesalon_48x48.png"));
+	
 	m_centralWidget = new QTabWidget();
 #if QT_VERSION >= 0x045000
 	m_centralWidget->setTabsClosable(true);
