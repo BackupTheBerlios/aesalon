@@ -4,7 +4,8 @@
 #include "SessionReader.moc"
 #include "DataTypes.h"
 
-SessionReader::SessionReader(SessionIOWrapper *ioWrapper) : QObject(NULL), m_ioDevice(ioWrapper->ioDevice()) {
+SessionReader::SessionReader(SessionIOWrapper *ioWrapper, ModuleMapper *moduleMapper)
+	: QObject(NULL), m_ioDevice(ioWrapper->ioDevice()), m_moduleMapper(moduleMapper) {
 	connect(m_ioDevice, SIGNAL(readyRead()), SLOT(readData()), Qt::QueuedConnection);
 }
 
@@ -27,6 +28,7 @@ void SessionReader::readData() {
 		}
 		packet->data = new char[packet->dataSize];
 		memcpy(packet->data, m_unprocessed.data() + sourceSize + sizeSize, packet->dataSize);
-		/* TODO: push packet onto queue. */
+		
+		m_moduleMapper->processPacket(packet);
 	}
 }

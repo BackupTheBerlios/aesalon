@@ -39,7 +39,11 @@ void MainWindow::setupMenus() {
 	QMenu *aesalonMenu = new QMenu(tr("&Aesalon"));
 	
 	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DriveNetIcon),
-		tr("&Connect"), this, SLOT(createLauncher()), settings.value("shortcuts/connect", "Ctrl+E").toString());
+		tr("&Connect to monitor . . ."), this, SLOT(createLauncher()), settings.value("shortcuts/connect", "Ctrl+E").toString());
+		
+	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon),
+		tr("&Open log file . . ."), this, SLOT(createLauncher()), settings.value("shortcuts/open", "Ctrl+O").toString());
+	
 	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DialogCloseButton),
 		tr("E&xit"), this, SLOT(close()), settings.value("shortcuts/quit", "Ctrl+Q").toString());
 	menuBar()->addMenu(aesalonMenu);
