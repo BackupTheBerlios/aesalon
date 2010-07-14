@@ -14,5 +14,8 @@ foreach(module ${aesalonModules})
 
     aux_source_directory(${module}/monitor monitorSources)
     add_library(${module}Monitor SHARED ${monitorSources})
+
+    aux_source_directory(${module}/visualizer visualizerSources)
+    add_library(${module}Visualizer SHARED ${visualizerSources})
 endforeach(module)
 

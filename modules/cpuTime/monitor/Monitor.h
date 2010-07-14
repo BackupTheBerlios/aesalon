@@ -1,7 +1,7 @@
 #ifndef CpuTimeMonitor_H
 #define CpuTimeMonitor_H
 
-#include "moduleInterface/Interface.h"
+#include "monitorInterface/Interface.h"
 
 class CpuTimeMonitor : public ModuleInterface {
 public:

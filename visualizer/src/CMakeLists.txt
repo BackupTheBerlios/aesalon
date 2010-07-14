@@ -1,5 +1,9 @@
 add_definitions(-W -Wall)
 
+if(devBuild)
+    add_definitions(-g)
+endif(devBuild)
+
 add_definitions(-DAesalonVersion="${aesalonVersion}")
 
 include_directories(.)

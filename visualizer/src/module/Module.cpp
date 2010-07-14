@@ -8,9 +8,10 @@
 Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL){
 	QString path = modulePath(QString("lib").append(name).append("Visualizer.so"));
 	if(path.length() == 0) return;
-	m_moduleHandle = dlopen(path.toAscii().constData(), RTLD_NOW | RTLD_LOCAL);
+	m_moduleHandle = dlopen(path.toAscii().constData(), RTLD_LAZY | RTLD_LOCAL);
 	if(m_moduleHandle == NULL) {
-		qWarning("Cannot load module \"%s\".", name);
+		qWarning("Cannot load module \"%s\". Error: %s", name, dlerror());
+		qWarning("Last path is %s.", path.toAscii().constData());
 		return;
 	}
 	
@@ -18,6 +19,7 @@ Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL){
 	
 	if(instantiationHandle == NULL) {
 		qWarning("Module \"%s\" does not have instantiation function.", name);
+		return;
 	}
 	
 	ModuleInterface *(*instantiateFunction)();

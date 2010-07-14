@@ -1,7 +1,7 @@
 #include "ModuleMapper.h"
 
 ModuleMapper::ModuleMapper() {
-	
+	m_moduleList.append(NULL);
 }
 
 ModuleMapper::~ModuleMapper() {

@@ -30,5 +30,7 @@ void SessionReader::readData() {
 		memcpy(packet->data, m_unprocessed.data() + sourceSize + sizeSize, packet->dataSize);
 		
 		m_moduleMapper->processPacket(packet);
+		
+		m_unprocessed.remove(0, sourceSize + sizeSize + packet->dataSize);
 	}
 }

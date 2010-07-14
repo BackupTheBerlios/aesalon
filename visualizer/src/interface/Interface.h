@@ -8,7 +8,7 @@ public:
 	ModuleInterface();
 	virtual ~ModuleInterface();
 public:
-	virtual void processIncoming(DataPacket *packet);
+	virtual void processIncoming(DataPacket *packet) = 0;
 };
 
 #endif
