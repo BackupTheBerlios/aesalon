@@ -28,3 +28,7 @@ valgrind.*
 # gprof ignores
 gmon.out
 profile.*
+
+# Aesalon configuration files.
+.aesalon.conf
+

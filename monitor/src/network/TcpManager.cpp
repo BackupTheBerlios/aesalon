@@ -69,6 +69,7 @@ void TcpManager::sendPacket(DataPacket *packet) {
 }
 
 void TcpManager::waitForConnections(int connections) {
+    if(connections == 0) return;
 	LogSystem::logNetworkMessage(Misc::StreamAsString() << "Waiting for " << connections << " incoming connections . . .");
 	for(int i = 0; i < connections; i ++) {
 		m_clientFds.push_back(accept(m_fd, NULL, NULL));
