@@ -13,6 +13,8 @@ aux_source_directory(main mainSources)
 aux_source_directory(session sessionSources)
 aux_source_directory(module moduleSources)
 aux_source_directory(interface interfaceSources)
+aux_source_directory(storage storageSources)
+aux_source_directory(visualization visualizationSources)
 
 set(sources
     ${dotSources}
@@ -20,6 +22,8 @@ set(sources
     ${sessionSources}
     ${moduleSources}
     ${interfaceSources}
+    ${storageSources}
+    ${visualizationSources}
 )
 
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)

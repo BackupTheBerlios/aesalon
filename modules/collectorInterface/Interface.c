@@ -44,7 +44,6 @@ void AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id) {
 	packet.dataSize = strlen(moduleName) + 1; /* Plus one for the NULL. */
 	packet.data = (void *)moduleName;
 	AesalonCollectorSendPacket(&packet);
-	/* TODO: send notification packet. */
 }
 
 void AesalonCollectorFillPacket(DataPacket *packet) {
