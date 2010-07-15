@@ -3,7 +3,7 @@
 
 #include "visualizerInterface/Interface.h"
 
-class CpuTimeVisualizer : public ModuleInterface {
+class CpuTimeVisualizer : public VisualizerInterface {
 public:
 	CpuTimeVisualizer();
 	virtual ~CpuTimeVisualizer();

@@ -27,7 +27,8 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 		LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Monitor library does not have instantiation function.");
 		return;
 	}
-	ModuleInterface *(*instantiateFunction)();
+	
+	MonitorInterface *(*instantiateFunction)();
 	*(void **)(&instantiateFunction) = instantiationHandle;
 	m_interface = instantiateFunction();
 	m_interface->setAnalyzer(Initializer::singleton()->launcher()->analyzer());

@@ -12,10 +12,10 @@ public:
 private:
 	QString m_name;
 	void *m_moduleHandle;
-	ModuleInterface *m_interface;
+	VisualizerInterface *m_interface;
 public:
 	const QString &name() const { return m_name; }
-	ModuleInterface *interface() const { return m_interface; }
+	VisualizerInterface *interface() const { return m_interface; }
 	
 	void processIncoming(DataPacket *packet);
 private:

@@ -4,7 +4,7 @@
 
 extern "C" {
 
-ModuleInterface *AesalonVisualizerCreateInstance() {
+VisualizerInterface *AesalonVisualizerCreateInstance() {
 	return new CpuTimeVisualizer();
 }
 

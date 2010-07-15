@@ -4,7 +4,7 @@
 #include <string>
 
 #include "DataTypes.h"
-#include "moduleInterface/Interface.h"
+#include "interface/Interface.h"
 
 namespace Module {
 
@@ -16,11 +16,11 @@ private:
 	uint16_t m_moduleID;
 	std::string m_moduleName;
 	void *m_monitorHandle;
-	ModuleInterface *m_interface;
+	MonitorInterface *m_interface;
 public:
 	uint16_t moduleID() const { return m_moduleID; }
 	const std::string &moduleName() const { return m_moduleName; }
-	ModuleInterface *interface() const { return m_interface; }
+	MonitorInterface *interface() const { return m_interface; }
 	
 	DataPacket *processPacket(DataPacket *packet);
 };

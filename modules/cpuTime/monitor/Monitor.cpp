@@ -4,11 +4,11 @@
 
 extern "C" {
 
-ModuleInterface *AesalonMonitorCreateInstance() {
+MonitorInterface *AesalonMonitorCreateInstance() {
 	return new CpuTimeMonitor();
 }
 
-}
+} // extern "C"
 
 CpuTimeMonitor::CpuTimeMonitor() {
 }

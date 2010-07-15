@@ -35,6 +35,20 @@ void Visualization::resize(const QSize &newSize) {
 	unlock();
 }
 
+void Visualization::setPenColour(int r, int g, int b, int a) {
+	QPen pen = m_painter.pen();
+	pen.setColor(qRgba(r, g, b, a));
+	m_painter.setPen(pen);
+}
+
+void Visualization::drawLine(DataCoord from, DataCoord to) {
+	if(!isLocked()) {
+		qWarning("drawLine() called when visualization is not locked.");
+		return;
+	}
+	QLineF line(translate(from), translate(to));
+}
+
 QPointF Visualization::translate(const DataCoord &coord) {
 	quint64 xSize = m_range.endTime() - m_range.beginTime();
 	qreal ySize = m_range.endData() - m_range.beginData();

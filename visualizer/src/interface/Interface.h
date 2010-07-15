@@ -3,10 +3,10 @@
 
 #include "DataTypes.h"
 
-class ModuleInterface {
+class VisualizerInterface {
 public:
-	ModuleInterface();
-	virtual ~ModuleInterface();
+	VisualizerInterface();
+	virtual ~VisualizerInterface();
 public:
 	virtual void processIncoming(DataPacket *packet) = 0;
 };

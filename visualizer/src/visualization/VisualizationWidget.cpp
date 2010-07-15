@@ -15,7 +15,7 @@ VisualizationWidget::~VisualizationWidget() {
 void VisualizationWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter(this);
 	
-	painter.drawPixmap(0, 0, m_visualization->pixmap());
+	painter.drawPixmap(0, 0, width(), height(), m_visualization->pixmap());
 	
 }
 

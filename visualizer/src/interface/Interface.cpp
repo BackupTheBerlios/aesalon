@@ -1,9 +1,9 @@
 #include "Interface.h"
 
-ModuleInterface::ModuleInterface() {
+VisualizerInterface::VisualizerInterface() {
 
 }
 
-ModuleInterface::~ModuleInterface() {
+VisualizerInterface::~VisualizerInterface() {
 
 }

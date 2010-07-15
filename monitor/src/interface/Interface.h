@@ -7,10 +7,10 @@ namespace Program {
 class Analyzer;
 } // namespace Program
 
-class ModuleInterface {
+class MonitorInterface {
 public:
-	ModuleInterface();
-	virtual ~ModuleInterface();
+	MonitorInterface();
+	virtual ~MonitorInterface();
 private:
 	Program::Analyzer *m_analyzer;
 public:
@@ -28,7 +28,7 @@ public:
 extern "C" {
 
 /* This function is expected to be implemented inside the monitor modules. */
-ModuleInterface *AesalonMonitorCreateInstance();
+MonitorInterface *AesalonMonitorCreateInstance();
 
 } // extern "C"
 

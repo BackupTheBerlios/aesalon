@@ -3,7 +3,7 @@
 
 #include "monitorInterface/Interface.h"
 
-class CpuTimeMonitor : public ModuleInterface {
+class CpuTimeMonitor : public MonitorInterface {
 public:
 	CpuTimeMonitor();
 	virtual ~CpuTimeMonitor();

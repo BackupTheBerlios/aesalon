@@ -22,7 +22,7 @@ Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL){
 		return;
 	}
 	
-	ModuleInterface *(*instantiateFunction)();
+	VisualizerInterface *(*instantiateFunction)();
 	*(void **)(&instantiateFunction) = instantiationHandle;
 	
 	m_interface = instantiateFunction();

@@ -28,8 +28,23 @@ public:
 	void lock();
 	/** Unlocks the visualization, signifying completion of painting. */
 	void unlock();
-	
+	/** Checks if the visualization is locked for painting.
+		@return The lock status of the visualization.
+	*/
+	bool isLocked() const { return m_painter.isActive(); }
+	/** Re-sizes the internal QPixmap.
+		@param newSize The new size of the pixmap.
+	*/
 	void resize(const QSize &newSize);
+	
+	/** Sets the pen colour. */
+	void setPenColour(int r, int g, int b, int a);
+	
+	/** Draws a line from @a from to @a to.
+		@param from The coordinates to start the line at.
+		@param to The coordinates to end the line.
+	*/
+	void drawLine(DataCoord from, DataCoord to);
 private:
 	QPointF translate(const DataCoord &coord);
 	QRectF translate(const DataRange &range);
