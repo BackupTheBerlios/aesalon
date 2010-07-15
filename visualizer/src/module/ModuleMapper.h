@@ -15,6 +15,7 @@ private:
 	QMap<QString, Module *> m_moduleMap;
 public:
 	Module *module(quint16 moduleID);
+	int moduleCount() const { return m_moduleList.count(); }
 	
 	void processPacket(DataPacket *packet);
 private:

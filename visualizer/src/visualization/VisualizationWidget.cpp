@@ -4,8 +4,8 @@
 #include "VisualizationWidget.h"
 #include "VisualizationWidget.moc"
 
-VisualizationWidget::VisualizationWidget(DataRange range) : QWidget(NULL) {
-	m_visualization = new Visualization(size(), range);
+VisualizationWidget::VisualizationWidget(Module *module) : QWidget(NULL), m_module(module) {
+	m_visualization = new Visualization(size(), DataRange());
 }
 
 VisualizationWidget::~VisualizationWidget() {

@@ -4,12 +4,14 @@
 #include <QWidget>
 
 #include "Visualization.h"
+#include "module/Module.h"
 
 class VisualizationWidget : public QWidget { Q_OBJECT
 public:
-	VisualizationWidget(DataRange range);
+	VisualizationWidget(Module *module);
 	virtual ~VisualizationWidget();
 private:
+	Module *m_module;
 	Visualization *m_visualization;
 public:
 	Visualization *visualization() const { return m_visualization; }
