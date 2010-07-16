@@ -18,6 +18,7 @@ public:
 	VisualizerInterface *interface() const { return m_interface; }
 	
 	void processIncoming(DataPacket *packet);
+	void visualize(Visualization *visualization);
 private:
 	QString modulePath(QString filename);
 };

@@ -1,3 +1,8 @@
+#include <QPixmap>
+#include <QPointF>
+#include <QPainter>
+#include <QMutex>
+
 #include "Visualization.h"
 
 Visualization::Visualization(QSize renderSize, DataRange range) : m_range(range) {

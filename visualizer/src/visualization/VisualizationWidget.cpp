@@ -6,6 +6,7 @@
 
 VisualizationWidget::VisualizationWidget(Module *module) : QWidget(NULL), m_module(module) {
 	m_visualization = new Visualization(size(), DataRange());
+	module->visualize(m_visualization);
 }
 
 VisualizationWidget::~VisualizationWidget() {

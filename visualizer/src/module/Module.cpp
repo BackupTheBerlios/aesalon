@@ -42,6 +42,11 @@ void Module::processIncoming(DataPacket *packet) {
 	m_interface->processIncoming(packet);
 }
 
+void Module::visualize(Visualization *visualization) {
+	if(m_interface == NULL) return;
+	m_interface->visualize(visualization);
+}
+
 QString Module::modulePath(QString filename) {
 	QSettings settings;
 	QString pathList = settings.value("module-path", "modules/build/").toString();
