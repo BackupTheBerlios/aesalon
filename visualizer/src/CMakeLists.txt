@@ -30,5 +30,7 @@ find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 QT4_AUTOMOC(${sources})
 
-add_executable(aesalon_visualizer ${sources})
+qt4_add_resources(qrcSources visualizerResources.qrc)
+
+add_executable(aesalon_visualizer ${sources} ${qrcSources})
 target_link_libraries(aesalon_visualizer ${QT_LIBRARIES})

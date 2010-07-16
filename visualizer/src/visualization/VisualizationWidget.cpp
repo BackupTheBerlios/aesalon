@@ -9,7 +9,7 @@ VisualizationWidget::VisualizationWidget(Module *module) : QWidget(NULL), m_modu
 }
 
 VisualizationWidget::~VisualizationWidget() {
-
+	
 }
 
 void VisualizationWidget::paintEvent(QPaintEvent *event) {
