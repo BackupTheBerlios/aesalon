@@ -21,6 +21,8 @@ public:
 	QGridLayout *grid() const { return m_grid; }
 	
 	virtual void resizeEvent(QResizeEvent *event);
+private:
+	SessionVisualization *newVisualization() const;
 public slots:
 	void addColumn();
 	void addRow();
@@ -29,6 +31,7 @@ public slots:
 private slots:
 	void displayContextMenu(QPoint globalPosition, SessionVisualization *visualization);
 	void setVisualizationModule(SessionVisualization *visualization, int moduleID);
+	void setVisualizationModule(QAction *action);
 };
 
 #endif

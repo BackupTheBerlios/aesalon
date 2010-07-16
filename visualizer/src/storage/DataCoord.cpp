@@ -1,6 +1,6 @@
 #include "DataCoord.h"
 
-DataCoord::DataCoord(quint64 time, qreal data) : m_time(time), m_data(data) {
+DataCoord::DataCoord(uint64_t time, double data) : m_time(time), m_data(data) {
 	
 }
 

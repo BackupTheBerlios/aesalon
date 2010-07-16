@@ -1,23 +1,23 @@
 #ifndef DataCoord_H
 #define DataCoord_H
 
-#include <QtGlobal>
+#include "DataTypes.h"
 
 class DataCoord {
 public:
-	DataCoord(quint64 time = 0.0, qreal data = 0.0);
+	DataCoord(uint64_t time = 0.0, double data = 0.0);
 	~DataCoord();
 private:
-	quint64 m_time;
-	qreal m_data;
+	uint64_t m_time;
+	double m_data;
 public:
-	quint64 &time() { return m_time; }
-	const quint64 &time() const { return m_time; }
-	void setTime(quint64 time) { m_time = time; }
+	uint64_t &time() { return m_time; }
+	const uint64_t &time() const { return m_time; }
+	void setTime(uint64_t time) { m_time = time; }
 	
-	qreal &data() { return m_data; }
-	const qreal &data() const { return m_data; }
-	void setData(qreal data) { m_data = data; }
+	double &data() { return m_data; }
+	const double &data() const { return m_data; }
+	void setData(double data) { m_data = data; }
 	
 	DataCoord operator+(const DataCoord &other) const;
 	DataCoord operator-(const DataCoord &other) const;

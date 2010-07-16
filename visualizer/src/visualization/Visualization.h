@@ -1,12 +1,11 @@
 #ifndef Visualization_H
 #define Visualization_H
 
-#include "storage/DataRange.h"
+#include <QPixmap>
+#include <QMutex>
+#include <QPainter>
 
-class QPixmap;
-class QPainter;
-class QMutex;
-class QSize;
+#include "storage/DataRange.h"
 
 class Visualization {
 public:

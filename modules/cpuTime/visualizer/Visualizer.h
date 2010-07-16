@@ -11,6 +11,7 @@ private:
 	
 public:
 	virtual void processIncoming(DataPacket *packet);
+	virtual void visualize(VisualizationWrapper *visualization);
 };
 
 #endif

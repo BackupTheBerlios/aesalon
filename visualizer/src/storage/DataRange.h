@@ -14,19 +14,19 @@ public:
 	const DataCoord &begin() const { return m_begin; }
 	void setBegin(const DataCoord &begin) { m_begin = begin; }
 	
-	quint64 &beginTime() { return m_begin.time(); }
-	const quint64 &beginTime() const { return m_begin.time(); }
-	qreal &beginData() { return m_begin.data(); }
-	const qreal &beginData() const { return m_begin.data(); }
+	uint64_t &beginTime() { return m_begin.time(); }
+	const uint64_t &beginTime() const { return m_begin.time(); }
+	double &beginData() { return m_begin.data(); }
+	const double &beginData() const { return m_begin.data(); }
 	
 	DataCoord &end() { return m_end; }
 	const DataCoord &end() const { return m_end; }
 	void setEnd(const DataCoord &end) { m_end = end; }
 	
-	quint64 &endTime() { return m_end.time(); }
-	const quint64 &endTime() const { return m_end.time(); }
-	qreal &endData() { return m_end.data(); }
-	const qreal &endData() const { return m_end.data(); }
+	uint64_t &endTime() { return m_end.time(); }
+	const uint64_t &endTime() const { return m_end.time(); }
+	double &endData() { return m_end.data(); }
+	const double &endData() const { return m_end.data(); }
 };
 
 #endif

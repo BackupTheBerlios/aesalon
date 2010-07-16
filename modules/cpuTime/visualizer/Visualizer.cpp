@@ -21,3 +21,7 @@ CpuTimeVisualizer::~CpuTimeVisualizer() {
 void CpuTimeVisualizer::processIncoming(DataPacket *packet) {
 	std::cout << "Received packet!" << std::endl;
 }
+
+void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization) {
+	std::cout << "Asked to visualize!" << std::endl;
+}

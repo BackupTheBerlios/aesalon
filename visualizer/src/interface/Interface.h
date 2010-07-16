@@ -2,7 +2,7 @@
 #define Interface_H
 
 #include "DataTypes.h"
-#include "visualization/Visualization.h"
+#include "visualization/VisualizationWrapper.h"
 
 class VisualizerInterface {
 public:
@@ -11,7 +11,7 @@ public:
 public:
 	virtual void processIncoming(DataPacket *packet) = 0;
 	
-	virtual void visualize(Visualization *visualization) = 0;
+	virtual void visualize(VisualizationWrapper *visualization) = 0;
 };
 
 #endif
