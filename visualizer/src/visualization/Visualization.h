@@ -7,6 +7,8 @@
 
 #include "storage/DataRange.h"
 
+class VisualizationWrapper;
+
 class Visualization {
 public:
 	Visualization(QSize renderSize, DataRange range);
@@ -16,12 +18,17 @@ private:
 	DataRange m_range;
 	QPainter m_painter;
 	QMutex m_paintLock;
+	VisualizationWrapper *m_wrapper;
 public:
 	const QPixmap &pixmap() const { return m_pixmap; }
+	const DataRange &range() const { return m_range; }
 	/** Merges another visualization with this one.
 		@param other The visualization to merge with.
 	*/
 	void merge(const Visualization &other);
+	
+	/** Clears the visualization of all painted data. */
+	void clear();
 	
 	/** Locks the visualization for painting. */
 	void lock();
@@ -44,6 +51,8 @@ public:
 		@param to The coordinates to end the line.
 	*/
 	void drawLine(DataCoord from, DataCoord to);
+	
+	VisualizationWrapper *getWrapper() const { return m_wrapper; }
 private:
 	QPointF translate(const DataCoord &coord);
 	QRectF translate(const DataRange &range);

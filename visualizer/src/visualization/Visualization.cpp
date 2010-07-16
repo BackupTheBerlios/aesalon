@@ -4,11 +4,13 @@
 #include <QMutex>
 
 #include "Visualization.h"
+#include "VisualizationWrapper.h"
 
 Visualization::Visualization(QSize renderSize, DataRange range) : m_range(range) {
 	m_pixmap = QPixmap(renderSize);
-	m_pixmap.fill();
+	m_pixmap.fill(Qt::white);
 	m_paintLock.unlock();
+	m_wrapper = new VisualizationWrapper(this);
 }
 
 Visualization::~Visualization() {
@@ -22,22 +24,33 @@ void Visualization::merge(const Visualization &other) {
 	unlock();
 }
 
+void Visualization::clear() {
+	lock();
+	m_pixmap.fill();
+	unlock();
+}
+
 void Visualization::lock() {
+	qDebug("Locking surface . . .");
 	m_paintLock.lock();
 	if(!m_painter.begin(&m_pixmap)) qWarning("Note: couldn't lock surface . . .");
 }
 
 void Visualization::unlock() {
+	qDebug("Unocking surface . . .");
 	m_painter.end();
 	m_paintLock.unlock();
 }
 
 void Visualization::resize(const QSize &newSize) {
-	lock();
+	qDebug("Resizing . . .");
+	m_paintLock.lock();
 	QPixmap temporary = m_pixmap;
 	m_pixmap = QPixmap(newSize);
+	m_painter.begin(&m_pixmap);
 	m_painter.drawPixmap(QRect(0, 0, temporary.width(), temporary.height()), temporary);
-	unlock();
+	m_painter.end();
+	m_paintLock.unlock();
 }
 
 void Visualization::setPenColour(int r, int g, int b, int a) {
@@ -52,6 +65,9 @@ void Visualization::drawLine(DataCoord from, DataCoord to) {
 		return;
 	}
 	QLineF line(translate(from), translate(to));
+	qDebug("Asked to draw line from (%f, %f) to (%f, %f) . . .", line.x1(), line.y1(), line.x2(), line.y2());
+	
+	m_painter.drawLine(line);
 }
 
 QPointF Visualization::translate(const DataCoord &coord) {
@@ -61,7 +77,7 @@ QPointF Visualization::translate(const DataCoord &coord) {
 	qreal xPercentage = (coord.time() - m_range.beginTime()) / qreal(xSize);
 	qreal yPercentage = (coord.data() - m_range.beginData()) / ySize;
 	
-	return QPointF(m_pixmap.width() * xPercentage, m_pixmap.height() * yPercentage);
+	return QPointF(m_pixmap.width() * xPercentage, m_pixmap.height() - (m_pixmap.height() * yPercentage));
 }
 
 QRectF Visualization::translate(const DataRange &range) {

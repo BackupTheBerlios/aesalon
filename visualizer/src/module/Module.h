@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "interface/Interface.h"
+#include "storage/DataRange.h"
 
 class Module {
 public:
@@ -19,6 +20,7 @@ public:
 	
 	void processIncoming(DataPacket *packet);
 	void visualize(Visualization *visualization);
+	DataRange defaultDataRange();
 private:
 	QString modulePath(QString filename);
 };

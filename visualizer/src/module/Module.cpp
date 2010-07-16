@@ -4,6 +4,7 @@
 #include <QSettings>
 
 #include "Module.h"
+#include "visualization/Visualization.h"
 
 Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL){
 	QString path = modulePath(QString("lib").append(name).append("Visualizer.so"));
@@ -44,7 +45,12 @@ void Module::processIncoming(DataPacket *packet) {
 
 void Module::visualize(Visualization *visualization) {
 	if(m_interface == NULL) return;
-	m_interface->visualize(&VisualizationWrapper(visualization));
+	m_interface->visualize(visualization->getWrapper());
+}
+
+DataRange Module::defaultDataRange() {
+	if(m_interface == NULL) return DataRange();
+	return m_interface->defaultDataRange();
 }
 
 QString Module::modulePath(QString filename) {
