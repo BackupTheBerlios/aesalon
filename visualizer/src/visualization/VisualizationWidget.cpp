@@ -26,3 +26,15 @@ void VisualizationWidget::resizeEvent(QResizeEvent *event) {
 	m_module->visualize(m_visualization);
 	update();
 }
+
+void VisualizationWidget::mouseMoveEvent(QMouseEvent *event) {
+	QWidget::mouseMoveEvent(event);
+}
+
+void VisualizationWidget::mousePressEvent(QMouseEvent *event) {
+	QWidget::mousePressEvent(event);
+}
+
+void VisualizationWidget::mouseReleaseEvent(QMouseEvent *event) {
+	QWidget::mouseReleaseEvent(event);
+}

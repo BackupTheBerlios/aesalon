@@ -10,6 +10,8 @@
 SessionDisplay::SessionDisplay(ModuleMapper *moduleMapper) : QWidget(NULL), m_moduleMapper(moduleMapper) {
 	m_grid = new QGridLayout();
 	m_grid->addWidget(newVisualization(), 0, 0);
+	m_grid->setColumnStretch(0, 1);
+	m_grid->setRowStretch(0, 1);
 	
 	setLayout(m_grid);
 }
@@ -34,6 +36,7 @@ void SessionDisplay::addColumn() {
 	for(int i = 1; i < m_grid->rowCount(); i ++) {
 		m_grid->addWidget(newVisualization(), i, m_grid->columnCount()-1);
 	}
+	m_grid->setColumnStretch(m_grid->columnCount()-1, 1);
 }
 
 void SessionDisplay::addRow() {
@@ -41,6 +44,7 @@ void SessionDisplay::addRow() {
 	for(int i = 1; i < m_grid->columnCount(); i ++) {
 		m_grid->addWidget(newVisualization(), m_grid->rowCount()-1, i);
 	}
+	m_grid->setRowStretch(m_grid->rowCount()-1, 1);
 }
 
 void SessionDisplay::setWidget(QPoint which, QWidget *widget) {
