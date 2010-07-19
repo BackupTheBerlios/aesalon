@@ -14,19 +14,27 @@ VisualizationController::~VisualizationController() {
 
 }
 
+void VisualizationController::registerRequest(VisualizationRequest *request) {
+	if(request->category() == FullRequest) {
+		foreach(VisualizationRequest *request, m_requestSets[request->category()]) {
+			request->abort();
+		}
+	}
+	m_requestSets[request->category()].insert(request);
+}
+
+void VisualizationController::deregisterRequest(VisualizationRequest *request) {
+	m_requestSets[request->category()].remove(request);
+}
+
 void VisualizationController::fullVisualization() {
-	VisualizationRequest *request = new VisualizationRequest(m_module, m_visualization, m_visualization->range());
+	VisualizationRequest *request = new VisualizationRequest(this, m_visualization->range(), FullRequest);
 	/* Full visualization priority: 15. */
 	m_threadPool->start(request, 15);
 }
 
-void VisualizationController::processRequest(VisualizationRequest *request) {
-	/* Default priority: 10. */
-	m_threadPool->start(request, 10);
-}
-
-void VisualizationController::renderRegion(const DataRange &range) {
-	processRequest(new VisualizationRequest(m_module, m_visualization, range));
+void VisualizationController::renderRegion(const DataRange &range, RequestType type) {
+	processRequest(new VisualizationRequest(this, range, type));
 }
 
 void VisualizationController::shift(QPoint pixels) {
@@ -39,4 +47,9 @@ void VisualizationController::shift(DataRange range) {
 
 void VisualizationController::scale(qreal zoom) {
 	m_visualization->scale(zoom);
+}
+
+void VisualizationController::processRequest(VisualizationRequest *request) {
+	/* Default priority: 10. */
+	m_threadPool->start(request, 10);
 }

@@ -15,7 +15,7 @@ private:
 	DataCoord m_lastElement;
 public:
 	virtual void processIncoming(DataPacket *packet);
-	virtual void visualize(VisualizationWrapper *visualization);
+	virtual void visualize(VisualizationWrapper *visualization, bool *abort);
 	virtual DataRange defaultDataRange();
 };
 

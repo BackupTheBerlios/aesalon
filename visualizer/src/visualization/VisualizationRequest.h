@@ -5,18 +5,20 @@
 
 #include "storage/DataRange.h"
 
-class Module;
-class Visualization;
+class VisualizationController;
 
 class VisualizationRequest : public QRunnable {
 public:
-	VisualizationRequest(Module *module, Visualization *visualization, DataRange range);
+	VisualizationRequest(VisualizationController *controller, DataRange range, int category);
 	virtual ~VisualizationRequest();
 private:
-	Module *m_module;
-	Visualization *m_visualization;
+	VisualizationController *m_controller;
 	DataRange m_range;
+	bool m_abort;
+	int m_category;
 public:
+	void abort() { m_abort = true; }
+	int category() const { return m_category; }
 	virtual void run();
 };
 

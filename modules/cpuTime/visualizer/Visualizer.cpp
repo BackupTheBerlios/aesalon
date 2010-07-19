@@ -47,7 +47,7 @@ static bool compareElements(DataCoord one, DataCoord two) {
 	return one.time() < two.time();
 }
 
-void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization) {
+void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization, bool *abort) {
 	std::cout << "Asked to visualize!" << std::endl;
 	visualization->lock();
 	
@@ -71,7 +71,7 @@ void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization) {
 	std::cout << "\tbegin: " << begin << std::endl;
 	std::cout << "\tend: " << end << std::endl;
 	
-	for(int i = begin + 1; i < end; i ++) {
+	for(int i = begin + 1; i < end && !(*abort); i ++) {
 		visualization->drawLine(m_elementList[i-1], m_elementList[i]);
 	}
 	

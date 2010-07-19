@@ -4,19 +4,26 @@
 #include "VisualizationController.h"
 #include "VisualizationWidget.h"
 
-VisualizationRequest::VisualizationRequest(Module *module, Visualization *visualization, DataRange range)
-	: QRunnable(), m_module(module), m_visualization(visualization), m_range(range) {
+VisualizationRequest::VisualizationRequest(VisualizationController *controller, DataRange range, int category)
+	: QRunnable(), m_controller(controller), m_range(range), m_abort(false), m_category(category) {
 	
+	setAutoDelete(true);
+	m_controller->registerRequest(this);
 }
 
 VisualizationRequest::~VisualizationRequest() {
-	
+	m_controller->deregisterRequest(this);
 }
 
 void VisualizationRequest::run() {
-	Visualization *sv = m_visualization->subVisualization(m_range);
-	m_module->visualize(sv);
-	m_visualization->merge(sv);
+	if(m_abort) return;
+	
+	Visualization *sv = m_controller->visualization()->subVisualization(m_range);
+	m_controller->module()->visualize(sv, &m_abort);
+	if(!m_abort) {
+		m_controller->visualization()->merge(sv);
+		m_controller->widget()->update();
+	}
+	
 	delete sv;
-	m_visualization->controller()->widget()->update();
 }

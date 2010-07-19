@@ -3,6 +3,7 @@
 
 #include <QThreadPool>
 #include <QPoint>
+#include <QSet>
 
 #include "module/Module.h"
 #include "VisualizationRequest.h"
@@ -12,6 +13,12 @@ class VisualizationWidget;
 
 class VisualizationController {
 public:
+	enum RequestType {
+		FullRequest,
+		PartialRequest,
+		RequestTypes
+	};
+
 	VisualizationController(Module *module, Visualization *visualization);
 	virtual ~VisualizationController();
 private:
@@ -19,28 +26,35 @@ private:
 	Visualization *m_visualization;
 	VisualizationThreadPool *m_threadPool;
 	VisualizationWidget *m_widget;
+	
+	typedef QSet<VisualizationRequest *> RequestSet;
+	RequestSet m_requestSets[RequestTypes];
 public:
 	Module *module() const { return m_module; }
 	Visualization *visualization() const { return m_visualization; }
 	VisualizationWidget *widget() const { return m_widget; }
 	void setWidget(VisualizationWidget *widget) { m_widget = widget; }
 	
+	void registerRequest(VisualizationRequest *request);
+	void deregisterRequest(VisualizationRequest *request);
+	
 	/** Requests a full visualization. This clears the visualization's pixmap
 		and visualizes the entire data range. */
 	void fullVisualization();
+	
+	void renderRegion(const DataRange &range, RequestType type = PartialRequest);
+	
+	void shift(QPoint pixels);
+	void shift(DataRange range);
+	
+	void scale(qreal zoom);
+private:
 	/** Processes a VisualizationRequest.
 		@param request The request to process. This memory should be
 			dynamically-allocated, as it will be freed upon request
 			completion.
 	*/
 	void processRequest(VisualizationRequest *request);
-	
-	void renderRegion(const DataRange &range);
-	
-	void shift(QPoint pixels);
-	void shift(DataRange range);
-	
-	void scale(qreal zoom);
 };
 
 #endif
