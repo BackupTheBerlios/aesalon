@@ -8,6 +8,8 @@
 
 Visualization::Visualization(QSize renderSize, DataRange range) : m_range(range) {
 	qDebug("renderSize: (%ix%i)", renderSize.width(), renderSize.height());
+	if(renderSize.width() == 0) renderSize.setWidth(1);
+	if(renderSize.height() == 0) renderSize.setHeight(1);
 	m_image = QImage(qAbs(renderSize.width()), qAbs(renderSize.height()), QImage::Format_ARGB32);
 	m_image.fill(Qt::white);
 	m_wrapper = new VisualizationWrapper(this);
@@ -73,7 +75,9 @@ void Visualization::drawLine(DataCoord from, DataCoord to) {
 }
 
 Visualization *Visualization::subVisualization(const DataRange &range) {
-	return new Visualization(translate(range).size().toSize(), range);
+	Visualization *sv = new Visualization(translate(range).size().toSize(), range);
+	sv->setController(m_controller);
+	return sv;
 }
 
 void Visualization::shift(QPoint pixels) {
@@ -90,19 +94,20 @@ void Visualization::shift(QPoint pixels) {
 	if(pixels.x() > 0) {
 		QRect rect = QRect(0, 0, pixels.x(), m_image.height());
 		m_painter.drawRect(rect);
-		m_controller->renderRegion(translate(rect));
+		m_controller->renderRegion(translate(rect.normalized()));
 	}
 	else if(pixels.x() < 0) {
-		QRect rect = QRect(m_image.width() - pixels.x(), 0, pixels.x(), m_image.height());
+		QRect rect = QRect(m_image.width() + pixels.x(), 0, -pixels.x(), m_image.height());
 		m_painter.drawRect(rect);
-		m_controller->renderRegion(translate(rect));
+		/*m_controller->renderRegion(translate(rect));*/
 	}
 	
 	if(pixels.y() > 0) {
-		m_painter.drawRect(0, m_image.height() - pixels.y(), m_image.width(), pixels.y());
+		m_painter.drawRect(0, 0, m_image.width(), pixels.y());
 	}
 	else if(pixels.y() < 0) {
-		m_painter.drawRect(0, 0, m_image.width(), pixels.y());
+		QRect rect = QRect(0, m_image.height() + pixels.y(), m_image.width(), -pixels.y());
+		m_painter.drawRect(rect.normalized());
 	}
 	
 	m_painter.end();

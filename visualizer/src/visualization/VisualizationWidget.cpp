@@ -20,8 +20,6 @@ void VisualizationWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter(this);
 	
 	painter.drawImage(QRect(0, 0, width(), height()), m_visualization->image());
-	
-	qDebug("paintEvent . . .");
 }
 
 void VisualizationWidget::resizeEvent(QResizeEvent *event) {
@@ -32,7 +30,6 @@ void VisualizationWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void VisualizationWidget::mouseMoveEvent(QMouseEvent *event) {
-	qDebug("mouseMoveEvent . . .");
 	if(event->buttons() & Qt::LeftButton) {
 		m_controller->shift(event->globalPos() - m_lastMousePos);
 		m_lastMousePos = event->globalPos();
