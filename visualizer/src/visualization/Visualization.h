@@ -1,31 +1,36 @@
 #ifndef Visualization_H
 #define Visualization_H
 
-#include <QPixmap>
+#include <QImage>
 #include <QMutex>
 #include <QPainter>
 
 #include "storage/DataRange.h"
 
 class VisualizationWrapper;
+class VisualizationController;
 
 class Visualization {
 public:
 	Visualization(QSize renderSize, DataRange range);
 	~Visualization();
 private:
-	QPixmap m_pixmap;
+	QImage m_image;
 	DataRange m_range;
 	QPainter m_painter;
 	QMutex m_paintLock;
 	VisualizationWrapper *m_wrapper;
+	VisualizationController *m_controller;
 public:
-	const QPixmap &pixmap() const { return m_pixmap; }
+	const QImage &image() const { return m_image; }
 	const DataRange &range() const { return m_range; }
+	VisualizationWrapper *wrapper() const { return m_wrapper; }
+	VisualizationController *controller() const { return m_controller; }
+	void setController(VisualizationController *controller) { m_controller = controller; }
 	/** Merges another visualization with this one.
 		@param other The visualization to merge with.
 	*/
-	void merge(const Visualization &other);
+	void merge(Visualization *other);
 	
 	/** Clears the visualization of all painted data. */
 	void clear();
@@ -38,8 +43,8 @@ public:
 		@return The lock status of the visualization.
 	*/
 	bool isLocked() const { return m_painter.isActive(); }
-	/** Re-sizes the internal QPixmap.
-		@param newSize The new size of the pixmap.
+	/** Re-sizes the internal QImage.
+		@param newSize The new size of the image.
 	*/
 	void resize(const QSize &newSize);
 	
@@ -52,7 +57,14 @@ public:
 	*/
 	void drawLine(DataCoord from, DataCoord to);
 	
-	VisualizationWrapper *getWrapper() const { return m_wrapper; }
+	/** Creates a sub-visualization of this visualization, preserving the
+		mapping ratio of data units to screen units for a given range.
+		@param range The range of the sub-visualization.
+		@return The new sub-visualization.
+	*/
+	Visualization *subVisualization(const DataRange &range);
+	
+	void shift(QPoint pixels);
 private:
 	QPointF translate(const DataCoord &coord);
 	QRectF translate(const DataRange &range);

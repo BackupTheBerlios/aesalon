@@ -45,7 +45,7 @@ void Module::processIncoming(DataPacket *packet) {
 
 void Module::visualize(Visualization *visualization) {
 	if(m_interface == NULL) return;
-	m_interface->visualize(visualization->getWrapper());
+	m_interface->visualize(visualization->wrapper());
 }
 
 DataRange Module::defaultDataRange() {

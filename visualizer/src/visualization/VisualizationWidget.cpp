@@ -6,7 +6,8 @@
 
 VisualizationWidget::VisualizationWidget(Module *module) : QWidget(NULL), m_module(module) {
 	m_visualization = new Visualization(size(), module->defaultDataRange());
-	module->visualize(m_visualization);
+	m_controller = new VisualizationController(module, m_visualization);
+	m_controller->fullVisualization();
 }
 
 VisualizationWidget::~VisualizationWidget() {
@@ -16,22 +17,28 @@ VisualizationWidget::~VisualizationWidget() {
 void VisualizationWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter(this);
 	
-	painter.drawPixmap(0, 0, width(), height(), m_visualization->pixmap());
+	painter.drawImage(QRect(0, 0, width(), height()), m_visualization->image());
 }
 
 void VisualizationWidget::resizeEvent(QResizeEvent *event) {
 	m_visualization->resize(event->size());
 	QWidget::resizeEvent(event);
-	m_visualization->clear();
-	m_module->visualize(m_visualization);
+	m_controller->fullVisualization();
 	update();
 }
 
 void VisualizationWidget::mouseMoveEvent(QMouseEvent *event) {
+	if(event->buttons().testFlag(Qt::LeftButton)) {
+		m_controller->shift(event->globalPos() - m_lastMousePos);
+		m_lastMousePos = event->globalPos();
+	}
 	QWidget::mouseMoveEvent(event);
 }
 
 void VisualizationWidget::mousePressEvent(QMouseEvent *event) {
+	if(event->button() == Qt::LeftButton) {
+		m_lastMousePos = event->globalPos();
+	}
 	QWidget::mousePressEvent(event);
 }
 

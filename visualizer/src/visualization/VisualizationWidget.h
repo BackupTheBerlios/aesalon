@@ -5,6 +5,7 @@
 
 #include "Visualization.h"
 #include "module/Module.h"
+#include "VisualizationController.h"
 
 class VisualizationWidget : public QWidget { Q_OBJECT
 public:
@@ -13,6 +14,8 @@ public:
 private:
 	Module *m_module;
 	Visualization *m_visualization;
+	VisualizationController *m_controller;
+	QPoint m_lastMousePos;
 public:
 	Visualization *visualization() const { return m_visualization; }
 	
