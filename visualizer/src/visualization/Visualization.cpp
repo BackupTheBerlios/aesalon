@@ -19,12 +19,11 @@ Visualization::~Visualization() {
 void Visualization::merge(Visualization *other) {
 	QRectF otherRect = translate(other->m_range);
 	lock();
-	m_painter.drawImage(otherRect.toRect(), other->m_image);
+	m_painter.drawImage(otherRect.normalized().toRect(), other->m_image);
 	unlock();
 }
 
 void Visualization::clear() {
-	qDebug("Clearing surface . . .");
 	lock();
 	m_image.fill(qRgb(255, 255, 255));
 	unlock();
