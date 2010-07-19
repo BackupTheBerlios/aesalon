@@ -15,7 +15,6 @@ VisualizationController::~VisualizationController() {
 }
 
 void VisualizationController::fullVisualization() {
-	m_visualization->clear();
 	VisualizationRequest *request = new VisualizationRequest(m_module, m_visualization, m_visualization->range());
 	/* Full visualization priority: 15. */
 	m_threadPool->start(request, 15);
@@ -36,4 +35,8 @@ void VisualizationController::shift(QPoint pixels) {
 
 void VisualizationController::shift(DataRange range) {
 	
+}
+
+void VisualizationController::scale(qreal zoom) {
+	m_visualization->scale(zoom);
 }

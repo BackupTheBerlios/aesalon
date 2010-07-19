@@ -5,20 +5,14 @@
 
 #include "visualizerInterface/Interface.h"
 
-class DataElement {
-public:
-	uint64_t timestamp;
-	uint64_t value;
-};
-
 class CpuTimeVisualizer : public VisualizerInterface {
 public:
 	CpuTimeVisualizer();
 	virtual ~CpuTimeVisualizer();
 private:
-	typedef std::vector<DataElement> ElementList;
+	typedef std::vector<DataCoord> ElementList;
 	ElementList m_elementList;
-	uint64_t m_lastElementValue;
+	DataCoord m_lastElement;
 public:
 	virtual void processIncoming(DataPacket *packet);
 	virtual void visualize(VisualizationWrapper *visualization);

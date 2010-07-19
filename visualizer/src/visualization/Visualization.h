@@ -65,11 +65,15 @@ public:
 	Visualization *subVisualization(const DataRange &range);
 	
 	void shift(QPoint pixels);
+	
+	void scale(qreal zoom);
 private:
 	QPointF translate(const DataCoord &coord);
 	QRectF translate(const DataRange &range);
 	DataCoord translate(const QPoint &point);
 	DataRange translate(const QRect &rect);
+	
+	DataCoord translateOffset(const QPoint &point);
 };
 
 #endif

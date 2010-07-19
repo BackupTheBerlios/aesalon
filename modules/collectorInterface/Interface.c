@@ -116,3 +116,8 @@ uint64_t AesalonCollectorGetTimestamp() {
 uint8_t AesalonCollectionStatus() {
 	return AesalonMemoryMap.header->mainReached;
 }
+
+const char **AesalonCollectorConfig(const char *module) {
+	
+	return NULL;
+}

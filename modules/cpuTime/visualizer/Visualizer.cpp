@@ -11,8 +11,8 @@ VisualizerInterface *AesalonVisualizerCreateInstance() {
 
 } // extern "C"
 
-CpuTimeVisualizer::CpuTimeVisualizer() {
-
+CpuTimeVisualizer::CpuTimeVisualizer() : m_lastElement() {
+	
 }
 
 CpuTimeVisualizer::~CpuTimeVisualizer() {
@@ -20,62 +20,66 @@ CpuTimeVisualizer::~CpuTimeVisualizer() {
 }
 
 void CpuTimeVisualizer::processIncoming(DataPacket *packet) {
-	DataElement e;
-	e.timestamp = packet->dataSource.timestamp;
-	e.value = *(uint64_t *)packet->data;
-	if(m_elementList.size() != 0) {
-		e.value -= m_lastElementValue;
-	}
-	m_lastElementValue = *(uint64_t *)packet->data;
+	DataCoord e;
+	e.setTime(packet->dataSource.timestamp);
+	e.setData((double)(*(uint64_t *)packet->data));
+	
 	std::cout << "Received packet!" << std::endl;
-	std::cout << "\tTimestamp: " << e.timestamp << std::endl;
-	std::cout << "\tOriginal value: " << *(uint64_t *)packet->data << std::endl;
-	std::cout << "\tAdjusted value: " << e.value << std::endl;
-	m_elementList.push_back(e);
+	std::cout << "\tTimestamp: " << e.time() << std::endl;
+	std::cout << "\tValue: " << e.data() << std::endl;
+	
+	if(m_lastElement.data() != 0) {
+		DataCoord adj;
+		adj.setTime((e.time() + m_lastElement.time()) / 2);
+		uint64_t tDiff = e.time() - m_lastElement.time();
+		
+		adj.setData((e.data() - m_lastElement.data()) / (double)(tDiff));
+		
+		std::cout << "\tAdjusted value: " << adj.data() << std::endl;
+		
+		m_elementList.push_back(adj);
+	}
+	
+	m_lastElement = e;
 }
 
-static bool compareElements(DataElement one, DataElement two) {
-	return one.timestamp < two.timestamp;
+static bool compareElements(DataCoord one, DataCoord two) {
+	return one.time() < two.time();
 }
 
 void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization) {
 	std::cout << "Asked to visualize!" << std::endl;
 	visualization->lock();
-	DataElement e;
-	e.timestamp = visualization->dataRange().beginTime();
-	ElementList::iterator begin = std::lower_bound(m_elementList.begin(), m_elementList.end(), e, compareElements);
-	if(begin == m_elementList.end()) {
+	
+	DataCoord e;
+	e.setTime(visualization->dataRange().beginTime());
+	ElementList::iterator beginIterator = std::lower_bound(m_elementList.begin(), m_elementList.end(), e, compareElements);
+	if(beginIterator == m_elementList.end()) {
 		std::cout << "Entire visualization is out-of-bounds. Aborting." << std::endl;
 		visualization->unlock();
 		return;
 	}
-	else if(begin == m_elementList.begin()) begin ++;
 	
-	e.timestamp = visualization->dataRange().endTime();
-	ElementList::iterator end = std::upper_bound(m_elementList.begin(), m_elementList.end(), e, compareElements);
-	
-	double last_v = 0.0;
-	uint64_t last_t = m_elementList.front().timestamp;
+	e.setTime(visualization->dataRange().endTime());
+	ElementList::iterator endIterator = std::upper_bound(m_elementList.begin(), m_elementList.end(), e, compareElements);
 	
 	std::cout << "Beginning drawing loop . . ." << std::endl;
 	
-	for(ElementList::iterator i = begin; i != end && i+1 != end; i ++) {
-		uint64_t vDiff = i->value;
-		uint64_t tDiff = i->timestamp - (i-1)->timestamp;
-		
-		double v = vDiff / (double)tDiff;
-		uint64_t t = i->timestamp;
-		
-		visualization->drawLine(DataCoord(last_t, last_v), DataCoord(t, v));
-		
-		last_v = v;
-		last_t = t;
+	int begin = beginIterator - m_elementList.begin();
+	int end = endIterator - m_elementList.begin();
+	
+	std::cout << "\tbegin: " << begin << std::endl;
+	std::cout << "\tend: " << end << std::endl;
+	
+	for(int i = begin + 1; i < end; i ++) {
+		visualization->drawLine(m_elementList[i-1], m_elementList[i]);
 	}
+	
 	visualization->unlock();
 }
 
 DataRange CpuTimeVisualizer::defaultDataRange() {
 	std::cout << "Asked for default data range . . ." << std::endl;
-	if(m_elementList.size() > 2) return DataRange(DataCoord(m_elementList.front().timestamp, 0.0), DataCoord(m_elementList.back().timestamp, 1.0));
+	if(m_elementList.size() > 2) return DataRange(DataCoord(m_elementList.front().time(), 0.0), DataCoord(m_elementList.back().time(), 1.0));
 	else return DataRange();
 }

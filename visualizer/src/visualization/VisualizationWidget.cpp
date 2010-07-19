@@ -1,5 +1,6 @@
 #include <QResizeEvent>
 #include <QPaintEvent>
+#include <QWheelEvent>
 
 #include "VisualizationWidget.h"
 #include "VisualizationWidget.moc"
@@ -47,4 +48,16 @@ void VisualizationWidget::mousePressEvent(QMouseEvent *event) {
 
 void VisualizationWidget::mouseReleaseEvent(QMouseEvent *event) {
 	QWidget::mouseReleaseEvent(event);
+}
+
+void VisualizationWidget::wheelEvent(QWheelEvent *event) {
+	qDebug("wheelEvent . . .");
+	qreal scale = 1 + event->delta() / 1000.0;
+	qDebug("\tscale: %f", scale);
+	
+	m_controller->scale(scale);
+	
+	update();
+	
+	QWidget::wheelEvent(event);
 }

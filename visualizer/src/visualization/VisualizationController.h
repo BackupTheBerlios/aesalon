@@ -39,6 +39,8 @@ public:
 	
 	void shift(QPoint pixels);
 	void shift(DataRange range);
+	
+	void scale(qreal zoom);
 };
 
 #endif
