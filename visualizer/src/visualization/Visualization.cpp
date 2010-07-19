@@ -9,7 +9,6 @@ Visualization::Visualization(QSize renderSize, DataRange range) : m_range(range)
 	qDebug("renderSize: (%ix%i)", renderSize.width(), renderSize.height());
 	m_image = QImage(renderSize.width(), qAbs(renderSize.height()), QImage::Format_ARGB32);
 	m_image.fill(Qt::white);
-	m_paintLock.unlock();
 	m_wrapper = new VisualizationWrapper(this);
 }
 
@@ -25,8 +24,9 @@ void Visualization::merge(Visualization *other) {
 }
 
 void Visualization::clear() {
+	qDebug("Clearing surface . . .");
 	lock();
-	m_image.fill(qRgb(0, 0, 0));
+	m_image.fill(qRgb(255, 255, 255));
 	unlock();
 }
 

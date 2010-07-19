@@ -7,7 +7,9 @@
 VisualizationWidget::VisualizationWidget(Module *module) : QWidget(NULL), m_module(module) {
 	m_visualization = new Visualization(size(), module->defaultDataRange());
 	m_controller = new VisualizationController(module, m_visualization);
-	m_controller->fullVisualization();
+	/*m_controller->fullVisualization();*/
+	/* A resizeEvent will be generated once the widget has been added to a layout;
+		when that happens, a full visualization will be produced. */
 }
 
 VisualizationWidget::~VisualizationWidget() {

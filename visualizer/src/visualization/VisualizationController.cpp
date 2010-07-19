@@ -7,6 +7,7 @@ VisualizationController::VisualizationController(Module *module, Visualization *
 	: m_module(module), m_visualization(visualization) {
 	m_threadPool = VisualizationThreadPool::singleton();
 	m_visualization->setController(this);
+	qDebug("Max. threads: %i", m_threadPool->maxThreadCount());
 }
 
 VisualizationController::~VisualizationController() {
