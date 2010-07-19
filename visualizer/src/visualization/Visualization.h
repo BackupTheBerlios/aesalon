@@ -68,6 +68,8 @@ public:
 private:
 	QPointF translate(const DataCoord &coord);
 	QRectF translate(const DataRange &range);
+	DataCoord translate(const QPoint &point);
+	DataRange translate(const QRect &rect);
 };
 
 #endif

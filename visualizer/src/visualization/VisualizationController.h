@@ -8,6 +8,8 @@
 #include "VisualizationRequest.h"
 #include "VisualizationThreadPool.h"
 
+class VisualizationWidget;
+
 class VisualizationController {
 public:
 	VisualizationController(Module *module, Visualization *visualization);
@@ -16,9 +18,12 @@ private:
 	Module *m_module;
 	Visualization *m_visualization;
 	VisualizationThreadPool *m_threadPool;
+	VisualizationWidget *m_widget;
 public:
 	Module *module() const { return m_module; }
 	Visualization *visualization() const { return m_visualization; }
+	VisualizationWidget *widget() const { return m_widget; }
+	void setWidget(VisualizationWidget *widget) { m_widget = widget; }
 	
 	/** Requests a full visualization. This clears the visualization's pixmap
 		and visualizes the entire data range. */
@@ -30,6 +35,7 @@ public:
 	*/
 	void processRequest(VisualizationRequest *request);
 	
+	void renderRegion(const DataRange &range);
 	
 	void shift(QPoint pixels);
 	void shift(DataRange range);

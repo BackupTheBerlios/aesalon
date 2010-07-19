@@ -5,7 +5,7 @@
 
 class DataCoord {
 public:
-	DataCoord(uint64_t time = 0.0, double data = 0.0);
+	DataCoord(uint64_t time = 0, double data = 0.0);
 	~DataCoord();
 private:
 	uint64_t m_time;

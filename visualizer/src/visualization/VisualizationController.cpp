@@ -26,8 +26,12 @@ void VisualizationController::processRequest(VisualizationRequest *request) {
 	m_threadPool->start(request, 10);
 }
 
+void VisualizationController::renderRegion(const DataRange &range) {
+	processRequest(new VisualizationRequest(m_module, m_visualization, range));
+}
+
 void VisualizationController::shift(QPoint pixels) {
-	
+	m_visualization->shift(pixels);
 }
 
 void VisualizationController::shift(DataRange range) {

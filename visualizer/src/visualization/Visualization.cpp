@@ -4,10 +4,11 @@
 
 #include "Visualization.h"
 #include "VisualizationWrapper.h"
+#include "VisualizationController.h"
 
 Visualization::Visualization(QSize renderSize, DataRange range) : m_range(range) {
 	qDebug("renderSize: (%ix%i)", renderSize.width(), renderSize.height());
-	m_image = QImage(renderSize.width(), qAbs(renderSize.height()), QImage::Format_ARGB32);
+	m_image = QImage(qAbs(renderSize.width()), qAbs(renderSize.height()), QImage::Format_ARGB32);
 	m_image.fill(Qt::white);
 	m_wrapper = new VisualizationWrapper(this);
 }
@@ -76,17 +77,32 @@ Visualization *Visualization::subVisualization(const DataRange &range) {
 }
 
 void Visualization::shift(QPoint pixels) {
+	qDebug("Asked to shift visualization . . .");
 	m_paintLock.lock();
 	QImage temporary = m_image;
 	m_painter.begin(&m_image);
 	
 	m_painter.drawImage(pixels, temporary);
 	
+	m_painter.setBrush(Qt::white);
+	m_painter.setPen(Qt::NoPen);
+	
 	if(pixels.x() > 0) {
-		
+		QRect rect = QRect(0, 0, pixels.x(), m_image.height());
+		m_painter.drawRect(rect);
+		m_controller->renderRegion(translate(rect));
 	}
 	else if(pixels.x() < 0) {
-		
+		QRect rect = QRect(m_image.width() - pixels.x(), 0, pixels.x(), m_image.height());
+		m_painter.drawRect(rect);
+		m_controller->renderRegion(translate(rect));
+	}
+	
+	if(pixels.y() > 0) {
+		m_painter.drawRect(0, m_image.height() - pixels.y(), m_image.width(), pixels.y());
+	}
+	else if(pixels.y() < 0) {
+		m_painter.drawRect(0, 0, m_image.width(), pixels.y());
 	}
 	
 	m_painter.end();
@@ -105,4 +121,18 @@ QPointF Visualization::translate(const DataCoord &coord) {
 
 QRectF Visualization::translate(const DataRange &range) {
 	return QRectF(translate(range.begin()), translate(range.end()));
+}
+
+DataCoord Visualization::translate(const QPoint &point) {
+	qreal xPercentage = point.x() / (qreal)m_image.width();
+	qreal yPercentage = point.y() / (qreal)m_image.height();
+	
+	quint64 xSize = m_range.endTime() - m_range.beginTime();
+	qreal ySize = m_range.endData() - m_range.beginData();
+	
+	return DataCoord((xPercentage * xSize) + m_range.beginTime(), (yPercentage * ySize) + m_range.beginData());
+}
+
+DataRange Visualization::translate(const QRect &rect) {
+	return DataRange(translate(rect.topLeft()), translate(rect.bottomRight()));
 }

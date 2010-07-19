@@ -24,10 +24,12 @@ void CpuTimeVisualizer::processIncoming(DataPacket *packet) {
 	e.timestamp = packet->dataSource.timestamp;
 	e.value = *(uint64_t *)packet->data;
 	if(m_elementList.size() != 0) {
-		e.value -= m_elementList.back().value;
+		e.value -= m_lastElementValue;
 	}
+	m_lastElementValue = *(uint64_t *)packet->data;
 	std::cout << "Received packet!" << std::endl;
 	std::cout << "\tTimestamp: " << e.timestamp << std::endl;
+	std::cout << "\tOriginal value: " << *(uint64_t *)packet->data << std::endl;
 	std::cout << "\tAdjusted value: " << e.value << std::endl;
 	m_elementList.push_back(e);
 }
