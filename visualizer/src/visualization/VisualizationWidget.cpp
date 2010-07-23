@@ -52,7 +52,7 @@ void VisualizationWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 void VisualizationWidget::wheelEvent(QWheelEvent *event) {
 	qDebug("wheelEvent . . .");
-	qreal scale = 1 + event->delta() / 1000.0;
+	qreal scale = 1 - (event->delta() / 1000.0);
 	qDebug("\tscale: %f", scale);
 	
 	m_controller->scale(scale);

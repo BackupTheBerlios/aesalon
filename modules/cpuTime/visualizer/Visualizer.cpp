@@ -24,9 +24,9 @@ void CpuTimeVisualizer::processIncoming(DataPacket *packet) {
 	e.setTime(packet->dataSource.timestamp);
 	e.setData((double)(*(uint64_t *)packet->data));
 	
-	std::cout << "Received packet!" << std::endl;
+	/*std::cout << "Received packet!" << std::endl;
 	std::cout << "\tTimestamp: " << e.time() << std::endl;
-	std::cout << "\tValue: " << e.data() << std::endl;
+	std::cout << "\tValue: " << e.data() << std::endl;*/
 	
 	if(m_lastElement.data() != 0) {
 		DataCoord adj;
@@ -36,6 +36,7 @@ void CpuTimeVisualizer::processIncoming(DataPacket *packet) {
 		adj.setData((e.data() - m_lastElement.data()) / (double)(tDiff));
 		
 		std::cout << "\tAdjusted value: " << adj.data() << std::endl;
+		std::cout << "\t\ttDiff: " << tDiff << std::endl;
 		
 		m_elementList.push_back(adj);
 	}

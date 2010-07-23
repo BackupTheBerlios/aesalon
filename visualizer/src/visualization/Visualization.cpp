@@ -131,11 +131,6 @@ void Visualization::scale(qreal zoom) {
 	uint64_t xCentre = (m_range.endTime() + m_range.beginTime()) / 2;
 	double yCentre = (m_range.endData() + m_range.beginData()) / 2.0;
 	
-	qDebug("xCenter: %lu", xCentre);
-	qDebug("xSize: %lu", xSize);
-	
-	qDebug("calc rect: (%f,%f),(%f,%f)", xCentre - ((xSize / 2) * zoom), yCentre - ((ySize / 2) * zoom), xCentre + ((xSize / 2) * zoom), yCentre + ((ySize / 2) * zoom));
-	
 	DataCoord newBegin = DataCoord((uint64_t)(xCentre - ((xSize / 2) * zoom)), yCentre - ((ySize / 2) * zoom));
 	DataCoord newEnd = DataCoord((uint64_t)(xCentre + ((xSize / 2) * zoom)), yCentre + ((ySize / 2) * zoom));
 	
@@ -146,11 +141,9 @@ void Visualization::scale(qreal zoom) {
 	QRectF rect = translate(DataRange(newBegin, newEnd)).normalized();
 	qDebug("rect: (%f,%f),(%f,%f)", rect.left(), rect.top(), rect.right(), rect.bottom());
 	m_painter.drawImage(translate(DataRange(
-	
-	DataCoord((uint64_t)(xCentre - ((xSize / 2) * 1/zoom)), yCentre - ((ySize / 2) * 1/zoom)),
-	DataCoord((uint64_t)(xCentre + ((xSize / 2) * 1/zoom)), yCentre + ((ySize / 2) * 1/zoom))
-	
-	)).normalized(), temporary);
+		DataCoord((uint64_t)(xCentre - ((xSize / 2) * 1/zoom)), yCentre - ((ySize / 2) * 1/zoom)),
+		DataCoord((uint64_t)(xCentre + ((xSize / 2) * 1/zoom)), yCentre + ((ySize / 2) * 1/zoom))
+		)).normalized(), temporary);
 	
 	m_painter.end();
 	
@@ -168,10 +161,6 @@ QPointF Visualization::translate(const DataCoord &coord) {
 	
 	qreal xPercentage = ((qreal)coord.time() - (qreal)m_range.beginTime()) / qreal(xSize);
 	qreal yPercentage = (coord.data() - m_range.beginData()) / ySize;
-	
-	qDebug("xPercentage: %f", xPercentage);
-	qDebug("\txSize: %llu", xSize);
-	qDebug("\tcoord.time(): %lu", coord.time());
 	
 	return QPointF(m_image.width() * xPercentage, m_image.height() - (m_image.height() * yPercentage));
 }

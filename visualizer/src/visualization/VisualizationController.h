@@ -38,8 +38,8 @@ public:
 	void registerRequest(VisualizationRequest *request);
 	void deregisterRequest(VisualizationRequest *request);
 	
-	/** Requests a full visualization. This clears the visualization's pixmap
-		and visualizes the entire data range. */
+	/** Requests a full visualization. This visualizes the entire data range
+		specified by the visualization. */
 	void fullVisualization();
 	
 	void renderRegion(const DataRange &range, RequestType type = PartialRequest);
