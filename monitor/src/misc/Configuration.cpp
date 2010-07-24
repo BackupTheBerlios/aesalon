@@ -49,6 +49,7 @@ void Configuration::processConfigFile(std::string path) {
 	
 	char lineBuffer[8192];
 	while(!file.eof()) {
+		bool append = false;
 		file.getline(lineBuffer, sizeof(lineBuffer));
 		std::string line = lineBuffer;
 		if(line.length() == 0) continue;
@@ -56,16 +57,27 @@ void Configuration::processConfigFile(std::string path) {
 		
 		std::string name = line.substr(0, line.find('='));
 		std::string content = line.substr(line.find('=') + 1);
-
+		
+		/* Handle additions. */
+		if(name[name.length()-1] == '+') {
+			append = true;
+			name.erase(name.length()-1, 1);
+		}
+		
 		ConfigurationItem *configItem = m_configItems[name];
 		if(configItem == NULL) {
 			LogSystem::logConfigurationMessage(StreamAsString() << "Unknown configuration item \"" << name << "\". Ignoring.");
 		}
 		else {
 			if(configItem->type() == ConfigurationItem::String) {
-				configItem->setValue(content);
+				if(!append) configItem->setValue(content);
+				else configItem->setValue(configItem->stringValue() + content);
 			}
 			else if(configItem->type() == ConfigurationItem::Boolean) {
+				if(append) {
+					LogSystem::logConfigurationMessage(
+						StreamAsString() << "Cannot append boolean values. Leaving " << name << " unchanged.");
+				}
 				if(content == "true") configItem->setValue(true);
 				else if(content == "false") configItem->setValue(true);
 				else {
@@ -78,7 +90,8 @@ void Configuration::processConfigFile(std::string path) {
 				int value;
 				std::istringstream converter(content);
 				converter >> value;
-				configItem->setValue(value);
+				if(!append) configItem->setValue(value);
+				else configItem->setValue(configItem->intValue() + value);
 			}
 		}
 	}
@@ -92,6 +105,7 @@ void Configuration::processArguments() {
 	while(m_argv[++index]) {
 		std::string indexStr = m_argv[index]; 
 		if(indexStr[0] == '-' && indexStr[1] == '-' && !foundEoo) {
+			bool append = false;
 			indexStr.erase(0, 2);
 			if(indexStr.length() == 0) {
 				foundEoo = true;
@@ -107,10 +121,20 @@ void Configuration::processArguments() {
 				configName = indexStr;
 				configValue = "true";
 			}
+			
+			if(configName[configName.length()-1] == '+') {
+				append = true;
+				configName.erase(configName.length()-1, 1);
+			}
+			
 			ConfigurationItem *item = m_configItems[configName];
 			
 			switch(item->type()) {
 				case ConfigurationItem::Boolean: {
+					if(append) {
+						LogSystem::logConfigurationMessage(
+							StreamAsString() << "Cannot append boolean values. Leaving " << configName << " unchanged.");
+					}
 					if(configValue == "true") item->setValue(true);
 					else if(configValue == "false") item->setValue(false);
 					else {
@@ -121,14 +145,16 @@ void Configuration::processArguments() {
 					break;
 				}
 				case ConfigurationItem::String: {
-					item->setValue(configValue);
+					if(!append) item->setValue(configValue);
+					else item->setValue(item->stringValue() + configValue);
 					break;
 				}
 				case ConfigurationItem::Integer: {
 					int value;
 					std::istringstream converter(configValue);
 					converter >> value;
-					item->setValue(value);
+					if(!append) item->setValue(value);
+					else item->setValue(item->intValue() + value);
 					break;
 				}
 			}
