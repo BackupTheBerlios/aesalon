@@ -11,7 +11,7 @@ namespace Misc {
 
 Configuration::Configuration(char *argv[]) : m_argv(argv) {
 	addConfigItems();
-	processConfigFiles();
+	processDefaultConfigFiles();
 	processArguments();
 }
 
@@ -19,26 +19,8 @@ Configuration::~Configuration() {
 	
 }
 
-void Configuration::addConfigItems() {
-#define String ConfigurationItem::String
-#define Boolean ConfigurationItem::Boolean
-#define Integer ConfigurationItem::Integer
-#define item(name, type, defaultValue, description) \
-	m_configItems[name] = new ConfigurationItem(name, type); \
-	m_configItems[name]->setValue(defaultValue); \
-	m_configItems[name]->setDescription(description); \
-
-#include "ConfigurationItems"
-
-#undef String
-#undef Boolean
-#undef item
-}
-
-void Configuration::processConfigFiles() {
-	processConfigFile(AesalonGlobalConfig);
-	processConfigFile(AesalonUserConfig);
-	processConfigFile(AesalonLocalConfig);
+void Configuration::addConfigItem(ConfigurationItem *item) {
+	m_configItems[item->name()] = item;
 }
 
 void Configuration::processConfigFile(std::string path) {
@@ -96,6 +78,28 @@ void Configuration::processConfigFile(std::string path) {
 		}
 	}
 	file.close();
+}
+
+void Configuration::addConfigItems() {
+#define String ConfigurationItem::String
+#define Boolean ConfigurationItem::Boolean
+#define Integer ConfigurationItem::Integer
+#define item(name, type, defaultValue, description) \
+	m_configItems[name] = new ConfigurationItem(name, type); \
+	m_configItems[name]->setValue(defaultValue); \
+	m_configItems[name]->setDescription(description); \
+
+#include "ConfigurationItems"
+
+#undef String
+#undef Boolean
+#undef item
+}
+
+void Configuration::processDefaultConfigFiles() {
+	processConfigFile(AesalonGlobalConfig);
+	processConfigFile(AesalonUserConfig);
+	processConfigFile(AesalonLocalConfig);
 }
 
 void Configuration::processArguments() {

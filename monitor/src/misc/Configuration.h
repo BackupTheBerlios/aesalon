@@ -27,12 +27,13 @@ public:
 	const ConfigItems &configItems() const { return m_configItems; }
 	const std::string &filename() const { return m_filename; }
 	const std::vector<std::string> &programArguments() const { return m_programArguments; }
+	
+	void addConfigItem(ConfigurationItem *item);
+	void processConfigFile(std::string path);
 private:
 	void addConfigItems();
-	void processConfigFiles();
-	void processConfigFile(std::string path);
+	void processDefaultConfigFiles();
 	void processArguments();
-	void processOption(char *argument);
 };
 
 } // namespace Misc
