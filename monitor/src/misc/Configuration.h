@@ -34,6 +34,7 @@ private:
 	void addConfigItems();
 	void processDefaultConfigFiles();
 	void processArguments();
+	void processItem(std::string itemStr);
 };
 
 } // namespace Misc

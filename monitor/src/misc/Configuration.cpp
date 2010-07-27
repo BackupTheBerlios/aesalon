@@ -41,45 +41,9 @@ void Configuration::processConfigFile(std::string path) {
 		if(line.length() == 0) continue;
 		if(line[0] == '#') continue;
 		
-		std::string name = line.substr(0, line.find('='));
-		std::string content = line.substr(line.find('=') + 1);
+		processItem(line);
 		
-		/* Handle additions. */
-		if(name[name.length()-1] == '+') {
-			append = true;
-			name.erase(name.length()-1, 1);
-		}
-		
-		ConfigurationItem *configItem = m_configItems[name];
-		if(configItem == NULL) {
-			LogSystem::logConfigurationMessage(StreamAsString() << "Unknown configuration item \"" << name << "\". Ignoring.");
-		}
-		else {
-			if(configItem->type() == ConfigurationItem::String) {
-				if(!append) configItem->setValue(content);
-				else configItem->setValue(configItem->stringValue() + content);
-			}
-			else if(configItem->type() == ConfigurationItem::Boolean) {
-				if(append) {
-					LogSystem::logConfigurationMessage(
-						StreamAsString() << "Cannot append boolean values. Leaving " << name << " unchanged.");
-				}
-				if(content == "true") configItem->setValue(true);
-				else if(content == "false") configItem->setValue(true);
-				else {
-					LogSystem::logConfigurationMessage(
-						StreamAsString() << "Unknown boolean value in " << name << " (" << content << "). Defaulting to false.");
-					configItem->setValue(false);
-				}
-			}
-			else if(configItem->type() == ConfigurationItem::Integer) {
-				int value;
-				std::istringstream converter(content);
-				converter >> value;
-				if(!append) configItem->setValue(value);
-				else configItem->setValue(configItem->intValue() + value);
-			}
-		}
+		continue;
 	}
 	file.close();
 }
@@ -117,96 +81,101 @@ void Configuration::processArguments() {
 	while(m_argv[++index]) {
 		std::string indexStr = m_argv[index]; 
 		if(indexStr[0] == '-' && indexStr[1] == '-' && !foundEoo) {
-			bool append = false;
 			indexStr.erase(0, 2);
 			if(indexStr.length() == 0) {
 				foundEoo = true;
 				continue;
 			}
-			std::string configName;
-			std::string configValue;
-			if(indexStr.find('=') != std::string::npos) {
-				configName = indexStr.substr(0, indexStr.find('='));
-				configValue = indexStr.substr(indexStr.find('=')+1);
-			}
-			else {
-				configName = indexStr;
-				configValue = "true";
-			}
-			
-			if(configName[configName.length()-1] == '+') {
-				append = true;
-				configName.erase(configName.length()-1, 1);
-			}
-			
-			ConfigurationItem *item = m_configItems[configName];
-			
-			if(item == NULL) {
-				/* Try the group list first. */
-				/* NOTE: this is a VERY hackish approach, but I can't think of a better way to do it at the moment. */
-				/* TODO: fix this up a little, possible handle groups specially? */
-				std::string name = configName;
-				std::string childName = "";
-				std::string::size_type index = 0;
-				while((index = name.rfind('-')) != std::string::npos) {
-					childName += name.substr(index+1);
-					name.erase(index);
-					item = m_configItems[name];
-					if(item && item->type() == ConfigurationItem::Group) {
-						ConfigurationItem *childItem = item->childValue(childName);
-						item = childItem;
-						break;
-					}
-				}
-				
-				/* if item is still NULL . . . */
-				if(item == NULL) {
-					LogSystem::logConfigurationMessage(StreamAsString() << "Unknown argument encountered: " << configName);
-				}
-			}
-			
-			switch(item->type()) {
-				case ConfigurationItem::Boolean: {
-					if(append) {
-						LogSystem::logConfigurationMessage(
-							StreamAsString() << "Cannot append boolean values. Leaving " << configName << " unchanged.");
-					}
-					if(configValue == "true") item->setValue(true);
-					else if(configValue == "false") item->setValue(false);
-					else {
-						LogSystem::logConfigurationMessage(StreamAsString() << "Unknown boolean value in " << configName
-							<< " (" << configValue << "). Defaulting to false.");
-						item->setValue(false);
-					}
-					break;
-				}
-				case ConfigurationItem::String: {
-					if(!append) item->setValue(configValue);
-					else item->setValue(item->stringValue() + configValue);
-					break;
-				}
-				case ConfigurationItem::Integer: {
-					int value;
-					std::istringstream converter(configValue);
-					converter >> value;
-					if(!append) item->setValue(value);
-					else item->setValue(item->intValue() + value);
-					break;
-				}
-				case ConfigurationItem::Group: {
-					LogSystem::logConfigurationMessage(
-						StreamAsString() << "Attempting to set the value of a configuration group."
-						<< " For reference, this is not a good idea. Append a subname to the end of "
-						<< configName);
-					break;
-				}
-			}
+			processItem(indexStr);
 		}
 		else {
 			m_programArguments.push_back(indexStr);
 		}
 	}
 	if(m_programArguments.size()) m_filename = m_programArguments[0];
+}
+
+
+void Configuration::processItem(std::string itemStr) {
+	bool append = false;
+	std::string configName;
+	std::string configValue;
+	if(itemStr.find('=') != std::string::npos) {
+		configName = itemStr.substr(0, itemStr.find('='));
+		configValue = itemStr.substr(itemStr.find('=')+1);
+	}
+	else {
+		configName = itemStr;
+		configValue = "true";
+	}
+	
+	if(configName[configName.length()-1] == '+') {
+		append = true;
+		configName.erase(configName.length()-1, 1);
+	}
+	
+	ConfigurationItem *item = m_configItems[configName];
+	
+	if(item == NULL) {
+		/* Try the group list first. */
+		/* NOTE: this is a VERY hackish approach, but I can't think of a better way to do it at the moment. */
+		/* TODO: fix this up a little, possible handle groups specially? */
+		std::string name = configName;
+		std::string childName = "";
+		std::string::size_type index = 0;
+		while((index = name.rfind('-')) != std::string::npos) {
+			childName += name.substr(index+1);
+			name.erase(index);
+			item = m_configItems[name];
+			if(item && item->type() == ConfigurationItem::Group) {
+				ConfigurationItem *childItem = item->childValue(childName);
+				item = childItem;
+				break;
+			}
+		}
+		
+		/* if item is still NULL . . . */
+		if(item == NULL) {
+			LogSystem::logConfigurationMessage(StreamAsString() << "Unknown config item encountered: " << configName);
+		}
+	}
+	
+	switch(item->type()) {
+		case ConfigurationItem::Boolean: {
+			if(append) {
+				LogSystem::logConfigurationMessage(
+					StreamAsString() << "Cannot append boolean values. Leaving " << configName << " unchanged.");
+			}
+			if(configValue == "true") item->setValue(true);
+			else if(configValue == "false") item->setValue(false);
+			else {
+				LogSystem::logConfigurationMessage(StreamAsString() << "Unknown boolean value in " << configName
+					<< " (" << configValue << "). Defaulting to false.");
+				item->setValue(false);
+			}
+			break;
+		}
+		case ConfigurationItem::String: {
+			if(!append) item->setValue(configValue);
+			else item->setValue(item->stringValue() + configValue);
+			break;
+		}
+		case ConfigurationItem::Integer: {
+			int value;
+			std::istringstream converter(configValue);
+			converter >> value;
+			if(!append) item->setValue(value);
+			else item->setValue(item->intValue() + value);
+			break;
+		}
+		case ConfigurationItem::Group: {
+			LogSystem::logConfigurationMessage(
+				StreamAsString() << "Attempting to set the value of a configuration group."
+				<< " For reference, this is not a good idea. Append a subname to the end of "
+				<< configName);
+			break;
+		}
+	}
 }
 
 } // namespace Misc

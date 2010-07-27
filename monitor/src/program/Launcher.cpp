@@ -88,8 +88,8 @@ std::string Launcher::preload() {
 	}
 	
 	do {
-		std::string moduleName = moduleList.substr(0, moduleList.find(","));
-		moduleList.erase(0, moduleList.find(",")+1);
+		std::string moduleName = moduleList.substr(0, moduleList.find(":"));
+		moduleList.erase(0, moduleList.find(":")+1);
 		
 		moduleName.insert(0, "lib");
 		moduleName.append("Collector.so");
@@ -98,7 +98,7 @@ std::string Launcher::preload() {
 			preload += found;
 			preload += ':';
 		}
-	} while(pathList.find(",") != std::string::npos);
+	} while(pathList.find(":") != std::string::npos);
 	
 	if(preload.length()) {
 		preload += Misc::PathSanitizer::findFromPaths("libcollectorInterface.so", pathList);

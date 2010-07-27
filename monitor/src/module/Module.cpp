@@ -15,11 +15,6 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 	
 	std::string modulePath = Misc::PathSanitizer::findFromPaths(moduleName, Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue());
 	
-	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItemString(moduleName + "-config"));
-	
-	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItemString(moduleName + "-collector"));
-	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItemString(moduleName + "-monitor"));
-	
 	Initializer::singleton()->configuration()->processConfigFile(Misc::StreamAsString() << modulePath << "/monitor.conf");
 	
 	
