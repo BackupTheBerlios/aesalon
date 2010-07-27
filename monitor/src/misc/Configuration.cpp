@@ -6,6 +6,9 @@
 #include "PathSanitizer.h"
 #include "LogSystem.h"
 #include "StreamAsString.h"
+#include "ConfigurationItemBoolean.h"
+#include "ConfigurationItemInteger.h"
+#include "ConfigurationItemString.h"
 
 namespace Misc {
 
@@ -81,11 +84,11 @@ void Configuration::processConfigFile(std::string path) {
 }
 
 void Configuration::addConfigItems() {
-#define String ConfigurationItem::String
-#define Boolean ConfigurationItem::Boolean
-#define Integer ConfigurationItem::Integer
+#define String ConfigurationItemString
+#define Boolean ConfigurationItemBoolean
+#define Integer ConfigurationItemInteger
 #define item(name, type, defaultValue, description) \
-	m_configItems[name] = new ConfigurationItem(name, type); \
+	m_configItems[name] = new type(name); \
 	m_configItems[name]->setValue(defaultValue); \
 	m_configItems[name]->setDescription(description); \
 
@@ -93,6 +96,7 @@ void Configuration::addConfigItems() {
 
 #undef String
 #undef Boolean
+#undef Integer
 #undef item
 }
 

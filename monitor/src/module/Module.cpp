@@ -6,6 +6,7 @@
 #include "misc/StreamAsString.h"
 #include "Initializer.h"
 #include "LogSystem.h"
+#include "misc/ConfigurationItemString.h"
 
 namespace Module {
 
@@ -14,13 +15,12 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 	
 	std::string modulePath = Misc::PathSanitizer::findFromPaths(moduleName, Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue());
 	
-	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItem(moduleName + "-config", Misc::ConfigurationItem::String));
+	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItemString(moduleName + "-config"));
 	
-	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItem(moduleName + "-collector", Misc::ConfigurationItem::String));
-	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItem(moduleName + "-monitor", Misc::ConfigurationItem::String));
-	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItem(moduleName + "-visualizer", Misc::ConfigurationItem::String));
+	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItemString(moduleName + "-collector"));
+	Initializer::singleton()->configuration()->addConfigItem(new Misc::ConfigurationItemString(moduleName + "-monitor"));
 	
-	Initializer::singleton()->configuration()->processConfigFile(Misc::StreamAsString() << modulePath << "/config");
+	Initializer::singleton()->configuration()->processConfigFile(Misc::StreamAsString() << modulePath << "/monitor.conf");
 	
 	
 	

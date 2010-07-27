@@ -10,30 +10,32 @@ public:
 	enum Type {
 		Boolean,
 		String,
-		Integer
+		Integer,
+		Group
 	};
+	
+	virtual ~ConfigurationItem();
+protected:
 	ConfigurationItem(const std::string &name, Type type);
 private:
 	std::string m_name;
 	Type m_type;
-	std::string m_stringValue;
-	bool m_boolValue;
-	int m_intValue;
 	std::string m_description;
 public:
 	const std::string &name() const { return m_name; }
 	Type type() const { return m_type; }
-	const std::string &stringValue() const { return m_stringValue; }
-	bool boolValue() const { return m_boolValue; }
-	int intValue() const { return m_intValue; }
+	virtual const std::string &stringValue() const;
+	virtual bool boolValue() const;
+	virtual int intValue() const;
+	virtual ConfigurationItem *childValue(std::string name) const;
 	
 	const std::string &description() const { return m_description; }
 	void setDescription(const std::string &description) { m_description = description; }
 	
-	void setValue(const std::string &value) { m_stringValue = value; }
-	void setValue(const char *value) { setValue(std::string(value)); }
-	void setValue(bool value) { m_boolValue = value; }
-	void setValue(int value) { m_intValue = value; }
+	virtual void setValue(const std::string &value);
+	virtual void setValue(const char *value);
+	virtual void setValue(bool value);
+	virtual void setValue(int value);
 };
 
 } // namespace Misc
