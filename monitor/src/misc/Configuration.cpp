@@ -9,6 +9,7 @@
 #include "ConfigurationItemBoolean.h"
 #include "ConfigurationItemInteger.h"
 #include "ConfigurationItemString.h"
+#include "ConfigurationItemGroup.h"
 
 namespace Misc {
 
@@ -90,7 +91,10 @@ void Configuration::addConfigItems() {
 #define item(name, type, defaultValue, description) \
 	m_configItems[name] = new type(name); \
 	m_configItems[name]->setValue(defaultValue); \
-	m_configItems[name]->setDescription(description); \
+	m_configItems[name]->setDescription(description);
+#define group(name, description) \
+	m_configItems[name] = new ConfigurationItemGroup(name); \
+	m_configItems[name]->setDescription(description);
 
 #include "ConfigurationItems"
 
@@ -137,6 +141,30 @@ void Configuration::processArguments() {
 			
 			ConfigurationItem *item = m_configItems[configName];
 			
+			if(item == NULL) {
+				/* Try the group list first. */
+				/* NOTE: this is a VERY hackish approach, but I can't think of a better way to do it at the moment. */
+				/* TODO: fix this up a little, possible handle groups specially? */
+				std::string name = configName;
+				std::string childName = "";
+				std::string::size_type index = 0;
+				while((index = name.rfind('-')) != std::string::npos) {
+					childName += name.substr(index+1);
+					name.erase(index);
+					item = m_configItems[name];
+					if(item && item->type() == ConfigurationItem::Group) {
+						ConfigurationItem *childItem = item->childValue(childName);
+						item = childItem;
+						break;
+					}
+				}
+				
+				/* if item is still NULL . . . */
+				if(item == NULL) {
+					LogSystem::logConfigurationMessage(StreamAsString() << "Unknown argument encountered: " << configName);
+				}
+			}
+			
 			switch(item->type()) {
 				case ConfigurationItem::Boolean: {
 					if(append) {
@@ -163,6 +191,13 @@ void Configuration::processArguments() {
 					converter >> value;
 					if(!append) item->setValue(value);
 					else item->setValue(item->intValue() + value);
+					break;
+				}
+				case ConfigurationItem::Group: {
+					LogSystem::logConfigurationMessage(
+						StreamAsString() << "Attempting to set the value of a configuration group."
+						<< " For reference, this is not a good idea. Append a subname to the end of "
+						<< configName);
 					break;
 				}
 			}

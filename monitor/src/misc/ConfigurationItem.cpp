@@ -29,7 +29,10 @@ ConfigurationItem *ConfigurationItem::childValue(std::string name) const {
 
 const std::string &ConfigurationItem::stringValue() const {
 	LogSystem::logConfigurationMessage("Attempted to retreive string value from non-string item. Defaulting to empty string.");
-	return *new std::string();
+	/* NOTE: I know this is leaked memory, but the only other choice is to
+		return a reference to a local variable. Besides, this function should
+		never actually be executed, as it indicates a programmer error. */
+	return *(new std::string());
 }
 
 void ConfigurationItem::setValue(const std::string &value) {

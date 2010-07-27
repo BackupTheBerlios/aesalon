@@ -48,7 +48,12 @@ void Initializer::usage() {
 	for(Misc::Configuration::ConfigItems::iterator i = m_configuration->configItems().begin();
 		i != m_configuration->configItems().end(); i ++) {
 		if(i->second == NULL) continue;
-		std::cout << "\t--" << i->second->name() << ": " << i->second->description() << std::endl;
+		
+		std::cout << "\t--" << i->second->name();
+		if(i->second->type() == Misc::ConfigurationItem::Group) {
+			std::cout << " (group)";
+		}
+		std::cout << ": " << i->second->description() << std::endl;
 		std::cout << "\t\tCurrent value: ";
 		switch(i->second->type()) {
 			case Misc::ConfigurationItem::Boolean: {
@@ -61,6 +66,10 @@ void Initializer::usage() {
 			}
 			case Misc::ConfigurationItem::Integer: {
 				std::cout << i->second->intValue();
+				break;
+			}
+			case Misc::ConfigurationItem::Group: {
+				std::cout << "N/A";
 				break;
 			}
 		}

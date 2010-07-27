@@ -5,6 +5,10 @@
     item("search-path", String, "modules/",
     	"Sets the path to search for modules.")
 	
+	group(name, description)
+	Examples:
+		group("module-config", "Individual module configuration.")
+	
 	Note: this file is simply inserted into a special block of #defines in a
 		source file. Yes, it is a hackish approach, but it works. Be careful
 		what you insert into here . . . segfaults have been known to occur.
@@ -18,3 +22,4 @@ item("tcp-port", Integer, 6321, "The TCP port to listen on, when TCP network com
 item("network-wait", Integer, 1, "The amount of client connections to wait for. Execution will commence once all clients have connected.")
 item("log-file", String, "", "If specified, logs the data to this file so visualizations can be re-constructed." /* %p is replaced with the PID of the monitored program."*/)
 
+group("module-config", "Individual module configuration.")
