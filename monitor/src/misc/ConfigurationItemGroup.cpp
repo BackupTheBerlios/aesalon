@@ -7,6 +7,12 @@ ConfigurationItemGroup::ConfigurationItemGroup(std::string name) : Configuration
 	
 }
 
+ConfigurationItemGroup::~ConfigurationItemGroup() {
+	for(ItemMap::iterator i = m_itemMap.begin(); i != m_itemMap.end(); i ++) {
+		if(i->second != NULL) delete i->second;
+	}
+}
+
 ConfigurationItem *ConfigurationItemGroup::childValue(std::string name) const {
 	ConfigurationItem *item = m_itemMap[name];
 	if(!item) {

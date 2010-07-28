@@ -11,7 +11,7 @@ namespace Misc {
 class ConfigurationItemGroup : public ConfigurationItem {
 public:
 	ConfigurationItemGroup(std::string name);
-	
+	virtual ~ConfigurationItemGroup();
 private:
 	typedef std::map<std::string, ConfigurationItem *> ItemMap;
 	/* NOTE: this mutable is probably not a good idea. */

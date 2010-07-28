@@ -33,6 +33,7 @@ public:
 private:
 	void addConfigItems();
 	void processDefaultConfigFiles();
+	void processModuleConfigFiles();
 	void processArguments();
 	void processItem(std::string itemStr);
 };

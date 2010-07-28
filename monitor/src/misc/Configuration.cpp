@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
+#include <string.h>
 
 #include "Configuration.h"
 #include "PathSanitizer.h"
@@ -16,11 +17,14 @@ namespace Misc {
 Configuration::Configuration(char *argv[]) : m_argv(argv) {
 	addConfigItems();
 	processDefaultConfigFiles();
+	processModuleConfigFiles();
 	processArguments();
 }
 
 Configuration::~Configuration() {
-	
+	for(ConfigItems::iterator i = m_configItems.begin(); i != m_configItems.end(); i ++) {
+		if(i->second) delete i->second;
+	}
 }
 
 void Configuration::addConfigItem(ConfigurationItem *item) {
@@ -34,10 +38,11 @@ void Configuration::processConfigFile(std::string path) {
 	if(!file.is_open()) return;
 	
 	char lineBuffer[8192];
+	memset(lineBuffer, 0, sizeof(lineBuffer));
 	while(!file.eof()) {
-		bool append = false;
 		file.getline(lineBuffer, sizeof(lineBuffer));
-		std::string line = lineBuffer;
+		std::string line;
+		line.append(lineBuffer);
 		if(line.length() == 0) continue;
 		if(line[0] == '#') continue;
 		
@@ -72,6 +77,32 @@ void Configuration::processDefaultConfigFiles() {
 	processConfigFile(AesalonGlobalConfig);
 	processConfigFile(AesalonUserConfig);
 	processConfigFile(AesalonLocalConfig);
+}
+
+void Configuration::processModuleConfigFiles() {
+	std::string moduleList = m_configItems["modules"]->stringValue();
+	
+	if(moduleList.length() == 0) return;
+	
+	std::string::size_type offset = 0;
+	std::string::size_type index = moduleList.find(":");
+	
+	do {
+		std::string module = moduleList.substr(offset, index);
+		
+		std::string modulePath = Misc::PathSanitizer::findFromPaths(module, m_configItems["search-path"]->stringValue());
+		
+		if(modulePath.length()) {
+			processConfigFile(modulePath + "/monitor.conf");
+			m_configItems["_module-path"]->childValue(module)->setValue(modulePath);
+		}
+		else {
+			LogSystem::logConfigurationMessage("Could not open configuration file for module \"" + module + "\". Module will not be loaded.");
+		}
+		
+		offset += module.length();
+		offset ++;
+	} while((index = moduleList.find(':', offset)) != std::string::npos);
 }
 
 void Configuration::processArguments() {

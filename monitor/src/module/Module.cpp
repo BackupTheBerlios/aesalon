@@ -13,12 +13,6 @@ namespace Module {
 Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleName) {
 	LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Loading new module: " << moduleName);
 	
-	std::string modulePath = Misc::PathSanitizer::findFromPaths(moduleName, Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue());
-	
-	Initializer::singleton()->configuration()->processConfigFile(Misc::StreamAsString() << modulePath << "/monitor.conf");
-	
-	
-	
 	/*std::string moduleFilename = "lib";
 	moduleFilename += moduleName;
 	moduleFilename += "Monitor.so";

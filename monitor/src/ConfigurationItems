@@ -9,10 +9,16 @@
 	Examples:
 		group("module-config", "Individual module configuration.")
 	
-	Note: this file is simply inserted into a special block of #defines in a
-		source file. Yes, it is a hackish approach, but it works. Be careful
-		what you insert into here . . . segfaults have been known to occur,
-		and weird compliations errors also.
+	FIXME: all child items of groups are currently assumed to be string items.
+	
+	NOTE: If name is preceeded by an underscore, it is assumed to be an
+		internally-used item and is not printed by the auto-generated about
+		message.
+		
+	NOTE: this file is simply inserted into a special block of
+		#defines in a source file. Yes, it is a hackish approach, but it
+		does work. Be careful what you insert into here . . . segfaults have
+		been known to occur, and weird compliations errors also.
 */
 
 item("help", Boolean, false, "Displays this help message.")
@@ -23,6 +29,10 @@ item("tcp-port", Integer, 6321, "The TCP port to listen on, when TCP network com
 item("network-wait", Integer, 1, "The amount of client connections to wait for. Execution will commence once all clients have connected.")
 item("log-file", String, "", "If specified, logs the data to this file so visualizations can be re-constructed.")
 
-group("module-config", "Individual module configuration.")
-group("collector", "Individual module collector library paths.")
-group("monitor", "Individual module collector library paths.")
+group("mconfig", "Individual module configuration.")
+
+/* Internal module configuration items. */
+
+group("_module-path", "The directory a module is located in.")
+group("_collector", "Individual module collector library paths.")
+group("_monitor", "Individual module collector library paths.")

@@ -19,6 +19,7 @@ Initializer::Initializer(char *argv[]) : m_argv(argv) {
 Initializer::~Initializer() {
 	if(m_launcher) delete m_launcher;
 	if(m_socketManager) delete m_socketManager;
+	if(m_moduleMapper) delete m_moduleMapper;
 	if(m_configuration) delete m_configuration;
 }
 
@@ -48,6 +49,8 @@ void Initializer::usage() {
 	for(Misc::Configuration::ConfigItems::iterator i = m_configuration->configItems().begin();
 		i != m_configuration->configItems().end(); i ++) {
 		if(i->second == NULL) continue;
+		/* Underscores denote an internally-used configuration item. */
+		if(i->second->name()[0] == '_') continue;
 		
 		std::cout << "\t--" << i->second->name();
 		if(i->second->type() == Misc::ConfigurationItem::Group) {
