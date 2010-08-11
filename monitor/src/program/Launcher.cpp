@@ -106,5 +106,4 @@ std::string Launcher::preload() {
 	return preload;
 }
 
-
 } // namespace Program

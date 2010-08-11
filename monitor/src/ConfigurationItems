@@ -26,7 +26,7 @@ item("shm-size", Integer, 4097152, "Size of the shared memory map used to transf
 item("search-path", String, "modules/modules/", "The paths to search for module directories. Separate directories with colons.")
 item("modules", String, "", "A colon-separated list of modules to load for data collection.")
 item("tcp-port", Integer, 6321, "The TCP port to listen on, when TCP network communication is enabled.")
-item("network-wait", Integer, 1, "The amount of client connections to wait for. Execution will commence once all clients have connected.")
+item("network-wait", Integer, 1, "The amount of client connections to wait for. Execution will commence after all clients have connected.")
 item("log-file", String, "", "If specified, logs the data to this file so visualizations can be re-constructed.")
 
 group("mconfig", "Individual module configuration.")

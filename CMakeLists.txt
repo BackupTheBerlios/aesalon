@@ -9,6 +9,6 @@ include(build.config)
 
 # Add the source subdirectories.
 add_subdirectory(monitor monitor/build)
-add_subdirectory(modules modules/build)
+add_subdirectory(module module/build)
 add_subdirectory(visualizer visualizer/build)
 add_subdirectory(tests tests/build)

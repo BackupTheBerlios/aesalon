@@ -4,6 +4,12 @@
 #include <stdint.h>
 #include <semaphore.h>
 
+#ifdef CollectorInterface_H
+	#define Address AC_Address
+	#define DataPacket AC_DataPacket
+	#define MemoryMapHeader AC_MemoryMapHeader
+#endif
+
 typedef unsigned long Address;
 
 /** Structure used to transfer data from collectors to the monitor. */
@@ -56,5 +62,11 @@ typedef struct {
 	/** Semaphore controlling dataEnd. */
 	sem_t dataEndSemaphore;
 } MemoryMapHeader;
+
+#ifdef CollectorInterface_H
+	#undef Address
+	#undef DataPacket
+	#undef MemoryMapHeader
+#endif
 
 #endif
