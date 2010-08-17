@@ -24,7 +24,7 @@ AC_Interface AC_globalInstance;
 
 void __attribute__((constructor)) AC_Constructor() {
 	char filename[64];
-	sprintf(filename, "AesalonCollector-%i", getpid());
+	sprintf(filename, "AC-%i", getpid());
 	
 	AC_globalInstance.mmap_fd = shm_open(filename, O_RDWR, 0);
 	
@@ -50,8 +50,12 @@ void __attribute__((constructor)) AC_Constructor() {
 
 void __attribute__((destructor)) AC_Destructor() {
 	char filename[64];
-	sprintf(filename, "AesalonCollector-%i", getpid());
+	sprintf(filename, "AC-%i", getpid());
 	shm_unlink(filename);
+}
+
+AC_Interface AC_EXPORT *AC_GetInterface() {
+	return &AC_globalInstance;
 }
 
 void AC_EXPORT *AC_GetModule(const char *name) {
@@ -124,7 +128,6 @@ void AC_WriteData(void *data, size_t size) {
 }
 
 void AC_SendPacket(AC_DataPacket *packet) {
-	/*sem_wait(&AesalonMemoryMap.header->dataStartSemaphore);*/
 	sem_wait(&AC_globalInstance.header->dataEndSemaphore);
 	
 	int size = sizeof(packet->dataSource) + sizeof(packet->dataSize) + packet->dataSize;
@@ -139,7 +142,6 @@ void AC_SendPacket(AC_DataPacket *packet) {
 	AC_WriteData(&packet->dataSize, sizeof(packet->dataSize));
 	AC_WriteData(packet->data, packet->dataSize);
 	
-	/*sem_post(&AesalonMemoryMap.header->dataStartSemaphore);*/
 	sem_post(&AC_globalInstance.header->dataEndSemaphore);
 	sem_post(&AC_globalInstance.header->dataSempahore);
 	

@@ -3,16 +3,17 @@
 #include <stdio.h>
 #include <time.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#include "collectorInterface/Interface.h"
+#include "collector/Interface.h"
 
 timer_t SendTimer;
 struct sigevent SendTimerType;
 
-void AesalonCpuTimeCollectorSendTime(union sigval unused) {
-	if(AesalonCollectionStatus() == 0) return;
-	DataPacket packet;
+void AC_SendTime(union sigval unused) {
+	if(AC_GetInterface()->status() == 0) return;
+	AC_DataPacket packet;
 	struct rusage ru;
 	getrusage(RUSAGE_SELF, &ru);
 	
@@ -23,21 +24,24 @@ void AesalonCpuTimeCollectorSendTime(union sigval unused) {
 	uint64_t value = (t.tv_sec * 1000000000) + t.tv_nsec;*/
 	packet.data = &value;
 	packet.dataSize = sizeof(value);
-	AesalonCollectorSendPacket(&packet);
+	AC_GetInterface()->sendPacket(&packet);
 }
 
-void __attribute__((constructor)) AesalonCpuTimeCollectorInitialize() {
-	AesalonCollectorRegisterModule("cpuTime");
+void __attribute__((constructor)) AC_Constructor() {
+	AC_Module *this;
+	this = malloc(sizeof(AC_Module));
+	this->name = "cpuTime";
+	this->id = 0;
+	this->modulePtr = NULL;
+	AC_RegisterModule(this);
 	
 	SendTimerType.sigev_notify = SIGEV_THREAD;
-	SendTimerType.sigev_notify_function = AesalonCpuTimeCollectorSendTime;
+	SendTimerType.sigev_notify_function = AC_SendTime;
 	
 	if(timer_create(CLOCK_REALTIME, &SendTimerType, &SendTimer) == -1) {
 		printf("Failed to create timer . . .\n");
 		return;
 	}
-	
-	const char **config = AesalonCollectorConfig("cpuTime");
 	
 	struct itimerspec its;
 	
@@ -50,3 +54,7 @@ void __attribute__((constructor)) AesalonCpuTimeCollectorInitialize() {
 	timer_settime(SendTimer, 0, &its, NULL);
 }
 
+void __attribute__((constructor)) AC_Destructor() {
+	union sigval unused;
+	AC_SendTime(unused);
+}

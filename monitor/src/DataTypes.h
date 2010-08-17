@@ -2,7 +2,9 @@
 #define DataTypes_H
 
 #include <stdint.h>
-#include <semaphore.h>
+#ifndef AesalonVisualizer
+	#include <semaphore.h>
+#endif
 
 #ifdef AesalonCollector
 	#define Address AC_Address
@@ -28,6 +30,7 @@ typedef struct {
 	uint32_t dataSize;
 } DataPacket;
 
+#ifndef AesalonVisualizer
 /** Structure used for maintaining a header within the SHM used to transfer
 	data between the collector interface and the monitor. */
 typedef struct {
@@ -60,6 +63,7 @@ typedef struct {
 	/** Semaphore controlling dataEnd. */
 	sem_t dataEndSemaphore;
 } MemoryMapHeader;
+#endif
 
 #ifdef AesalonCollector
 	#undef Address
