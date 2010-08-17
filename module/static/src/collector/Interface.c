@@ -142,7 +142,7 @@ void AC_SendPacket(AC_DataPacket *packet) {
 	AC_WriteData(&packet->dataSize, sizeof(packet->dataSize));
 	AC_WriteData(packet->data, packet->dataSize);
 	
-	sem_post(&AC_globalInstance.header->dataEndSemaphore);
+sem_post(&AC_globalInstance.header->dataEndSemaphore);
 	sem_post(&AC_globalInstance.header->dataSempahore);
 	
 	int value;

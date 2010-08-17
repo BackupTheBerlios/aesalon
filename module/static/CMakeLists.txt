@@ -5,5 +5,5 @@ include_directories("./include")
 
 aux_source_directory(src/collector CollectorSources)
 
-add_library(collector SHARED ${CollectorSources})
+add_library(collector MODULE ${CollectorSources})
 
