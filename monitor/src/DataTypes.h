@@ -20,8 +20,6 @@ typedef struct {
 		uint16_t moduleID;
 		/** The timestamp this collection occurred at. */
 		uint64_t timestamp;
-		/** The thread the event occurred in. */
-		int64_t thread;
 	} dataSource;
 	/** The data this packet contains. Dynamically-allocated or otherwise. */
 	void *data;
