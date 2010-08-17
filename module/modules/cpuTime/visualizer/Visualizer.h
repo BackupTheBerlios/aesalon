@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "visualizerInterface/Interface.h"
+#include "visualizer/Interface.h"
 
 class CpuTimeVisualizer : public VisualizerInterface {
 public:
