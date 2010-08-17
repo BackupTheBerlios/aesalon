@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <semaphore.h>
 
-#ifdef CollectorInterface_H
+#ifdef AesalonCollector
 	#define Address AC_Address
 	#define DataPacket AC_DataPacket
 	#define MemoryMapHeader AC_MemoryMapHeader
@@ -63,7 +63,7 @@ typedef struct {
 	sem_t dataEndSemaphore;
 } MemoryMapHeader;
 
-#ifdef CollectorInterface_H
+#ifdef AesalonCollector
 	#undef Address
 	#undef DataPacket
 	#undef MemoryMapHeader

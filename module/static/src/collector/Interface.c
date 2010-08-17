@@ -1,17 +1,19 @@
 #define AesalonCollectorImplementation
 
-#include <pthread.h>
 #include <sys/mman.h>
 #include <string.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <linux/futex.h>
+#include <search.h>
+#include <errno.h>
 
 #include "Interface.h"
 
-void __attribute__((constructor)) AesalonCollectorConstructor() {
+struct hsearch_data AC_ModuleHash;
+
+void __attribute__((constructor)) AC_Constructor() {
 	char filename[64];
 	sprintf(filename, "AesalonCollector-%i", getpid());
 	
@@ -28,27 +30,42 @@ void __attribute__((constructor)) AesalonCollectorConstructor() {
 	AesalonMemoryMap.memory = mmap(NULL, shmSize, PROT_READ | PROT_WRITE, MAP_SHARED, AesalonMemoryMap.fd, 0);
 	
 	AesalonMemoryMap.header = (MemoryMapHeader *)AesalonMemoryMap.memory;
+	
+	/* FIXME: this limits the maximum total number of modules to 64; probably not a good limitation to have. */
+	hcreate_r(64, &AC_ModuleHash);
 }
 
-void __attribute__((destructor)) AesalonCollectorDestructor() {
+void __attribute__((destructor)) AC_Destructor() {
 	char filename[64];
 	sprintf(filename, "AesalonCollector-%i", getpid());
 	shm_unlink(filename);
 }
 
-void AesalonCollectorRegisterModule(const char *moduleName, uint16_t *id) {
-	(*id) = ++AesalonMemoryMap.header->latestModule;
-	printf("AesalonCollectorRegisterModule: registering module %s as id %i.\n", moduleName, *id);
-	DataPacket packet;
+void AC_EXPORT * AC_GetModule(const char* name) {
+	
+}
+
+void AC_RegisterModule(AC_Module *module) {
+	ENTRY e, *ep;
+	
+	e.key = module->name;
+	e.data = module;
+	
+	if(hsearch_r(e, ENTER, &ep, &AC_ModuleHash) == 0) {
+		printf("AC_RegisterModule: failed to register module: ");
+		if(errno == ENOMEM) printf("No space left in hash table.\n");
+		else printf("Unknown error.\n");
+		return;
+	}
+	
+	module->id = ++AesalonMemoryMap.header->latestModule;
+	
+	printf("AC_RegisterModule: registering module %s as id %i.\n", module->name, module->id);
+	AC_DataPacket packet;
 	packet.dataSource.moduleID = 0;
 	packet.dataSize = strlen(moduleName) + 1; /* Plus one for the NULL. */
 	packet.data = (void *)moduleName;
 	AesalonCollectorSendPacket(&packet);
-}
-
-void AesalonCollectorFillPacket(DataPacket *packet) {
-	packet->dataSource.thread = pthread_self();
-	packet->dataSource.timestamp = AesalonCollectorGetTimestamp();
 }
 
 int AesalonCollectorRemainingSpace() {

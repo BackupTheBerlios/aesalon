@@ -1,6 +1,8 @@
 #ifndef CollectorInterface_H
 #define CollectorInterface_H
 
+#include <stdint.h>
+
 #include "DataTypes.h"
 
 #if defined(__cplusplus)
@@ -13,18 +15,30 @@ extern "C" {
 	#error "No supported compiler found."
 #endif
 
-#if AC_GCC
+#ifdef AC_GCC
 	#define AC_EXPORT __attribute__((visibility("default")))
 	#pragma GCC visibility push(hidden)
 #endif
 
 typedef struct {
+	const char *name;
+	uint16_t id;
+	void *functionList;
+} AC_Module;
+
+typedef struct {
 	
 } AC_Interface;
 
-AC_Interface *AC_EXPORT AC_GetInterface();
+/* These two functions should be overloaded in all modules, but not exported under ANY circumstances. */
+void __attribute__((constructor)) AC_Constructor();
+void __attribute__((destructor)) AC_Destructor();
 
-#if AC_GCC
+
+void AC_EXPORT * AC_GetModule(const char *name);
+void AC_EXPORT AC_RegisterModule(AC_Module *module);
+
+#ifdef AC_GCC
 	#pragma GCC visibility pop
 #endif
 
