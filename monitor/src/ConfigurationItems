@@ -23,16 +23,18 @@
 
 item("help", Boolean, false, "Displays this help message.")
 item("shm-size", Integer, 4097152, "Size of the shared memory map used to transfer data between the collector interface and the monitor.")
-item("search-path", String, "modules/modules/", "The paths to search for module directories. Separate directories with colons.")
+item("search-path", String, "module/modules/", "The paths to search for module directories. Separate directories with colons.")
 item("modules", String, "", "A colon-separated list of modules to load for data collection.")
 item("tcp-port", Integer, 6321, "The TCP port to listen on, when TCP network communication is enabled.")
 item("network-wait", Integer, 1, "The amount of client connections to wait for. Execution will commence after all clients have connected.")
 item("log-file", String, "", "If specified, logs the data to this file so visualizations can be re-constructed.")
 
 group("mconfig", "Individual module configuration.")
+/*group("mpath", "Individual module paths.")*/
 
 /* Internal module configuration items. */
 
-group("_module-path", "The directory a module is located in.")
+/*group("_module-path", "The directory a module is located in.")
 group("_collector", "Individual module collector library paths.")
-group("_monitor", "Individual module collector library paths.")
+group("_monitor", "Individual module collector library paths.")*/
+

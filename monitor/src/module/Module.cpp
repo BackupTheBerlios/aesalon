@@ -13,10 +13,13 @@ namespace Module {
 Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleName) {
 	LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Loading new module: " << moduleName);
 	
-	/*std::string moduleFilename = "lib";
-	moduleFilename += moduleName;
-	moduleFilename += "Monitor.so";
-	std::string modulePath = Misc::PathSanitizer::findFromPaths(moduleFilename, Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue());
+	/*Initializer::singleton()->configuration()->configItems()["mconfig"]->childValue(moduleName);*/
+	
+	std::string moduleFilename = moduleName;
+	moduleFilename += "/";
+	moduleFilename += "monitor.so";
+	std::string modulePath = Misc::PathSanitizer::findFromPaths(moduleFilename,
+		Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue());
 	
 	m_monitorHandle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if(m_monitorHandle == NULL) {
@@ -32,7 +35,7 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 	MonitorInterface *(*instantiateFunction)();
 	*(void **)(&instantiateFunction) = instantiationHandle;
 	m_interface = instantiateFunction();
-	m_interface->setAnalyzer(Initializer::singleton()->launcher()->analyzer());*/
+	m_interface->setAnalyzer(Initializer::singleton()->launcher()->analyzer());
 }
 
 Module::~Module() {

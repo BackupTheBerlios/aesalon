@@ -168,6 +168,7 @@ void Configuration::processItem(std::string itemStr) {
 		/* if item is still NULL . . . */
 		if(item == NULL) {
 			LogSystem::logConfigurationMessage(StreamAsString() << "Unknown config item encountered: " << configName);
+			return;
 		}
 	}
 	

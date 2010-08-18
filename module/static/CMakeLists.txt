@@ -7,3 +7,4 @@ aux_source_directory(src/collector CollectorSources)
 
 add_library(collector MODULE ${CollectorSources})
 
+target_link_libraries(collector rt)

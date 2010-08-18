@@ -10,6 +10,7 @@
 
 timer_t SendTimer;
 struct sigevent SendTimerType;
+AC_Module *this;
 
 void AC_SendTime(union sigval unused) {
 	if(AC_GetInterface()->status() == 0) return;
@@ -22,13 +23,14 @@ void AC_SendTime(union sigval unused) {
 	/*struct timespec t;
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
 	uint64_t value = (t.tv_sec * 1000000000) + t.tv_nsec;*/
+	packet.dataSource.timestamp = AC_GetInterface()->getTimestamp();
+	packet.dataSource.moduleID = this->id;
 	packet.data = &value;
 	packet.dataSize = sizeof(value);
 	AC_GetInterface()->sendPacket(&packet);
 }
 
 void __attribute__((constructor)) AC_Constructor() {
-	AC_Module *this;
 	this = malloc(sizeof(AC_Module));
 	this->name = "cpuTime";
 	this->id = 0;

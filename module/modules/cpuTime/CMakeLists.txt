@@ -15,7 +15,7 @@ set_property(TARGET ${Module}Monitor APPEND PROPERTY COMPILE_DEFINITIONS Aesalon
 add_library(${Module}Visualizer MODULE ${VisualizerSources})
 set_property(TARGET ${Module}Visualizer APPEND PROPERTY COMPILE_DEFINITIONS AesalonVisualizer)
 
-add_custom_target(${Module} ALL cp lib${Module}Collector.so ../../../modules/${Module}/collector.so COMMAND cp lib${Module}Monitor.so ../../../modules/${Module}/monitor.so COMMAND cp lib${Module}Monitor.so ../../../modules/${Module}/visualizer.so)
+add_custom_target(${Module} ALL cp lib${Module}Collector.so ../../../modules/${Module}/collector.so COMMAND cp lib${Module}Monitor.so ../../../modules/${Module}/monitor.so COMMAND cp lib${Module}Visualizer.so ../../../modules/${Module}/visualizer.so)
 
 add_dependencies(${Module} ${Module}Collector ${Module}Monitor ${Module}Visualizer)
 

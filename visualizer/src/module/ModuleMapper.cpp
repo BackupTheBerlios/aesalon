@@ -17,11 +17,14 @@ void ModuleMapper::processPacket(DataPacket *packet) {
 }
 
 Module *ModuleMapper::module(quint16 moduleID) {
+	qDebug("Asked for module pointer for ID %i . . .", moduleID);
 	return m_moduleList[moduleID];
 }
 
 void ModuleMapper::loadModule(const char *name) {
+	qDebug("Asked to load module \"%s\" . . .", name);
 	Module *module = new Module(name);
 	m_moduleList.append(module);
 	m_moduleMap[name] = module;
+	qDebug("Module loaded. ID: %i", m_moduleList.size() - 1);
 }

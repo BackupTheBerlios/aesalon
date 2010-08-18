@@ -56,7 +56,7 @@ void Launcher::startProcess() {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
 		char buffer[128];
 		sprintf(buffer, "%i", Initializer::singleton()->configuration()->configItems()["shm-size"]->intValue());
-		setenv("AesalonCollectorShmSize", buffer, 1);
+		setenv("AC_ShmSize", buffer, 1);
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
 		execv(m_argv[0], m_argv);
 		LogSystem::logProgramMessage(m_argv[0], Misc::StreamAsString() << "execv() failed: " << strerror(errno));
@@ -91,8 +91,8 @@ std::string Launcher::preload() {
 		std::string moduleName = moduleList.substr(0, moduleList.find(":"));
 		moduleList.erase(0, moduleList.find(":")+1);
 		
-		moduleName.insert(0, "lib");
-		moduleName.append("Collector.so");
+		/*moduleName.insert(0, "lib");*/
+		moduleName.append("/collector.so");
 		std::string found = Misc::PathSanitizer::findFromPaths(moduleName, pathList);
 		if(found.length()) {
 			preload += found;
@@ -101,8 +101,9 @@ std::string Launcher::preload() {
 	} while(pathList.find(":") != std::string::npos);
 	
 	if(preload.length()) {
-		preload += Misc::PathSanitizer::findFromPaths("libcollectorInterface.so", pathList);
+		preload += Misc::PathSanitizer::findFromPaths("interface.so", pathList);
 	}
+	
 	return preload;
 }
 
