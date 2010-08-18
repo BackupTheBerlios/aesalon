@@ -111,13 +111,28 @@ int AC_RemainingSpace() {
 }
 
 void AC_WriteData(void *data, size_t size) {
-	size_t remaining = AC_globalInstance.header->dataSize - AC_globalInstance.header->dataEnd;
+	size_t remaining = 0;
+	
+	/* NOTE: remaining is mis-named slightly; it is used to denote the remaining space before a wrap. */
+	
+	/* First case: dataStart < dataEnd . . . */
+	if(AC_globalInstance.header->dataStart <= AC_globalInstance.header->dataEnd) {
+		remaining = AC_globalInstance.header->dataSize - AC_globalInstance.header->dataEnd;
+		/*remaining += AC_globalInstance.header->dataStart - AC_globalInstance.header->dataOffset;*/
+	}
+	/* Second case: dataStart > dataEnd . . . */
+	else {
+		printf("Second case . . .\n");
+		remaining = AC_globalInstance.header->dataEnd - AC_globalInstance.header->dataStart;
+	}
+	
 	if(remaining > size) {
 		/* If this is a simple copy . . . */
 		memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataEnd, data, size);
 		AC_globalInstance.header->dataEnd += size;
 	}
 	else {
+		printf("Special copy . . .\n");
 		/* It's not a single copy. */
 		/* First copy . . . */
 		memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataEnd, data, remaining);

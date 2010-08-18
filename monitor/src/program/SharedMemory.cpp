@@ -79,8 +79,24 @@ DataPacket *SharedMemory::readPacket() {
 }
 
 void SharedMemory::readData(void *buffer, int size) {
-	memcpy(buffer, m_shmMemory + m_header->dataStart, size);
-	m_header->dataStart += size;
+	if((m_header->dataStart + size) < m_header->dataSize) {
+		memcpy(buffer, m_shmMemory + m_header->dataStart, size);
+		m_header->dataStart += size;
+	}
+	else {
+		std::cout << "Overflow . . ." << std::endl;
+		std::cout << "\tdataStart: " << m_header->dataStart << std::endl;
+		
+		uint64_t end_size = m_header->dataSize - m_header->dataStart;
+		end_size -= 1;
+		std::cout << "\tend_size: " << end_size << std::endl;
+		if(end_size) readData(buffer, end_size);
+		
+		std::cout << "Copying second section . . . (size is " << size - end_size << ")" << std::endl;
+		memcpy((char *)buffer + end_size, m_shmMemory + m_header->dataOffset, (size - end_size));
+		m_header->dataStart = m_header->dataOffset + (size - end_size);
+		std::cout << "\tnew dataStart: " << m_header->dataStart << std::endl;
+	}
 }
 
 } // namespace Program
