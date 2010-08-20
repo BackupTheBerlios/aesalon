@@ -15,6 +15,7 @@ ModuleMapper::~ModuleMapper() {
 }
 
 Module *ModuleMapper::module(uint16_t moduleID) {
+	if(moduleID >= m_moduleVector.size()) return NULL;
 	return m_moduleVector[moduleID];
 }
 

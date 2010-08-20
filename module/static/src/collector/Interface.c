@@ -111,34 +111,32 @@ int AC_RemainingSpace() {
 }
 
 void AC_WriteData(void *data, size_t size) {
-	size_t remaining = 0;
-	
-	/* NOTE: remaining is mis-named slightly; it is used to denote the remaining space before a wrap. */
-	
-	/* First case: dataStart < dataEnd . . . */
+	/* If dataStart <= dataEnd, then the used memory is a contigious chunk. */
 	if(AC_globalInstance.header->dataStart <= AC_globalInstance.header->dataEnd) {
-		remaining = AC_globalInstance.header->dataSize - AC_globalInstance.header->dataEnd;
-		/*remaining += AC_globalInstance.header->dataStart - AC_globalInstance.header->dataOffset;*/
+		/* Two possible scenarios: the data fits on the end . . . */
+		if(size < (AC_globalInstance.header->dataSize - AC_globalInstance.header->dataEnd)) {
+			memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataEnd, data, size);
+			AC_globalInstance.header->dataEnd += size;
+		}
+		/* And the data does not fit on the end. */
+		else {
+			printf("AC_WriteData(): overflow detected.\n");
+			size_t over = size - (AC_globalInstance.header->dataSize - AC_globalInstance.header->dataEnd);
+			size_t under = size - over;
+			printf("\ttotal size:%i\n\tdataEnd:%i\n",
+				AC_globalInstance.header->dataSize, AC_globalInstance.header->dataEnd);
+			printf("\tdata size: %i\n\tover: %i\n\tunder:%i\n", size, over, under);
+			
+			memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataEnd, data, under);
+			
+			memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataOffset, data + under, over);
+			
+			AC_globalInstance.header->dataEnd = AC_globalInstance.header->dataOffset + over;
+		}
 	}
-	/* Second case: dataStart > dataEnd . . . */
+	/* Else the used memory is in two separate chunks. */
 	else {
-		printf("Second case . . .\n");
-		remaining = AC_globalInstance.header->dataEnd - AC_globalInstance.header->dataStart;
-	}
-	
-	if(remaining > size) {
-		/* If this is a simple copy . . . */
 		memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataEnd, data, size);
-		AC_globalInstance.header->dataEnd += size;
-	}
-	else {
-		printf("Special copy . . .\n");
-		/* It's not a single copy. */
-		/* First copy . . . */
-		memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataEnd, data, remaining);
-		
-		/* Second copy. */
-		memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataOffset, data + remaining, size - remaining);
 	}
 }
 
@@ -157,7 +155,7 @@ void AC_SendPacket(AC_DataPacket *packet) {
 	AC_WriteData(&packet->dataSize, sizeof(packet->dataSize));
 	AC_WriteData(packet->data, packet->dataSize);
 	
-sem_post(&AC_globalInstance.header->dataEndSemaphore);
+	sem_post(&AC_globalInstance.header->dataEndSemaphore);
 	sem_post(&AC_globalInstance.header->dataSempahore);
 	
 	int value;

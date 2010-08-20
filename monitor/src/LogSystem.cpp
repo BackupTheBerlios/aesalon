@@ -22,3 +22,7 @@ void LogSystem::logProgramMessage(std::string filename, std::string message) {
 void LogSystem::logNetworkMessage(std::string message) {
 	std::cout << "[network] " << message << std::endl;
 }
+
+void LogSystem::logReaderMessage(std::string message) {
+	std::cout << "[reader] " << message << std::endl;
+}

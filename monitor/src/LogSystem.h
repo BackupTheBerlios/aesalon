@@ -16,6 +16,7 @@ public:
 	static void logAnalyzerMessage(Program::Analyzer *analyzer, std::string message);
 	static void logProgramMessage(std::string filename, std::string message);
 	static void logNetworkMessage(std::string message);
+	static void logReaderMessage(std::string message);
 };
 
 #endif

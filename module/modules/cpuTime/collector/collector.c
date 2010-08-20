@@ -48,7 +48,7 @@ void __attribute__((constructor)) AC_Constructor() {
 	struct itimerspec its;
 	
 	its.it_interval.tv_sec = 0;
-	its.it_interval.tv_nsec = 25000000;
+	its.it_interval.tv_nsec = 2500000;
 	
 	its.it_value.tv_sec = 0;
 	its.it_value.tv_nsec = 1;
