@@ -66,7 +66,9 @@ DataPacket *SharedMemory::readPacket() {
 	memset(packet, 0, sizeof(DataPacket));
 	
 	readData(&packet->dataSource, sizeof(packet->dataSource));
+	
 	readData(&packet->dataSize, sizeof(packet->dataSize));
+	
 	packet->data = new char[packet->dataSize];
 	readData(packet->data, packet->dataSize);
 	
@@ -92,6 +94,8 @@ void SharedMemory::readData(void *buffer, int size) {
 		
 		memcpy((char *)buffer + end_copy_size, m_shmMemory + m_header->dataOffset, size - end_copy_size);
 		m_header->dataStart = m_header->dataOffset + size - end_copy_size;
+		std::cout << "\tdataOffset: " << m_header->dataOffset << std::endl;
+		std::cout << "\tnew dataStart: " << m_header->dataStart << std::endl;
 		std::cout << "Overflow read successful . . ." << std::endl;
 	}
 	else {
