@@ -58,6 +58,9 @@ void Launcher::startProcess() {
 		sprintf(buffer, "%i", Initializer::singleton()->configuration()->configItems()["shm-size"]->intValue());
 		setenv("AC_ShmSize", buffer, 1);
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
+		
+		setModuleEnvironment();
+		
 		execv(m_argv[0], m_argv);
 		LogSystem::logProgramMessage(m_argv[0], Misc::StreamAsString() << "execv() failed: " << strerror(errno));
 		exit(0);
@@ -105,6 +108,10 @@ std::string Launcher::preload() {
 	}
 	
 	return preload;
+}
+
+void Launcher::setModuleEnvironment() {
+	
 }
 
 } // namespace Program

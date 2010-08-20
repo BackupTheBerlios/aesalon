@@ -33,6 +33,7 @@ private:
 	void assembleArgv();
 	void startProcess();
 	std::string preload();
+	void setModuleEnvironment();
 };
 
 } // namespace Program
