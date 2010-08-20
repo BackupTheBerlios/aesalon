@@ -78,4 +78,5 @@ void Initializer::usage() {
 		}
 		std::cout << std::endl;
 	}
+	std::cout << "[*] These are used internally and by modules. Modification may lead to unexpected behaviour and segfaults." << std::endl;
 }

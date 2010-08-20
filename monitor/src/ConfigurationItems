@@ -30,11 +30,10 @@ item("network-wait", Integer, 1, "The amount of client connections to wait for. 
 item("log-file", String, "", "If specified, logs the data to this file so visualizations can be re-constructed.")
 
 group("mconfig", "Individual module configuration.")
-/*group("mpath", "Individual module paths.")*/
+group("collector", "[*] Individual collector-module paths.")
+group("monitor", "[*] Individual monitor-module paths.")
 
 /* Internal module configuration items. */
 
-/*group("_module-path", "The directory a module is located in.")
-group("_collector", "Individual module collector library paths.")
-group("_monitor", "Individual module collector library paths.")*/
+group("_module-path", "The directory a module is located in.")
 

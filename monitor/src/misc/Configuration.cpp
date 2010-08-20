@@ -17,8 +17,8 @@ namespace Misc {
 Configuration::Configuration(char *argv[]) : m_argv(argv) {
 	addConfigItems();
 	processDefaultConfigFiles();
-	processModuleConfigFiles();
 	processArguments();
+	processModuleConfigFiles();
 }
 
 Configuration::~Configuration() {
@@ -93,11 +93,12 @@ void Configuration::processModuleConfigFiles() {
 		std::string modulePath = Misc::PathSanitizer::findFromPaths(module, m_configItems["search-path"]->stringValue());
 		
 		if(modulePath.length()) {
+			/*std::cout << "processing " << modulePath << "/monitor.conf . . ." << std::endl;*/
 			processConfigFile(modulePath + "/monitor.conf");
 			m_configItems["_module-path"]->childValue(module)->setValue(modulePath);
 		}
 		else {
-			LogSystem::logConfigurationMessage("Could not open configuration file for module \"" + module + "\". Module will not be loaded.");
+			LogSystem::logConfigurationMessage("Could not find module \"" + module + "\". Module will not be loaded.");
 		}
 		
 		offset += module.length();

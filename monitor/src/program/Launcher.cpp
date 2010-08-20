@@ -94,9 +94,11 @@ std::string Launcher::preload() {
 		std::string moduleName = moduleList.substr(0, moduleList.find(":"));
 		moduleList.erase(0, moduleList.find(":")+1);
 		
-		/*moduleName.insert(0, "lib");*/
-		moduleName.append("/collector.so");
-		std::string found = Misc::PathSanitizer::findFromPaths(moduleName, pathList);
+		std::string found = Misc::PathSanitizer::findFromPaths(Initializer::singleton()->configuration()
+			->configItems()["collector"]->childValue(moduleName)->stringValue(),
+			Initializer::singleton()->configuration()->configItems()["_module-path"]->
+			childValue(moduleName)->stringValue());
+		
 		if(found.length()) {
 			preload += found;
 			preload += ':';

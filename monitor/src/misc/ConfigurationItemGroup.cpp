@@ -18,6 +18,7 @@ ConfigurationItem *ConfigurationItemGroup::childValue(std::string name) const {
 	if(!item) {
 		item = new ConfigurationItemString(name);
 		item->setDescription(description());
+		m_itemMap[name] = item;
 	}
 	return item;
 }
