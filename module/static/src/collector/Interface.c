@@ -120,12 +120,8 @@ void AC_WriteData(void *data, size_t size) {
 		}
 		/* And the data does not fit on the end. */
 		else {
-/*			printf("AC_WriteData(): overflow detected.\n");*/
 			size_t over = size - (AC_globalInstance.header->dataSize - AC_globalInstance.header->dataEnd);
 			size_t under = size - over;
-/*			printf("\ttotal size:%i\n\tdataEnd:%i\n",
-				AC_globalInstance.header->dataSize, AC_globalInstance.header->dataEnd);*/
-/*			printf("\tdata size: %i\n\tover: %i\n\tunder:%i\n", size, over, under);*/
 			
 			memcpy(AC_globalInstance.memory + AC_globalInstance.header->dataEnd, data, under);
 			

@@ -31,6 +31,7 @@ void Controller::run() {
 	Symbol *mainSymbol = m_analyzer->symbol("main");
 	if(mainSymbol == NULL) {
 		LogSystem::logProgramMessage(m_analyzer->filename(), "Cannot resolve main(). Program is probably stripped.");
+		LogSystem::logProgramMessage(m_analyzer->filename(), "Detaching from program . . .");
 		return;
 	}
 	Address mainAddress = mainSymbol->address();
