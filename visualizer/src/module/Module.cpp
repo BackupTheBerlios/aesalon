@@ -38,7 +38,7 @@ Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL) {
 		qWarning("Module \"%s\" failed to create ModuleInterface instance.", name);
 		return;
 	}
-	qDebug("Loaded module \"%s\" properly.");
+	qDebug("Loaded module \"%s\" properly.", name);
 }
 
 Module::~Module() {

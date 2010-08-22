@@ -24,10 +24,6 @@ void CpuTimeVisualizer::processIncoming(DataPacket *packet) {
 	e.setTime(packet->dataSource.timestamp);
 	e.setData((double)(*(uint64_t *)packet->data));
 	
-	/*std::cout << "Received packet!" << std::endl;
-	std::cout << "\tTimestamp: " << e.time() << std::endl;
-	std::cout << "\tValue: " << e.data() << std::endl;*/
-	
 	if(m_lastElement.data() != 0) {
 		DataCoord adj;
 		adj.setTime((e.time() + m_lastElement.time()) / 2);
@@ -35,8 +31,8 @@ void CpuTimeVisualizer::processIncoming(DataPacket *packet) {
 		
 		adj.setData((e.data() - m_lastElement.data()) / (double)(tDiff));
 		
-		std::cout << "\tAdjusted value: " << adj.data() << std::endl;
-		std::cout << "\t\ttDiff: " << tDiff << std::endl;
+/*		std::cout << "\tAdjusted value: " << adj.data() << std::endl;
+		std::cout << "\t\ttDiff: " << tDiff << std::endl;*/
 		
 		m_elementList.push_back(adj);
 	}
@@ -49,7 +45,7 @@ static bool compareElements(DataCoord one, DataCoord two) {
 }
 
 void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization, bool *abort) {
-	std::cout << "Asked to visualize!" << std::endl;
+	/*std::cout << "Asked to visualize!" << std::endl;*/
 	visualization->lock();
 	
 	DataCoord e;
@@ -64,13 +60,13 @@ void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization, bool *abo
 	e.setTime(visualization->dataRange().endTime());
 	ElementList::iterator endIterator = std::upper_bound(m_elementList.begin(), m_elementList.end(), e, compareElements);
 	
-	std::cout << "Beginning drawing loop . . ." << std::endl;
+	/*std::cout << "Beginning drawing loop . . ." << std::endl;*/
 	
 	int begin = beginIterator - m_elementList.begin();
 	int end = endIterator - m_elementList.begin();
 	
-	std::cout << "\tbegin: " << begin << std::endl;
-	std::cout << "\tend: " << end << std::endl;
+	/*std::cout << "\tbegin: " << begin << std::endl;
+	std::cout << "\tend: " << end << std::endl;*/
 	
 	for(int i = begin + 1; i < end && !(*abort); i ++) {
 		visualization->drawLine(m_elementList[i-1], m_elementList[i]);

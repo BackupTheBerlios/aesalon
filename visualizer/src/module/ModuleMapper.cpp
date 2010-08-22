@@ -17,7 +17,7 @@ void ModuleMapper::processPacket(DataPacket *packet) {
 }
 
 Module *ModuleMapper::module(quint16 moduleID) {
-	qDebug("Asked for module pointer for ID %i . . .", moduleID);
+	/*qDebug("Asked for module pointer for ID %i . . .", moduleID);*/
 	return m_moduleList[moduleID];
 }
 

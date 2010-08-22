@@ -96,8 +96,8 @@ std::string Launcher::preload() {
 		
 		std::string found = Misc::PathSanitizer::findFromPaths(Initializer::singleton()->configuration()
 			->configItems()["collector"]->childValue(moduleName)->stringValue(),
-			Initializer::singleton()->configuration()->configItems()["_module-path"]->
-			childValue(moduleName)->stringValue());
+			Initializer::singleton()->configuration()->configItems()["_module-path"]
+			->childValue(moduleName)->stringValue());
 		
 		if(found.length()) {
 			preload += found;

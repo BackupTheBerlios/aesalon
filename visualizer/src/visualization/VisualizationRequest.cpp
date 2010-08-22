@@ -22,6 +22,7 @@ void VisualizationRequest::run() {
 	m_controller->module()->visualize(sv, &m_abort);
 	if(!m_abort) {
 		m_controller->visualization()->merge(sv);
+		qDebug("VisualizationRequest executed, updating widget . . .");
 		m_controller->widget()->update();
 	}
 	

@@ -7,7 +7,7 @@
 #include "VisualizationController.h"
 
 Visualization::Visualization(QSize renderSize, DataRange range) : m_range(range) {
-	qDebug("renderSize: (%ix%i)", renderSize.width(), renderSize.height());
+	/*qDebug("renderSize: (%ix%i)", renderSize.width(), renderSize.height());*/
 	if(renderSize.width() == 0) renderSize.setWidth(1);
 	if(renderSize.height() == 0) renderSize.setHeight(1);
 	m_image = QImage(qAbs(renderSize.width()), qAbs(renderSize.height()), QImage::Format_ARGB32);
@@ -36,7 +36,7 @@ void Visualization::clear() {
 }
 
 void Visualization::lock() {
-	qDebug("Locking surface . . .");
+	/*qDebug("Locking surface . . .");*/
 	m_paintLock.lock();
 	if(!m_painter.begin(&m_image)) {
 		qWarning("Note: couldn't lock surface . . .");
@@ -44,13 +44,13 @@ void Visualization::lock() {
 }
 
 void Visualization::unlock() {
-	qDebug("Unlocking surface . . .");
+	/*qDebug("Unlocking surface . . .");*/
 	m_painter.end();
 	m_paintLock.unlock();
 }
 
 void Visualization::resize(const QSize &newSize) {
-	qDebug("Resizing . . .");
+	/*qDebug("Resizing . . .");*/
 	m_paintLock.lock();
 	QImage temporary = m_image;
 	m_image = QImage(newSize, QImage::Format_ARGB32);
@@ -84,7 +84,7 @@ Visualization *Visualization::subVisualization(const DataRange &range) {
 }
 
 void Visualization::shift(QPoint pixels) {
-	qDebug("Asked to shift visualization . . .");
+	/*qDebug("Asked to shift visualization . . .");*/
 	m_paintLock.lock();
 	QImage temporary = m_image;
 	m_painter.begin(&m_image);
@@ -139,7 +139,7 @@ void Visualization::scale(qreal zoom) {
 	
 	m_image.fill(qRgb(255, 255, 255));
 	QRectF rect = translate(DataRange(newBegin, newEnd)).normalized();
-	qDebug("rect: (%f,%f),(%f,%f)", rect.left(), rect.top(), rect.right(), rect.bottom());
+	/*qDebug("rect: (%f,%f),(%f,%f)", rect.left(), rect.top(), rect.right(), rect.bottom());*/
 	m_painter.drawImage(translate(DataRange(
 		DataCoord((uint64_t)(xCentre - ((xSize / 2) * 1/zoom)), yCentre - ((ySize / 2) * 1/zoom)),
 		DataCoord((uint64_t)(xCentre + ((xSize / 2) * 1/zoom)), yCentre + ((ySize / 2) * 1/zoom))

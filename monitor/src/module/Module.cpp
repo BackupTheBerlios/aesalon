@@ -23,6 +23,7 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 		LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Couldn't open monitor library: " << dlerror());
 		return;
 	}
+	
 	void *instantiationHandle = dlsym(m_monitorHandle, "AesalonMonitorCreateInstance");
 	if(instantiationHandle == NULL) {
 		LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Monitor library does not have instantiation function.");
