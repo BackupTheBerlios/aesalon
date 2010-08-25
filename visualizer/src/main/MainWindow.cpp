@@ -7,7 +7,8 @@
 
 #include "MainWindow.h"
 #include "MainWindow.moc"
-#include "SessionLauncher.h"
+#include "NetworkSessionLauncher.h"
+#include "LogSessionLauncher.h"
 
 MainWindow::MainWindow() {
 	setMinimumSize(600, 400);
@@ -39,10 +40,10 @@ void MainWindow::setupMenus() {
 	QMenu *aesalonMenu = new QMenu(tr("&Aesalon"));
 	
 	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DriveNetIcon),
-		tr("&Connect to monitor . . ."), this, SLOT(createLauncher()), settings.value("shortcuts/connect", "Ctrl+E").toString());
+		tr("&Connect to monitor . . ."), this, SLOT(createNetworkLauncher()), settings.value("shortcuts/connect", "Ctrl+E").toString());
 		
 	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon),
-		tr("&Open log file . . ."), this, SLOT(createLauncher()), settings.value("shortcuts/open", "Ctrl+O").toString());
+		tr("&Open log file . . ."), this, SLOT(createLogLauncher()), settings.value("shortcuts/open", "Ctrl+O").toString());
 	
 	aesalonMenu->addAction(style()->standardIcon(QStyle::SP_DialogCloseButton),
 		tr("E&xit"), this, SLOT(close()), settings.value("shortcuts/quit", "Ctrl+Q").toString());
@@ -54,9 +55,15 @@ void MainWindow::setupMenus() {
 	menuBar()->addMenu(helpMenu);
 }
 
-void MainWindow::createLauncher() {
-	SessionLauncher *launcher = new SessionLauncher(this);
+void MainWindow::createNetworkLauncher() {
+	NetworkSessionLauncher *launcher = new NetworkSessionLauncher(this);
 	connect(launcher, SIGNAL(newTab(QWidget*)), SLOT(addTab(QWidget*)));
+	launcher->exec();
+}
+
+void MainWindow::createLogLauncher() {
+	LogSessionLauncher *launcher = new LogSessionLauncher(this);
+	connect(launcher, SIGNAL(newTab(QWidget *)), SLOT(addTab(QWidget*)));
 	launcher->exec();
 }
 

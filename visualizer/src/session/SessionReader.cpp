@@ -6,7 +6,7 @@
 
 SessionReader::SessionReader(SessionIOWrapper *ioWrapper, ModuleMapper *moduleMapper)
 	: QObject(NULL), m_ioDevice(ioWrapper->ioDevice()), m_moduleMapper(moduleMapper) {
-	connect(m_ioDevice, SIGNAL(readyRead()), SLOT(readData()), Qt::QueuedConnection);
+	connect(ioWrapper, SIGNAL(readyRead()), SLOT(readData()), Qt::QueuedConnection);
 }
 
 SessionReader::~SessionReader() {

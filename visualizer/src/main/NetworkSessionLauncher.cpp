@@ -4,27 +4,27 @@
 #include <QStyle>
 #include <QTcpSocket>
 
-#include "SessionLauncher.h"
-#include "SessionLauncher.moc"
+#include "NetworkSessionLauncher.h"
+#include "NetworkSessionLauncher.moc"
 #include "session/Session.h"
 #include "session/TCPWrapper.h"
 
-SessionLauncher::SessionLauncher(QWidget *parent) : QDialog(parent) {
+NetworkSessionLauncher::NetworkSessionLauncher(QWidget *parent) : QDialog(parent) {
 	setMinimumSize(400, 300);
 	setupDialog();
 }
 
-SessionLauncher::~SessionLauncher() {
+NetworkSessionLauncher::~NetworkSessionLauncher() {
 	
 }
 
-void SessionLauncher::accept() {
+void NetworkSessionLauncher::accept() {
 	Session *session = new Session(new TCPWrapper(m_host->text(), m_port->value()));
 	emit newTab(session->sessionDisplay());
 	QDialog::accept();
 }
 
-void SessionLauncher::setupDialog() {
+void NetworkSessionLauncher::setupDialog() {
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	QFormLayout *formLayout = new QFormLayout();
 	

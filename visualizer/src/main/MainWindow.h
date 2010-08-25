@@ -15,7 +15,8 @@ public slots:
 private:
 	void setupMenus();
 private slots:
-	void createLauncher();
+	void createNetworkLauncher();
+	void createLogLauncher();
 	void about();
 };
 

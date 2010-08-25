@@ -2,6 +2,7 @@
 #define LogWrapper_H
 
 #include <QFile>
+#include <QTimer>
 
 #include "SessionIOWrapper.h"
 

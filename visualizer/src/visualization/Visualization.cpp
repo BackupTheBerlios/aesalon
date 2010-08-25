@@ -102,7 +102,7 @@ void Visualization::shift(QPoint pixels) {
 	else if(pixels.x() < 0) {
 		QRect rect = QRect(m_image.width() + pixels.x(), 0, -pixels.x(), m_image.height());
 		m_painter.drawRect(rect);
-		/*m_controller->renderRegion(translate(rect));*/
+		m_controller->renderRegion(translate(rect));
 	}
 	
 	if(pixels.y() > 0) {
