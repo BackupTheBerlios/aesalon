@@ -4,7 +4,7 @@
 #include "session/LogWrapper.h"
 
 LogSessionLauncher::LogSessionLauncher(QWidget *parent) : QFileDialog(parent) {
-	
+	setFilter(tr("Aesalon log files (*.alog);;All files (*)"));
 }
 
 LogSessionLauncher::~LogSessionLauncher() {

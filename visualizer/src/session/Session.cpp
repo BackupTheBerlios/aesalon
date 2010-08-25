@@ -15,4 +15,3 @@ Session::~Session() {
 	delete m_reader;
 	delete m_moduleMapper;
 }
-
