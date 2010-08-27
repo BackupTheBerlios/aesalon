@@ -29,6 +29,9 @@ valgrind.*
 gmon.out
 profile.*
 
-# Aesalon configuration files.
+# Aesalon configuration files
 .aesalon.conf
+
+# Aesalon log files
+*.alog
 

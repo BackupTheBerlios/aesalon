@@ -118,13 +118,12 @@ There are five different levels of configuration, presented in order of processi
 \end{description}
 
 \begin{figure}[h]
- \caption{Example global configuration file.\label{exampleconfigfile}}
- \begin{verbatim}
-search-path=/usr/share/aesalon/modules/:
-shm-size=1048576
+  \small{\texttt{%
+search-path=/usr/share/aesalon/modules/: \\
+shm-size=1048576 \\
 tcp-port=6321
- \end{verbatim}
-
+  }}
+  \caption{Example global configuration file.\label{exampleconfigfile}}
 \end{figure}
 
 In configuration files, options are specified as demonstrated in Figure \ref{exampleconfigfile}. Additionally, \texttt{+=} may be used

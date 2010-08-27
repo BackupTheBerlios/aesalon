@@ -20,31 +20,23 @@ extern "C" {
 	#pragma GCC visibility push(hidden)
 #endif
 
-typedef struct {
-	const char *name;
-	uint16_t id;
-	void *modulePtr;
-} AC_Module;
-
-typedef struct {
-	/* Module data. */
-	int mmap_fd;
-	void *memory;
-	AC_MemoryMapHeader *header;
-	
-	/* Module API */
-	void (*sendPacket)(AC_DataPacket *packet);
-	uint64_t (*getTimestamp)();
-	uint8_t (*status)();
-} AC_Interface;
-
 /* These two functions should be overloaded in all modules, but not exported under ANY circumstances. */
-void __attribute__((constructor)) AC_Constructor();
-void __attribute__((destructor)) AC_Destructor();
+void __attribute__((constructor)) AC_constructor();
+void __attribute__((destructor)) AC_destructor();
 
-AC_Interface AC_EXPORT *AC_GetInterface();
-void AC_EXPORT *AC_GetModule(const char *name);
-void AC_EXPORT AC_RegisterModule(AC_Module *module);
+uint16_t AC_EXPORT AC_registerModule(const char *name);
+
+void AC_EXPORT AC_writePacket(AC_DataPacket *packet);
+uint64_t AC_EXPORT AC_timestamp();
+uint8_t AC_EXPORT AC_hasCollectionBegun();
+
+uint16_t AC_moduleID();
+void AC_setModuleID(uint16_t moduleID);
+
+#define AC_moduleDefinition \
+	static uint16_t AC_m_moduleID; \
+	uint16_t AC_moduleID() { return AC_m_moduleID; } \
+	void AC_setModuleID(uint16_t moduleID) { AC_m_moduleID = moduleID; }
 
 #ifdef AC_GCC
 	#pragma GCC visibility pop

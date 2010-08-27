@@ -26,6 +26,7 @@ public:
 			visualization process is aborted.
 	*/
 	virtual void visualize(VisualizationWrapper *visualization, bool *abort) = 0;
+	
 	/** Calculate a data range suitable for a default visualization view.
 		@return A DataRange object, suitable for usage as a Visualization range.
 	*/
