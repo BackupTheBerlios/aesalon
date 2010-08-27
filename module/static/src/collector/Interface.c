@@ -14,10 +14,10 @@ static uint8_t *AC_memory;
 static AC_MemoryMapHeader *AC_header;
 
 /* Function prototypes for internally-used, non-exposed functions. */
-int AC_remainingSpace();
-void AC_writeData(void *data, size_t size);
+static int AC_remainingSpace();
+static void AC_writeData(void *data, size_t size);
 
-void __attribute__((constructor)) AC_constructor() {
+void AC_CONSTRUCTOR AC_constructor() {
 	printf("Constructing module interface . . .\n");
 	char filename[64];
 	sprintf(filename, "AC-%i", getpid());
@@ -36,10 +36,13 @@ void __attribute__((constructor)) AC_constructor() {
 	
 	AC_header = (AC_MemoryMapHeader *)AC_memory;
 	
+	printf("looking for libc offset . . .\n");
+	printf("libc offset: %p\n", AC_libraryOffset("libc-"));
+	
 	printf("Module interface construction complete.\n");
 }
 
-void __attribute__((destructor)) AC_destructor() {
+void AC_DESTRUCTOR AC_destructor() {
 	char filename[64];
 	sprintf(filename, "AC-%i", getpid());
 	shm_unlink(filename);
@@ -129,4 +132,40 @@ uint64_t AC_timestamp() {
 
 uint8_t AC_hasCollectionBegun() {
 	return AC_header->mainReached;
+}
+
+AC_Address AC_EXPORT AC_libraryOffset(const char *name) {
+	int fd = open("/proc/self/maps", O_RDONLY);
+	
+	if(!fd) {
+		printf("open() failed: %s\n", strerror(errno));
+		return 0;
+	}
+	
+	char buffer[256];
+	int found = 0;
+	AC_Address address = 0;
+	int ret = 1;
+	
+	while(ret > 0) {
+		char c = 0;
+		int pos = 0;
+		while((ret = read(fd, &c, sizeof(c))) && c != '\n') buffer[pos++] = c;
+		buffer[pos] = 0;
+		/*printf("Trying line \"%s\"\n", buffer);*/
+		
+		char mode[128], path[128];
+		sscanf(buffer, "%lx-%*x %s %*s %*s %*s %s", &address, mode, path);
+		
+		if(strcmp(mode, "r-xp")) {
+			continue;
+		}
+		if(!strncmp(strrchr(path, '/')+1, name, strlen(name))) {
+			close(fd);
+			return address;
+		}
+	}
+	
+	close(fd);
+	return 0;
 }

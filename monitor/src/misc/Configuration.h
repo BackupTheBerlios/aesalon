@@ -35,6 +35,7 @@ private:
 	void processDefaultConfigFiles();
 	void processModuleConfigFiles();
 	void processArguments();
+	void processArgumentsModuleList();
 	void processItem(std::string itemStr);
 };
 

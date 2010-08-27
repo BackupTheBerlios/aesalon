@@ -17,8 +17,9 @@ namespace Misc {
 Configuration::Configuration(char *argv[]) : m_argv(argv) {
 	addConfigItems();
 	processDefaultConfigFiles();
-	processArguments();
+	processArgumentsModuleList();
 	processModuleConfigFiles();
+	processArguments();
 }
 
 Configuration::~Configuration() {
@@ -118,6 +119,8 @@ void Configuration::processArguments() {
 				foundEoo = true;
 				continue;
 			}
+			/* Handle "modules" specially. */
+			if(indexStr == "modules") continue;
 			processItem(indexStr);
 		}
 		else {
@@ -127,6 +130,28 @@ void Configuration::processArguments() {
 	if(m_programArguments.size()) m_filename = m_programArguments[0];
 }
 
+void Configuration::processArgumentsModuleList() {
+	bool foundEoo = false;
+	
+	int index = 0;
+	while(m_argv[++index]) {
+		std::string indexStr = m_argv[index]; 
+		if(indexStr[0] == '-' && indexStr[1] == '-' && !foundEoo) {
+			indexStr.erase(0, 2);
+			if(indexStr.length() == 0) {
+				foundEoo = true;
+				continue;
+			}
+			/* Handle "modules" specially. */
+			if(indexStr != "modules") continue;
+			processItem(indexStr);
+		}
+		else {
+			m_programArguments.push_back(indexStr);
+		}
+	}
+	if(m_programArguments.size()) m_filename = m_programArguments[0];
+}
 
 void Configuration::processItem(std::string itemStr) {
 	bool append = false;
