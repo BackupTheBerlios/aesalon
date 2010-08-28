@@ -24,15 +24,17 @@ Initializer::~Initializer() {
 }
 
 int Initializer::run() {
-	if(m_configuration->configItems()["help"]->boolValue() || m_configuration->programArguments().size() == 0) {
-		if(m_configuration->programArguments().size() == 0)
+	/* TODO: reinsert */
+	if(m_configuration->traverse("global.help")->asBool() || m_configuration->launchArguments().size() == 0) {
+		if(m_configuration->launchArguments().size() == 0)
 			LogSystem::logConfigurationMessage("No filename specified. Displaying usage information.");
 		usage();
 		return 0;
 	}
 	
-	m_socketManager = new Network::TcpManager(m_configuration->configItems()["tcp-port"]->intValue());
-	m_socketManager->waitForConnections(m_configuration->configItems()["network-wait"]->intValue());
+	/* TODO: reinsert */
+	/*m_socketManager = new Network::TcpManager(m_configuration->configItems()["tcp-port"]->intValue());
+	m_socketManager->waitForConnections(m_configuration->configItems()["network-wait"]->intValue());*/
 	
 	m_launcher = new Program::Launcher();
 	
@@ -46,3 +48,4 @@ void Initializer::usage() {
 	std::cout << "This program is released under the GNU GPLv3. For more legal information, see the LICENSE file." << std::endl;
 	std::cout << "usage: " << m_argv[0] << " [options] [--] filename [arguments]" << std::endl;
 	std::cout << "Options:" << std::endl;
+}

@@ -20,7 +20,7 @@ public:
 	const std::string &name() const { return m_name; }
 	
 	void addItem(ConfigurationItem *item);
-	void item(std::string name);
+	ConfigurationItem *item(std::string name);
 };
 
 } // namespace Misc

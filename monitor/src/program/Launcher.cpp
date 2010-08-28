@@ -38,8 +38,8 @@ void Launcher::start() {
 void Launcher::assembleArgv() {
 	Misc::Configuration *config = Initializer::singleton()->configuration();
 	
-	std::string filename = config->filename();
-	const std::vector<std::string> &programArguments = config->programArguments();
+	/*std::string filename = config->launchArguments();*/
+	const std::vector<std::string> &programArguments = config->launchArguments();
 	
 	m_argv = static_cast<char **>(malloc(sizeof(char *) * (programArguments.size() + 2)));
 	
@@ -55,7 +55,8 @@ void Launcher::startProcess() {
 	if(m_childPid == 0) {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
 		char buffer[128];
-		sprintf(buffer, "%i", Initializer::singleton()->configuration()->configItems()["shm-size"]->intValue());
+		/* TODO: reinsert */
+		sprintf(buffer, "%i", 65536/*Initializer::singleton()->configuration()->configItems()["shm-size"]->intValue()*/);
 		setenv("AC_ShmSize", buffer, 1);
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
 		
@@ -74,14 +75,16 @@ void Launcher::startProcess() {
 
 std::string Launcher::preload() {
 	std::vector<std::string> searchPaths;
-	std::string pathList = Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue();
+	/* TODO: reinsert */
+	std::string pathList = "";/*Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue();*/;
 	
 	do {
 		searchPaths.push_back(pathList.substr(0, pathList.find(":")));
 		pathList.erase(0, pathList.find(":")+1);
 	} while(pathList.find(":") != std::string::npos);
 	
-	std::string moduleList = Initializer::singleton()->configuration()->configItems()["modules"]->stringValue();
+	/* TODO: reinsert */
+	std::string moduleList = ""; /*Initializer::singleton()->configuration()->configItems()["modules"]->stringValue();*/
 	
 	char *oldPreload = getenv("LD_PRELOAD");
 	std::string preload;
@@ -94,10 +97,11 @@ std::string Launcher::preload() {
 		std::string moduleName = moduleList.substr(0, moduleList.find(":"));
 		moduleList.erase(0, moduleList.find(":")+1);
 		
-		std::string found = Misc::PathSanitizer::findFromPaths(Initializer::singleton()->configuration()
+		/* TODO: reinsert */
+		std::string found = ""; /*Misc::PathSanitizer::findFromPaths(Initializer::singleton()->configuration()
 			->configItems()["collector"]->childValue(moduleName)->stringValue(),
 			Initializer::singleton()->configuration()->configItems()["_module-path"]
-			->childValue(moduleName)->stringValue());
+			->childValue(moduleName)->stringValue());*/
 		
 		if(found.length()) {
 			preload += found;

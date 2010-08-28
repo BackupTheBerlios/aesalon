@@ -7,7 +7,8 @@
 namespace Program {
 
 Logger::Logger() : m_fd(0) {
-	std::string filename = Initializer::singleton()->configuration()->configItems()["log-file"]->stringValue();
+	/* TODO: reinsert */
+	std::string filename = ""; /*Initializer::singleton()->configuration()->configItems()["log-file"]->stringValue();*/
 	
 	if(!filename.length()) return;
 	

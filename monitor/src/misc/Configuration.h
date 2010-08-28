@@ -2,6 +2,7 @@
 #define Configuration_H
 
 #include <map>
+#include <vector>
 
 #include "ConfigurationModule.h"
 
@@ -9,18 +10,22 @@ namespace Misc {
 
 class Configuration {
 public:
-	Configuration();
+	Configuration(char **argv);
 	~Configuration();
 private:
 	typedef std::map<std::string, ConfigurationModule *> ModuleMap;
 	ModuleMap m_moduleMap;
-	std::string m_launchArguments;
+	std::vector<std::string> m_launchArguments;
+	char **m_argv;
 public:
 	ConfigurationModule *module(const std::string &name);
+	const std::vector<std::string> &launchArguments() const { return m_launchArguments; }
 	
 	void processFile(const std::string &path);
-	void processArgv(const char **argv);
-	void copyArgv();
+	void processSearchPaths();
+	void processArgv();
+	
+	ConfigurationItem *traverse(const std::string &path);
 private:
 	void addLaunchArgument(const std::string &argument);
 };
