@@ -31,6 +31,10 @@ void Reader::processPacket(DataPacket *packet) {
 	}
 	m_logger->logPacket(packet);
 	m_socketManager->sendPacket(packet);
+	
+	delete[] (char *)packet->data;
+	
+	delete packet;
 }
 
 } // namespace Module

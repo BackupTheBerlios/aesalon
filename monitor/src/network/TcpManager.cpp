@@ -25,6 +25,7 @@ TcpManager::TcpManager(int port) : SocketManager() {
 	hints.ai_next = NULL;
 	
 	char port_str[7];
+	memset(port_str, 0, 7);
 	sprintf(port_str, "%i", port);
 	
 	int ret = getaddrinfo(NULL, port_str, &hints, &result);
@@ -49,6 +50,8 @@ TcpManager::TcpManager(int port) : SocketManager() {
 		LogSystem::logNetworkMessage(Misc::StreamAsString() << "Couldn't perform port binding.");
 		return;
 	}
+	
+	freeaddrinfo(result);
 	
 	if(listen(m_fd, 16) == -1) {
 		LogSystem::logNetworkMessage(Misc::StreamAsString() << "Couldn't listen on port.");

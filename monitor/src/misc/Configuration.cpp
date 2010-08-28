@@ -15,6 +15,9 @@ namespace Misc {
 
 Configuration::Configuration(char **argv) : m_argv(argv) {
 	processSearchPaths();
+	processFile(AesalonGlobalConfig);
+	processFile(AesalonUserConfig);
+	processFile(AesalonLocalConfig);
 	processArgv();
 }
 

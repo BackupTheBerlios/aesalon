@@ -31,7 +31,6 @@ Launcher::~Launcher() {
 }
 
 void Launcher::start() {
-	assembleArgv();
 	startProcess();
 }
 
@@ -51,6 +50,7 @@ void Launcher::assembleArgv() {
 }
 
 void Launcher::startProcess() {
+	assembleArgv();
 	m_childPid = fork();
 	if(m_childPid == 0) {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
@@ -69,12 +69,16 @@ void Launcher::startProcess() {
 	m_analyzer = new ElfAnalyzer(m_argv[0]);
 	m_controller = new Controller(m_childPid);
 	
+	
+	
 	m_controller->run();
+	
+	for(int i = 0; m_argv[i]; i ++) free(m_argv[i]);
+	free(m_argv);
 }
 
 std::string Launcher::preload() {
 	std::string moduleList = Initializer::singleton()->configuration()->traverse("modules")->data();
-	
 	
 	char *oldPreload = getenv("LD_PRELOAD");
 	std::string preload;

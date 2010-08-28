@@ -16,7 +16,8 @@ public:
 	~ModuleMapper();
 private:
 	std::vector<Module *> m_moduleVector;
-	std::map<std::string, Module *> m_moduleMap;
+	typedef std::map<std::string, Module *> ModuleMap;
+	ModuleMap m_moduleMap;
 public:
 	Module *module(uint16_t moduleID);
 	Module *module(const std::string &name);

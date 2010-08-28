@@ -11,7 +11,9 @@ ModuleMapper::ModuleMapper() {
 }
 
 ModuleMapper::~ModuleMapper() {
-	
+	for(ModuleMap::iterator i = m_moduleMap.begin(); i != m_moduleMap.end(); ++i) {
+		if(i->second != NULL) delete i->second;
+	}
 }
 
 Module *ModuleMapper::module(uint16_t moduleID) {

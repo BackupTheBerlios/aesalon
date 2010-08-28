@@ -7,7 +7,7 @@ Section::Section(Address address, Address size, Address fileOffset, Address name
 }
 
 Section::~Section() {
-	if(m_data) delete m_data;
+	if(m_data) delete[] m_data;
 }
 
 } // namespace Program

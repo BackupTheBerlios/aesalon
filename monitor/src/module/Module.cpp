@@ -36,6 +36,7 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 
 Module::~Module() {
 	delete m_interface;
+	if(m_monitorHandle) dlclose(m_monitorHandle);
 }
 
 DataPacket *Module::processPacket(DataPacket *packet) {

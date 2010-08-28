@@ -8,7 +8,9 @@ ConfigurationModule::ConfigurationModule(std::string name) : m_name(name) {
 }
 
 ConfigurationModule::~ConfigurationModule() {
-	
+	for(ItemMap::iterator i = m_itemMap.begin(); i != m_itemMap.end(); ++i) {
+		if(i->second != NULL) delete i->second;
+	}
 }
 
 void ConfigurationModule::addItem(ConfigurationItem *item) {

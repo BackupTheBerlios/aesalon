@@ -133,6 +133,7 @@ static void *PacketReaderThread(void *unused) {
 	Module::Reader *reader = new Module::Reader();
 	DataPacket *packet;
 	while((packet = shm->readPacket())) reader->processPacket(packet);
+	delete reader;
 	return NULL;
 }
 

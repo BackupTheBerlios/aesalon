@@ -15,7 +15,7 @@ ConfigurationItem::~ConfigurationItem() {
 int ConfigurationItem::asInt() const {
 	std::stringstream stream;
 	stream << m_data;
-	int value;
+	int value = 0;
 	stream >> value;
 	return value;
 }
