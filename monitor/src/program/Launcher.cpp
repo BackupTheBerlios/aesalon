@@ -55,8 +55,7 @@ void Launcher::startProcess() {
 	if(m_childPid == 0) {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
 		char buffer[128];
-		/* TODO: reinsert */
-		sprintf(buffer, "%i", 65536/*Initializer::singleton()->configuration()->configItems()["shm-size"]->intValue()*/);
+		sprintf(buffer, "%i", Initializer::singleton()->configuration()->traverse("shm-size")->asInt());
 		setenv("AC_ShmSize", buffer, 1);
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
 		
@@ -74,17 +73,8 @@ void Launcher::startProcess() {
 }
 
 std::string Launcher::preload() {
-	std::vector<std::string> searchPaths;
-	/* TODO: reinsert */
-	std::string pathList = "";/*Initializer::singleton()->configuration()->configItems()["search-path"]->stringValue();*/;
+	std::string moduleList = Initializer::singleton()->configuration()->traverse("modules")->data();
 	
-	do {
-		searchPaths.push_back(pathList.substr(0, pathList.find(":")));
-		pathList.erase(0, pathList.find(":")+1);
-	} while(pathList.find(":") != std::string::npos);
-	
-	/* TODO: reinsert */
-	std::string moduleList = ""; /*Initializer::singleton()->configuration()->configItems()["modules"]->stringValue();*/
 	
 	char *oldPreload = getenv("LD_PRELOAD");
 	std::string preload;
@@ -97,20 +87,22 @@ std::string Launcher::preload() {
 		std::string moduleName = moduleList.substr(0, moduleList.find(":"));
 		moduleList.erase(0, moduleList.find(":")+1);
 		
-		/* TODO: reinsert */
-		std::string found = ""; /*Misc::PathSanitizer::findFromPaths(Initializer::singleton()->configuration()
-			->configItems()["collector"]->childValue(moduleName)->stringValue(),
-			Initializer::singleton()->configuration()->configItems()["_module-path"]
-			->childValue(moduleName)->stringValue());*/
+		std::string found = Misc::PathSanitizer::findFromPaths(
+			Initializer::singleton()->configuration()->module(moduleName)->item("collector")->data(),
+			Initializer::singleton()->configuration()->module(moduleName)->item("module-path")->data());
 		
 		if(found.length()) {
 			preload += found;
 			preload += ':';
 		}
-	} while(pathList.find(":") != std::string::npos);
+		else {
+			std::cout << "didn't find \"" << moduleName << "\"\n";
+		}
+	} while(moduleList.find(":") != std::string::npos);
 	
 	if(preload.length()) {
-		preload += Misc::PathSanitizer::findFromPaths("interface.so", pathList);
+		preload += Misc::PathSanitizer::findFromPaths("interface.so",
+			Initializer::singleton()->configuration()->traverse("search-paths")->data());
 	}
 	
 	return preload;

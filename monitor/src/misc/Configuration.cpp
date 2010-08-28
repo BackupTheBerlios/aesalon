@@ -15,6 +15,7 @@ namespace Misc {
 
 Configuration::Configuration(char **argv) : m_argv(argv) {
 	processSearchPaths();
+	processArgv();
 }
 
 Configuration::~Configuration() {
@@ -27,6 +28,7 @@ ConfigurationModule *Configuration::module(const std::string &name) {
 	ConfigurationModule *module = m_moduleMap[name];
 	if(module == NULL) {
 		module = new ConfigurationModule(name);
+		m_moduleMap[name] = module;
 	}
 	return module;
 }
@@ -64,9 +66,7 @@ void Configuration::processFile(const std::string &path) {
 			}
 			std::string variable = content.substr(0, divider);
 			content.erase(0, divider+1);
-			/*std::cout << "variable: " << variable << std::endl;
-			std::cout << "content: " << content << std::endl;*/
-			module->item("variable")->setData(content);
+			module->item(variable)->setData(content);
 		}
 		else {
 			LogSystem::logConfigurationMessage(Misc::StreamAsString() << "Mangled configuration file: unknown command \"" << command << "\"");
@@ -77,7 +77,14 @@ void Configuration::processFile(const std::string &path) {
 }
 
 void Configuration::processSearchPaths() {
-	std::string searchPaths = getenv("AesalonSearchPath");
+	const char *pathEnv = getenv("AesalonSearchPath");
+	if(pathEnv == NULL) {
+		LogSystem::logConfigurationMessage("Enviroment variable AesalonSearchPath not set; cannot load modules.");
+		return;
+	}
+	std::string searchPaths = pathEnv;
+	
+	traverse("search-paths")->setData(searchPaths);
 	
 	do {
 		std::string::size_type position = searchPaths.find(":");
@@ -101,8 +108,11 @@ void Configuration::processSearchPaths() {
 			struct stat file_stat;
 			if(stat(dirpath.c_str(), &file_stat) == 0) {
 				if(S_ISDIR(file_stat.st_mode)) {
-					dirpath += "/monitor.conf";
-					if(stat(dirpath.c_str(), &file_stat) == 0 && S_ISREG(file_stat.st_mode)) processFile(dirpath);
+					/*dirpath += "/monitor.conf";*/
+					if(stat((dirpath + "/monitor.conf").c_str(), &file_stat) == 0 && S_ISREG(file_stat.st_mode)) {
+						processFile(dirpath + "/monitor.conf");
+						traverse(std::string(file->d_name) + ".module-path")->setData(dirpath);
+					}
 				}
 			}
 		}
@@ -112,20 +122,56 @@ void Configuration::processSearchPaths() {
 }
 
 void Configuration::processArgv() {
+	int i = 0;
 	
+	/* This will occur in a very few circumstances, mainly mangled exec() calls. */
+	if(m_argv[0] == NULL) return;
+	
+	bool eoaFound = false;
+	
+	while(m_argv[++i] != NULL) {
+		
+		if(eoaFound) {
+			addLaunchArgument(m_argv[i]);
+			continue;
+		}
+		else if(m_argv[i][0] != '-' || m_argv[i][1] != '-') {
+			/*LogSystem::logConfigurationMessage(Misc::StreamAsString()
+				<< "Mangled argument \"" << m_argv[i] << "\"; all arguments begin with a double dash.");*/
+			eoaFound = true;
+			addLaunchArgument(m_argv[i]);
+			continue;
+		}
+		std::string argument = &m_argv[i][2];
+		if(argument.length() == 0) {
+			eoaFound = true;
+			continue;
+		}
+		
+		std::string::size_type divider = argument.find('=');
+		if(divider == std::string::npos) {
+			traverse(argument)->setData("true");
+		}
+		else {
+			traverse(argument.substr(0, divider))->setData(argument.substr(divider+1));
+		}
+	}
 }
 
-ConfigurationItem *Configuration::traverse(const std::string &path) {
+ConfigurationItem *Configuration::traverse(std::string path) {
 	std::string::size_type divider = path.find('.');
-	if(divider == std::string::npos) {
-		LogSystem::logConfigurationMessage(Misc::StreamAsString() << "Poorly-formed traverse path \"" << path << "\"; no item specified.");
-		return NULL;
+	std::string moduleName;
+	if(divider != std::string::npos) {
+		/*LogSystem::logConfigurationMessage(Misc::StreamAsString() << "Poorly-formed traverse path \"" << path << "\"; no item specified.");*/
+		/*return NULL;*/
+		moduleName = path.substr(0, divider);
+		path.erase(0, divider+1);
 	}
+	else moduleName = "global";
 	
-	std::string moduleName = path.substr(0, divider);
 	ConfigurationModule *module = this->module(moduleName);
 	
-	return module->item(path.substr(divider+1));
+	return module->item(path);
 }
 
 void Configuration::addLaunchArgument(const std::string &argument) {

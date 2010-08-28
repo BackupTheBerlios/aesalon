@@ -12,11 +12,9 @@ namespace Module {
 Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleName) {
 	LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Loading new module: " << moduleName);
 	
-	/* TODO: reinsert */
-	std::string modulePath = ""; /*Misc::PathSanitizer::findFromPaths(Initializer::singleton()->configuration()
-			->configItems()["monitor"]->childValue(moduleName)->stringValue(),
-			Initializer::singleton()->configuration()->configItems()["_module-path"]->
-			childValue(moduleName)->stringValue());*/
+	std::string modulePath = Misc::PathSanitizer::findFromPaths(
+			Initializer::singleton()->configuration()->module(moduleName)->item("monitor")->data(),
+			Initializer::singleton()->configuration()->module(moduleName)->item("module-path")->data());
 	
 	m_monitorHandle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if(m_monitorHandle == NULL) {

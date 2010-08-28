@@ -25,7 +25,7 @@ public:
 	void processSearchPaths();
 	void processArgv();
 	
-	ConfigurationItem *traverse(const std::string &path);
+	ConfigurationItem *traverse(std::string path);
 private:
 	void addLaunchArgument(const std::string &argument);
 };
