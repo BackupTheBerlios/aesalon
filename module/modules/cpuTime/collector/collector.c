@@ -63,7 +63,7 @@ void __attribute__((constructor)) AC_constructor() {
 	
 	printf("Constructed. Registering . . .\n");
 	
-	AC_setModuleID(AC_registerModule("cpuTime"));
+	AC_registerModule("cpuTime");
 	
 	printf("Registered.\n");
 }

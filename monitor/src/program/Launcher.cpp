@@ -124,7 +124,6 @@ void Launcher::setModuleEnvironment() {
 		for(Misc::ConfigurationModule::ItemMap::const_iterator i = itemMap.begin(); i != itemMap.end(); ++i) {
 			if(i->second == NULL) continue;
 			std::string name = Misc::StreamAsString() << "ACM_" << moduleName << "_" << i->second->name();
-			std::cout << "setting environment variable \"" << name << "\" to \"" << i->second->data() << "\"\n";
 			setenv(name.c_str(), i->second->data().c_str(), 1);
 		}
 	} while(moduleList.find(":") != std::string::npos); 

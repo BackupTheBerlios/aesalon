@@ -18,7 +18,6 @@ static int AC_remainingSpace();
 static void AC_writeData(void *data, size_t size);
 
 void AC_CONSTRUCTOR AC_constructor() {
-	printf("Constructing module interface . . .\n");
 	char filename[64];
 	sprintf(filename, "AC-%i", getpid());
 	
@@ -35,8 +34,6 @@ void AC_CONSTRUCTOR AC_constructor() {
 	AC_memory = mmap(NULL, shmSize, PROT_READ | PROT_WRITE, MAP_SHARED, AC_mmapFd, 0);
 	
 	AC_header = (AC_MemoryMapHeader *)AC_memory;
-	
-	printf("Module interface construction complete.\n");
 }
 
 void AC_DESTRUCTOR AC_destructor() {
@@ -45,7 +42,7 @@ void AC_DESTRUCTOR AC_destructor() {
 	shm_unlink(filename);
 }
 
-uint16_t AC_registerModule(const char *name) {
+uint16_t AC_registerModuleInternal(const char *name) {
 	uint16_t id = ++AC_header->latestModule;
 	
 	printf("AC_RegisterModule: registering module %s as id %i.\n", name, id);

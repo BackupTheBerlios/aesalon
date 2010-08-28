@@ -43,8 +43,14 @@ int Initializer::run() {
 }
 
 void Initializer::usage() {
-	std::cout << "Aesalon version " << AesalonVersion << ". Copyright (C) 2010 by strange." << std::endl;
-	std::cout << "This program is released under the GNU GPLv3. For more legal information, see the LICENSE file." << std::endl;
+	std::cout << "Aesalon version " << AesalonVersion << ". Copyright (C) 2009-2010, strange." << std::endl;
+	std::cout << "This program is released under the GNU GPLv3. " << std::endl;
+	std::cout << "\tFor more legal information, see the included file LICENSE." << std::endl;
 	std::cout << "usage: " << m_argv[0] << " [options] [--] filename [arguments]" << std::endl;
 	std::cout << "Options:" << std::endl;
+	std::cout << "\t--help: displays this help message." << std::endl;
+	std::cout << "\t--network-wait: amount of network clients to wait for before executing." << std::endl;
+	std::cout << "\t--tcp-port: TCP port to listen on." << std::endl;
+	std::cout << "\t--log-file: optional log file to write collected data to." << std::endl;
+	std::cout << "\t--shm-size: size of the SHM used to communicate." << std::endl;
 }

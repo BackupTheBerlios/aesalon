@@ -18,46 +18,96 @@ static void *(*ACM_originalMalloc)(size_t size);
 static void (*ACM_originalFree)(void *ptr);
 static void *(*ACM_originalRealloc)(void *ptr, size_t size);
 
-void AC_CONSTRUCTOR AC_constructor() {
-	printf("Constructing dynamicMemory module . . .\n");
-	AC_Address libcOffset = AC_libraryOffset("libc-");
-	ACM_originalMalloc = (void *)(libcOffset + 0x76900);
-	/*void *libcHandle = dlopen("libc-2.11.2.so", RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD);
-	printf("libcHandle: %p\n", libcHandle);*/
+AC_moduleDefinition;
 
-	*(void **)(&ACM_originalCalloc) = dlsym(RTLD_NEXT, "calloc");/*dlsym(libcHandle, "calloc");*/
+void AC_CONSTRUCTOR AC_constructor() {
+	AC_Address libcOffset = AC_libraryOffset("libc-");
+	
+	ACM_originalCalloc = (void *)(libcOffset + AC_configurationInt("dynamicMemory", "calloc-offset"));
+	
+	*(void **)(&ACM_originalMalloc) = dlsym(RTLD_NEXT, "malloc");
 	*(void **)(&ACM_originalFree) = dlsym(RTLD_NEXT, "free");
 	*(void **)(&ACM_originalRealloc) = dlsym(RTLD_NEXT, "realloc");
-	printf("ACM_originalCalloc: %p\n", ACM_originalCalloc);
+	
+	AC_registerModule("dynamicMemory");
 }
 
 void AC_DESTRUCTOR AC_destructor() {
-	printf("Destructing dynamicMemory module . . .\n");
+	
 }
 
 void AC_EXPORT *calloc(size_t nmemb, size_t size) {
-	printf("In calloc() . . .\n");
-	printf("\tnmemb: %i\n\tsize: %i\n", nmemb, size);
-	if(ACM_originalCalloc == NULL) {
-		void *data = malloc(nmemb * size);
-		memset(data, 0, nmemb * size);
-		return data;
+	void *data = ACM_originalCalloc(nmemb, size);
+	
+	if(AC_hasCollectionBegun()) {
+		/* ID byte, address, nmemb, size. */
+		uint8_t toSend[1 + 8 + 8 + 8];
+		toSend[0] = 0x00;
+		memcpy(toSend + 1, &data, 8);
+		memcpy(toSend + 9, &nmemb, 8);
+		memcpy(toSend + 17, &size, 8);
+		AC_DataPacket packet;
+		packet.dataSource.timestamp = AC_timestamp();
+		packet.dataSource.moduleID = AC_moduleID();
+		packet.dataSize = sizeof(toSend);
+		packet.data = toSend;
+		AC_writePacket(&packet);
 	}
-	return NULL;
+	
+	return data;
 }
 
 void AC_EXPORT *malloc(size_t size) {
-	printf("In malloc() . . .\n");
+	void *data = ACM_originalMalloc(size);
 	
-	return ACM_originalMalloc(size);
+	if(AC_hasCollectionBegun()) {
+		/* ID byte, address, size. */
+		uint8_t toSend[1 + 8 + 8];
+		toSend[0] = 0x01;
+		memcpy(toSend + 1, &data, 8);
+		memcpy(toSend + 9, &size, 8);
+		AC_DataPacket packet;
+		packet.dataSource.timestamp = AC_timestamp();
+		packet.dataSource.moduleID = AC_moduleID();
+		packet.dataSize = sizeof(toSend);
+		packet.data = toSend;
+		AC_writePacket(&packet);
+	}
+	
+	return data;
 }
 
 void AC_EXPORT free(void *ptr) {
-	printf("In free() . . .\n");
+	if(AC_hasCollectionBegun()) {
+		/* ID byte, address. */
+		uint8_t toSend[1 + 8];
+		toSend[0] = 0x02;
+		memcpy(toSend + 1, &ptr, 8);
+		AC_DataPacket packet;
+		packet.dataSource.timestamp = AC_timestamp();
+		packet.dataSource.moduleID = AC_moduleID();
+		packet.dataSize = sizeof(toSend);
+		packet.data = toSend;
+		AC_writePacket(&packet);
+	}
+	
 	ACM_originalFree(ptr);
 }
 
 void AC_EXPORT *realloc(void *ptr, size_t size) {
-	printf("In realloc() . . .\n");
+	if(AC_hasCollectionBegun()) {
+		/* ID byte, address, size. */
+		uint8_t toSend[1 + 8 + 8];
+		toSend[0] = 0x03;
+		memcpy(toSend + 1, &ptr, 8);
+		memcpy(toSend + 9, &size, 8);
+		AC_DataPacket packet;
+		packet.dataSource.timestamp = AC_timestamp();
+		packet.dataSource.moduleID = AC_moduleID();
+		packet.dataSize = sizeof(toSend);
+		packet.data = toSend;
+		AC_writePacket(&packet);
+	}
+	
 	return ACM_originalRealloc(ptr, size);
 }

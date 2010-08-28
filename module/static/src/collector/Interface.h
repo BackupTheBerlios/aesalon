@@ -26,7 +26,7 @@ extern "C" {
 void AC_CONSTRUCTOR AC_constructor();
 void AC_DESTRUCTOR AC_destructor();
 
-uint16_t AC_EXPORT AC_registerModule(const char *name);
+uint16_t AC_EXPORT AC_registerModuleInternal(const char *name);
 
 void AC_EXPORT AC_writePacket(AC_DataPacket *packet);
 uint64_t AC_EXPORT AC_timestamp();
@@ -44,6 +44,9 @@ void AC_setModuleID(uint16_t moduleID);
 	static uint16_t AC_m_moduleID; \
 	uint16_t AC_moduleID() { return AC_m_moduleID; } \
 	void AC_setModuleID(uint16_t moduleID) { AC_m_moduleID = moduleID; }
+
+#define AC_registerModule(name) \
+	AC_setModuleID(AC_registerModuleInternal(name))
 
 /*#ifdef AC_GCC
 	#pragma GCC visibility pop
