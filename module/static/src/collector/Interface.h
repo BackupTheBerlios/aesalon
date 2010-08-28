@@ -33,6 +33,10 @@ uint64_t AC_EXPORT AC_timestamp();
 uint8_t AC_EXPORT AC_hasCollectionBegun();
 AC_Address AC_EXPORT AC_libraryOffset(const char *name);
 
+char AC_EXPORT * AC_configurationString(const char *module, const char *name);
+int AC_EXPORT AC_configurationInt(const char *module, const char *name);
+int AC_EXPORT AC_configurationBool(const char *module, const char *name);
+
 uint16_t AC_moduleID();
 void AC_setModuleID(uint16_t moduleID);
 

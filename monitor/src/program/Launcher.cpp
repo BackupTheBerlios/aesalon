@@ -31,6 +31,7 @@ Launcher::~Launcher() {
 }
 
 void Launcher::start() {
+	assembleArgv();
 	startProcess();
 }
 
@@ -50,7 +51,6 @@ void Launcher::assembleArgv() {
 }
 
 void Launcher::startProcess() {
-	assembleArgv();
 	m_childPid = fork();
 	if(m_childPid == 0) {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
@@ -69,8 +69,6 @@ void Launcher::startProcess() {
 	m_analyzer = new ElfAnalyzer(m_argv[0]);
 	m_controller = new Controller(m_childPid);
 	
-	
-	
 	m_controller->run();
 	
 	for(int i = 0; m_argv[i]; i ++) free(m_argv[i]);
@@ -79,6 +77,8 @@ void Launcher::startProcess() {
 
 std::string Launcher::preload() {
 	std::string moduleList = Initializer::singleton()->configuration()->traverse("modules")->data();
+	
+	if(moduleList.length() == 0) return "";
 	
 	char *oldPreload = getenv("LD_PRELOAD");
 	std::string preload;
@@ -99,9 +99,6 @@ std::string Launcher::preload() {
 			preload += found;
 			preload += ':';
 		}
-		else {
-			std::cout << "didn't find \"" << moduleName << "\"\n";
-		}
 	} while(moduleList.find(":") != std::string::npos);
 	
 	if(preload.length()) {
@@ -113,7 +110,24 @@ std::string Launcher::preload() {
 }
 
 void Launcher::setModuleEnvironment() {
+	Misc::Configuration *configuration = Initializer::singleton()->configuration();
+	std::string moduleList = Initializer::singleton()->configuration()->traverse("modules")->data();
 	
+	if(moduleList.length() == 0) return;
+	
+	do {
+		std::string moduleName = moduleList.substr(0, moduleList.find(":"));
+		moduleList.erase(0, moduleList.find(":")+1);
+		
+		const Misc::ConfigurationModule::ItemMap &itemMap = configuration->module(moduleName)->itemMap();
+		
+		for(Misc::ConfigurationModule::ItemMap::const_iterator i = itemMap.begin(); i != itemMap.end(); ++i) {
+			if(i->second == NULL) continue;
+			std::string name = Misc::StreamAsString() << "ACM_" << moduleName << "_" << i->second->name();
+			std::cout << "setting environment variable \"" << name << "\" to \"" << i->second->data() << "\"\n";
+			setenv(name.c_str(), i->second->data().c_str(), 1);
+		}
+	} while(moduleList.find(":") != std::string::npos); 
 }
 
 } // namespace Program

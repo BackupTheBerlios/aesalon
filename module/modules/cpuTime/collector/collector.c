@@ -33,7 +33,7 @@ void ACM_sendTime(union sigval unused) {
 	packet.dataSource.moduleID = AC_moduleID();
 	packet.data = &value;
 	packet.dataSize = sizeof(value);
-	printf("Packet: timestamp=%lu, value=%lu\n", packet.dataSource.timestamp, value);
+	/*printf("Packet: timestamp=%lu, value=%lu\n", packet.dataSource.timestamp, value);*/
 	AC_writePacket(&packet);
 }
 
@@ -49,8 +49,12 @@ void __attribute__((constructor)) AC_constructor() {
 	
 	struct itimerspec its;
 	
+	int interval = AC_configurationInt("cpuTime", "interval");
+	interval *= 1000;
+	printf("interval: %i\n", interval);
+	
 	its.it_interval.tv_sec = 0;
-	its.it_interval.tv_nsec = 50000000;
+	its.it_interval.tv_nsec = interval;
 	
 	its.it_value.tv_sec = 0;
 	its.it_value.tv_nsec = 1;

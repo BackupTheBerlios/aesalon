@@ -36,9 +36,6 @@ void AC_CONSTRUCTOR AC_constructor() {
 	
 	AC_header = (AC_MemoryMapHeader *)AC_memory;
 	
-	printf("looking for libc offset . . .\n");
-	printf("libc offset: %p\n", AC_libraryOffset("libc-"));
-	
 	printf("Module interface construction complete.\n");
 }
 
@@ -167,5 +164,31 @@ AC_Address AC_EXPORT AC_libraryOffset(const char *name) {
 	}
 	
 	close(fd);
+	return 0;
+}
+
+char *AC_configurationString(const char *module, const char *name) {
+	char envName[256];
+	snprintf(envName, 256, "ACM_%s_%s", module, name);
+	return getenv(envName);
+}
+
+int AC_configurationInt(const char *module, const char *name) {
+	char envName[256];
+	snprintf(envName, 256, "ACM_%s_%s", module, name);
+	char *envContent = getenv(envName);
+	if(envContent == NULL) return 0;
+	int content;
+	sscanf(envContent, "%i", &content);
+	return content;
+}
+
+int AC_configurationBool(const char *module, const char *name) {
+	char envName[256];
+	snprintf(envName, 256, "ACM_%s_%s", module, name);
+	char *envContent = getenv(envName);
+	if(envContent == NULL) return 0;
+	else if(!strcmp(envContent, "false")) return 0;
+	else if(!strcmp(envContent, "true")) return 1;
 	return 0;
 }
