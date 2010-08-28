@@ -1,54 +1,28 @@
 #include "ConfigurationItem.h"
-#include "LogSystem.h"
+#include "misc/StreamAsString.h"
 
 namespace Misc {
 
+ConfigurationItem::ConfigurationItem(std::string name) : m_name(name) {
+}
+
 ConfigurationItem::~ConfigurationItem() {
+}
+
+int ConfigurationItem::asInt() const {
+
+}
+
+bool ConfigurationItem::asBool() const {
+	if(m_data == "false") return false;
+	else if(m_data == "true") return true;
+	else {
+		throw ConfigurationItemException(Misc::StreamAsString() << "Configuration item \"" << m_name << "\" expects a boolean value.");
+	}
+}
+
+ConfigurationItemException::ConfigurationItemException(std::string message) : m_message(message) {
 	
-}
-
-ConfigurationItem::ConfigurationItem(const std::string &name, Misc::ConfigurationItem::Type type)
-	: m_name(name), m_type(type) {
-	
-}
-
-bool ConfigurationItem::boolValue() const {
-	LogSystem::logConfigurationMessage("Attempted to retreive bool value from non-bool item. Defaulting to false.");
-	return false;
-}
-
-int ConfigurationItem::intValue() const {
-	LogSystem::logConfigurationMessage("Attempted to retreive int value from non-int item. Defaulting to 0.");
-	return 0;
-}
-
-ConfigurationItem *ConfigurationItem::childValue(std::string name) const {
-	LogSystem::logConfigurationMessage("Attempted to retreive child value from non-group item. Defaulting to NULL.");
-	return NULL;
-}
-
-const std::string &ConfigurationItem::stringValue() const {
-	LogSystem::logConfigurationMessage("Attempted to retreive string value from non-string item. Defaulting to empty string.");
-	/* NOTE: I know this is leaked memory, but the only other choice is to
-		return a reference to a local variable. Besides, this function should
-		never actually be executed, as it indicates a programmer error. */
-	return *(new std::string());
-}
-
-void ConfigurationItem::setValue(const std::string &value) {
-	LogSystem::logConfigurationMessage("Attempted to set string value of non-string item \"" + m_name + "\".");
-}
-
-void ConfigurationItem::setValue(const char *value) {
-	LogSystem::logConfigurationMessage("Attempted to set string value of non-string item \"" + m_name + "\".");
-}
-
-void ConfigurationItem::setValue(bool value) {
-	LogSystem::logConfigurationMessage("Attempted to set bool value of non-bool item.");
-}
-
-void ConfigurationItem::setValue(int value) {
-	LogSystem::logConfigurationMessage("Attempted to set int value of non-int item.");
 }
 
 } // namespace Misc

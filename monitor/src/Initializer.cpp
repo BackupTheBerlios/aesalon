@@ -46,37 +46,3 @@ void Initializer::usage() {
 	std::cout << "This program is released under the GNU GPLv3. For more legal information, see the LICENSE file." << std::endl;
 	std::cout << "usage: " << m_argv[0] << " [options] [--] filename [arguments]" << std::endl;
 	std::cout << "Options:" << std::endl;
-	for(Misc::Configuration::ConfigItems::iterator i = m_configuration->configItems().begin();
-		i != m_configuration->configItems().end(); i ++) {
-		if(i->second == NULL) continue;
-		/* Underscores denote an internally-used configuration item. */
-		if(i->second->name()[0] == '_') continue;
-		
-		std::cout << "\t--" << i->second->name();
-		if(i->second->type() == Misc::ConfigurationItem::Group) {
-			std::cout << " (group)";
-		}
-		std::cout << ": " << i->second->description() << std::endl;
-		std::cout << "\t\tCurrent value: ";
-		switch(i->second->type()) {
-			case Misc::ConfigurationItem::Boolean: {
-				std::cout << (i->second->boolValue() ? "true" : "false");
-				break;
-			}
-			case Misc::ConfigurationItem::String: {
-				std::cout << i->second->stringValue();
-				break;
-			}
-			case Misc::ConfigurationItem::Integer: {
-				std::cout << i->second->intValue();
-				break;
-			}
-			case Misc::ConfigurationItem::Group: {
-				std::cout << "N/A";
-				break;
-			}
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "[*] These are used internally and by modules. Modification may lead to unexpected behaviour and segfaults." << std::endl;
-}
