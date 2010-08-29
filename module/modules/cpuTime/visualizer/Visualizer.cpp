@@ -49,7 +49,7 @@ void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization, bool *abo
 	visualization->lock();
 	
 	DataCoord e;
-	e.setTime(visualization->dataRange().beginTime());
+	e.setTime(visualization->range().beginTime());
 	ElementList::iterator beginIterator = std::lower_bound(m_elementList.begin(), m_elementList.end(), e, compareElements);
 	if(beginIterator == m_elementList.end()) {
 		std::cout << "Entire visualization is out-of-bounds. Aborting." << std::endl;
@@ -57,7 +57,7 @@ void CpuTimeVisualizer::visualize(VisualizationWrapper *visualization, bool *abo
 		return;
 	}
 	
-	e.setTime(visualization->dataRange().endTime());
+	e.setTime(visualization->range().endTime());
 	ElementList::iterator endIterator = std::upper_bound(m_elementList.begin(), m_elementList.end(), e, compareElements);
 	
 	/*std::cout << "Beginning drawing loop . . ." << std::endl;*/

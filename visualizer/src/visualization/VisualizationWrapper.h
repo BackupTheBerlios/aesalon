@@ -4,21 +4,17 @@
 #include "storage/DataCoord.h"
 #include "storage/DataRange.h"
 
-class Visualization;
-
 class VisualizationWrapper {
 public:
-	VisualizationWrapper(Visualization *visualization);
-private:
-	Visualization *m_visualization;
+	VisualizationWrapper();
+	virtual ~VisualizationWrapper();
 public:
-	Visualization *visualization() const { return m_visualization; }
-	const DataRange &dataRange() const;
+	virtual const DataRange &range() const = 0;
 	
-	void lock() const;
-	void unlock() const;
-	bool isLocked() const;
-	void drawLine(DataCoord from, DataCoord to) const;
+	virtual void lock() = 0;
+	virtual void unlock() = 0;
+	virtual bool isLocked() const = 0;
+	virtual void drawLine(DataCoord from, DataCoord to) = 0;
 };
 
 #endif

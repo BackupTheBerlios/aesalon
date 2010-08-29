@@ -6,6 +6,8 @@
 #include "interface/Interface.h"
 #include "storage/DataRange.h"
 
+class Visualization;
+
 class Module {
 public:
 	Module(const char *name);

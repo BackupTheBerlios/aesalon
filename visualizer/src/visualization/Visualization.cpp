@@ -12,7 +12,6 @@ Visualization::Visualization(QSize renderSize, DataRange range) : m_range(range)
 	if(renderSize.height() == 0) renderSize.setHeight(1);
 	m_image = QImage(qAbs(renderSize.width()), qAbs(renderSize.height()), QImage::Format_ARGB32);
 	m_image.fill(Qt::white);
-	m_wrapper = new VisualizationWrapper(this);
 }
 
 Visualization::~Visualization() {

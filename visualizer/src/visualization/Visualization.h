@@ -6,11 +6,11 @@
 #include <QPainter>
 
 #include "storage/DataRange.h"
+#include "VisualizationWrapper.h"
 
-class VisualizationWrapper;
 class VisualizationController;
 
-class Visualization {
+class Visualization : public VisualizationWrapper {
 public:
 	Visualization(QSize renderSize, DataRange range);
 	~Visualization();
@@ -19,12 +19,10 @@ private:
 	DataRange m_range;
 	QPainter m_painter;
 	QMutex m_paintLock;
-	VisualizationWrapper *m_wrapper;
 	VisualizationController *m_controller;
 public:
 	const QImage &image() const { return m_image; }
 	const DataRange &range() const { return m_range; }
-	VisualizationWrapper *wrapper() const { return m_wrapper; }
 	VisualizationController *controller() const { return m_controller; }
 	void setController(VisualizationController *controller) { m_controller = controller; }
 	/** Merges another visualization with this one.

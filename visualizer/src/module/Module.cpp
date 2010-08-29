@@ -52,7 +52,7 @@ void Module::processIncoming(DataPacket *packet) {
 
 void Module::visualize(Visualization *visualization, bool *abort) {
 	if(m_interface == NULL) return;
-	m_interface->visualize(visualization->wrapper(), abort);
+	m_interface->visualize(visualization, abort);
 }
 
 DataRange Module::defaultDataRange() {
