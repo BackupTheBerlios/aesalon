@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include "interface/Interface.h"
+#include "interface/Controller.h"
 #include "storage/DataRange.h"
 
 class Visualization;
@@ -15,13 +15,13 @@ public:
 private:
 	QString m_name;
 	void *m_moduleHandle;
-	VisualizerInterface *m_interface;
+	VisualizerModule::Controller *m_controller;
 public:
 	const QString &name() const { return m_name; }
-	VisualizerInterface *interface() const { return m_interface; }
+	VisualizerModule::Controller *controller() const { return m_controller; }
 	
 	void processIncoming(DataPacket *packet);
-	void visualize(Visualization *visualization, bool *abort);
+	VisualizerModule::Renderer *createRenderer(std::string name);
 	DataRange defaultDataRange();
 private:
 	QString modulePath(QString filename);

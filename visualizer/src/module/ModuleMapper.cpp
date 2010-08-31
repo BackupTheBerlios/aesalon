@@ -21,6 +21,10 @@ Module *ModuleMapper::module(quint16 moduleID) {
 	return m_moduleList[moduleID];
 }
 
+Module *ModuleMapper::module(QString moduleName) {
+	return m_moduleMap[moduleName];
+}
+
 void ModuleMapper::loadModule(const char *name) {
 	qDebug("Asked to load module \"%s\" . . .", name);
 	Module *module = new Module(name);

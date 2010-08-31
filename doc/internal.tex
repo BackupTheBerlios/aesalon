@@ -6,15 +6,33 @@
 
 \begin{document}
 
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
-
 % Prevent 'Aesalon' from being broken by hyphenation.
 \hyphenation{Aesalon}
+
+% The four arguments are:
+% - return type
+% - function name
+% - parameters
+% - documentation
+\newcommand{\documentFunction}[4]{
+  %\label{#2}
+  \emph{\textbf{#1 #2(}#3\textbf{)}} \\
+    \par{
+    \hangindent=2em
+    \hangafter=0
+
+    #4
+
+  }
+}
 
 \maketitle
 
 \tableofcontents
+
+\setlength{\parindent}{10pt}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+
 
 \chapter[Overview]{An overview of Aesalon}
 \section{Introduction}
@@ -158,7 +176,39 @@ There are two primary threads in the monitor:
 The module API is relatively dynamic; changes both minor and major may be made without much warning. Detailed here are the
 current module APIs.
 \section{Collector}
-The Collector API is very minimalistic. 
+The Collector API is very minimalistic. It consists of a \emph{collector interface}, responsible for (among other duties)
+transferring data packets from the various loaded modules into the SHM. Its other duties include timestamp generation,
+module configurations, and module management\footnote{Other various utility functions are also provided to prevent
+redundancy amongst module sources}.
+
+\subsection{Naming convention}
+The functions provided by the collector module interface have a strict naming convention. To reduce unnecessary namespace
+pollution, it is recommended that module developers follow these naming guidelines.
+\begin{description}
+ \item[Interface functions] are preceeded by \emph{AC\_} (\emph{A}esalon \emph{C}ollector). For example, \emph{AC\_timestamp()}
+constructs a timestamp representing the current moment.
+ \item[Module functions] are preceeded by \emph{ACM\_} (\emph{A}esalon \emph{C}ollector \emph{M}odule). For example,
+\emph{ACM\_sendData()}.
+\end{description}
+
+\subsection{Module registration}
+Before a collector module can send data to its monitor counterpart, it first must be registered and obtain a module ID.
+The process is quite simple, fortunately. A pair of functions, or a single macro, are used to perform this task.
+
+\documentFunction{uint16\_t}{AC\_registerModuleInternal}{const char *name}{Internal function, registers a module and returns
+its ID.}
+
+\documentFunction{uint16\_t}{AC\_registerModuleInternal}{const char *name}{Internal function, registers a module and returns
+its ID.}
+\documentFunction{void}{AC\_setModuleID}{uint16\_t id}{Sets the module-wide ID for this module.}
+
+In reality, however, the convenience macro \emph{AC\_registerModule()} should be used.
+
+\documentMacro{AC\_registerModule}{const char *name}{Calls \emph{AC\_registerModuleInternal()} and \emph{AC\_setModuleID()},
+in essence registering a module for use.}
+
+
+
 \section{Monitor}
 The Monitor API is only partially completed at the moment.
 \section{Visualizer}

@@ -5,10 +5,11 @@
 #include "VisualizationWidget.h"
 #include "VisualizationWidget.moc"
 
-VisualizationWidget::VisualizationWidget(Module *module) : QWidget(NULL), m_module(module) {
+VisualizationWidget::VisualizationWidget(Module *module, const QString &rendererName) : QWidget(NULL), m_module(module) {
 	m_visualization = new Visualization(size(), module->defaultDataRange());
 	m_controller = new VisualizationController(module, m_visualization);
 	m_controller->setWidget(this);
+	m_controller->setRenderer(module->createRenderer(rendererName.toStdString()));
 	/* A resizeEvent will be generated once the widget has been added to a layout;
 		when that happens, a full visualization will be produced. */
 }

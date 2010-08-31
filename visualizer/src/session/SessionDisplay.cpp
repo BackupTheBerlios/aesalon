@@ -54,31 +54,37 @@ void SessionDisplay::setWidget(QPoint which, QWidget *widget) {
 void SessionDisplay::displayContextMenu(QPoint globalPosition, SessionVisualization *visualization) {
 	m_contextMenu = new QMenu(this);
 	
-	QMenu *moduleMenu = m_contextMenu->addMenu(tr("Modules"));
+	m_contextVisualization = visualization;
+	
+	QMenu *modulesMenu = m_contextMenu->addMenu(tr("Modules"));
 	
 	for(int i = 1; i < m_moduleMapper->moduleCount(); i ++) {
-		QAction *action = moduleMenu->addAction(m_moduleMapper->module(i)->name());
-		action->setProperty("moduleID", i);
+		Module *module = m_moduleMapper->module(i);
+		QMenu *moduleMenu = modulesMenu->addMenu(module->name());
 		
-		action->setProperty("visualization", (quint64)visualization);
+		std::vector<std::string> rendererNames;
+		module->controller()->factory()->rendererNames(rendererNames);
+		
+		for(size_t rendererIndex = 0; rendererIndex < rendererNames.size(); rendererIndex ++) {
+			QAction *action = moduleMenu->addAction(rendererNames[rendererIndex].c_str());
+			action->setProperty("moduleID", QVariant(qint32(rendererIndex)));
+		}
+		
+		connect(moduleMenu, SIGNAL(triggered(QAction*)), SLOT(setVisualizationModule(QAction*)));
 	}
-	connect(moduleMenu, SIGNAL(triggered(QAction*)), SLOT(setVisualizationModule(QAction*)));
 	
 	m_contextMenu->popup(globalPosition);
 }
 
 void SessionDisplay::setVisualizationModule(SessionVisualization *visualization, int moduleID) {
-	Module *module = m_moduleMapper->module(moduleID);
+	qWarning("Deprecated function . . .");
+	/*Module *module = m_moduleMapper->module(moduleID);
 	
-	visualization->setVisualization(new VisualizationWidget(module));
-	
+	visualization->setVisualization(new VisualizationWidget(module));*/
 }
 
 void SessionDisplay::setVisualizationModule(QAction *action) {
-	int moduleID = action->property("moduleID").toInt();
-	SessionVisualization *visualization = (SessionVisualization *)action->property("visualization").toULongLong();
+	Module *module = m_moduleMapper->module(action->property("moduleID").toInt());
 	
-	
-	
-	visualization->setVisualization(new VisualizationWidget(m_moduleMapper->module(moduleID)));
+	m_contextVisualization->setVisualization(new VisualizationWidget(module, action->text()));
 }

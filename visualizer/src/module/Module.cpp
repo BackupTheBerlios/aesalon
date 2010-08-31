@@ -29,12 +29,12 @@ Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL) {
 		return;
 	}
 	
-	VisualizerInterface *(*instantiateFunction)();
+	VisualizerModule::Controller *(*instantiateFunction)();
 	*(void **)(&instantiateFunction) = instantiationHandle;
 	
-	m_interface = instantiateFunction();
+	m_controller = instantiateFunction();
 	
-	if(m_interface == NULL) {
+	if(m_controller == NULL) {
 		qWarning("Module \"%s\" failed to create ModuleInterface instance.", name);
 		return;
 	}
@@ -46,18 +46,20 @@ Module::~Module() {
 }
 
 void Module::processIncoming(DataPacket *packet) {
-	if(m_interface == NULL) return;
-	m_interface->processIncoming(packet);
+	if(m_controller == NULL) return;
+	m_controller->dataCache()->processPacket(packet);
 }
 
-void Module::visualize(Visualization *visualization, bool *abort) {
-	if(m_interface == NULL) return;
-	m_interface->visualize(visualization, abort);
+VisualizerModule::Renderer *Module::createRenderer(std::string name) {
+	if(m_controller == NULL) return NULL;
+	return m_controller->factory()->createRenderer(name);
 }
 
 DataRange Module::defaultDataRange() {
-	if(m_interface == NULL) return DataRange();
-	return m_interface->defaultDataRange();
+	/*if(m_interface == NULL) return DataRange();
+	return m_interface->defaultDataRange();*/
+	/* TODO: implement this. */
+	return DataRange();
 }
 
 QString Module::modulePath(QString filename) {

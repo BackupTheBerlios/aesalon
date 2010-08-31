@@ -9,7 +9,7 @@
 
 class VisualizationWidget : public QWidget { Q_OBJECT
 public:
-	VisualizationWidget(Module *module);
+	VisualizationWidget(Module *module, const QString &rendererName);
 	virtual ~VisualizationWidget();
 private:
 	Module *m_module;

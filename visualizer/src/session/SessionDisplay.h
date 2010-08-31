@@ -16,6 +16,7 @@ private:
 	ModuleMapper *m_moduleMapper;
 	QGridLayout *m_grid;
 	QMenu *m_contextMenu;
+	SessionVisualization *m_contextVisualization;
 public:
 	ModuleMapper *moduleMapper() const { return m_moduleMapper; }
 	QGridLayout *grid() const { return m_grid; }

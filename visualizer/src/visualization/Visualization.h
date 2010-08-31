@@ -22,7 +22,7 @@ private:
 	VisualizationController *m_controller;
 public:
 	const QImage &image() const { return m_image; }
-	const DataRange &range() const { return m_range; }
+	virtual const DataRange &range() const { return m_range; }
 	VisualizationController *controller() const { return m_controller; }
 	void setController(VisualizationController *controller) { m_controller = controller; }
 	/** Merges another visualization with this one.
@@ -31,29 +31,29 @@ public:
 	void merge(Visualization *other);
 	
 	/** Clears the visualization of all painted data. */
-	void clear();
+	virtual void clear();
 	
 	/** Locks the visualization for painting. */
-	void lock();
+	virtual void lock();
 	/** Unlocks the visualization, signifying completion of painting. */
-	void unlock();
+	virtual void unlock();
 	/** Checks if the visualization is locked for painting.
 		@return The lock status of the visualization.
 	*/
-	bool isLocked() const { return m_painter.isActive(); }
+	virtual bool isLocked() const { return m_painter.isActive(); }
 	/** Re-sizes the internal QImage.
 		@param newSize The new size of the image.
 	*/
 	void resize(const QSize &newSize);
 	
 	/** Sets the pen colour. */
-	void setPenColour(int r, int g, int b, int a);
+	virtual void setPenColour(int r, int g, int b, int a);
 	
 	/** Draws a line from @a from to @a to.
 		@param from The coordinates to start the line at.
 		@param to The coordinates to end the line.
 	*/
-	void drawLine(DataCoord from, DataCoord to);
+	virtual void drawLine(DataCoord from, DataCoord to);
 	
 	/** Creates a sub-visualization of this visualization, preserving the
 		mapping ratio of data units to screen units for a given range.
