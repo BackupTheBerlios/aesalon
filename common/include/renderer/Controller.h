@@ -3,6 +3,7 @@
 
 #include "DataCache.h"
 #include "Factory.h"
+#include "ConcreteFactory.h"
 
 class RendererController {
 private:

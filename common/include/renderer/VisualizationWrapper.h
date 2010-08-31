@@ -6,8 +6,7 @@
 
 class VisualizationWrapper {
 public:
-	VisualizationWrapper();
-	virtual ~VisualizationWrapper();
+	virtual ~VisualizationWrapper() {}
 public:
 	virtual const DataRange &range() const = 0;
 	

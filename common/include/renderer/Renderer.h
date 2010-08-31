@@ -2,7 +2,7 @@
 #define RendererRenderer_H
 
 #include "renderer/DataRange.h"
-#include "visualization/VisualizationWrapper.h"
+#include "renderer/VisualizationWrapper.h"
 
 class Renderer {
 public:

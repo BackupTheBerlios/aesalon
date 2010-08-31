@@ -3,7 +3,6 @@
 #include <QMutex>
 
 #include "Visualization.h"
-#include "VisualizationWrapper.h"
 #include "VisualizationController.h"
 
 Visualization::Visualization(QSize renderSize, DataRange range) : m_range(range) {

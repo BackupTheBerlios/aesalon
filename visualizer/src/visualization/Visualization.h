@@ -6,7 +6,7 @@
 #include <QPainter>
 
 #include "renderer/DataRange.h"
-#include "VisualizationWrapper.h"
+#include "renderer/VisualizationWrapper.h"
 
 class VisualizationController;
 
