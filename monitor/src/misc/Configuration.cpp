@@ -99,22 +99,23 @@ void Configuration::processSearchPaths() {
 		if(directory == NULL) {
 			LogSystem::logConfigurationMessage(Misc::StreamAsString() << "Cannot open search path \"" << path << "\": " << strerror(errno));
 		}
-		
-		struct dirent *file;
-		
-		while((file = readdir(directory)) != NULL) {
-			if(!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) continue;
+		else {
+			struct dirent *file;
 			
-			std::string dirpath = path + "/";
-			dirpath += file->d_name;
-			
-			struct stat file_stat;
-			if(stat(dirpath.c_str(), &file_stat) == 0) {
-				if(S_ISDIR(file_stat.st_mode)) {
-					/*dirpath += "/monitor.conf";*/
-					if(stat((dirpath + "/monitor.conf").c_str(), &file_stat) == 0 && S_ISREG(file_stat.st_mode)) {
-						processFile(dirpath + "/monitor.conf");
-						traverse(std::string(file->d_name) + ".module-path")->setData(dirpath);
+			while((file = readdir(directory)) != NULL) {
+				if(!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) continue;
+				
+				std::string dirpath = path + "/";
+				dirpath += file->d_name;
+				
+				struct stat file_stat;
+				if(stat(dirpath.c_str(), &file_stat) == 0) {
+					if(S_ISDIR(file_stat.st_mode)) {
+						/*dirpath += "/monitor.conf";*/
+						if(stat((dirpath + "/monitor.conf").c_str(), &file_stat) == 0 && S_ISREG(file_stat.st_mode)) {
+							processFile(dirpath + "/monitor.conf");
+							traverse(std::string(file->d_name) + ".module-path")->setData(dirpath);
+						}
 					}
 				}
 			}

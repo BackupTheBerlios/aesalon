@@ -13,7 +13,7 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 	LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Loading new module: " << moduleName);
 	
 	std::string modulePath = Misc::PathSanitizer::findFromPaths(
-			Initializer::singleton()->configuration()->module(moduleName)->item("monitor")->data(),
+			Initializer::singleton()->configuration()->module(moduleName)->item("polisher")->data(),
 			Initializer::singleton()->configuration()->module(moduleName)->item("module-path")->data());
 	
 	m_monitorHandle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
@@ -22,13 +22,13 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 		return;
 	}
 	
-	void *instantiationHandle = dlsym(m_monitorHandle, "AesalonMonitorCreateInstance");
+	void *instantiationHandle = dlsym(m_monitorHandle, "Instantiate");
 	if(instantiationHandle == NULL) {
-		LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Monitor library does not have instantiation function.");
+		LogSystem::logModuleMessage(moduleID, Misc::StreamAsString() << "Polisher library does not have instantiation function.");
 		return;
 	}
 	
-	MonitorInterface *(*instantiateFunction)();
+	PolisherInterface *(*instantiateFunction)();
 	*(void **)(&instantiateFunction) = instantiationHandle;
 	m_interface = instantiateFunction();
 	m_interface->setAnalyzer(Initializer::singleton()->launcher()->analyzer());

@@ -1,5 +1,5 @@
-#ifndef ModuleInterface_H
-#define ModuleInterface_H
+#ifndef PolisherInterface_H
+#define PolisherInterface_H
 
 #include "DataTypes.h"
 
@@ -7,10 +7,10 @@ namespace Program {
 class Analyzer;
 } // namespace Program
 
-class MonitorInterface {
+class PolisherInterface {
 public:
-	MonitorInterface();
-	virtual ~MonitorInterface();
+	PolisherInterface() {}
+	virtual ~PolisherInterface() {}
 private:
 	Program::Analyzer *m_analyzer;
 public:
@@ -20,16 +20,17 @@ public:
 	/** Handles a packet from the corresponding collector library.
 		@param packet The packet to process.
 		@return A DataPacket instance (can be the same as @a packet) to be sent
-			to the visualizer library.
+			to the visualizer library. Note that packet->data will be freed, so
+			it should be dynamically-allocated memory.
 	*/
 	virtual DataPacket *handlePacket(DataPacket *packet) = 0;
 };
 
-extern "C" {
-
-/* This function is expected to be implemented inside the monitor modules. */
-MonitorInterface *AesalonMonitorCreateInstance();
-
-} // extern "C"
+#define CreateInstantiationFunction(type) \
+	extern "C" { \
+	PolisherInterface *Instantiate() { \
+		return new type(); \
+	} \
+	} // extern "C"
 
 #endif

@@ -30,12 +30,12 @@ add_definitions(-DAesalonGlobalConfig="${globalConfig}" -DAesalonUserConfig="${u
 aux_source_directory(. dotSources)
 aux_source_directory(misc miscSources)
 aux_source_directory(module moduleSources)
-aux_source_directory(interface interfaceSources)
+aux_source_directory(polisher polisherSources)
 aux_source_directory(program programSources)
 aux_source_directory(network networkSources)
 
 # Add the executable "aesalon".
-add_executable(aesalon ${dotSources} ${miscSources} ${moduleSources} ${programSources} ${interfaceSources} ${networkSources})
+add_executable(aesalon ${dotSources} ${miscSources} ${moduleSources} ${programSources} ${polisherSources} ${networkSources})
 
 # Link aesalon with the dl and rt libraries.
 target_link_libraries(aesalon dl rt)

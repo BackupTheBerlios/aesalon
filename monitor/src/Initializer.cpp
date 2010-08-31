@@ -24,13 +24,15 @@ Initializer::~Initializer() {
 }
 
 int Initializer::run() {
-	if(m_configuration->traverse("help")->asBool() || m_configuration->launchArguments().size() == 0) {
-		if(m_configuration->launchArguments().size() == 0)
-			LogSystem::logConfigurationMessage("No filename specified. Displaying usage information.");
+	if(m_configuration->traverse("help")->asBool()) {
 		usage();
 		return 0;
 	}
-	
+	else if(m_configuration->launchArguments().size() == 0) {
+		LogSystem::logConfigurationMessage("No filename specified. Displaying usage information.");
+		usage();
+		return 0;
+	}
 	
 	m_socketManager = new Network::TcpManager(m_configuration->traverse("tcp-port")->asInt());
 	m_socketManager->waitForConnections(m_configuration->traverse("network-wait")->asInt());

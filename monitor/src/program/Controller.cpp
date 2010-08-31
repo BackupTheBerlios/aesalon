@@ -11,6 +11,7 @@
 #include "LogSystem.h"
 #include "Initializer.h"
 #include "module/Reader.h"
+#include "misc/StreamAsString.h"
 
 namespace Program {
 
@@ -52,6 +53,8 @@ void Controller::run() {
 	/* Create the reading thread(s). */
 	createThreads();
 	
+	
+	LogSystem::logProgramMessage(m_analyzer->filename(), "Beginning data collection . . .");
 	/* Continue execution of the monitored program. */
 	continueExecution();
 	
@@ -63,8 +66,14 @@ void Controller::run() {
 	do {
 		waitForSignal(&status);
 	} while(signalFromStatus(status) != -1);
-	std::cout << "Received termination signal . . ." << std::endl;
-	std::cout << "\tSignal number: " << signalFromStatus(status) << std::endl;
+	
+	int signal = signalFromStatus(status);
+	if(signal != -1) {
+		LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process terminating with signal " << signal << ".");
+	}
+	else {
+		LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process terminated normally.");
+	}
 }
 
 void Controller::waitForSigTrap() {
