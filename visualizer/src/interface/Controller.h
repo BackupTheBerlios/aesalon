@@ -1,5 +1,5 @@
-#ifndef Controller_H
-#define Controller_H
+#ifndef InterfaceController_H
+#define InterfaceController_H
 
 #include "DataCache.h"
 #include "Factory.h"

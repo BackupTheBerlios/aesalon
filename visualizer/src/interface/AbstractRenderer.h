@@ -1,5 +1,5 @@
-#ifndef AbstractRenderer_H
-#define AbstractRenderer_H
+#ifndef InterfaceAbstractRenderer_H
+#define InterfaceAbstractRenderer_H
 
 #include "Renderer.h"
 

@@ -1,5 +1,5 @@
-#ifndef DataCache_H
-#define DataCache_H
+#ifndef InterfaceDataCache_H
+#define InterfaceDataCache_H
 
 #include "DataTypes.h"
 

@@ -1,5 +1,5 @@
-#ifndef Renderer_H
-#define Renderer_H
+#ifndef InterfaceRenderer_H
+#define InterfaceRenderer_H
 
 #include "storage/DataRange.h"
 #include "visualization/VisualizationWrapper.h"
