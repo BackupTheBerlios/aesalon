@@ -10,6 +10,8 @@ class Analyzer;
 } // namespace Program
 
 class LogSystem {
+private:
+	static std::ostream *m_stream;
 public:
 	static void logModuleMessage(uint16_t moduleID, std::string message);
 	static void logConfigurationMessage(std::string message);

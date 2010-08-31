@@ -1,5 +1,6 @@
 #include <string>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "Logger.h"
 #include "Initializer.h"
@@ -11,7 +12,8 @@ Logger::Logger() : m_fd(0) {
 	
 	if(!filename.length()) return;
 	
-	m_fd = open(filename.c_str(), O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+	if(filename != "-") m_fd = open(filename.c_str(), O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+	else m_fd = STDOUT_FILENO;
 }
 
 Logger::~Logger() {

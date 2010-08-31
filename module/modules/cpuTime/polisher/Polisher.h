@@ -3,12 +3,11 @@
 
 #include "polisher/Polisher.h"
 
-class DynamicMemoryPolisher : public PolisherInterface {
+class CpuTimePolisher : public PolisherInterface {
 public:
-    DynamicMemoryPolisher();
-    virtual ~DynamicMemoryPolisher();
+    CpuTimePolisher();
+    virtual ~CpuTimePolisher();
 private:
-	
 public:
     virtual DataPacket *handlePacket(DataPacket *packet);
 };
