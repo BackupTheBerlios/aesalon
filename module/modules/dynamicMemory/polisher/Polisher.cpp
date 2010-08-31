@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Polisher.h"
 
 CreateInstantiationFunction(DynamicMemoryPolisher)
