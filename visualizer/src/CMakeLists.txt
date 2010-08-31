@@ -12,7 +12,7 @@ aux_source_directory(. dotSources)
 aux_source_directory(main mainSources)
 aux_source_directory(session sessionSources)
 aux_source_directory(module moduleSources)
-aux_source_directory(interface interfaceSources)
+aux_source_directory(renderer rendererSources)
 aux_source_directory(storage storageSources)
 aux_source_directory(visualization visualizationSources)
 
@@ -21,7 +21,7 @@ set(sources
     ${mainSources}
     ${sessionSources}
     ${moduleSources}
-    ${interfaceSources}
+    ${rendererSources}
     ${storageSources}
     ${visualizationSources}
 )

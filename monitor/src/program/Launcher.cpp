@@ -102,7 +102,7 @@ std::string Launcher::preload() {
 	} while(moduleList.find(":") != std::string::npos);
 	
 	if(preload.length()) {
-		preload += Misc::PathSanitizer::findFromPaths("interface.so",
+		preload += Misc::PathSanitizer::findFromPaths("collector.so",
 			Initializer::singleton()->configuration()->traverse("search-paths")->data());
 	}
 	

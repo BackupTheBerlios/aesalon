@@ -5,8 +5,8 @@
 
 class DataRange {
 public:
-	DataRange(DataCoord begin = DataCoord(), DataCoord end = DataCoord());
-	~DataRange();
+	DataRange(DataCoord begin = DataCoord(), DataCoord end = DataCoord()) : m_begin(begin), m_end(end) {}
+	~DataRange() {}
 private:
 	DataCoord m_begin, m_end;
 public:

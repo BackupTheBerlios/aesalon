@@ -1,10 +1,8 @@
-#ifndef InterfaceRenderer_H
-#define InterfaceRenderer_H
+#ifndef RendererRenderer_H
+#define RendererRenderer_H
 
-#include "storage/DataRange.h"
+#include "renderer/DataRange.h"
 #include "visualization/VisualizationWrapper.h"
-
-namespace VisualizerModule {
 
 class Renderer {
 public:
@@ -12,7 +10,5 @@ public:
 	
 	virtual void renderRange(VisualizationWrapper *visualization, const DataRange &range, bool *abort) = 0;
 };
-
-} // namespace VisualizerModule
 
 #endif

@@ -9,6 +9,7 @@ extern "C" {
 Controller *AesalonVisualizerCreateInstance() {
 	Controller *controller = new Controller();
 	controller->setFactory(new CpuTimeFactory());
+	
 	controller->setDataCache(NULL);
 }
 

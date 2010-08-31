@@ -8,7 +8,7 @@
 #include "module/Module.h"
 #include "VisualizationRequest.h"
 #include "VisualizationThreadPool.h"
-#include "interface/Renderer.h"
+#include "renderer/Renderer.h"
 
 class VisualizationWidget;
 
@@ -27,7 +27,7 @@ private:
 	Visualization *m_visualization;
 	VisualizationThreadPool *m_threadPool;
 	VisualizationWidget *m_widget;
-	VisualizerModule::Renderer *m_renderer;
+	Renderer *m_renderer;
 	
 	typedef QSet<VisualizationRequest *> RequestSet;
 	RequestSet m_requestSets[RequestTypes];
@@ -36,8 +36,8 @@ public:
 	Visualization *visualization() const { return m_visualization; }
 	VisualizationWidget *widget() const { return m_widget; }
 	void setWidget(VisualizationWidget *widget) { m_widget = widget; }
-	VisualizerModule::Renderer *renderer() const { return m_renderer; }
-	void setRenderer(VisualizerModule::Renderer *renderer) { m_renderer = renderer; }
+	Renderer *renderer() const { return m_renderer; }
+	void setRenderer(Renderer *renderer) { m_renderer = renderer; }
 	
 	void registerRequest(VisualizationRequest *request);
 	void deregisterRequest(VisualizationRequest *request);

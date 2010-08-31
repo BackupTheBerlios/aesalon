@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <time.h>
 
-#include "Interface.h"
+#include "collector/Interface.h"
 
 static int AC_mmapFd;
 static uint8_t *AC_memory;

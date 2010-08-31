@@ -5,7 +5,7 @@
 #include <QMutex>
 #include <QPainter>
 
-#include "storage/DataRange.h"
+#include "renderer/DataRange.h"
 #include "VisualizationWrapper.h"
 
 class VisualizationController;

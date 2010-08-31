@@ -1,3 +1,3 @@
-add_subdirectory(static)
+add_subdirectory(collector)
 add_subdirectory(modules)
 

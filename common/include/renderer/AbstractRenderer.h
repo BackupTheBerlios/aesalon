@@ -1,9 +1,7 @@
-#ifndef InterfaceAbstractRenderer_H
-#define InterfaceAbstractRenderer_H
+#ifndef RendererAbstractRenderer_H
+#define RendererAbstractRenderer_H
 
 #include "Renderer.h"
-
-namespace VisualizerModule {
 
 template <typename CacheType>
 class AbstractRenderer : public Renderer {
@@ -16,7 +14,5 @@ public:
 protected:
 	CacheType *dataCache() const { return m_dataCache; }
 };
-
-} // namespace VisualizerModule
 
 #endif

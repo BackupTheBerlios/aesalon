@@ -29,7 +29,7 @@ Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL) {
 		return;
 	}
 	
-	VisualizerModule::Controller *(*instantiateFunction)();
+	RendererController *(*instantiateFunction)();
 	*(void **)(&instantiateFunction) = instantiationHandle;
 	
 	m_controller = instantiateFunction();
@@ -50,9 +50,9 @@ void Module::processIncoming(DataPacket *packet) {
 	m_controller->dataCache()->processPacket(packet);
 }
 
-VisualizerModule::Renderer *Module::createRenderer(std::string name) {
+Renderer *Module::renderer(std::string name) {
 	if(m_controller == NULL) return NULL;
-	return m_controller->factory()->createRenderer(name);
+	return m_controller->factory()->renderer(name);
 }
 
 DataRange Module::defaultDataRange() {

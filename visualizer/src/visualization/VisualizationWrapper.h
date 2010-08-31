@@ -1,8 +1,8 @@
 #ifndef VisualizationWrapper_H
 #define VisualizationWrapper_H
 
-#include "storage/DataCoord.h"
-#include "storage/DataRange.h"
+#include "renderer/DataCoord.h"
+#include "renderer/DataRange.h"
 
 class VisualizationWrapper {
 public:
