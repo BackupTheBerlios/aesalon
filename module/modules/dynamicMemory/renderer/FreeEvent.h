@@ -13,7 +13,11 @@ private:
 	uint64_t m_address;
 	uint64_t m_timestamp;
 public:
-    virtual void applyTo(TreeHead *head);
+	virtual uint64_t timestamp() const { return m_timestamp; }
+    
+	virtual void accept(EventVisitor *visitor);
+    
+	virtual void applyTo(TreeHead *head);
 };
 
 #endif

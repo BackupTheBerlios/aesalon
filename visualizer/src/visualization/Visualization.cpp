@@ -75,6 +75,16 @@ void Visualization::drawLine(DataCoord from, DataCoord to) {
 	m_painter.drawLine(line);
 }
 
+void Visualization::drawBox(DataRange range) {
+	if(!isLocked()) {
+		qWarning("drawBox() called when visualization is not locked.");
+		return;
+	}
+	QRectF rect(translate(range));
+	m_painter.drawRect(rect);
+}
+
+
 Visualization *Visualization::subVisualization(const DataRange &range) {
 	Visualization *sv = new Visualization(translate(range).toAlignedRect().size(), range);
 	sv->setController(m_controller);

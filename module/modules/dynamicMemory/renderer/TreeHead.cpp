@@ -22,6 +22,10 @@ void TreeHead::attachTo(TreeHead *tree) {
 	}
 }
 
+void TreeHead::addEvent(Event *event) {
+	m_eventList.push_back(event);
+}
+
 TreeNode *TreeHead::lookup(uint64_t address) {
 	return lookup(address, 0);
 }
@@ -33,7 +37,6 @@ TreeNode *TreeHead::create(uint64_t address) {
 void TreeHead::remove(uint64_t address) {
 	lookup(address, REMOVE);
 }
-
 
 TreeNode *TreeHead::lookup(uint64_t address, int lookupMode) {
 	bool create = lookupMode & CREATE;
@@ -80,7 +83,7 @@ void TreeHead::mark(uint64_t address) {
 	
 	TreeNode *node = m_headNode;
 	
-	for(uint8_t bit = 0; bit < 64; bit ++) {
+	for(int8_t bit = 63; bit >= 0; bit --) {
 		uint64_t mask = (uint64_t(0x01) << bit);
 		int value = (address & mask)?1:0;
 		TreeNode *child = NULL;

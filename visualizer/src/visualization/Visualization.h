@@ -55,6 +55,8 @@ public:
 	*/
 	virtual void drawLine(DataCoord from, DataCoord to);
 	
+    virtual void drawBox(DataRange range);
+	
 	/** Creates a sub-visualization of this visualization, preserving the
 		mapping ratio of data units to screen units for a given range.
 		@param range The range of the sub-visualization.

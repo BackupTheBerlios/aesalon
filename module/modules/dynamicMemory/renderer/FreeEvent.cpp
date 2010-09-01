@@ -1,6 +1,7 @@
 #include "FreeEvent.h"
 #include "TreeNode.h"
 #include "TreeHead.h"
+#include "EventVisitor.h"
 
 FreeEvent::FreeEvent(uint64_t address, uint64_t timestamp) : m_address(address), m_timestamp(timestamp) {
 	
@@ -8,6 +9,10 @@ FreeEvent::FreeEvent(uint64_t address, uint64_t timestamp) : m_address(address),
 
 FreeEvent::~FreeEvent() {
 	
+}
+
+void FreeEvent::accept(EventVisitor *visitor) {
+	visitor->visit(this);
 }
 
 void FreeEvent::applyTo(TreeHead *head) {

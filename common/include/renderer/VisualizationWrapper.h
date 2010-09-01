@@ -16,6 +16,7 @@ public:
 	virtual bool isLocked() const = 0;
 	virtual void setPenColour(int r, int g, int b, int a) = 0;
 	virtual void drawLine(DataCoord from, DataCoord to) = 0;
+	virtual void drawBox(DataRange range) = 0;
 };
 
 #endif

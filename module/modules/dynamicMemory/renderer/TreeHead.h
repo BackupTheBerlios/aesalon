@@ -1,28 +1,34 @@
 #ifndef TreeHead_H
 #define TreeHead_H
 
-#include "DataTypes.h"
+#include <list>
 
+#include "DataTypes.h"
 #include "TreeNode.h"
+#include "Event.h"
 
 class TreeHead {
 public:
+	typedef std::list<Event *> EventList;
 	TreeHead(uint32_t headID);
 	~TreeHead();
 private:
-	uint32_t m_headID;
-	TreeNode *m_headNode;
-	static uint64_t m_headValue;
-	/* TODO: store events that change the previous head into this one. (e.g. delta of headID-1 to headID.) */
-	
 	enum LookupMode {
 		CREATE = 0x01,
 		REMOVE = 0x02
 	};
+	
+	uint32_t m_headID;
+	TreeNode *m_headNode;
+	static uint64_t m_headValue;
+	EventList m_eventList;
 public:
 	TreeNode *headNode() const { return m_headNode; }
 	
 	void attachTo(TreeHead *tree);
+	
+	void addEvent(Event *event);
+	int eventCount() const { return m_eventList.size(); }
 	
 	TreeNode *lookup(uint64_t address);
 	TreeNode *create(uint64_t address);

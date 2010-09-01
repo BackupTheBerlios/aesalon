@@ -1,3 +1,4 @@
 dynamicMemory:
 -   Implement support for path compression
+-   Handle calloc/realloc() properly
 
