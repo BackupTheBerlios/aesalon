@@ -9,6 +9,7 @@ public:
 	virtual ~Renderer() {}
 	
 	virtual void renderRange(VisualizationWrapper *visualization, const DataRange &range, bool *abort) = 0;
+	virtual DataRange defaultRange() const = 0;
 };
 
 #endif

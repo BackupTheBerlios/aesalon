@@ -8,8 +8,8 @@
 
 Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL) {
 	qDebug("Attempting to load module \"%s\" . . .", name);
-	QString path = modulePath(QString(name).append("/visualizer.so"));
-	qDebug("to parse: %s", qPrintable(QString(name).append("/visualizer.so")));
+	QString path = modulePath(QString(name).append("/renderer.so"));
+	qDebug("to parse: %s", qPrintable(QString(name).append("/renderer.so")));
 	qDebug("path: %s", qPrintable(path));
 	if(path.length() == 0) {
 		qWarning("Cannot load module; does not exist in module path.");
@@ -22,7 +22,7 @@ Module::Module(const char *name) : m_name(name), m_moduleHandle(NULL) {
 		return;
 	}
 	
-	void *instantiationHandle = dlsym(m_moduleHandle, "AesalonVisualizerCreateInstance");
+	void *instantiationHandle = dlsym(m_moduleHandle, "Instantiate");
 	
 	if(instantiationHandle == NULL) {
 		qWarning("Module \"%s\" does not have instantiation function.", name);
@@ -53,13 +53,6 @@ void Module::processIncoming(DataPacket *packet) {
 Renderer *Module::renderer(std::string name) {
 	if(m_controller == NULL) return NULL;
 	return m_controller->factory()->renderer(name);
-}
-
-DataRange Module::defaultDataRange() {
-	/*if(m_interface == NULL) return DataRange();
-	return m_interface->defaultDataRange();*/
-	/* TODO: implement this. */
-	return DataRange();
 }
 
 QString Module::modulePath(QString filename) {

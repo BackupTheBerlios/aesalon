@@ -5,44 +5,51 @@
 #include <sys/time.h>
 #include <sys/times.h>
 #include <sys/resource.h>
+#include <sys/timerfd.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "collector/Interface.h"
 
 AC_moduleDefinition;
 
-static timer_t SendTimer;
-static struct sigevent SendTimerType;
+int ACM_timerFd;
+pthread_t ACM_threadID;
+int ACM_running;
 
-void ACM_sendTime(union sigval unused) {
-	if(!AC_hasCollectionBegun()) return;
+static void *ACM_sendTime(void *unused) {
+	ACM_running = 1;
+	while(ACM_running) {
+		uint64_t exp;
+		read(ACM_timerFd, &exp, sizeof(exp));
+		if(!AC_hasCollectionBegun()) continue;
 	
-	AC_DataPacket packet;
-	struct rusage ru;
-	getrusage(RUSAGE_SELF, &ru);
-	
-	uint64_t value = (ru.ru_utime.tv_sec * 1000000000) + (ru.ru_utime.tv_usec * 1000);
-	
-	/*struct tms times_value;
-	times(&times_value);
-	
-	uint64_t value = times_value.tms_utime + times_value.tms_stime;
-	value *= 10000000;
-	
-	printf("value: %lu\n", value);*/
-	
-	packet.dataSource.timestamp = AC_timestamp();
-	packet.dataSource.moduleID = AC_moduleID();
-	packet.data = &value;
-	packet.dataSize = sizeof(value);
-	/*printf("Packet: timestamp=%lu, value=%lu\n", packet.dataSource.timestamp, value);*/
-	AC_writePacket(&packet);
+		AC_DataPacket packet;
+		struct rusage ru;
+		getrusage(RUSAGE_SELF, &ru);
+		
+		uint64_t value = (ru.ru_utime.tv_sec * 1000000000) + (ru.ru_utime.tv_usec * 1000);
+		
+		/*struct tms times_value;
+		times(&times_value);
+		
+		uint64_t value = times_value.tms_utime + times_value.tms_stime;
+		value *= 10000000;
+		
+		printf("value: %lu\n", value);*/
+		
+		packet.dataSource.timestamp = AC_timestamp();
+		packet.dataSource.moduleID = AC_moduleID();
+		packet.data = &value;
+		packet.dataSize = sizeof(value);
+		/*printf("Packet: timestamp=%lu, value=%lu\n", packet.dataSource.timestamp, value);*/
+		AC_writePacket(&packet);
+	}
+	return NULL;
 }
 
 void __attribute__((constructor)) AC_constructor() {
-	printf("Constructing cpuTime . . .\n");
-	SendTimerType.sigev_notify = SIGEV_THREAD;
-	SendTimerType.sigev_notify_function = ACM_sendTime;
-	
-	if(timer_create(CLOCK_REALTIME, &SendTimerType, &SendTimer) == -1) {
+	/* NOTE: TFD_CLOEXEC was introduced in Linux 2.6.27; timerfd_create() is Linux-specific. */
+	if((ACM_timerFd = timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC)) == -1) {
 		printf("Failed to create timer . . .\n");
 		return;
 	}
@@ -57,18 +64,16 @@ void __attribute__((constructor)) AC_constructor() {
 	its.it_interval.tv_nsec = interval;
 	
 	its.it_value.tv_sec = 0;
-	its.it_value.tv_nsec = 1;
+	its.it_value.tv_nsec = interval;
 	
-	timer_settime(SendTimer, 0, &its, NULL);
+	timerfd_settime(ACM_timerFd, 0, &its, NULL);
 	
-	printf("Constructed. Registering . . .\n");
+	pthread_create(&ACM_threadID, NULL, ACM_sendTime, NULL);
 	
 	AC_registerModule("cpuTime");
-	
-	printf("Registered.\n");
 }
 
 void __attribute__((destructor)) AC_destructor() {
-	union sigval unused;
-	ACM_sendTime(unused);
+	ACM_running = 0;
+	pthread_join(ACM_threadID, NULL);
 }

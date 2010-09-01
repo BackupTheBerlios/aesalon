@@ -11,6 +11,7 @@ public:
 private:
 public:
     virtual void renderRange(VisualizationWrapper *visualization, const DataRange &range, bool *abort);
+    virtual DataRange defaultRange() const;
 };
 
 #endif

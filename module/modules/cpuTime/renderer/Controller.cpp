@@ -9,6 +9,7 @@ RendererController *Instantiate() {
 	RendererConcreteFactory *factory = new RendererConcreteFactory();
 	CpuTimeDataCache *dataCache = new CpuTimeDataCache();
 	controller->setDataCache(dataCache);
+	controller->setFactory(factory);
 
 	factory->registerRenderer("Global CPU usage", new GlobalUsageRenderer(dataCache));
 

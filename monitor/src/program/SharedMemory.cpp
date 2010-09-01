@@ -82,21 +82,21 @@ DataPacket *SharedMemory::readPacket() {
 
 void SharedMemory::readData(void *buffer, int size) {
 	if(m_header->dataStart + size > m_header->dataSize) {
-		std::cout << "Overflow!" << std::endl;
+		/*std::cout << "Overflow!" << std::endl;
 		std::cout << "\tdataSize: " << m_header->dataSize << std::endl;
 		std::cout << "\tdataStart: " << m_header->dataStart << std::endl;
-		std::cout << "\tsize: " << size << std::endl;
+		std::cout << "\tsize: " << size << std::endl;*/
 		
 		int end_copy_size = (m_header->dataSize - m_header->dataStart);
-		std::cout << "\tend_copy_size:" << end_copy_size << std::endl;
+		/*std::cout << "\tend_copy_size:" << end_copy_size << std::endl;*/
 		
 		memcpy(buffer, m_shmMemory + m_header->dataStart, end_copy_size);
 		
 		memcpy((char *)buffer + end_copy_size, m_shmMemory + m_header->dataOffset, size - end_copy_size);
 		m_header->dataStart = m_header->dataOffset + size - end_copy_size;
-		std::cout << "\tdataOffset: " << m_header->dataOffset << std::endl;
+		/*std::cout << "\tdataOffset: " << m_header->dataOffset << std::endl;
 		std::cout << "\tnew dataStart: " << m_header->dataStart << std::endl;
-		std::cout << "Overflow read successful . . ." << std::endl;
+		std::cout << "Overflow read successful . . ." << std::endl;*/
 	}
 	else {
 		memcpy(buffer, m_shmMemory + m_header->dataStart, size);

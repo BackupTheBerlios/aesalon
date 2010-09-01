@@ -22,7 +22,6 @@ public:
 	
 	void processIncoming(DataPacket *packet);
 	Renderer *renderer(std::string name);
-	DataRange defaultDataRange();
 private:
 	QString modulePath(QString filename);
 };

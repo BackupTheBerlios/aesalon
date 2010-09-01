@@ -67,7 +67,8 @@ void SessionDisplay::displayContextMenu(QPoint globalPosition, SessionVisualizat
 		
 		for(size_t rendererIndex = 0; rendererIndex < rendererNames.size(); rendererIndex ++) {
 			QAction *action = moduleMenu->addAction(rendererNames[rendererIndex].c_str());
-			action->setProperty("moduleID", QVariant(qint32(rendererIndex)));
+			action->setProperty("moduleID", i);
+			qDebug("action->property(): %i", action->property("moduleID").toInt());
 		}
 		
 		connect(moduleMenu, SIGNAL(triggered(QAction*)), SLOT(setVisualizationModule(QAction*)));
