@@ -6,6 +6,10 @@
 	#include <semaphore.h>
 #endif
 
+#ifndef NULL
+	#define NULL 0
+#endif
+
 #ifdef AesalonCollector
 	#define Address AC_Address
 	#define DataPacket AC_DataPacket
