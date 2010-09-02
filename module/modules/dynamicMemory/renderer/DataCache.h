@@ -6,7 +6,7 @@
 #include "renderer/DataCache.h"
 #include "renderer/DataRange.h"
 #include "TreeHead.h"
-#include "EventVisitor.h"
+#include "CacheVisitor.h"
 
 class DynamicMemoryDataCache : public RendererDataCache {
 public:
@@ -18,9 +18,13 @@ private:
 public:
     virtual void processPacket(DataPacket *packet);
     
-    void visit(EventVisitor *visitor, const DataRange &range);
+    void visit(const DataRange &dataRange, CacheVisitor *visitor);
 private:
+	void visit(TreeHead *tree, uint64_t start, uint64_t end);
+	TreeHead *latestTree() const { return m_treeHeadVector.back(); }
 	void newHead();
+	void allocBlock(uint64_t address, uint64_t size, uint64_t timestamp);
+	void freeBlock(uint64_t address, uint64_t timestamp);
 };
 
 #endif

@@ -5,11 +5,10 @@
 
 #include "DataTypes.h"
 #include "TreeNode.h"
-#include "Event.h"
 
 class TreeHead {
 public:
-	typedef std::list<Event *> EventList;
+	typedef std::list<Block *> BlockList;
 	TreeHead(uint32_t headID);
 	~TreeHead();
 private:
@@ -20,18 +19,39 @@ private:
 	
 	uint32_t m_headID;
 	TreeNode *m_headNode;
-	static uint64_t m_headValue;
+	BlockList m_changedList;
+	uint64_t m_timestamp;
 public:
 	TreeNode *headNode() const { return m_headNode; }
+	uint64_t timestamp() const { return m_timestamp; }
+	void updateTimestamp(uint64_t timestamp) { m_timestamp = timestamp; }
 	
 	void attachTo(TreeHead *tree);
 	
-	void addEvent(Event *event);
-	int eventCount() const { return m_eventList.size(); }
+	const BlockList &changedList() const { return m_changedList; }
+	void appendChanged(Block *block) { m_changedList.push_back(block); }
 	
+	/** Looks up a tree node.
+		@param address The address of the node to look up.
+		@return The node at @a address, or NULL if there is no block at that location.
+	*/
 	TreeNode *lookup(uint64_t address);
+	
+	/** Creates a tree node.
+		@param address The address of the new node.
+		@return A new node at @a address, or NULL if the node alreay exists.
+	*/
 	TreeNode *create(uint64_t address);
-	void remove(uint64_t address);
+	
+	/** Removes a tree node.
+		@param address The address of the node to remove.
+		@return True if the node was removed, false if removing the node would destroy data.
+	*/
+	bool remove(uint64_t address);
+	
+	/** Marks an address as changed.
+		@param address The address to mark.
+	*/
 	void mark(uint64_t address);
 private:
 	TreeNode *lookup(uint64_t address, int lookupMode);

@@ -5,6 +5,8 @@
 
 class DataRange {
 public:
+	DataRange(uint64_t beginTime, double beginData, uint64_t endTime, double endData)
+		: m_begin(DataCoord(beginTime, beginData)), m_end(DataCoord(endTime, endData)) {}
 	DataRange(DataCoord begin = DataCoord(), DataCoord end = DataCoord()) : m_begin(begin), m_end(end) {}
 	~DataRange() {}
 private:

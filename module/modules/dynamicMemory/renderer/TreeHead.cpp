@@ -2,8 +2,6 @@
 
 #include "TreeHead.h"
 
-uint64_t TreeHead::m_headValue = 0x8000000000000000ull;
-
 TreeHead::TreeHead(uint32_t headID) : m_headID(headID), m_headNode(NULL) {
 	
 }
@@ -22,10 +20,6 @@ void TreeHead::attachTo(TreeHead *tree) {
 	}
 }
 
-void TreeHead::addEvent(Event *event) {
-	m_eventList.push_back(event);
-}
-
 TreeNode *TreeHead::lookup(uint64_t address) {
 	return lookup(address, 0);
 }
@@ -34,8 +28,10 @@ TreeNode *TreeHead::create(uint64_t address) {
 	return lookup(address, CREATE);
 }
 
-void TreeHead::remove(uint64_t address) {
+bool TreeHead::remove(uint64_t address) {
 	lookup(address, REMOVE);
+	/* TODO: implement this. */
+	return false;
 }
 
 TreeNode *TreeHead::lookup(uint64_t address, int lookupMode) {
