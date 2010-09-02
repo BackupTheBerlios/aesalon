@@ -1,5 +1,6 @@
 #include "renderer/Controller.h"
 #include "DataCache.h"
+#include "DensityRenderer.h"
 
 extern "C" {
 
@@ -10,7 +11,7 @@ RendererController *Instantiate() {
 	controller->setFactory(factory);
 	controller->setDataCache(dataCache);
 	
-	
+	factory->registerRenderer("Block density", new DensityRenderer(dataCache));
 	
 	return controller;
 }

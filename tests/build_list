@@ -3,4 +3,5 @@ set(testList
     log_test
     sleep_test
     cpu_test
+    alloc_test
 )

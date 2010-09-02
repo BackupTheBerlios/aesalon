@@ -19,8 +19,9 @@ public:
     virtual void processPacket(DataPacket *packet);
     
     void visit(const DataRange &dataRange, CacheVisitor *visitor);
+    
+    DataRange densityRange() const;
 private:
-	void visit(TreeHead *tree, uint64_t start, uint64_t end);
 	TreeHead *latestTree() const { return m_treeHeadVector.back(); }
 	void newHead();
 	void allocBlock(uint64_t address, uint64_t size, uint64_t timestamp);

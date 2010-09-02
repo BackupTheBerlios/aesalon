@@ -43,6 +43,9 @@ void DynamicMemoryDataCache::processPacket(DataPacket *packet) {
 		/* TODO: implement this. */
 		std::cout << "realloc currently NYI." << std::endl;
 	}
+	
+	/* TODO: softcode this limit. */
+	if(latestTree()->changedList().size() > 500) newHead();
 }
 
 static bool compareHeads(TreeHead *one, TreeHead *two) {
@@ -89,17 +92,21 @@ void DynamicMemoryDataCache::visit(const DataRange &dataRange, CacheVisitor *vis
 	
 	TreeHead::BlockList::const_iterator start = std::lower_bound((*startHead)->changedList().begin(), (*startHead)->changedList().end(), &block, compareBlocks);
 	
-	(*startHead)->changedList();
+	for(; start != (*startHead)->changedList().end(); start ++) {
+		visitor->handleBlock((*start));
+	}
+	
+	if(startHead == endHead) return;
 	
 	++ startHead;
 	
 	for(; startHead != endHead; startHead ++) {
-		
+		for(TreeHead::BlockList::const_iterator i = (*startHead)->changedList().begin();
+			i != (*startHead)->changedList().end() && (*i)->allocTime() < dataRange.endTime(); i ++) {
+			
+			visitor->handleBlock(*i);
+		}
 	}
-	
-}
-
-void DynamicMemoryDataCache::visit(TreeHead *tree, uint64_t start, uint64_t end) {
 	
 }
 
@@ -131,4 +138,9 @@ void DynamicMemoryDataCache::freeBlock(uint64_t address, uint64_t timestamp) {
 	}
 	node->data()->setReleaseTime(timestamp);
 	latestTree()->appendChanged(node->data());
+}
+
+DataRange DynamicMemoryDataCache::densityRange() const {
+	return DataRange(m_treeHeadVector.front()->changedList().front()->allocTime(), m_treeHeadVector.front()->changedList().front()->address(),
+		m_treeHeadVector.front()->changedList().front()->releaseTime(), m_treeHeadVector.front()->changedList().front()->address() + m_treeHeadVector.front()->changedList().front()->size());
 }
