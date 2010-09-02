@@ -21,7 +21,6 @@ private:
 	uint32_t m_headID;
 	TreeNode *m_headNode;
 	static uint64_t m_headValue;
-	EventList m_eventList;
 public:
 	TreeNode *headNode() const { return m_headNode; }
 	
