@@ -25,6 +25,12 @@ public:
 	DataCoord operator-(const DataCoord &other) const {
         return DataCoord(m_time - other.m_time, m_data - other.m_data);
     }
+    
+    DataCoord &operator+=(const DataCoord &other) {
+		m_time += other.m_time;
+		m_data += other.m_data;
+		return *this;
+    }
 };
 
 #endif

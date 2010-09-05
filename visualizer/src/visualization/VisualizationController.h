@@ -51,7 +51,7 @@ public:
 	void renderRegion(const DataRange &range, RequestType type = PartialRequest);
 	
 	void shift(QPoint pixels);
-	void shift(DataRange range);
+	void shift(DataCoord by);
 	
 	void scale(qreal zoom);
 private:

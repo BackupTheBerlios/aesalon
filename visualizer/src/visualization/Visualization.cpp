@@ -103,6 +103,7 @@ void Visualization::shift(QPoint pixels) {
 	m_painter.setBrush(Qt::white);
 	m_painter.setPen(Qt::NoPen);
 	
+	/* TODO: move this code into the Controller class. It doesn't belong here. */
 	if(pixels.x() > 0) {
 		QRect rect = QRect(0, 0, pixels.x(), m_image.height());
 		m_painter.drawRect(rect);
@@ -126,6 +127,24 @@ void Visualization::shift(QPoint pixels) {
 	
 	m_range.begin() = m_range.begin() - translateOffset(pixels);
 	m_range.end() = m_range.end() - translateOffset(pixels);
+	
+	m_painter.end();
+	m_paintLock.unlock();
+}
+
+void Visualization::shift(DataCoord by) {
+	m_paintLock.lock();
+	QPoint pixels = translateOffset(by).toPoint();
+	QImage temporary = m_image;
+	m_painter.begin(&m_image);
+	
+	m_painter.drawImage(pixels, temporary);
+	
+	m_painter.setBrush(Qt::white);
+	m_painter.setPen(Qt::NoPen);
+	
+	m_range.begin() += by;
+	m_range.end() += by;
 	
 	m_painter.end();
 	m_paintLock.unlock();
@@ -165,7 +184,7 @@ void Visualization::scale(qreal zoom) {
 }
 
 QPointF Visualization::translate(const DataCoord &coord) {
-	quint64 xSize = m_range.endTime() - m_range.beginTime();
+	Timestamp xSize = m_range.endTime() - m_range.beginTime();
 	qreal ySize = m_range.endData() - m_range.beginData();
 	
 	qreal xPercentage = ((qreal)coord.time() - (qreal)m_range.beginTime()) / qreal(xSize);
@@ -182,7 +201,7 @@ DataCoord Visualization::translate(const QPoint &point) {
 	qreal xPercentage = point.x() / (qreal)m_image.width();
 	qreal yPercentage = point.y() / (qreal)m_image.height();
 	
-	quint64 xSize = m_range.endTime() - m_range.beginTime();
+	Timestamp xSize = m_range.endTime() - m_range.beginTime();
 	qreal ySize = m_range.endData() - m_range.beginData();
 	
 	return DataCoord((xPercentage * xSize) + m_range.beginTime(), (yPercentage * ySize) + m_range.beginData());
@@ -196,8 +215,12 @@ DataCoord Visualization::translateOffset(const QPoint &point) {
 	qreal xPercentage = point.x() / (qreal)m_image.width();
 	qreal yPercentage = point.y() / (qreal)m_image.height();
 	
-	quint64 xSize = m_range.endTime() - m_range.beginTime();
+	Timestamp xSize = m_range.endTime() - m_range.beginTime();
 	qreal ySize = m_range.endData() - m_range.beginData();
 	
 	return DataCoord((xPercentage * xSize), (yPercentage * ySize));
+}
+
+QPointF Visualization::translateOffset(const DataCoord &coord) {
+	return translate(m_range.begin() + coord);
 }
