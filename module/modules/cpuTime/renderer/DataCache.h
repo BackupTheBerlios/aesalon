@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "renderer/DataCache.h"
+#include "renderer/AbstractDataCache.h"
 #include "renderer/DataCoord.h"
 
-class CpuTimeDataCache : public RendererDataCache {
+class CpuTimeDataCache : public AbstractRendererDataCache {
 public:
 	virtual ~CpuTimeDataCache();
 	

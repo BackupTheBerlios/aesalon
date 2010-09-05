@@ -6,16 +6,21 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/timerfd.h>
+#include <pthread.h>
 
 #include "collector/Interface.h"
 
-static int AC_mmapFd;
+static int AC_mmapFd, AC_heartbeatFd;
 static uint8_t *AC_memory;
 static AC_MemoryMapHeader *AC_header;
+static uint8_t AC_heartbeatStatus;
+static pthread_t AC_heartbeatThread;
 
 /* Function prototypes for internally-used, non-exposed functions. */
 static int AC_remainingSpace();
 static void AC_writeData(void *data, size_t size);
+static void *AC_sendHeartbeats(void *unused);
 
 void AC_CONSTRUCTOR AC_constructor() {
 	char filename[64];
@@ -34,9 +39,31 @@ void AC_CONSTRUCTOR AC_constructor() {
 	AC_memory = mmap(NULL, shmSize, PROT_READ | PROT_WRITE, MAP_SHARED, AC_mmapFd, 0);
 	
 	AC_header = (AC_MemoryMapHeader *)AC_memory;
+	
+	/* NOTE: TFD_CLOEXEC was introduced in Linux 2.6.27; timerfd_create() is Linux-specific. */
+	if((AC_heartbeatFd = timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC)) == -1) {
+		printf("Failed to create timer . . .\n");
+		return;
+	}
+	
+	struct itimerspec its;
+	
+	its.it_interval.tv_sec = 0;
+	/* 10,000,000 nanoseconds is 1/100th of a second. E.g. 100 heartbeats per second. */
+	its.it_interval.tv_nsec = 10000000;
+	
+	its.it_value.tv_sec = 0;
+	its.it_value.tv_nsec = 10000000;
+	
+	timerfd_settime(AC_heartbeatFd, 0, &its, NULL);
+	
+	pthread_create(&AC_heartbeatThread, NULL, AC_sendHeartbeats, NULL);
 }
 
 void AC_DESTRUCTOR AC_destructor() {
+	AC_heartbeatStatus = 0;
+	pthread_join(AC_heartbeatThread, NULL);
+	
 	char filename[64];
 	sprintf(filename, "AC-%i", getpid());
 	shm_unlink(filename);
@@ -109,13 +136,30 @@ void AC_writePacket(AC_DataPacket *packet) {
 	
 	AC_writeData(&packet->dataSource, sizeof(packet->dataSource));
 	AC_writeData(&packet->dataSize, sizeof(packet->dataSize));
-	AC_writeData(packet->data, packet->dataSize);
+	if(packet->dataSize) AC_writeData(packet->data, packet->dataSize);
 	
 	sem_post(&AC_header->dataEndSemaphore);
 	sem_post(&AC_header->dataSempahore);
 	
 	int value;
 	sem_getvalue(&AC_header->dataSempahore, &value);
+}
+
+void *AC_sendHeartbeats(void *unused) {
+	AC_heartbeatStatus = 1;
+	while(AC_heartbeatStatus == 1) {
+		uint64_t exp;
+		read(AC_heartbeatFd, &exp, sizeof(exp));
+		
+		AC_DataPacket packet;
+		packet.dataSource.timestamp = AC_timestamp();
+		packet.dataSource.moduleID = 0;
+		packet.dataSize = 0;
+		packet.data = NULL;
+		
+		AC_writePacket(&packet);
+	}
+	return NULL;
 }
 
 uint64_t AC_timestamp() {

@@ -3,12 +3,12 @@
 
 #include <vector>
 
-#include "renderer/DataCache.h"
+#include "renderer/AbstractDataCache.h"
 #include "renderer/DataRange.h"
 #include "TreeHead.h"
 #include "CacheVisitor.h"
 
-class DynamicMemoryDataCache : public RendererDataCache {
+class DynamicMemoryDataCache : public AbstractRendererDataCache {
 public:
 	DynamicMemoryDataCache();
 	virtual ~DynamicMemoryDataCache();

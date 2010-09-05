@@ -9,10 +9,18 @@ ModuleMapper::~ModuleMapper() {
 }
 
 void ModuleMapper::processPacket(DataPacket *packet) {
+	/* Module ID #0 is the interface; thus if it it's not the collector interface . . . */
 	if(packet->dataSource.moduleID != 0) module(packet->dataSource.moduleID)->processIncoming(packet);
-	else {
+	/* If the size is nonzero, then it is a module loading notification; load the corresponding module. */
+	else if(packet->dataSize != 0) {
 		const char *name = (const char *)packet->data;
 		loadModule(name);
+	}
+	/* If the size is zero, then the packet is a heartbeat. */
+	else {
+		for(int i = 1; i < m_moduleList.size(); i ++) {
+			m_moduleList[i]->controller()->dataCache()->updateHeartbeatTimestamp(packet->dataSource.timestamp);
+		}
 	}
 }
 

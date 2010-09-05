@@ -9,6 +9,9 @@ public:
 	virtual ~VisualizationWrapper() {}
 public:
 	virtual const DataRange &range() const = 0;
+	virtual const DataRange &totalRange() const = 0;
+	
+	virtual void updateUpperTimestamp(uint64_t upperTimestamp) = 0;
 	
 	virtual void clear() = 0;
 	virtual void lock() = 0;

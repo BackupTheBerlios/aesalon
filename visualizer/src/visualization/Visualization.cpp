@@ -17,6 +17,10 @@ Visualization::~Visualization() {
 	
 }
 
+void Visualization::updateUpperTimestamp(uint64_t upperTimestamp) {
+	m_totalRange.endTime() = upperTimestamp;
+}
+
 void Visualization::merge(Visualization *other) {
 	QRectF otherRect = translate(other->m_range);
 	lock();
@@ -24,6 +28,9 @@ void Visualization::merge(Visualization *other) {
 	m_painter.setPen(Qt::NoPen);
 	m_painter.drawRect(otherRect.normalized());
 	m_painter.drawImage(otherRect.normalized().toRect(), other->m_image);
+	
+	if(m_totalRange.endTime() < other->m_totalRange.endTime()) m_totalRange.endTime() = other->m_totalRange.endTime();
+	
 	unlock();
 }
 

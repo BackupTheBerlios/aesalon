@@ -26,8 +26,10 @@ void Reader::processPacket(DataPacket *packet) {
 		}
 	}
 	else {
-		char *moduleName = (char *)packet->data;
-		m_mapper->loadModule(moduleName);
+		if(packet->dataSize) {
+			char *moduleName = (char *)packet->data;
+			m_mapper->loadModule(moduleName);
+		}
 	}
 	m_logger->logPacket(packet);
 	m_socketManager->sendPacket(packet);
