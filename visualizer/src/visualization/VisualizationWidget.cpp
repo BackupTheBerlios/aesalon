@@ -20,9 +20,14 @@ VisualizationWidget::~VisualizationWidget() {
 }
 
 void VisualizationWidget::paintEvent(QPaintEvent *event) {
+	/* TODO: find a better method of doing this. Acquiring an exclusive lock
+		on the mutex just to paint it is a bit overkill. */
+	m_visualization->lock();
+
 	QPainter painter(this);
 	
 	painter.drawImage(QRect(0, 0, width(), height()), m_visualization->image());
+	m_visualization->unlock();
 }
 
 void VisualizationWidget::resizeEvent(QResizeEvent *event) {
