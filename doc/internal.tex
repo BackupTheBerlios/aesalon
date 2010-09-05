@@ -64,11 +64,11 @@ not only useful, but also interesting.
 The Aesalon framework is segregated into two separate sections.
 \flushleft
 \begin{description}
- \item[\textnormal{The} Monitor] is responsible for launching the process in question. It also loads the monitor modules
+ \item[\textnormal{The} Monitor] is responsible for launching the process in question. It also loads the polisher modules
   and parses any ELF and DWARF information present inside the executable file. Any data processed by the
   monitor modules is then sent over a network connection to the Visualizer and/or written to a logfile.
- \item[\textnormal{The} Visualizer] loads the visualizer modules and provides storage and rendering frameworks for the
-  modules.
+ \item[\textnormal{The} Visualizer] provides a GUI, reads from the network and/or a logfile, and provides storage and rendering
+  frameworks for the renderer modules that it loads.
 \end{description}
 
 Overall, the framework is relatively bare-bones; much of the processing etc. is done by the modules themselves.
@@ -77,12 +77,12 @@ Overall, the framework is relatively bare-bones; much of the processing etc. is 
 Each module is split into three separate sections.
 \flushleft
 \begin{description}
- \item[\textnormal{The} Collector module] is loaded into the address space of the process being monitored; as such, the
+ \item[\textnormal{The} collector module] is loaded into the address space of the process being monitored; as such, the
   data is collected here, and transferred to the Monitor by a shared memory map.
- \item[\textnormal{The} Monitor module] is loaded by the Monitor into the Monitor's address space. Here, the raw data collected
+ \item[\textnormal{The} polisher module] is loaded by the Monitor into the Monitor's address space. Here, the raw data collected
   by the Collector is refined slightly. For example, raw function addresses might be processed into C-style
   scope names.
- \item[\textnormal{The} Visualizer module] stores and visualizes the data processed by the monitor; it is loaded into the address
+ \item[\textnormal{The} renderer module] stores and visualizes the data processed by the monitor; it is loaded into the address
   space of the Visualizer.
 \end{description}
 
@@ -106,47 +106,53 @@ and loading the monitor modules.
 Provided, in alphabetical order, are the command-line options for the program monitor. The general form
 for invocation is \texttt{aesalon [options] [--] filename [arguments]}.
 \begin{description}
- \item[\texttt{--collector:} (group *)] Provides the module-specific paths to the collector shared library, relative to the module's
-  root directory.
  \item[\texttt{--help:}] Displays an automatically-generated list of options, with brief descriptions.
  \item[\texttt{--log-file:}] If set, specifies a file to write events to. \texttt{.alog} is the standardized extension.
- \item[\texttt{--mconfig:} (group *)] Module-specific configurations. Can be used to set timers, disallow collection of certain types of data, etc.
  \item[\texttt{--modules:}] A colon-separated list of modules to load.
- \item[\texttt{--monitor:} (group *)] Provides the module-specific paths to the monitor shared library, relative to the module's
-  root directory.
  \item[\texttt{--network-wait:}] The number of network clients to wait for a connection from before commencing execution.
- \item[\texttt{--search-path:}] A colon-separated list of paths to search for module root directories in.
  \item[\texttt{--shm-size:}] The size of the SHM to use; must be a multiple of the page size of the operating system.%
   \footnote{Typically 4096 bytes on x86 and x86\_64 Linux systems.}
  \item[\texttt{--tcp-port:}] The TCP port to listen on for client connections.
 \end{description}
-\small{Items marked with a * are groups, a special type of argument. Each group has multiple sub-options, optionally specified.}
+
+\subsection{Environment variables}
+Aesalon's behaviour is also influenced by a number of environment variables.
+\begin{description}
+ \item[\texttt{AesalonSearchPath:}] A colon-separated list of paths to search for module directories.
+\end{description}
 
 \subsection{Configuration}
 There are five different levels of configuration, presented in order of processing.
 \begin{description}
+ \item[Module configuration] applies a default range of settings on a module-wide basis. These files are located in the module root, 
+  called \texttt{monitor.conf}.
  \item[Global configuration] is the system-wide defaults. The default path is \texttt{/etc/default/aesalon.conf.}
  \item[User configuration] is the user-wide defaults. The default path is \texttt{$\sim$/.config/aesalon/aesalon.conf.}
  \item[Local configuration] is the directory. This is a special case; any file named (by default) \texttt{.aesalon.conf}
   will be parsed and applied to any instances launched from that directory.
- \item[Module configuration] applies a default range of settings on a module-wide basis. These files are located in the module root, 
-  called \texttt{monitor.conf}.
  \item[Command-line arguments] are the final level of configuration. These override all other configurations, and are specified
   on the command-line.
 \end{description}
 
 \begin{figure}[h]
   \small{\texttt{%
-search-path=/usr/share/aesalon/modules/: \\
-shm-size=1048576 \\
-tcp-port=6321
+set shm-size=1048576 \\
+set tcp-port=6321 \\
+\\
+module dynamicMemory \\
+set rttiTracking=false \\
+set polisher=/tmp/build/dynamicMemory\_polisher-test.so \\
   }}
   \caption{Example global configuration file.\label{exampleconfigfile}}
 \end{figure}
 
-In configuration files, options are specified as demonstrated in Figure \ref{exampleconfigfile}. Additionally, \texttt{+=} may be used
-to concatenate the content of an option that is specified in two separate locations. This behaviour is identical to that of the
-command-line\footnote{e.g. \texttt{--modules+=cpuTime:} is perfectly valid behaviour.}.
+In configuration files, options are specified as demonstrated in Figure \ref{exampleconfigfile}; options are specified in the
+same manner on the command-line. The general form of a configuration item is \texttt{set \{item\}=\{content\}}; items may be
+specified inside a namespace, or a module. If no module command is specified, then the default module, called ``global'', is
+used.
+
+Note that there is currently no method of specifing configuration options; thus, no warnings about mis-spelled arguments or
+configuration items are given.
 
 \section{Design}
 \subsection{Source layout}
@@ -204,10 +210,8 @@ its ID.}
 
 In reality, however, the convenience macro \emph{AC\_registerModule()} should be used.
 
-\documentMacro{AC\_registerModule}{const char *name}{Calls \emph{AC\_registerModuleInternal()} and \emph{AC\_setModuleID()},
-in essence registering a module for use.}
-
-
+%\documentMacro{AC\_registerModule}{const char *name}{Calls \emph{AC\_registerModuleInternal()} and \emph{AC\_setModuleID()},
+%in essence registering a module for use.}
 
 \section{Monitor}
 The Monitor API is only partially completed at the moment.

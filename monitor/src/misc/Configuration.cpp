@@ -22,7 +22,7 @@ Configuration::Configuration(char **argv) : m_argv(argv) {
 }
 
 Configuration::~Configuration() {
-	for(ModuleMap::iterator i = m_moduleMap.begin(); i != m_moduleMap.end(); i ++) {
+	for(ModuleMap::iterator i = m_moduleMap.begin(); i != m_moduleMap.end(); ++ i) {
 		if(i->second != NULL) delete i->second;
 	}
 }
