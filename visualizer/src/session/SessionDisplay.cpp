@@ -18,7 +18,7 @@ SessionDisplay::SessionDisplay(ModuleMapper *moduleMapper) : QWidget(NULL), m_mo
 	m_updateTimer = new QTimer(this);
 	connect(m_updateTimer, SIGNAL(timeout()), SIGNAL(updateVisualizations()));
 	m_updateTimer->setSingleShot(false);
-	m_updateTimer->start(250);
+	/*m_updateTimer->start(250);*/
 }
 
 SessionDisplay::~SessionDisplay() {

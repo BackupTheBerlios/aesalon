@@ -18,13 +18,19 @@ Visualization::~Visualization() {
 }
 
 void Visualization::merge(Visualization *other) {
-	QRectF otherRect = translate(other->m_range);
 	lock();
+	other->lock();
+	QRectF otherRect = translate(other->m_range).normalized();
+	
+	qDebug("merge: this size is (%i,%i) . . .", m_image.width(), m_image.height());
+	qDebug("merge: otherRect is (%f,%f),(%f,%f) . . .", otherRect.left(), otherRect.top(), otherRect.right(), otherRect.bottom());
+	
 	m_painter.setBrush(Qt::white);
 	m_painter.setPen(Qt::NoPen);
-	m_painter.drawRect(otherRect.normalized());
-	m_painter.drawImage(otherRect.normalized().toRect(), other->m_image);
+	m_painter.drawRect(otherRect);
+	m_painter.drawImage(otherRect.toRect(), other->m_image);
 	
+	other->unlock();
 	unlock();
 }
 
@@ -35,8 +41,8 @@ void Visualization::clear() {
 }
 
 void Visualization::lock() {
-	/*qDebug("Locking surface . . .");*/
 	m_paintLock.lock();
+	/*qDebug("Locked surface . . .");*/
 	if(!m_painter.begin(&m_image)) {
 		qWarning("Note: couldn't lock surface . . .");
 	}
@@ -74,6 +80,8 @@ void Visualization::drawLine(DataCoord from, DataCoord to) {
 	/*qDebug("Asked to draw line from (%f, %f) to (%f, %f) . . .", line.x1(), line.y1(), line.x2(), line.y2());*/
 	
 	m_painter.drawLine(line);
+	m_controller->modifiedPoint(from);
+	m_controller->modifiedPoint(to);
 }
 
 void Visualization::drawBox(DataRange range) {
@@ -83,6 +91,8 @@ void Visualization::drawBox(DataRange range) {
 	}
 	QRectF rect(translate(range));
 	m_painter.drawRect(rect);
+	m_controller->modifiedPoint(range.begin());
+	m_controller->modifiedPoint(range.end());
 }
 
 
@@ -92,56 +102,20 @@ Visualization *Visualization::subVisualization(const DataRange &range) {
 	return sv;
 }
 
-void Visualization::shift(QPoint pixels) {
-	/*qDebug("Asked to shift visualization . . .");*/
-	m_paintLock.lock();
-	QImage temporary = m_image;
-	m_painter.begin(&m_image);
-	
-	m_painter.drawImage(pixels, temporary);
-	
-	m_painter.setBrush(Qt::white);
-	m_painter.setPen(Qt::NoPen);
-	
-	/* TODO: move this code into the Controller class. It doesn't belong here. */
-	if(pixels.x() > 0) {
-		QRect rect = QRect(0, 0, pixels.x(), m_image.height());
-		m_painter.drawRect(rect);
-		m_controller->renderRegion(translate(rect.normalized()));
-	}
-	else if(pixels.x() < 0) {
-		QRect rect = QRect(m_image.width() + pixels.x(), 0, -pixels.x(), m_image.height());
-		m_painter.drawRect(rect);
-		m_controller->renderRegion(translate(rect));
-	}
-	
-	if(pixels.y() > 0) {
-		m_painter.drawRect(0, 0, m_image.width(), pixels.y());
-	}
-	else if(pixels.y() < 0) {
-		QRect rect = QRect(0, m_image.height() + pixels.y(), m_image.width(), -pixels.y());
-		m_painter.drawRect(rect.normalized());
-	}
-	
-	pixels.setY(-pixels.y());
-	
-	m_range.begin() = m_range.begin() - translateOffset(pixels);
-	m_range.end() = m_range.end() - translateOffset(pixels);
-	
-	m_painter.end();
-	m_paintLock.unlock();
-}
-
 void Visualization::shift(DataCoord by) {
 	m_paintLock.lock();
-	QPoint pixels = translateOffset(by).toPoint();
-	QImage temporary = m_image;
+	QPointF pixels = translateOffset(by);
+	qDebug("by: %li, %f", by.time(), by.data());
+	qDebug("pixels: %f,%f", pixels.x(), pixels.y());
+	QImage temporary = m_image.copy();
 	m_painter.begin(&m_image);
+	
+	m_image.fill(qRgb(255, 192, 192));
 	
 	m_painter.drawImage(pixels, temporary);
 	
-	m_painter.setBrush(Qt::white);
-	m_painter.setPen(Qt::NoPen);
+	/*m_painter.setBrush(Qt::white);
+	m_painter.setPen(Qt::NoPen);*/
 	
 	m_range.begin() += by;
 	m_range.end() += by;
@@ -190,7 +164,7 @@ QPointF Visualization::translate(const DataCoord &coord) {
 	qreal xPercentage = ((qreal)coord.time() - (qreal)m_range.beginTime()) / qreal(xSize);
 	qreal yPercentage = (coord.data() - m_range.beginData()) / ySize;
 	
-	return QPointF(m_image.width() * xPercentage, m_image.height() - (m_image.height() * yPercentage));
+	return QPointF((m_image.width()-1) * xPercentage, (m_image.height()-1) - ((m_image.height()-1) * yPercentage));
 }
 
 QRectF Visualization::translate(const DataRange &range) {
@@ -198,8 +172,8 @@ QRectF Visualization::translate(const DataRange &range) {
 }
 
 DataCoord Visualization::translate(const QPoint &point) {
-	qreal xPercentage = point.x() / (qreal)m_image.width();
-	qreal yPercentage = point.y() / (qreal)m_image.height();
+	qreal xPercentage = point.x() / (qreal)(m_image.width()-1);
+	qreal yPercentage = point.y() / (qreal)(m_image.height()-1);
 	
 	Timestamp xSize = m_range.endTime() - m_range.beginTime();
 	qreal ySize = m_range.endData() - m_range.beginData();
@@ -212,8 +186,8 @@ DataRange Visualization::translate(const QRect &rect) {
 }
 
 DataCoord Visualization::translateOffset(const QPoint &point) {
-	qreal xPercentage = point.x() / (qreal)m_image.width();
-	qreal yPercentage = point.y() / (qreal)m_image.height();
+	qreal xPercentage = point.x() / (qreal)(m_image.width()-1);
+	qreal yPercentage = point.y() / (qreal)(m_image.height()-1);
 	
 	Timestamp xSize = m_range.endTime() - m_range.beginTime();
 	qreal ySize = m_range.endData() - m_range.beginData();
@@ -222,5 +196,11 @@ DataCoord Visualization::translateOffset(const QPoint &point) {
 }
 
 QPointF Visualization::translateOffset(const DataCoord &coord) {
-	return translate(m_range.begin() + coord);
+	DataCoord c = coord;
+	c.time() += m_range.beginTime();
+	c.data() += m_range.endData();
+	QPointF translated = translate(c);
+	translated.setX(-translated.x());
+	translated.setY(-translated.y());	
+	return translated;
 }

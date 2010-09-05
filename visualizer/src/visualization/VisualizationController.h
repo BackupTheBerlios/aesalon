@@ -9,6 +9,7 @@
 #include "VisualizationRequest.h"
 #include "VisualizationThreadPool.h"
 #include "renderer/Renderer.h"
+#include "renderer/DataRange.h"
 
 class VisualizationWidget;
 
@@ -28,6 +29,7 @@ private:
 	VisualizationThreadPool *m_threadPool;
 	VisualizationWidget *m_widget;
 	Renderer *m_renderer;
+	DataRange m_totalRange;
 	
 	typedef QSet<VisualizationRequest *> RequestSet;
 	RequestSet m_requestSets[RequestTypes];
@@ -38,6 +40,9 @@ public:
 	void setWidget(VisualizationWidget *widget) { m_widget = widget; }
 	Renderer *renderer() const { return m_renderer; }
 	void setRenderer(Renderer *renderer) { m_renderer = renderer; }
+	void modifiedPoint(DataCoord point);
+	void heartbeat(Timestamp timestamp);
+	const DataRange &totalRange() const { return m_totalRange; }
 	
 	void updateVisualization();
 	

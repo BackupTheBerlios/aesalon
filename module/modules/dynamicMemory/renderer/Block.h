@@ -5,12 +5,12 @@
 
 class Block {
 public:
-	Block(uint64_t address, uint64_t size, uint64_t allocTime);
+	Block(uint64_t address, uint64_t size, Timestamp allocTime);
 private:
 	uint64_t m_address;
 	uint64_t m_size;
-	uint64_t m_allocTime;
-	uint64_t m_releaseTime;
+	Timestamp m_allocTime;
+	Timestamp m_releaseTime;
 	Block *m_reallocedTo;
 public:
 	uint64_t address() const { return m_address; }

@@ -19,11 +19,11 @@ void VisualizationRequest::run() {
 	if(m_abort) return;
 	
 	Visualization *sv = m_controller->visualization()->subVisualization(m_range);
-	qDebug("Asking renderer to render visualization . . .");
+	/*qDebug("Asking renderer to render visualization . . .");*/
 	m_controller->renderer()->renderRange(sv, m_range, &m_abort);
 	if(!m_abort) {
 		m_controller->visualization()->merge(sv);
-		qDebug("VisualizationRequest executed, updating widget . . .");
+		/*qDebug("VisualizationRequest executed, updating widget . . .");*/
 		m_controller->widget()->update();
 	}
 	

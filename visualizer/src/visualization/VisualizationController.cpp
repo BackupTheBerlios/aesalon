@@ -8,15 +8,32 @@ VisualizationController::VisualizationController(Module *module, Visualization *
 	m_threadPool = VisualizationThreadPool::singleton();
 	m_visualization->setController(this);
 	qDebug("Max. threads: %i", m_threadPool->maxThreadCount());
+	m_totalRange.beginData() = 1e50;
+	m_totalRange.endData() = -1e50;
+	m_totalRange.beginTime() = 0;
+	m_totalRange.endTime() = 0;
 }
 
 VisualizationController::~VisualizationController() {
 
 }
 
+void VisualizationController::heartbeat(Timestamp timestamp) {
+	if(timestamp > m_totalRange.endTime()) m_totalRange.endTime() = timestamp;
+}
+
+void VisualizationController::modifiedPoint(DataCoord point) {
+	if(point.time() < m_totalRange.beginTime() || m_totalRange.beginTime() == 0) m_totalRange.beginTime() = point.time();
+	if(point.time() > m_totalRange.endTime()) m_totalRange.endTime() = point.time();
+	if(point.data() < m_totalRange.beginData()) m_totalRange.beginData() = point.data();
+	if(point.data() > m_totalRange.endData()) m_totalRange.endData() = point.data();
+}
+
 void VisualizationController::updateVisualization() {
 	DataRange range = m_visualization->range();
 	Timestamp tdiff = m_module->latestHeartbeat() - range.endTime();
+	
+	heartbeat(m_module->latestHeartbeat());
 	
 	shift(DataCoord(tdiff, 0.0));
 	
@@ -47,38 +64,50 @@ void VisualizationController::renderRegion(const DataRange &range, RequestType t
 }
 
 void VisualizationController::shift(QPoint pixels) {
-	m_visualization->shift(pixels);
+	/*qDebug("Asked to shift visualization . . .");*/
+	/* Invert the X value. The Y value is already inverted due to the visualization coordinate system. */
+	pixels.setY(-pixels.y());
+	
+	pixels.setX(1);
+	pixels.setY(0);
+	
+	shift(m_visualization->translateOffset(pixels));
 }
 
 void VisualizationController::shift(DataCoord by) {
-	/* NOTE: locks removed due to possible deadlocks. */
+	m_visualization->shift(by);
+
 	/* Handle the horizontal side . . .*/
-	/*m_visualization->lock();*/
 	DataRange hRange = m_visualization->range();
 	if(by.time() < 0) {
 		hRange.endTime() = hRange.beginTime();
 		hRange.beginTime() += by.time();
+		qDebug("** rendering horizontal region . . .");
+		renderRegion(hRange, PartialRequest);
 	}
 	else if(by.time() > 0) {
 		hRange.beginTime() = hRange.endTime();
 		hRange.endTime() += by.time();
+		qDebug("** rendering horizontal region . . .");
+		renderRegion(hRange, PartialRequest);
 	}
 	/* Now for the vertical. */
 	DataRange vRange = m_visualization->range();
 	if(by.data() < 0) {
 		vRange.endData() = vRange.beginData();
 		vRange.beginData() += by.data();
+		qDebug("** rendering vertical region . . .");
+		renderRegion(vRange, PartialRequest);
 	}
 	else if(by.data() > 0) {
 		vRange.beginData() = vRange.endData();
 		vRange.endData() += by.data();
+		qDebug("** rendering vertical region . . .");
+		renderRegion(vRange, PartialRequest);
 	}
 	
-	m_visualization->shift(by);
-	
-	renderRegion(hRange, PartialRequest);
-	renderRegion(vRange, PartialRequest);
-	/*m_visualization->unlock();*/
+	/*renderRegion(vRange, PartialRequest);*/
+	/*renderRegion(m_visualization->range(), PartialRequest);*/
 }
 
 void VisualizationController::scale(qreal zoom) {

@@ -17,7 +17,7 @@ static bool compareCoords(const DataCoord &one, const DataCoord &two) {
 }
 
 void GlobalUsageRenderer::renderRange(VisualizationWrapper *visualization, const DataRange &range, bool *abort) {
-	std::cout << "GlobalUsageRenderer::renderRange() . . ." << std::endl;
+	/*std::cout << "GlobalUsageRenderer::renderRange() . . ." << std::endl;*/
 	const CpuTimeDataCache::DataVector &dataVector = dataCache()->dataVector();
 	
 	DataCoord c;
@@ -29,7 +29,7 @@ void GlobalUsageRenderer::renderRange(VisualizationWrapper *visualization, const
 	
 	if(begin == dataVector.end()) {
 		/* Then the visualization is out of range. */
-		std::cout << "Out of range. " << std::endl;
+		/*std::cout << "Out of range. " << std::endl;*/
 		return;
 	}
 	else if(begin != dataVector.begin()) --begin;
@@ -52,7 +52,7 @@ void GlobalUsageRenderer::renderRange(VisualizationWrapper *visualization, const
 	
 	visualization->unlock();
 	
-	std::cout << end - begin << " elements in visualization." << std::endl;
+	/*std::cout << end - begin << " elements in visualization." << std::endl;*/
 }
 
 DataRange GlobalUsageRenderer::defaultRange() const {
