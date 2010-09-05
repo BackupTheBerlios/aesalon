@@ -104,6 +104,10 @@ Visualization *Visualization::subVisualization(const DataRange &range) {
 
 void Visualization::shift(DataCoord by) {
 	m_paintLock.lock();
+	
+	if(m_range.beginTime() + by.time() < m_controller->totalRange().beginTime()) by.time() = 0.0;
+	if(m_range.endTime() + by.time() > m_controller->totalRange().endTime()) by.time() = 0.0;
+	
 	QPointF pixels = translateOffset(by);
 	qDebug("by: %li, %f", by.time(), by.data());
 	qDebug("pixels: %f,%f", pixels.x(), pixels.y());

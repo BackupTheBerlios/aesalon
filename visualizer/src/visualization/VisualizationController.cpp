@@ -66,19 +66,22 @@ void VisualizationController::renderRegion(const DataRange &range, RequestType t
 void VisualizationController::shift(QPoint pixels) {
 	/*qDebug("Asked to shift visualization . . .");*/
 	/* Invert the X value. The Y value is already inverted due to the visualization coordinate system. */
+	pixels.setX(-pixels.x());
 	pixels.setY(-pixels.y());
 	
-	pixels.setX(1);
+	/*pixels.setX(1);*/
 	pixels.setY(0);
 	
 	shift(m_visualization->translateOffset(pixels));
 }
 
 void VisualizationController::shift(DataCoord by) {
+	/* Save the previous ranges. */
+	DataRange hRange = m_visualization->range();
+	DataRange vRange = m_visualization->range();
 	m_visualization->shift(by);
 
 	/* Handle the horizontal side . . .*/
-	DataRange hRange = m_visualization->range();
 	if(by.time() < 0) {
 		hRange.endTime() = hRange.beginTime();
 		hRange.beginTime() += by.time();
@@ -92,7 +95,6 @@ void VisualizationController::shift(DataCoord by) {
 		renderRegion(hRange, PartialRequest);
 	}
 	/* Now for the vertical. */
-	DataRange vRange = m_visualization->range();
 	if(by.data() < 0) {
 		vRange.endData() = vRange.beginData();
 		vRange.beginData() += by.data();
