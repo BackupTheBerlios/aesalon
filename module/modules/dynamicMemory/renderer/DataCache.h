@@ -24,8 +24,8 @@ public:
 private:
 	TreeHead *latestTree() const { return m_treeHeadVector.back(); }
 	void newHead();
-	void allocBlock(uint64_t address, uint64_t size, uint64_t timestamp);
-	void freeBlock(uint64_t address, uint64_t timestamp);
+	void allocBlock(uint64_t address, uint64_t size, Timestamp timestamp);
+	void freeBlock(uint64_t address, Timestamp timestamp);
 };
 
 #endif

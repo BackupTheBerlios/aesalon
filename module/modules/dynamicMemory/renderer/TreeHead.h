@@ -20,11 +20,11 @@ private:
 	uint32_t m_headID;
 	TreeNode *m_headNode;
 	BlockList m_changedList;
-	uint64_t m_timestamp;
+	Timestamp m_timestamp;
 public:
 	TreeNode *headNode() const { return m_headNode; }
-	uint64_t timestamp() const { return m_timestamp; }
-	void updateTimestamp(uint64_t timestamp) { m_timestamp = timestamp; }
+	Timestamp timestamp() const { return m_timestamp; }
+	void updateTimestamp(Timestamp timestamp) { m_timestamp = timestamp; }
 	
 	void attachTo(TreeHead *tree);
 	

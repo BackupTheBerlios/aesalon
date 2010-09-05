@@ -5,15 +5,15 @@
 
 class DataCoord {
 public:
-	DataCoord(uint64_t time = 0, double data = 0.0) : m_time(time), m_data(data) {}
+	DataCoord(Timestamp time = 0, double data = 0.0) : m_time(time), m_data(data) {}
 	~DataCoord() {}
 private:
-	uint64_t m_time;
+	Timestamp m_time;
 	double m_data;
 public:
-	uint64_t &time() { return m_time; }
-	const uint64_t &time() const { return m_time; }
-	void setTime(uint64_t time) { m_time = time; }
+	Timestamp &time() { return m_time; }
+	const Timestamp &time() const { return m_time; }
+	void setTime(Timestamp time) { m_time = time; }
 	
 	double &data() { return m_data; }
 	const double &data() const { return m_data; }

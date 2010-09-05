@@ -5,10 +5,10 @@
 
 #include "Factory.h"
 
-class RendererConcreteFactory : public RendererFactory {
+class ConcreteRendererFactory : public RendererFactory {
 public:
-	RendererConcreteFactory();
-	virtual ~RendererConcreteFactory();
+	ConcreteRendererFactory();
+	virtual ~ConcreteRendererFactory();
 private:
 	typedef std::map<std::string, Renderer *> RendererMap;
 	RendererMap m_rendererMap;

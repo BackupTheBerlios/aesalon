@@ -14,6 +14,14 @@ VisualizationController::~VisualizationController() {
 
 }
 
+void VisualizationController::updateVisualization() {
+	DataRange range = m_visualization->range();
+	range.beginTime() = range.endTime();
+	range.endTime() = m_module->latestHeartbeat();
+	/*renderRegion(range, PartialRequest);*/
+	qDebug("Update range: %lu %lu", range.beginTime(), range.endTime());
+}
+
 void VisualizationController::registerRequest(VisualizationRequest *request) {
 	if(request->category() == FullRequest) {
 		foreach(VisualizationRequest *request, m_requestSets[request->category()]) {
@@ -42,7 +50,9 @@ void VisualizationController::shift(QPoint pixels) {
 }
 
 void VisualizationController::shift(DataRange range) {
-	
+	/* Handle the horizontal sides . . .*/
+	m_visualization->lock();
+	DataRange hRange = m_visualization->range();
 }
 
 void VisualizationController::scale(qreal zoom) {

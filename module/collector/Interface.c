@@ -162,10 +162,10 @@ void *AC_sendHeartbeats(void *unused) {
 	return NULL;
 }
 
-uint64_t AC_timestamp() {
+AC_Timestamp AC_timestamp() {
 	struct timespec t;
 	clock_gettime(CLOCK_REALTIME, &t);
-	return ((uint64_t)t.tv_sec * 1000000000) + t.tv_nsec;
+	return ((AC_Timestamp)t.tv_sec * 1000000000) + t.tv_nsec;
 }
 
 uint8_t AC_hasCollectionBegun() {

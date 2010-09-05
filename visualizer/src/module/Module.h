@@ -19,6 +19,7 @@ private:
 public:
 	const QString &name() const { return m_name; }
 	RendererController *controller() const { return m_controller; }
+	Timestamp latestHeartbeat() const;
 	
 	void processIncoming(DataPacket *packet);
 	Renderer *renderer(std::string name);

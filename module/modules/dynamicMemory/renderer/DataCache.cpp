@@ -66,8 +66,8 @@ void DynamicMemoryDataCache::visit(const DataRange &dataRange, CacheVisitor *vis
 	class RecursiveTraversal {
 	public:
 		CacheVisitor *m_visitor;
-		uint64_t m_lowerCutoff;
-		uint64_t m_upperCutoff;
+		Timestamp m_lowerCutoff;
+		Timestamp m_upperCutoff;
 		
 		void traverse(TreeNode *node) {
 			if(node == NULL) return;
@@ -116,7 +116,7 @@ void DynamicMemoryDataCache::newHead() {
 	m_treeHeadVector.push_back(head);
 }
 
-void DynamicMemoryDataCache::allocBlock(uint64_t address, uint64_t size, uint64_t timestamp) {
+void DynamicMemoryDataCache::allocBlock(uint64_t address, uint64_t size, Timestamp timestamp) {
 	TreeNode *node = latestTree()->create(address);
 	
 	if(node == NULL) {
@@ -130,7 +130,7 @@ void DynamicMemoryDataCache::allocBlock(uint64_t address, uint64_t size, uint64_
 	latestTree()->appendChanged(block);
 }
 
-void DynamicMemoryDataCache::freeBlock(uint64_t address, uint64_t timestamp) {
+void DynamicMemoryDataCache::freeBlock(uint64_t address, Timestamp timestamp) {
 	TreeNode *node = latestTree()->lookup(address);
 	if(!latestTree()->remove(address)) {
 		newHead();

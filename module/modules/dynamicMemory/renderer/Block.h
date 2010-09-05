@@ -15,8 +15,8 @@ private:
 public:
 	uint64_t address() const { return m_address; }
 	uint64_t size() const { return m_size; }
-	uint64_t allocTime() const { return m_allocTime; }
-	uint64_t releaseTime() const { return m_releaseTime; }
+	Timestamp allocTime() const { return m_allocTime; }
+	Timestamp releaseTime() const { return m_releaseTime; }
 	void setReleaseTime(uint64_t releaseTime) { m_releaseTime = releaseTime; }
 	
 	Block *reallocedTo() const { return m_reallocedTo; }

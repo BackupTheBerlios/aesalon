@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QMenu>
+#include <QTimer>
 
 #include "module/ModuleMapper.h"
 #include "SessionVisualization.h"
@@ -17,6 +18,7 @@ private:
 	QGridLayout *m_grid;
 	QMenu *m_contextMenu;
 	SessionVisualization *m_contextVisualization;
+	QTimer *m_updateTimer;
 public:
 	ModuleMapper *moduleMapper() const { return m_moduleMapper; }
 	QGridLayout *grid() const { return m_grid; }
@@ -33,6 +35,8 @@ private slots:
 	void displayContextMenu(QPoint globalPosition, SessionVisualization *visualization);
 	void setVisualizationModule(SessionVisualization *visualization, int moduleID);
 	void setVisualizationModule(QAction *action);
+signals:
+	void updateVisualizations();
 };
 
 #endif

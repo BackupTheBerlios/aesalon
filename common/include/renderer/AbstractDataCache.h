@@ -9,8 +9,8 @@ private:
 public:
 	virtual ~AbstractRendererDataCache() {}
 	
-	virtual uint64_t heartbeatTimestamp() const { return m_heartbeatTimestamp; }
-	virtual void updateHeartbeatTimestamp(uint64_t timestamp) { m_heartbeatTimestamp = timestamp; }
+	virtual Timestamp heartbeatTimestamp() const { return m_heartbeatTimestamp; }
+	virtual void updateHeartbeatTimestamp(Timestamp timestamp) { m_heartbeatTimestamp = timestamp; }
 	
 	virtual void processPacket(DataPacket *packet) = 0;
 };

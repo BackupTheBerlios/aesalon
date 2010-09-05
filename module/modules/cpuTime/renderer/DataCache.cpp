@@ -12,7 +12,7 @@ void CpuTimeDataCache::processPacket(DataPacket *packet) {
 	}
 	else {
 		uint64_t ddiff = cpuTime - m_lastCpuTime;
-		uint64_t tdiff = packet->dataSource.timestamp - m_dataVector.back().time();
+		Timestamp tdiff = packet->dataSource.timestamp - m_dataVector.back().time();
 		
 		double usage = ddiff / (double)tdiff;
 		

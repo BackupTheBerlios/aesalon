@@ -18,7 +18,7 @@ private:
 public:
 	QLabel *titleLabel() const { return m_titleLabel; }
 	
-	void setVisualization(VisualizationWidget *widget);
+	void setVisualization(VisualizationWidget *widget);;
 private slots:
 	void handleMenuRequest(QPoint pos);
 signals:

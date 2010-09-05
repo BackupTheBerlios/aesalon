@@ -39,6 +39,8 @@ public:
 	Renderer *renderer() const { return m_renderer; }
 	void setRenderer(Renderer *renderer) { m_renderer = renderer; }
 	
+	void updateVisualization();
+	
 	void registerRequest(VisualizationRequest *request);
 	void deregisterRequest(VisualizationRequest *request);
 	

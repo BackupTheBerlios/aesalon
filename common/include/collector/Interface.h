@@ -29,7 +29,7 @@ void AC_DESTRUCTOR AC_destructor();
 uint16_t AC_EXPORT AC_registerModuleInternal(const char *name);
 
 void AC_EXPORT AC_writePacket(AC_DataPacket *packet);
-uint64_t AC_EXPORT AC_timestamp();
+AC_Timestamp AC_EXPORT AC_timestamp();
 uint8_t AC_EXPORT AC_hasCollectionBegun();
 AC_Address AC_EXPORT AC_libraryOffset(const char *name);
 

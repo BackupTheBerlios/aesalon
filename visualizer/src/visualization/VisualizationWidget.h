@@ -25,6 +25,8 @@ public:
 	virtual void mousePressEvent(QMouseEvent *event);
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void wheelEvent(QWheelEvent *event);
+public slots:
+	void updateVisualization();
 };
 
 #endif

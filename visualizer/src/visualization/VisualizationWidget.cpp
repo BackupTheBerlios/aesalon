@@ -63,3 +63,7 @@ void VisualizationWidget::wheelEvent(QWheelEvent *event) {
 	
 	QWidget::wheelEvent(event);
 }
+
+void VisualizationWidget::updateVisualization() {
+	m_controller->updateVisualization();
+}

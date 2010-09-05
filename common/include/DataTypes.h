@@ -12,11 +12,13 @@
 
 #ifdef AesalonCollector
 	#define Address AC_Address
+	#define Timestamp AC_Timestamp
 	#define DataPacket AC_DataPacket
 	#define MemoryMapHeader AC_MemoryMapHeader
 #endif
 
 typedef unsigned long Address;
+typedef int64_t Timestamp;
 
 /** Structure used to transfer data from collectors to the monitor. */
 typedef struct {
@@ -25,7 +27,7 @@ typedef struct {
 		/** Module ID this packet was sent from. */
 		uint16_t moduleID;
 		/** The timestamp this collection occurred at. */
-		uint64_t timestamp;
+		Timestamp timestamp;
 	} dataSource;
 	/** The data this packet contains. Dynamically-allocated or otherwise. */
 	void *data;
@@ -71,6 +73,7 @@ typedef struct {
 
 #ifdef AesalonCollector
 	#undef Address
+	#undef Timestamp
 	#undef DataPacket
 	#undef MemoryMapHeader
 #endif

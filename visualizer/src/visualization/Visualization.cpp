@@ -17,10 +17,6 @@ Visualization::~Visualization() {
 	
 }
 
-void Visualization::updateUpperTimestamp(uint64_t upperTimestamp) {
-	m_totalRange.endTime() = upperTimestamp;
-}
-
 void Visualization::merge(Visualization *other) {
 	QRectF otherRect = translate(other->m_range);
 	lock();
@@ -28,8 +24,6 @@ void Visualization::merge(Visualization *other) {
 	m_painter.setPen(Qt::NoPen);
 	m_painter.drawRect(otherRect.normalized());
 	m_painter.drawImage(otherRect.normalized().toRect(), other->m_image);
-	
-	if(m_totalRange.endTime() < other->m_totalRange.endTime()) m_totalRange.endTime() = other->m_totalRange.endTime();
 	
 	unlock();
 }
@@ -140,14 +134,14 @@ void Visualization::shift(QPoint pixels) {
 void Visualization::scale(qreal zoom) {
 	m_paintLock.lock();
 	
-	uint64_t xSize = m_range.endTime() - m_range.beginTime();
+	Timestamp xSize = m_range.endTime() - m_range.beginTime();
 	double ySize = m_range.endData() - m_range.beginData();
 	
-	uint64_t xCentre = (m_range.endTime() + m_range.beginTime()) / 2;
+	Timestamp xCentre = (m_range.endTime() + m_range.beginTime()) / 2;
 	double yCentre = (m_range.endData() + m_range.beginData()) / 2.0;
 	
-	DataCoord newBegin = DataCoord((uint64_t)(xCentre - ((xSize / 2) * zoom)), yCentre - ((ySize / 2) * zoom));
-	DataCoord newEnd = DataCoord((uint64_t)(xCentre + ((xSize / 2) * zoom)), yCentre + ((ySize / 2) * zoom));
+	DataCoord newBegin = DataCoord((Timestamp)(xCentre - ((xSize / 2) * zoom)), yCentre - ((ySize / 2) * zoom));
+	DataCoord newEnd = DataCoord((Timestamp)(xCentre + ((xSize / 2) * zoom)), yCentre + ((ySize / 2) * zoom));
 	
 	QImage temporary = m_image;
 	m_painter.begin(&m_image);
@@ -156,8 +150,8 @@ void Visualization::scale(qreal zoom) {
 	QRectF rect = translate(DataRange(newBegin, newEnd)).normalized();
 	/*qDebug("rect: (%f,%f),(%f,%f)", rect.left(), rect.top(), rect.right(), rect.bottom());*/
 	m_painter.drawImage(translate(DataRange(
-		DataCoord((uint64_t)(xCentre - ((xSize / 2) * 1/zoom)), yCentre - ((ySize / 2) * 1/zoom)),
-		DataCoord((uint64_t)(xCentre + ((xSize / 2) * 1/zoom)), yCentre + ((ySize / 2) * 1/zoom))
+		DataCoord((Timestamp)(xCentre - ((xSize / 2) * 1/zoom)), yCentre - ((ySize / 2) * 1/zoom)),
+		DataCoord((Timestamp)(xCentre + ((xSize / 2) * 1/zoom)), yCentre + ((ySize / 2) * 1/zoom))
 		)).normalized(), temporary);
 	
 	m_painter.end();

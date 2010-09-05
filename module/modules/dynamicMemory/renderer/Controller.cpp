@@ -6,7 +6,7 @@ extern "C" {
 
 RendererController *Instantiate() {
 	RendererController *controller = new RendererController();
-	RendererConcreteFactory *factory = new RendererConcreteFactory();
+	ConcreteRendererFactory *factory = new ConcreteRendererFactory();
 	DynamicMemoryDataCache *dataCache = new DynamicMemoryDataCache();
 	controller->setFactory(factory);
 	controller->setDataCache(dataCache);

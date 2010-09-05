@@ -14,6 +14,11 @@ SessionDisplay::SessionDisplay(ModuleMapper *moduleMapper) : QWidget(NULL), m_mo
 	m_grid->setRowStretch(0, 1);
 	
 	setLayout(m_grid);
+	
+	m_updateTimer = new QTimer(this);
+	connect(m_updateTimer, SIGNAL(timeout()), SIGNAL(updateVisualizations()));
+	m_updateTimer->setSingleShot(false);
+	m_updateTimer->start(1000);
 }
 
 SessionDisplay::~SessionDisplay() {
@@ -87,5 +92,7 @@ void SessionDisplay::setVisualizationModule(SessionVisualization *visualization,
 void SessionDisplay::setVisualizationModule(QAction *action) {
 	Module *module = m_moduleMapper->module(action->property("moduleID").toInt());
 	
-	m_contextVisualization->setVisualization(new VisualizationWidget(module, action->text()));
+	VisualizationWidget *widget = new VisualizationWidget(module, action->text());
+	connect(this, SIGNAL(updateVisualizations()), widget, SLOT(updateVisualization()));
+	m_contextVisualization->setVisualization(widget);
 }

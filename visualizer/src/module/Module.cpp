@@ -45,6 +45,11 @@ Module::~Module() {
 	
 }
 
+Timestamp Module::latestHeartbeat() const {
+	if(m_controller == NULL) return 0;
+	return m_controller->dataCache()->heartbeatTimestamp();
+}
+
 void Module::processIncoming(DataPacket *packet) {
 	if(m_controller == NULL) return;
 	m_controller->dataCache()->processPacket(packet);

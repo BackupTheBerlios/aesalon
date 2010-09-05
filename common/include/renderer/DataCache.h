@@ -8,8 +8,8 @@ class RendererDataCache {
 public:
 	virtual ~RendererDataCache() {}
 	
-	virtual uint64_t heartbeatTimestamp() const = 0;
-	virtual void updateHeartbeatTimestamp(uint64_t timestamp) = 0;
+	virtual Timestamp heartbeatTimestamp() const = 0;
+	virtual void updateHeartbeatTimestamp(Timestamp timestamp) = 0;
 	
 	virtual void processPacket(DataPacket *packet) = 0;
 };

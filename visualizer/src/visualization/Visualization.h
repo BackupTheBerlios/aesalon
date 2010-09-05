@@ -17,16 +17,12 @@ public:
 private:
 	QImage m_image;
 	DataRange m_range;
-	DataRange m_totalRange;
 	QPainter m_painter;
 	QMutex m_paintLock;
 	VisualizationController *m_controller;
 public:
 	const QImage &image() const { return m_image; }
 	virtual const DataRange &range() const { return m_range; }
-	
-    virtual const DataRange &totalRange() const { return m_totalRange; }
-    virtual void updateUpperTimestamp(uint64_t upperTimestamp);
 	
 	VisualizationController *controller() const { return m_controller; }
 	void setController(VisualizationController *controller) { m_controller = controller; }
