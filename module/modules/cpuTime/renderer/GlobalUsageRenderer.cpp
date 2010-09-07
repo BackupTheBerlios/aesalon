@@ -52,6 +52,8 @@ void GlobalUsageRenderer::renderRange(VisualizationWrapper *visualization, const
 	
 	visualization->unlock();
 	
+	std::cout << "Visualization renderered . . ." << std::endl;
+	
 	/*std::cout << end - begin << " elements in visualization." << std::endl;*/
 }
 
