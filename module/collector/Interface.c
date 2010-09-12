@@ -53,8 +53,6 @@ void AC_CONSTRUCTOR AC_constructor() {
 		heartbeatInterval = 10;
 	}
 	
-	printf("Heartbeat interval: %li ms.\n", heartbeatInterval);
-	
 	/* heartbeatInterval is specified in milliseconds. Convert it to nanoseconds . . . */
 	heartbeatInterval *= 1000 * 1000;
 	
@@ -67,7 +65,10 @@ void AC_CONSTRUCTOR AC_constructor() {
 	
 	timerfd_settime(AC_heartbeatFd, 0, &its, NULL);
 	
-	pthread_create(&AC_heartbeatThread, NULL, AC_sendHeartbeats, NULL);
+	printf("Creating thread . . .\n");
+	/*pthread_create(&AC_heartbeatThread, NULL, AC_sendHeartbeats, NULL);*/
+	
+	printf("Interface initialized.\n");
 }
 
 void AC_DESTRUCTOR AC_destructor() {

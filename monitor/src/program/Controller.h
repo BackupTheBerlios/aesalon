@@ -30,6 +30,7 @@ protected:
 	int waitForSignal(int *status) const;
 	int checkForSignal(int *status) const;
 	int signalFromStatus(int status);
+	bool shouldContinueAfter(int status);
 	Address getIp() const;
 	void setIp(Address value) const;
 	void writeData(Address memoryAddress, uint8_t data) const;

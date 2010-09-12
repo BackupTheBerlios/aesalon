@@ -65,7 +65,8 @@ void Controller::run() {
 	/* Now, wait for the termination signal. */
 	do {
 		waitForSignal(&status);
-	} while(signalFromStatus(status) != -1);
+		std::cout << "received signal . . ." << std::endl;
+	} while(shouldContinueAfter(status));
 	
 	int signal = signalFromStatus(status);
 	if(signal != -1) {
@@ -97,6 +98,20 @@ int Controller::signalFromStatus(int status) {
 	else if(WIFEXITED(status)) return -1;
 	/* Unknown signal, ignore. */
 	return 0;
+}
+
+bool Controller::shouldContinueAfter(int status) {
+	if(WIFSIGNALED(status)) return false;
+	else if(WIFEXITED(status)) return false;
+	else if(WIFSTOPPED(status)) {
+		switch(WSTOPSIG(status)) {
+			case SIGSTOP: break;
+			case SIGSEGV: return false;
+			default: break;
+		}
+	}
+	std::cout << "Continuing after signal " << signalFromStatus(status) << " . . .\n";
+	return true;
 }
 
 Address Controller::getIp() const {

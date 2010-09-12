@@ -116,8 +116,10 @@ void Launcher::setModuleEnvironment() {
 	moduleList.insert(0, "global:");
 	
 	do {
-		std::string moduleName = moduleList.substr(0, moduleList.find(":"));
-		moduleList.erase(0, moduleList.find(":")+1);
+		std::string::size_type divider = moduleList.find(":");
+		std::string moduleName = moduleList.substr(0, divider);
+		if(divider != std::string::npos) moduleList.erase(0, moduleList.find(":")+1);
+		else moduleList.clear();
 		
 		const Misc::ConfigurationModule::ItemMap &itemMap = configuration->module(moduleName)->itemMap();
 		
@@ -126,7 +128,7 @@ void Launcher::setModuleEnvironment() {
 			std::string name = Misc::StreamAsString() << "ACM_" << moduleName << "_" << i->second->name();
 			setenv(name.c_str(), i->second->data().c_str(), 1);
 		}
-	} while(moduleList.find(":") != std::string::npos); 
+	} while(moduleList.size());
 }
 
 } // namespace Program

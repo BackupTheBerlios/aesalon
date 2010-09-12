@@ -1,4 +1,4 @@
-add_definitions(-W -Wall -D_GNU_SOURCE)
+add_definitions(-W -Wall -D_GNU_SOURCE -pthread)
 add_definitions(-DAesalonCollector)
 
 aux_source_directory(. CollectorSources)
