@@ -49,10 +49,14 @@ void Initializer::usage() {
 	std::cout << "This program is released under the GNU GPLv3. " << std::endl;
 	std::cout << "\tFor more legal information, see the included file LICENSE." << std::endl;
 	std::cout << "usage: " << m_argv[0] << " [options] [--] filename [arguments]" << std::endl;
-	std::cout << "Options:" << std::endl;
+	
+	std::cout << "\nOptions:" << std::endl;
 	std::cout << "\t--help: displays this help message." << std::endl;
 	std::cout << "\t--networkWait: amount of network clients to wait for before executing." << std::endl;
 	std::cout << "\t--tcpPort: TCP port to listen on." << std::endl;
 	std::cout << "\t--logFile: optional log file to write collected data to." << std::endl;
 	std::cout << "\t--shmSize: size of the SHM used to communicate." << std::endl;
+	
+	std::cout << "\nEnvironment variables:" << std::endl;
+	std::cout << "\tAesalonSearchPath: a colon-separated path to search for modules." << std::endl;
 }

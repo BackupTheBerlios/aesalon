@@ -28,14 +28,12 @@ void AC_CONSTRUCTOR AC_constructor() {
 	
 	AC_mmapFd = shm_open(filename, O_RDWR, 0);
 	
-	/* TODO: replace this with a call to AC_configurationString . . . */
-	char *shmSizeEnv = getenv("AC_ShmSize");
-	if(shmSizeEnv == NULL) {
-		printf("AC_ShmSize is not set. Aborting.\n");
-		exit(1);
+	int shmSize = AC_configurationInt("global", "shmSize");
+	
+	if(shmSize == 0) {
+		/* Default size is 128KB -- large enough not to overflow, small enough to not waste memory. */
+		shmSize = 131072;
 	}
-	int shmSize;
-	sscanf(shmSizeEnv, "%i", &shmSize);
 	
 	AC_memory = mmap(NULL, shmSize, PROT_READ | PROT_WRITE, MAP_SHARED, AC_mmapFd, 0);
 	

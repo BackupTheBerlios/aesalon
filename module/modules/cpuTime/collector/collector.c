@@ -57,14 +57,18 @@ void __attribute__((constructor)) AC_constructor() {
 	struct itimerspec its;
 	
 	int interval = AC_configurationInt("cpuTime", "interval");
+	if(interval == 0) {
+		/* The default interval is 10 times per second, or every 100 ms. */
+		interval = 100000;
+	}
 	interval *= 1000;
 	printf("interval: %i\n", interval);
 	
-	its.it_interval.tv_sec = 0;
-	its.it_interval.tv_nsec = interval;
+	its.it_interval.tv_sec = interval / 1000000000;
+	its.it_interval.tv_nsec = interval % 1000000000;
 	
-	its.it_value.tv_sec = 0;
-	its.it_value.tv_nsec = interval;
+	its.it_value.tv_sec = interval / 1000000000;
+	its.it_value.tv_nsec = interval % 1000000000;
 	
 	timerfd_settime(ACM_timerFd, 0, &its, NULL);
 	

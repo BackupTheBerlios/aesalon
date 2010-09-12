@@ -7,9 +7,9 @@
 SessionSettings::SessionSettings(QWidget *parent, Session *session) : QDialog(parent), m_session(session) {
 	QFormLayout *mainLayout = new QFormLayout();
 	
-	m_sessionName = new QLineEdit();
+	/*m_sessionName = new QLineEdit();
 	m_sessionName->setText(tr("Session"));
-	mainLayout->addRow(tr("Session Name:"), m_sessionName);
+	mainLayout->addRow(tr("Session Name:"), m_sessionName);*/
 	
 	m_heartbeatTime = new QSpinBox();
 	m_heartbeatTime->setSuffix(tr(" milliseconds"));

@@ -54,9 +54,7 @@ void Launcher::startProcess() {
 	m_childPid = fork();
 	if(m_childPid == 0) {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
-		char buffer[128];
-		sprintf(buffer, "%i", Initializer::singleton()->configuration()->traverse("shmSize")->asInt());
-		setenv("AC_ShmSize", buffer, 1);
+		
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
 		
 		setModuleEnvironment();
