@@ -41,7 +41,7 @@ int AC_EXPORT AC_configurationBool(const char *module, const char *name);
 uint16_t AC_moduleID();
 void AC_setModuleID(uint16_t moduleID);
 
-#define AC_moduleDefinition \
+#define AC_moduleDefinition() \
 	static uint16_t AC_m_moduleID; \
 	uint16_t AC_moduleID() { return AC_m_moduleID; } \
 	void AC_setModuleID(uint16_t moduleID) { AC_m_moduleID = moduleID; }

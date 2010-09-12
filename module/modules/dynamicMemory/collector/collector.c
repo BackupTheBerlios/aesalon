@@ -21,7 +21,7 @@ static void *(*ACM_originalRealloc)(void *ptr, size_t size) = 0;
 static void ACM_initialize();
 static int ACM_initialized = 0;
 
-AC_moduleDefinition;
+AC_moduleDefinition();
 
 void AC_CONSTRUCTOR AC_constructor() {
 	if(!ACM_initialized) ACM_initialize();

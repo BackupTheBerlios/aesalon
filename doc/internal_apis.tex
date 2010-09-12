@@ -1,0 +1,103 @@
+\chapter{Module APIs}
+The module APIs are currently relatively dynamic; changes both minor and major may be made without much warning.
+Detailed here are the current module APIs.
+\section{Collector}
+The Collector API is very minimalistic. It consists of a \emph{collector interface}, responsible for (among other
+duties)
+transferring data packets from the various loaded modules into the SHM. Its other duties include timestamp generation,
+module configurations, and module management.\footnote{Other various utility functions are also provided to prevent
+redundancy amongst module sources.}
+
+\subsection{Naming convention}
+The functions provided by the collector module interface have a strict naming convention. To reduce unnecessary
+namespace
+pollution, it is recommended that module developers follow these naming guidelines.
+\begin{description}
+ \item[Interface functions] are preceeded by \emph{AC\_} (\emph{A}esalon \emph{C}ollector). For example,
+\emph{AC\_timestamp()}
+constructs a timestamp representing the current moment.
+ \item[Module functions] are preceeded by \emph{ACM\_} (\emph{A}esalon \emph{C}ollector \emph{M}odule). For example,
+\emph{ACM\_initializeFunctionPointers()}.
+\end{description}
+
+\subsection{Types}
+Several types are defined by the collector interface.
+
+\documentType{AC\_Address}{Description \ldots}{}
+
+\subsection{Module basics}
+Before a collector module can send data to its monitor counterpart, it first must be registered and obtain a module ID.
+The process is quite simple, fortunately. A pair of functions, or a single macro, are used to perform this task.
+
+\documentFunction{uint16\_t}{AC\_registerModuleInternal}{const char *name}{Internal function, registers a module and
+returns its ID.}
+
+\documentFunction{void}{AC\_setModuleID}{uint16\_t id}{Sets the module-wide ID for this module.}
+
+In reality, however, the convenience macro \emph{AC\_registerModule()} should be used.
+
+\documentMacro{AC\_registerModule}{name}{
+  Calls \emph{AC\_registerModuleInternal()} and \emph{AC\_setModuleID()}, in essence registering a module for use.
+}
+
+Before \emph{AC\_registerModule()} can be used, however, the module must be defined, creating several internally-used
+global variables and functions. The macro \emph{AC\_moduleDefiniton()} is used for this purpose.
+
+\documentMacro{AC\_moduleDefinition}{}{Creates global variables and internally-used functions; should be placed
+within the global scope of a single source file per module.}
+
+\subsection{Module communication}
+The communication between the collector modules and the monitor is very much a one-sided conversation. The collector
+modules can send data to the monitor, but the monitor (and through it, the polisher modules) cannot send any data to
+the collector modules.\footnote{A few internally-used flags -- not accessible to collector modules -- notwithstanding.}
+Below are the functions that are used to communicate between the collector modules and the monitor.
+
+\documentFunction{void}{AC\_writePacket}{AC\_DataPacket *packet}{Sends an \emph{AC\_DataPacket} to the associated
+polisher module via the monitor.}
+\documentFunction{uint8\_t}{AC\_hasCollectionBegun}{}{Returns 1 if ``collection has begun''; this currently means only
+if main() has been reached. 0 if otherwise.}
+
+\subsection{Module configuration}
+The collector modules have a configuration system that chains on to the monitor's; any configuration option specified
+on the command-line or in configuration files for the monitor is also accessible by the collector modules. Four
+functions are provided for doing so.
+
+\documentFunction{char *}{AC\_configurationString}{const char *module, const char *name}{Returns a constant string
+referencing the configuration item \emph{module.name}.}
+
+\documentFunction{int}{AC\_configurationInt}{const char *module, const char *name}{Performs similar duties to
+\emph{AC\_configurationString()}, except that the return value is converted into an integer automatically. Zero is
+returned if the string could not be converted to an integer, or if the configuration item does not exist. Note there is
+currently no way to tell which has occurred.}
+
+\documentFunction{long}{AC\_configurationLong}{const char *module, const char *name}{Performs the same task as
+\emph{AC\_configurationInt()}, except the value is converted to a long. Return value semantics are identical.}
+
+\documentFunction{int}{AC\_configurationBool}{const char *module, const char *name}{Takes the configuration value
+\emph{module.name} and converts the string value to a bool. Returns a C-style bool; 1 if the string value is ``true'',
+0 if ``false''.}
+
+\subsection{Utility functions}
+To reduce the amount of redundant code between the various modules, a small set of generic utility functions is
+provided. This list will expand in the future.
+
+\documentFunction{AC\_Timestamp}{AC\_timestamp}{}{Returns an \emph{AC\_Timestamp} detailing the current time.}
+
+\documentFunction{AC\_Address}{AC\_libraryOffset}{const char *name}{Returns the address in memory that the library
+filename beginning with with \emph{name} is loaded into.}
+
+\section{Polisher}
+The Polisher API is only partially completed at the moment; however, the currently-existing API is functional. It just
+cannot do very much \ldots
+
+\section{Renderer}
+The Renderer API is very simple in concept, rather more complex in practice. The Renderer module has two primary
+duties. The first is to take packets received from the associated polisher module, extract the data, and store said
+data. The second is to, upon request, render the stored data in a number of ways, specified by the exported Renderers.
+
+\documentType{AbstractDataCache}{Stores the data associated with this module. This class contains pure virtual methods.}
+
+\documentMethod{AbstractDataCache}{void}{processPacket}{DataPacket *packet}{= 0}{The primary method in the derived
+classes. This function takes a DataPacket and extracts the data contained within; presumably storing it for later
+retrieval.}
+

@@ -1,0 +1,85 @@
+\chapter{Implementation details}
+\section{The Program Monitor}
+\subsection{High-level Overview}
+The Program Monitor can be termed the core of the data collection system in Aesalon. It is responsible for
+launching the process, loading the various collection modules, parsing the executable's ELF and DWARF data,
+and loading the polisher modules.
+
+\subsection{Command-line invocation}
+Provided, in alphabetical order, are the command-line options for the program monitor. The general form
+for invocation is \texttt{aesalon [options] [--] filename [arguments]}.
+\begin{description}
+ \item[\texttt{--help:}] Displays an automatically-generated list of options, with brief descriptions.
+ \item[\texttt{--logFile:}] If set, specifies a file to write events to. \texttt{.alog} is the standardized extension.
+ \item[\texttt{--modules:}] A colon-separated list of modules to load.
+ \item[\texttt{--networkWait:}] The number of network clients to wait for a connection from before commencing
+execution.
+ \item[\texttt{--shmSize:}] The size of the SHM to use; must be a multiple of the page size of the operating system.%
+  \footnote{Typically 4096 bytes on x86 and x86\_64 Linux systems.}
+ \item[\texttt{--tcpPort:}] The TCP port to listen on for client connections.
+\end{description}
+
+\subsection{Environment variables}
+Aesalon's behaviour is also influenced by a number of environment variables.
+\begin{description}
+ \item[\texttt{AesalonSearchPath:}] A colon-separated list of paths to search for module directories.
+\end{description}
+
+\subsection{Configuration}
+There are five different levels of configuration, presented in order of processing.
+\begin{description}
+ \item[Module configuration] applies a default range of settings on a module-wide basis. These files are located in the
+module root directories, called \texttt{monitor.conf}.
+ \item[Global configuration] is the system-wide defaults. The default path is \texttt{/etc/default/aesalon.conf.}
+ \item[User configuration] is the user-wide defaults. The default path is \texttt{$\sim$/.config/aesalon/aesalon.conf.}
+ \item[Local configuration] is the directory. This is a special case; any file named (by default) \texttt{.aesalon.conf}
+  will be parsed and applied to any instances launched from that directory.
+ \item[Command-line arguments] are the final level of configuration. These override all other configurations, and are
+specified
+  on the command-line.
+\end{description}
+
+\begin{figure}[t]
+  \small{\texttt{%
+set shmSize=1048576 \\
+set tcpPort=6321 \\
+\\
+module dynamicMemory \\
+set rttiTracking=false \\
+set polisher=/tmp/build/dynamicMemory\_polisher-test.so
+  }}
+  \caption{Example global configuration file.\label{exampleconfigfile}}
+\end{figure}
+
+In configuration files, options are specified as demonstrated in Figure \ref{exampleconfigfile}; options are
+specified
+in the same manner on the command-line. The general form of a configuration item is \texttt{set <item>=<content>};
+items may be specified inside a namespace, or a module. If no module command is specified, then the default module,
+called ``global'', is used.
+
+Note that there is currently no method of specifing configuration options; thus, no warnings about mis-spelled arguments
+or configuration items are given.
+
+\section{Design}
+\subsection{Source layout}
+The monitor is designed in a somewhat logical manner. The source is separated into directories, each of which handles a
+specific set of duties.
+
+\begin{description}
+ \item[.:] contains the ``essential'' files; the generic, global sources, if you will.
+ \item[program:] contains source files relating to execution control and executable analysing.
+ \item[network:] has all the network-related source files.
+ \item[module:] the monitor module-related source code.
+ \item[polisher:] the polisher module interface; implementations only.
+ \item[misc:] any miscellaneous/utility classes.
+\end{description}
+
+\subsection{Threads}
+
+There are two primary threads in the monitor:
+\begin{description}
+ \item[\textnormal{The} main thread] handles all initialization (including executable parsing), then eventually calls
+\emph{wait()} on the monitored process.
+ \item[\textnormal{The} reader thread] reads from the SHM, processes the data packets via the monitor module, logs the
+packets to a log file if applicable, then sends the packets via the network socket to any connected visualizers.
+\end{description}

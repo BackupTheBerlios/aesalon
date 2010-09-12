@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include "collector/Interface.h"
 
-AC_moduleDefinition;
+AC_moduleDefinition();
 
 int ACM_timerFd;
 pthread_t ACM_threadID;

@@ -1,10 +1,9 @@
 \documentclass[a4paper,10pt]{report}
 \usepackage[utf8x]{inputenc}
+\usepackage{indentfirst}
 
-\author{strange\\kawk256@gmail.com}
-\title{Internals of the Aesalon visualization tool\\\normalsize{Version 0.1}}
-
-\begin{document}
+\author{Ethereal\\ethereal.visage@gmail.com}
+\title{Internals of the Aesalon visualization tool\\\normalsize{Document version 0.1}}
 
 % Prevent 'Aesalon' from being broken by hyphenation.
 \hyphenation{Aesalon}
@@ -13,219 +12,92 @@
 % - return type
 % - function name
 % - parameters
-% - documentation
+% - description
 \newcommand{\documentFunction}[4]{
-  %\label{#2}
-  \emph{\textbf{#1 #2(}#3\textbf{)}} \\
-    \par{
-    \hangindent=2em
-    \hangafter=0
+  \emph{\textbf{#1 #2(}#3\textbf{)}}
+  \begin{quotation}
 
     #4
 
-  }
+  \end{quotation}
 }
 
-\maketitle
+% The three arguments are:
+% - macro name
+% - parameters
+% - description
+\newcommand{\documentMacro}[3]{
+  \emph{\textbf{#1(}#2\textbf{)}}
+  \begin{quotation}
 
-\tableofcontents
+    #3
 
-\setlength{\parindent}{10pt}
-\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+  \end{quotation}
+}
 
+% The three arguments are:
+% - return type
+% - variable name
+% - description
+\newcommand{\documentVariable}[3]{
+  \emph{\textbf{#1 #2}}
+  \begin{quotation}
 
-\chapter[Overview]{An overview of Aesalon}
-\section{Introduction}
-Aesalon is a tool to visualize, in real-time or non, various aspects of a program.
-The specific aspects visualized depend upon the modules specified when invoking Aesalon
-upon an unsuspecting program. \footnote{Aesalon strives to reduce the impact upon the
-monitored program; much of the time there should be only nominal changes in its behaviour.}
-The data supplied may range from per-thread CPU utilization to lifetime data on the allocated
-blocks of memory; referenced shared libraries, network connection utilization and file-descriptor
-information. These types of information have three primary applications \ldots
+    #3
 
-\subsection{Optimization}
-One can call the primary utilization of Aesalon the function of optimization. Having access to a
-full description of exactly where and how a program is utilizing not only its CPU time, but also
-its memory, network connections, timers, shared libraries, and other such data can be invaluable
-for tracking down issues both esoteric and not.
+  \end{quotation}
+}
 
-\subsection{Leaked resources}
-With some types of modules (memory block tracking and file descriptor tracking, for two examples),
-it is possible to track where resources are allocated by a process. If this process does not release
-these resources, once allocated, then the allocation history can prove useful.
+% The three arguments are:
+% - type name
+% - description
+% - \documentFunction/\documentType macros for the sub-types.
+\newcommand{\documentType}[2]{
+  \emph{\textbf{#1}}
+  \begin{quotation}
 
-\subsection{Pure interest}
-What programmer does not want to know exactly how their program is behaving? Such information can be
-not only useful, but also interesting.
+    #2
 
-\section{Implementation layout}
-\subsection{The Aesalon framework}
-The Aesalon framework is segregated into two separate sections.
-\flushleft
-\begin{description}
- \item[\textnormal{The} Monitor] is responsible for launching the process in question. It also loads the polisher modules
-  and parses any ELF and DWARF information present inside the executable file. Any data processed by the
-  monitor modules is then sent over a network connection to the Visualizer and/or written to a logfile.
- \item[\textnormal{The} Visualizer] provides a GUI, reads from the network and/or a logfile, and provides storage and rendering
-  frameworks for the renderer modules that it loads.
-\end{description}
+  \end{quotation}
+}
 
-Overall, the framework is relatively bare-bones; much of the processing etc. is done by the modules themselves.
+% The four arguments are:
+% - Class name
+% - return type
+% - function name
+% - parameters
+% - modifiers
+% - description
+\newcommand{\documentMethod}[6]{
+  \emph{\textbf{#2 #1::#3(}#4\textbf{) #5}}
+  \begin{quotation}
 
-\subsection{The modules}
-Each module is split into three separate sections.
-\flushleft
-\begin{description}
- \item[\textnormal{The} collector module] is loaded into the address space of the process being monitored; as such, the
-  data is collected here, and transferred to the Monitor by a shared memory map.
- \item[\textnormal{The} polisher module] is loaded by the Monitor into the Monitor's address space. Here, the raw data collected
-  by the Collector is refined slightly. For example, raw function addresses might be processed into C-style
-  scope names.
- \item[\textnormal{The} renderer module] stores and visualizes the data processed by the monitor; it is loaded into the address
-  space of the Visualizer.
-\end{description}
+    #6
 
-\section{Communication methods used}
-Several methods are used to communicate between the various sections.
-\flushleft
-\begin{description}
- \item[SHM (SHared Memory)] is used to communicate between the Collector modules and the Monitor;
- \item[\textnormal{A} TCP network socket] is used to communicate between the Monitor and Visualizer when operating in
-  real-time mode.
-\end{description}
+  \end{quotation}
+}
 
-\chapter{Implementation details}
-\section{The Program Monitor}
-\subsection{High-level Overview}
-The Program Monitor can be termed the core of the data collection system in Aesalon. It is responsible for
-launching the process, loading the various collection modules, parsing the executable's ELF and DWARF data,
-and loading the monitor modules.
+\begin{document}
 
-\subsection{Command-line invocation}
-Provided, in alphabetical order, are the command-line options for the program monitor. The general form
-for invocation is \texttt{aesalon [options] [--] filename [arguments]}.
-\begin{description}
- \item[\texttt{--help:}] Displays an automatically-generated list of options, with brief descriptions.
- \item[\texttt{--log-file:}] If set, specifies a file to write events to. \texttt{.alog} is the standardized extension.
- \item[\texttt{--modules:}] A colon-separated list of modules to load.
- \item[\texttt{--network-wait:}] The number of network clients to wait for a connection from before commencing execution.
- \item[\texttt{--shm-size:}] The size of the SHM to use; must be a multiple of the page size of the operating system.%
-  \footnote{Typically 4096 bytes on x86 and x86\_64 Linux systems.}
- \item[\texttt{--tcp-port:}] The TCP port to listen on for client connections.
-\end{description}
+\setlength{\parindent}{1cm}
+%\setlength{\parskip}{1ex}
 
-\subsection{Environment variables}
-Aesalon's behaviour is also influenced by a number of environment variables.
-\begin{description}
- \item[\texttt{AesalonSearchPath:}] A colon-separated list of paths to search for module directories.
-\end{description}
+%Testing, testing.
 
-\subsection{Configuration}
-There are five different levels of configuration, presented in order of processing.
-\begin{description}
- \item[Module configuration] applies a default range of settings on a module-wide basis. These files are located in the module root, 
-  called \texttt{monitor.conf}.
- \item[Global configuration] is the system-wide defaults. The default path is \texttt{/etc/default/aesalon.conf.}
- \item[User configuration] is the user-wide defaults. The default path is \texttt{$\sim$/.config/aesalon/aesalon.conf.}
- \item[Local configuration] is the directory. This is a special case; any file named (by default) \texttt{.aesalon.conf}
-  will be parsed and applied to any instances launched from that directory.
- \item[Command-line arguments] are the final level of configuration. These override all other configurations, and are specified
-  on the command-line.
-\end{description}
+%\documentType{ExampleType}{An example type, with a short description here.}
+%\documentMethod{ExampleType}{void}{test}{}{Description for the test function.}
 
-\begin{figure}[h]
-  \small{\texttt{%
-set shm-size=1048576 \\
-set tcp-port=6321 \\
-\\
-module dynamicMemory \\
-set rttiTracking=false \\
-set polisher=/tmp/build/dynamicMemory\_polisher-test.so \\
-  }}
-  \caption{Example global configuration file.\label{exampleconfigfile}}
-\end{figure}
+%\setlength{\textindent}{1cm}
+%\maketitle
 
-In configuration files, options are specified as demonstrated in Figure \ref{exampleconfigfile}; options are specified in the
-same manner on the command-line. The general form of a configuration item is \texttt{set \{item\}=\{content\}}; items may be
-specified inside a namespace, or a module. If no module command is specified, then the default module, called ``global'', is
-used.
+%\tableofcontents
 
-Note that there is currently no method of specifing configuration options; thus, no warnings about mis-spelled arguments or
-configuration items are given.
+%\include{internal_overview}
 
-\section{Design}
-\subsection{Source layout}
-The monitor is designed in a somewhat logical manner. The source is separated into directories, each of which handles a specific
-set of duties.
+%\include{internal_implementation}
 
-\begin{description}
- \item[.:] contains the ``essential'' files; the generic, global sources, if you will.
- \item[program:] contains source files relating to execution control and executable analysing.
- \item[network:] has all the network-related source files.
- \item[module:] the monitor module-related source code.
- \item[interface:] the monitor module interface; class definitions and implementations.
- \item[misc:] any miscellaneous/utility classes.
-\end{description}
+\include{internal_apis}
 
-\subsection{Threads}
-
-There are two primary threads in the monitor:
-\begin{description}
- \item[\textnormal{The} main thread] handles all initialization (including executable parsing), then eventually calls \emph{wait()} on
-  the monitored process.
- \item[\textnormal{The} reader thread] reads from the SHM, processes the data packets via the monitor module, logs the packets to a log
-  file if applicable, then sends the packets via the network socket to any connected visualizers.
-\end{description}
-
-\chapter{Module API}
-The module API is relatively dynamic; changes both minor and major may be made without much warning. Detailed here are the
-current module APIs.
-\section{Collector}
-The Collector API is very minimalistic. It consists of a \emph{collector interface}, responsible for (among other duties)
-transferring data packets from the various loaded modules into the SHM. Its other duties include timestamp generation,
-module configurations, and module management\footnote{Other various utility functions are also provided to prevent
-redundancy amongst module sources}.
-
-\subsection{Naming convention}
-The functions provided by the collector module interface have a strict naming convention. To reduce unnecessary namespace
-pollution, it is recommended that module developers follow these naming guidelines.
-\begin{description}
- \item[Interface functions] are preceeded by \emph{AC\_} (\emph{A}esalon \emph{C}ollector). For example, \emph{AC\_timestamp()}
-constructs a timestamp representing the current moment.
- \item[Module functions] are preceeded by \emph{ACM\_} (\emph{A}esalon \emph{C}ollector \emph{M}odule). For example,
-\emph{ACM\_sendData()}.
-\end{description}
-
-\subsection{Module registration}
-Before a collector module can send data to its monitor counterpart, it first must be registered and obtain a module ID.
-The process is quite simple, fortunately. A pair of functions, or a single macro, are used to perform this task.
-
-\documentFunction{uint16\_t}{AC\_registerModuleInternal}{const char *name}{Internal function, registers a module and returns
-its ID.}
-
-\documentFunction{uint16\_t}{AC\_registerModuleInternal}{const char *name}{Internal function, registers a module and returns
-its ID.}
-\documentFunction{void}{AC\_setModuleID}{uint16\_t id}{Sets the module-wide ID for this module.}
-
-In reality, however, the convenience macro \emph{AC\_registerModule()} should be used.
-
-%\documentMacro{AC\_registerModule}{const char *name}{Calls \emph{AC\_registerModuleInternal()} and \emph{AC\_setModuleID()},
-%in essence registering a module for use.}
-
-\section{Monitor}
-The Monitor API is only partially completed at the moment.
-\section{Visualizer}
-The Visualizer API is very simple in concept, rather more complex in practice.
-
-\appendix
-
-\chapter{Version History}
-\begin{description}
- \item[Version 0.1] Initial version of this document.
-\end{description}
-
-\chapter{Author Contact information}
-The author of this document can be reached at \texttt{kawk256@gmail.com}.
+%\include{internal_appendix}
 
 \end{document}
