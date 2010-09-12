@@ -14,6 +14,8 @@ private:
 	QFile m_logfile;
 public:
 	virtual void open();
+	
+	virtual bool hasHeartbeat() { return false; }
 };
 
 #endif

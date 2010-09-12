@@ -7,6 +7,7 @@
 #include "SessionIOWrapper.h"
 #include "module/ModuleMapper.h"
 #include "SessionReader.h"
+#include "SessionHeartbeat.h"
 
 class Session {
 public:
@@ -17,10 +18,12 @@ private:
 	SessionDisplay *m_sessionDisplay;
 	SessionReader *m_reader;
 	ModuleMapper *m_moduleMapper;
+	SessionHeartbeat *m_heartbeat;
 public:
 	SessionIOWrapper *ioWrapper() const { return m_ioWrapper; }
 	SessionDisplay *sessionDisplay() const { return m_sessionDisplay; }
 	ModuleMapper *moduleMapper() const { return m_moduleMapper; }
+	SessionHeartbeat *heartbeat() const { return m_heartbeat; }
 };
 
 #endif

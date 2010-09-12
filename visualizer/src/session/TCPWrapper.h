@@ -15,6 +15,8 @@ private:
 	QTcpSocket *m_tcpSocket;
 public:
 	virtual void open();
+	
+	virtual bool hasHeartbeat() { return true; }
 };
 
 #endif

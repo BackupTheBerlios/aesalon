@@ -16,6 +16,7 @@ void LogWrapper::open() {
 		m_logfile.open(QIODevice::ReadOnly);
 		emit connected();
 		emit readyRead();
+		emit disconnected();
 	}
 	else {
 		qWarning("Log file does not exist: \"%s\"", qPrintable(m_logfile.fileName()));

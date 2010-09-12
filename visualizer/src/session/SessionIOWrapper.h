@@ -14,6 +14,7 @@ public:
 	
 	virtual void open() = 0;
 	
+	virtual bool hasHeartbeat() = 0;
 protected:
 	void setIODevice(QIODevice *ioDevice) { m_ioDevice = ioDevice; }
 signals:

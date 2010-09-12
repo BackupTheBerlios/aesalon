@@ -6,19 +6,30 @@
 #include "SessionDisplay.h"
 #include "SessionDisplay.moc"
 #include "SessionVisualization.h"
+#include "Session.h"
+#include "SessionSettings.h"
 
-SessionDisplay::SessionDisplay(ModuleMapper *moduleMapper) : QWidget(NULL), m_moduleMapper(moduleMapper) {
+SessionDisplay::SessionDisplay(Session *session) : QWidget(NULL), m_session(session) {
+	QVBoxLayout *vLayout = new QVBoxLayout();
+	
+	m_menuBar = new QMenuBar();
+	
+	setupMenuBar();
+	
+	vLayout->addWidget(m_menuBar);
+	
 	m_grid = new QGridLayout();
 	m_grid->addWidget(newVisualization(), 0, 0);
 	m_grid->setColumnStretch(0, 1);
 	m_grid->setRowStretch(0, 1);
 	
-	setLayout(m_grid);
+	vLayout->addLayout(m_grid);
 	
-	m_updateTimer = new QTimer(this);
-	connect(m_updateTimer, SIGNAL(timeout()), SIGNAL(updateVisualizations()));
-	m_updateTimer->setSingleShot(false);
-	/*m_updateTimer->start(250);*/
+	setLayout(vLayout);
+	
+	connect(m_session->heartbeat(), SIGNAL(heartbeat()), SIGNAL(updateVisualizations()));
+	
+	m_moduleMapper = m_session->moduleMapper();
 }
 
 SessionDisplay::~SessionDisplay() {
@@ -35,6 +46,9 @@ SessionVisualization *SessionDisplay::newVisualization() const {
 	return sv;
 }
 
+void SessionDisplay::setupMenuBar() {
+	m_menuBar->addAction(tr("&Settings"), this, SLOT(showSettings()));
+}
 
 void SessionDisplay::addColumn() {
 	m_grid->addWidget(newVisualization(), 0, m_grid->columnCount());
@@ -73,7 +87,7 @@ void SessionDisplay::displayContextMenu(QPoint globalPosition, SessionVisualizat
 		for(size_t rendererIndex = 0; rendererIndex < rendererNames.size(); rendererIndex ++) {
 			QAction *action = moduleMenu->addAction(rendererNames[rendererIndex].c_str());
 			action->setProperty("moduleID", i);
-			qDebug("action->property(): %i", action->property("moduleID").toInt());
+			/*qDebug("action->property(): %i", action->property("moduleID").toInt());*/
 		}
 		
 		connect(moduleMenu, SIGNAL(triggered(QAction*)), SLOT(setVisualizationModule(QAction*)));
@@ -95,4 +109,10 @@ void SessionDisplay::setVisualizationModule(QAction *action) {
 	VisualizationWidget *widget = new VisualizationWidget(module, action->text());
 	connect(this, SIGNAL(updateVisualizations()), widget, SLOT(updateVisualization()));
 	m_contextVisualization->setVisualization(widget);
+}
+
+void SessionDisplay::showSettings() {
+	SessionSettings *settings = new SessionSettings(parentWidget(), m_session);
+	
+	settings->show();
 }
