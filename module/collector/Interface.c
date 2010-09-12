@@ -66,7 +66,7 @@ void AC_CONSTRUCTOR AC_constructor() {
 	timerfd_settime(AC_heartbeatFd, 0, &its, NULL);
 	
 	printf("Creating thread . . .\n");
-	/*pthread_create(&AC_heartbeatThread, NULL, AC_sendHeartbeats, NULL);*/
+	pthread_create(&AC_heartbeatThread, NULL, AC_sendHeartbeats, NULL);
 	
 	printf("Interface initialized.\n");
 }

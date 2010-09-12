@@ -40,6 +40,7 @@ TreeNode *TreeHead::lookup(uint64_t address, int lookupMode) {
 	else if(m_headNode == NULL && create == true) {
 		m_headNode = new TreeNode();
 		m_headNode->setHeadID(m_headID);
+		std::cout << "Created new head node . . ." << std::endl;
 	}
 	
 	TreeNode *node = m_headNode;

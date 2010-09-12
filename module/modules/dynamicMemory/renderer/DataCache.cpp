@@ -6,6 +6,7 @@
 
 DynamicMemoryDataCache::DynamicMemoryDataCache() {
 	m_treeHeadVector.push_back(new TreeHead(0));
+	std::cout << "m_treeHeadVector.size(): " << m_treeHeadVector.size() << std::endl;
 }
 
 DynamicMemoryDataCache::~DynamicMemoryDataCache() {
@@ -45,7 +46,10 @@ void DynamicMemoryDataCache::processPacket(DataPacket *packet) {
 	}
 	
 	/* TODO: softcode this limit. */
-	if(latestTree()->changedList().size() > 500) newHead();
+	if(latestTree()->changedList().size() > 500) {
+		std::cout << ">500 events in tree, creating new head . . ." << std::endl;
+		newHead();
+	}
 }
 
 static bool compareHeads(TreeHead *one, TreeHead *two) {
@@ -60,6 +64,12 @@ void DynamicMemoryDataCache::visit(const DataRange &dataRange, CacheVisitor *vis
 	TreeHead th(-1);
 	th.updateTimestamp(dataRange.beginTime());
 	TreeHeadVector::const_iterator startHead = std::lower_bound(m_treeHeadVector.begin(), m_treeHeadVector.end(), &th, compareHeads);
+	
+	if(startHead == m_treeHeadVector.end()) {
+		/* The range is out of range. */
+		return;
+	}
+	
 	th.updateTimestamp(dataRange.endTime());
 	TreeHeadVector::const_iterator endHead = std::upper_bound(m_treeHeadVector.begin(), m_treeHeadVector.end(), &th, compareHeads);
 	
@@ -128,6 +138,7 @@ void DynamicMemoryDataCache::allocBlock(uint64_t address, uint64_t size, Timesta
 	
 	node->setData(block);
 	latestTree()->appendChanged(block);
+	latestTree()->updateTimestamp(timestamp);
 }
 
 void DynamicMemoryDataCache::freeBlock(uint64_t address, Timestamp timestamp) {
@@ -138,9 +149,11 @@ void DynamicMemoryDataCache::freeBlock(uint64_t address, Timestamp timestamp) {
 	}
 	node->data()->setReleaseTime(timestamp);
 	latestTree()->appendChanged(node->data());
+	latestTree()->updateTimestamp(timestamp);
 }
 
 DataRange DynamicMemoryDataCache::densityRange() const {
+	/* TODO: calculate total time and data range. (step through each?) */
 	return DataRange(m_treeHeadVector.front()->changedList().front()->allocTime(), m_treeHeadVector.front()->changedList().front()->address(),
-		m_treeHeadVector.front()->changedList().front()->releaseTime(), m_treeHeadVector.front()->changedList().front()->address() + m_treeHeadVector.front()->changedList().front()->size());
+		m_treeHeadVector.front()->changedList().front()->releaseTime(), m_treeHeadVector.front()->changedList().front()->address() + m_treeHeadVector.front()->changedList().front()->size() + 128);
 }

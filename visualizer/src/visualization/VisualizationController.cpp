@@ -23,10 +23,17 @@ void VisualizationController::heartbeat(Timestamp timestamp) {
 }
 
 void VisualizationController::modifiedPoint(DataCoord point) {
-	if(point.time() < m_totalRange.beginTime() || m_totalRange.beginTime() == 0) m_totalRange.beginTime() = point.time();
-	if(point.time() > m_totalRange.endTime()) m_totalRange.endTime() = point.time();
+	modifiedTime(point.time());
 	if(point.data() < m_totalRange.beginData()) m_totalRange.beginData() = point.data();
 	if(point.data() > m_totalRange.endData()) m_totalRange.endData() = point.data();
+}
+
+void VisualizationController::modifiedTime(Timestamp timestamp) {
+	if(timestamp < m_totalRange.beginTime() || m_totalRange.beginTime() == 0) {
+		qDebug("**** setting beginTime to %li . . .", timestamp);
+		m_totalRange.beginTime() = timestamp;
+	}
+	if(timestamp > m_totalRange.endTime() || m_totalRange.endTime() == 0) m_totalRange.endTime() = timestamp;
 }
 
 void VisualizationController::updateVisualization() {

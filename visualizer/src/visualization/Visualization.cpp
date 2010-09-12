@@ -71,6 +71,13 @@ void Visualization::setPenColour(int r, int g, int b, int a) {
 	m_painter.setPen(pen);
 }
 
+void Visualization::setFillColour(int r, int g, int b, int a) {
+	QBrush brush = m_painter.brush();
+	brush.setStyle(Qt::SolidPattern);
+	brush.setColor(qRgba(r, g, b, a));
+	m_painter.setBrush(brush);
+}
+
 void Visualization::drawLine(DataCoord from, DataCoord to) {
 	if(!isLocked()) {
 		qWarning("drawLine() called when visualization is not locked.");
@@ -95,6 +102,9 @@ void Visualization::drawBox(DataRange range) {
 	m_controller->modifiedPoint(range.end());
 }
 
+void Visualization::touch(Timestamp timestamp) {
+	m_controller->modifiedTime(timestamp);
+}
 
 Visualization *Visualization::subVisualization(const DataRange &range) {
 	Visualization *sv = new Visualization(translate(range).toAlignedRect().size(), range);
@@ -105,8 +115,9 @@ Visualization *Visualization::subVisualization(const DataRange &range) {
 void Visualization::shift(DataCoord by) {
 	m_paintLock.lock();
 	
-	if(m_range.beginTime() + by.time() < m_controller->totalRange().beginTime()) by.time() = 0.0;
-	if(m_range.endTime() + by.time() > m_controller->totalRange().endTime()) by.time() = 0.0;
+	qDebug("\n\tbeginTime(): %li\n", m_controller->totalRange().beginTime());
+	if(by.time() < 0 && m_range.beginTime() + by.time() < m_controller->totalRange().beginTime()) by.time() = 0.0;
+	if(by.time() > 0 && m_range.endTime() + by.time() > m_controller->totalRange().endTime()) by.time() = 0.0;
 	
 	QPointF pixels = translateOffset(by);
 	qDebug("by: %li, %f", by.time(), by.data());

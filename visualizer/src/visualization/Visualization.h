@@ -50,6 +50,7 @@ public:
 	/** Sets the pen colour. */
 	virtual void setPenColour(int r, int g, int b, int a);
 	
+	virtual void setFillColour(int r, int g, int b, int a);
 	/** Draws a line from @a from to @a to.
 		@param from The coordinates to start the line at.
 		@param to The coordinates to end the line.
@@ -57,6 +58,8 @@ public:
 	virtual void drawLine(DataCoord from, DataCoord to);
 	
     virtual void drawBox(DataRange range);
+	
+	virtual void touch(Timestamp timestamp);
 	
 	/** Creates a sub-visualization of this visualization, preserving the
 		mapping ratio of data units to screen units for a given range.

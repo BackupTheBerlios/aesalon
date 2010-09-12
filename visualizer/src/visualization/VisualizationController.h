@@ -41,6 +41,7 @@ public:
 	Renderer *renderer() const { return m_renderer; }
 	void setRenderer(Renderer *renderer) { m_renderer = renderer; }
 	void modifiedPoint(DataCoord point);
+	void modifiedTime(Timestamp timestamp);
 	void heartbeat(Timestamp timestamp);
 	const DataRange &totalRange() const { return m_totalRange; }
 	

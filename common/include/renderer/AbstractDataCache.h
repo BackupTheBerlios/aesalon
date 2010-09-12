@@ -7,6 +7,7 @@ class AbstractRendererDataCache : public RendererDataCache {
 private:
 	uint64_t m_heartbeatTimestamp;
 public:
+	AbstractRendererDataCache() : m_heartbeatTimestamp(0) {}
 	virtual ~AbstractRendererDataCache() {}
 	
 	virtual Timestamp heartbeatTimestamp() const { return m_heartbeatTimestamp; }

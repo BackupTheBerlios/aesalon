@@ -15,8 +15,12 @@ public:
 	virtual void unlock() = 0;
 	virtual bool isLocked() const = 0;
 	virtual void setPenColour(int r, int g, int b, int a) = 0;
+	virtual void setFillColour(int r, int g, int b, int a) = 0;
 	virtual void drawLine(DataCoord from, DataCoord to) = 0;
 	virtual void drawBox(DataRange range) = 0;
+	
+	virtual void touch(Timestamp timestamp) = 0;
+	
 };
 
 #endif
