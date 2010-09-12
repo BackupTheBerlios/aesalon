@@ -128,7 +128,7 @@ void Visualization::shift(DataCoord by) {
 	m_paintLock.unlock();
 }
 
-void Visualization::scale(qreal zoom) {
+void Visualization::scale(qreal x, qreal y) {
 	m_paintLock.lock();
 	
 	Timestamp xSize = m_range.endTime() - m_range.beginTime();
@@ -137,8 +137,8 @@ void Visualization::scale(qreal zoom) {
 	Timestamp xCentre = (m_range.endTime() + m_range.beginTime()) / 2;
 	double yCentre = (m_range.endData() + m_range.beginData()) / 2.0;
 	
-	DataCoord newBegin = DataCoord((Timestamp)(xCentre - ((xSize / 2) * zoom)), yCentre - ((ySize / 2) * zoom));
-	DataCoord newEnd = DataCoord((Timestamp)(xCentre + ((xSize / 2) * zoom)), yCentre + ((ySize / 2) * zoom));
+	DataCoord newBegin = DataCoord((Timestamp)(xCentre - ((xSize / 2) * x)), yCentre - ((ySize / 2) * y));
+	DataCoord newEnd = DataCoord((Timestamp)(xCentre + ((xSize / 2) * x)), yCentre + ((ySize / 2) * y));
 	
 	QImage temporary = m_image;
 	m_painter.begin(&m_image);
@@ -147,8 +147,8 @@ void Visualization::scale(qreal zoom) {
 	QRectF rect = translate(DataRange(newBegin, newEnd)).normalized();
 	/*qDebug("rect: (%f,%f),(%f,%f)", rect.left(), rect.top(), rect.right(), rect.bottom());*/
 	m_painter.drawImage(translate(DataRange(
-		DataCoord((Timestamp)(xCentre - ((xSize / 2) * 1/zoom)), yCentre - ((ySize / 2) * 1/zoom)),
-		DataCoord((Timestamp)(xCentre + ((xSize / 2) * 1/zoom)), yCentre + ((ySize / 2) * 1/zoom))
+		DataCoord((Timestamp)(xCentre - ((xSize / 2) * 1/x)), yCentre - ((ySize / 2) * 1/y)),
+		DataCoord((Timestamp)(xCentre + ((xSize / 2) * 1/x)), yCentre + ((ySize / 2) * 1/y))
 		)).normalized(), temporary);
 	
 	m_painter.end();

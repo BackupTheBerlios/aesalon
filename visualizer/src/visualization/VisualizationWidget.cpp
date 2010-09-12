@@ -62,7 +62,15 @@ void VisualizationWidget::wheelEvent(QWheelEvent *event) {
 	qreal scale = 1 - (event->delta() / 1000.0);
 	qDebug("\tscale: %f", scale);
 	
-	m_controller->scale(scale);
+	if(event->modifiers() & Qt::ShiftModifier) {
+		m_controller->scale(1.0, scale);
+	}
+	else if(event->modifiers() & Qt::ControlModifier) {
+		m_controller->scale(scale, 1.0);
+	}
+	else {
+		m_controller->scale(scale, scale);
+	}
 	
 	update();
 	

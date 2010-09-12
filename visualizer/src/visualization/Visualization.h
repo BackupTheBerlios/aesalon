@@ -67,7 +67,7 @@ public:
 	
 	void shift(DataCoord by);
 	
-	void scale(qreal zoom);
+	void scale(qreal x, qreal y);
 
 	QPointF translate(const DataCoord &coord);
 	QRectF translate(const DataRange &range);

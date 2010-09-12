@@ -112,8 +112,8 @@ void VisualizationController::shift(DataCoord by) {
 	/*renderRegion(m_visualization->range(), PartialRequest);*/
 }
 
-void VisualizationController::scale(qreal zoom) {
-	m_visualization->scale(zoom);
+void VisualizationController::scale(qreal x, qreal y) {
+	m_visualization->scale(x, y);
 }
 
 void VisualizationController::processRequest(VisualizationRequest *request) {

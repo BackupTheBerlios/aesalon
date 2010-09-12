@@ -37,7 +37,6 @@ SessionSettings::~SessionSettings() {
 }
 
 void SessionSettings::accept() {
-	
 	m_session->heartbeat()->setInterval(m_heartbeatTime->value());
 	
 	QDialog::accept();

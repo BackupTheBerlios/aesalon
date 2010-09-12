@@ -58,7 +58,7 @@ public:
 	void shift(QPoint pixels);
 	void shift(DataCoord by);
 	
-	void scale(qreal zoom);
+	void scale(qreal x, qreal y);
 private:
 	/** Processes a VisualizationRequest.
 		@param request The request to process. This memory should be
