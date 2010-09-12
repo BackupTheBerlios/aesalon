@@ -28,6 +28,7 @@ void AC_CONSTRUCTOR AC_constructor() {
 	
 	AC_mmapFd = shm_open(filename, O_RDWR, 0);
 	
+	/* TODO: replace this with a call to AC_configurationString . . . */
 	char *shmSizeEnv = getenv("AC_ShmSize");
 	if(shmSizeEnv == NULL) {
 		printf("AC_ShmSize is not set. Aborting.\n");
@@ -48,12 +49,23 @@ void AC_CONSTRUCTOR AC_constructor() {
 	
 	struct itimerspec its;
 	
-	its.it_interval.tv_sec = 0;
-	/* 10,000,000 nanoseconds is 1/100th of a second. E.g. 100 heartbeats per second. */
-	its.it_interval.tv_nsec = 10000000;
+	long heartbeatInterval = AC_configurationLong("global", "heartbeatInterval");
+	if(heartbeatInterval == 0) {
+		/* The default is 100 heartbeats per second, or a 10 millisecond interval. */
+		heartbeatInterval = 10;
+	}
 	
+	printf("Heartbeat interval: %li ms.\n", heartbeatInterval);
+	
+	/* heartbeatInterval is specified in milliseconds. Convert it to nanoseconds . . . */
+	heartbeatInterval *= 1000 * 1000;
+	
+	its.it_interval.tv_sec = heartbeatInterval / 1000000000;
+	its.it_interval.tv_nsec = heartbeatInterval % 1000000000;
+	
+	/* Fire off the timer as soon as is possible. */
 	its.it_value.tv_sec = 0;
-	its.it_value.tv_nsec = 10000000;
+	its.it_value.tv_nsec = 1;
 	
 	timerfd_settime(AC_heartbeatFd, 0, &its, NULL);
 	
@@ -221,6 +233,16 @@ int AC_configurationInt(const char *module, const char *name) {
 	if(envContent == NULL) return 0;
 	int content;
 	sscanf(envContent, "%i", &content);
+	return content;
+}
+
+long AC_configurationLong(const char *module, const char *name) {
+	char envName[256];
+	snprintf(envName, 256, "ACM_%s_%s", module, name);
+	char *envContent = getenv(envName);
+	if(envContent == NULL) return 0;
+	long content;
+	sscanf(envContent, "%li", &content);
 	return content;
 }
 

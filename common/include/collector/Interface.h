@@ -35,6 +35,7 @@ AC_Address AC_EXPORT AC_libraryOffset(const char *name);
 
 char AC_EXPORT * AC_configurationString(const char *module, const char *name);
 int AC_EXPORT AC_configurationInt(const char *module, const char *name);
+long AC_EXPORT AC_configurationLong(const char *module, const char *name);
 int AC_EXPORT AC_configurationBool(const char *module, const char *name);
 
 uint16_t AC_moduleID();

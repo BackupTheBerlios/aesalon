@@ -14,7 +14,7 @@ Module::Module(uint16_t moduleID, std::string moduleName) : m_moduleName(moduleN
 	
 	std::string modulePath = Misc::PathSanitizer::findFromPaths(
 			Initializer::singleton()->configuration()->module(moduleName)->item("polisher")->data(),
-			Initializer::singleton()->configuration()->module(moduleName)->item("module-path")->data());
+			Initializer::singleton()->configuration()->module(moduleName)->item("modulePath")->data());
 	
 	m_monitorHandle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if(m_monitorHandle == NULL) {

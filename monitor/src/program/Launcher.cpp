@@ -55,7 +55,7 @@ void Launcher::startProcess() {
 	if(m_childPid == 0) {
 		setenv("LD_PRELOAD", preload().c_str(), 1);
 		char buffer[128];
-		sprintf(buffer, "%i", Initializer::singleton()->configuration()->traverse("shm-size")->asInt());
+		sprintf(buffer, "%i", Initializer::singleton()->configuration()->traverse("shmSize")->asInt());
 		setenv("AC_ShmSize", buffer, 1);
 		ptrace(PTRACE_TRACEME, 0, 0, 0);
 		
@@ -93,7 +93,7 @@ std::string Launcher::preload() {
 		
 		std::string found = Misc::PathSanitizer::findFromPaths(
 			Initializer::singleton()->configuration()->module(moduleName)->item("collector")->data(),
-			Initializer::singleton()->configuration()->module(moduleName)->item("module-path")->data());
+			Initializer::singleton()->configuration()->module(moduleName)->item("modulePath")->data());
 		
 		if(found.length()) {
 			preload += found;
@@ -103,7 +103,7 @@ std::string Launcher::preload() {
 	
 	if(preload.length()) {
 		preload += Misc::PathSanitizer::findFromPaths("collector.so",
-			Initializer::singleton()->configuration()->traverse("search-paths")->data());
+			Initializer::singleton()->configuration()->traverse("searchPaths")->data());
 	}
 	
 	return preload;
@@ -114,6 +114,8 @@ void Launcher::setModuleEnvironment() {
 	std::string moduleList = Initializer::singleton()->configuration()->traverse("modules")->data();
 	
 	if(moduleList.length() == 0) return;
+	
+	moduleList.insert(0, "global:");
 	
 	do {
 		std::string moduleName = moduleList.substr(0, moduleList.find(":"));

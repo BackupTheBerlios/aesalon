@@ -23,7 +23,7 @@ AC_moduleDefinition;
 void AC_CONSTRUCTOR AC_constructor() {
 	AC_Address libcOffset = AC_libraryOffset("libc-");
 	
-	ACM_originalCalloc = (void *)(libcOffset + AC_configurationInt("dynamicMemory", "calloc-offset"));
+	ACM_originalCalloc = (void *)(libcOffset + AC_configurationInt("dynamicMemory", "callocOffset"));
 	
 	*(void **)(&ACM_originalMalloc) = dlsym(RTLD_NEXT, "malloc");
 	*(void **)(&ACM_originalFree) = dlsym(RTLD_NEXT, "free");

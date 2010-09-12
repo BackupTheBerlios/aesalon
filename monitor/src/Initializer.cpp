@@ -34,8 +34,8 @@ int Initializer::run() {
 		return 0;
 	}
 	
-	m_socketManager = new Network::TcpManager(m_configuration->traverse("tcp-port")->asInt());
-	m_socketManager->waitForConnections(m_configuration->traverse("network-wait")->asInt());
+	m_socketManager = new Network::TcpManager(m_configuration->traverse("tcpPort")->asInt());
+	m_socketManager->waitForConnections(m_configuration->traverse("networkWait")->asInt());
 	
 	m_launcher = new Program::Launcher();
 	
@@ -51,8 +51,8 @@ void Initializer::usage() {
 	std::cout << "usage: " << m_argv[0] << " [options] [--] filename [arguments]" << std::endl;
 	std::cout << "Options:" << std::endl;
 	std::cout << "\t--help: displays this help message." << std::endl;
-	std::cout << "\t--network-wait: amount of network clients to wait for before executing." << std::endl;
-	std::cout << "\t--tcp-port: TCP port to listen on." << std::endl;
-	std::cout << "\t--log-file: optional log file to write collected data to." << std::endl;
-	std::cout << "\t--shm-size: size of the SHM used to communicate." << std::endl;
+	std::cout << "\t--networkWait: amount of network clients to wait for before executing." << std::endl;
+	std::cout << "\t--tcpPort: TCP port to listen on." << std::endl;
+	std::cout << "\t--logFile: optional log file to write collected data to." << std::endl;
+	std::cout << "\t--shmSize: size of the SHM used to communicate." << std::endl;
 }

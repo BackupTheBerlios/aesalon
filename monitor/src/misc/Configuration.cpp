@@ -87,7 +87,7 @@ void Configuration::processSearchPaths() {
 	}
 	std::string searchPaths = pathEnv;
 	
-	traverse("search-paths")->setData(searchPaths);
+	traverse("searchPaths")->setData(searchPaths);
 	
 	do {
 		std::string::size_type position = searchPaths.find(":");
@@ -114,7 +114,7 @@ void Configuration::processSearchPaths() {
 						/*dirpath += "/monitor.conf";*/
 						if(stat((dirpath + "/monitor.conf").c_str(), &file_stat) == 0 && S_ISREG(file_stat.st_mode)) {
 							processFile(dirpath + "/monitor.conf");
-							traverse(std::string(file->d_name) + ".module-path")->setData(dirpath);
+							traverse(std::string(file->d_name) + ".modulePath")->setData(dirpath);
 						}
 					}
 				}

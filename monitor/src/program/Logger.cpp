@@ -8,7 +8,7 @@
 namespace Program {
 
 Logger::Logger() : m_fd(0) {
-	std::string filename = Initializer::singleton()->configuration()->traverse("log-file")->data();
+	std::string filename = Initializer::singleton()->configuration()->traverse("logFile")->data();
 	
 	if(!filename.length()) return;
 	
