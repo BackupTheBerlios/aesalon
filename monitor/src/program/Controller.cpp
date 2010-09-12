@@ -62,19 +62,41 @@ void Controller::run() {
 	detachFromProcess();
 	
 	int status;
-	/* Now, wait for the termination signal. */
-	do {
-		waitForSignal(&status);
-		std::cout << "received signal . . ." << std::endl;
-	} while(shouldContinueAfter(status));
+	/* Now, wait for the termination signal. */	
+	siginfo_t sinfo;
+	waitid(P_PID, m_childPid, &sinfo, WEXITED);
 	
-	int signal = signalFromStatus(status);
+	/* NOTE: the return value of a program killed by a signal is 128 + signal number. */
+	if(sinfo.si_code == CLD_KILLED) {
+		LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process killed with signal " << sinfo.si_status << ".");
+		m_returnCode = sinfo.si_status + 128;
+	}
+	else if(sinfo.si_code == CLD_DUMPED) {
+		LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process coredumped on signal " << sinfo.si_status << ".");
+		m_returnCode = sinfo.si_status + 128;
+	}
+	else if(sinfo.si_code == CLD_EXITED) {
+		if(sinfo.si_status != 0) LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process terminated. Return code: " << sinfo.si_status << ".");
+		else LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process terminated successfully.");
+		m_returnCode = sinfo.si_status;
+	}
+	else if(sinfo.si_code == CLD_TRAPPED) {
+		LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process aborting on signal " << sinfo.si_status << ".");
+		m_returnCode = sinfo.si_status;
+	}
+	else {
+		std::cout << "Unknown exit status . . ." << std::endl;
+		std::cout << "\tsi_code:" << sinfo.si_code << std::endl;
+		std::cout << "\tsi_status:" << sinfo.si_status << std::endl;
+	}
+	
+	/*int signal = signalFromStatus(status);
 	if(signal != -1) {
 		LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process terminating with signal " << signal << ".");
 	}
 	else {
 		LogSystem::logProgramMessage(m_analyzer->filename(), Misc::StreamAsString() << "Process terminated normally.");
-	}
+	}*/
 }
 
 void Controller::waitForSigTrap() {
