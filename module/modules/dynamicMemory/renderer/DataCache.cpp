@@ -143,6 +143,7 @@ void DynamicMemoryDataCache::allocBlock(uint64_t address, uint64_t size, Timesta
 
 void DynamicMemoryDataCache::freeBlock(uint64_t address, Timestamp timestamp) {
 	TreeNode *node = latestTree()->lookup(address);
+	if(node == NULL) return;
 	if(!latestTree()->remove(address)) {
 		newHead();
 		latestTree()->remove(address);

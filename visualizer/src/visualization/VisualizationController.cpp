@@ -74,10 +74,9 @@ void VisualizationController::shift(QPoint pixels) {
 	/*qDebug("Asked to shift visualization . . .");*/
 	/* Invert the X value. The Y value is already inverted due to the visualization coordinate system. */
 	pixels.setX(-pixels.x());
-	pixels.setY(-pixels.y());
+	/*pixels.setY(-pixels.y());*/
 	
 	/*pixels.setX(1);*/
-	pixels.setY(0);
 	
 	shift(m_visualization->translateOffset(pixels));
 }

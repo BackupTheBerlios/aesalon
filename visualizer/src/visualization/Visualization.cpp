@@ -96,13 +96,15 @@ void Visualization::drawBox(DataRange range) {
 		qWarning("drawBox() called when visualization is not locked.");
 		return;
 	}
-	QRectF rect(translate(range));
+	QRectF rect(translate(range).normalized());
 	
-	if(rect.x() < 0) rect.setX(0.0);
-	else if(rect.x() > m_image.width()) rect.setX(m_image.width());
+	if(rect.left() < 0) rect.setLeft(0.0);
+	else if(rect.right() > m_image.width()) rect.setRight(m_image.width());
 	
-	if(rect.y() < 0) rect.setY(0.0);
-	else if(rect.y() > m_image.height()) rect.setY(m_image.height());
+	if(rect.top() < 0) rect.setTop(0.0);
+	else if(rect.bottom() > m_image.height()) rect.setBottom(m_image.height());
+	
+	qDebug("Drawing box from (%f, %f) to (%f, %f) . . .", rect.left(), rect.top(), rect.right(), rect.bottom());
 	
 	m_painter.drawRect(rect);
 	m_controller->modifiedPoint(range.begin());
@@ -125,6 +127,9 @@ void Visualization::shift(DataCoord by) {
 	qDebug("\n\tbeginTime(): %li\n", m_controller->totalRange().beginTime());
 	if(by.time() < 0 && m_range.beginTime() + by.time() < m_controller->totalRange().beginTime()) by.time() = 0.0;
 	if(by.time() > 0 && m_range.endTime() + by.time() > m_controller->totalRange().endTime()) by.time() = 0.0;
+	
+	if(by.data() < 0 && m_range.beginData() + by.data() < m_controller->totalRange().beginData()) by.data() = 0.0;
+	if(by.data() > 0 && m_range.endData() + by.data() > m_controller->totalRange().endData()) by.data() = 0.0;
 	
 	QPointF pixels = translateOffset(by);
 	qDebug("by: %li, %f", by.time(), by.data());
