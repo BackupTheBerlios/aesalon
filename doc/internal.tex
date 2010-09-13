@@ -1,6 +1,7 @@
 \documentclass[a4paper,10pt]{report}
 \usepackage[utf8x]{inputenc}
 \usepackage{indentfirst}
+\usepackage{listings}
 
 \author{Ethereal\\ethereal.visage@gmail.com}
 \title{Internals of the Aesalon visualization tool\\\normalsize{Document version 0.1}}
@@ -108,16 +109,18 @@
 \setlength{\parindent}{1em}
 %\setlength{\parskip}{1ex}
 
-%\maketitle
+\maketitle
 
-%\tableofcontents
+\tableofcontents
 
-%\include{internal_overview}
+\include{internal_overview}
 
-%\include{internal_implementation}
+\include{internal_implementation}
 
 \include{internal_apis}
 
-%\include{internal_appendix}
+\include{internal_example}
+
+\include{internal_appendix}
 
 \end{document}

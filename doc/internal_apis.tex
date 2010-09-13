@@ -62,6 +62,13 @@ global variables and functions. The macro \emph{AC\_moduleDefiniton()} is used f
 \documentMacro{AC\_moduleDefinition}{}{Creates global variables and internally-used functions; should be placed
 within the global scope of a single source file per module.}
 
+Two more functions that should be covered off:
+
+\documentFunction{void}{AC\_constructor}{}{Called when the module is initializing.}
+\documentFunction{void}{AC\_destructor}{}{Called just before the program exits.}
+
+These two functions should be implemented in each collector module; even if they are only stubs.
+
 \subsection{Module communication}
 The communication between the collector modules and the monitor is very much a one-sided conversation. The collector
 modules can send data to the monitor, but the monitor (and through it, the polisher modules) cannot send any data to
