@@ -235,7 +235,7 @@ definitions for the two:
 
 class CpuTimeDataCache : public AbstractRendererDataCache {
 public:
-    virtual ~CpuTimeDataCache();
+    virtual ~CpuTimeDataCache() {}
     
     typedef std::vector<DataCoord> DataVector;
 private:
@@ -264,7 +264,7 @@ public:
 class GlobalUsageRenderer : public AbstractRenderer<CpuTimeDataCache> {
 public:
     GlobalUsageRenderer(CpuTimeDataCache *dataCache);
-    virtual ~GlobalUsageRenderer();
+    virtual ~GlobalUsageRenderer() {}
 private:
 public:
     virtual void renderRange(VisualizationWrapper *visualization,
@@ -280,3 +280,120 @@ methods.
 
 The definitions for the previous two headers:
 
+\lstset{
+  caption={Example renderer, DataCache.cpp source file.},
+  label={exampleRendererDataCacheSource}
+}
+\begin{lstlisting}
+#include "DataCache.h"
+
+void CpuTimeDataCache::processPacket(DataPacket *packet) {
+    uint64_t cpuTime = *(uint64_t *)packet->data;
+    if(m_dataVector.size() == 0) {
+    m_dataVector.push_back(DataCoord(packet->dataSource.timestamp, 0.0));
+    }
+    else {
+	uint64_t ddiff = cpuTime - m_lastCpuTime;
+	Timestamp tdiff = packet->dataSource.timestamp - m_dataVector.back().time();
+	
+	double usage = ddiff / (double)tdiff;
+	
+	m_dataVector.push_back(DataCoord(packet->dataSource.timestamp, usage));
+    }
+    m_lastCpuTime = cpuTime;
+}
+\end{lstlisting}
+
+\lstset{
+  caption={Example renderer, GlobalUsageRenderer.cpp source file.},
+  label={exampleRendererGURendererSource}
+}
+\begin{lstlisting}
+#include <algorithm>
+
+#include "GlobalUsageRenderer.h"
+
+GlobalUsageRenderer::GlobalUsageRenderer(CpuTimeDataCache *dataCache)
+    : AbstractRenderer<CpuTimeDataCache>(dataCache) {
+    
+}
+
+static bool compareCoords(const DataCoord &one, const DataCoord &two) {
+    if(one.time() < two.time()) return true;
+    return false;
+}
+
+void GlobalUsageRenderer::renderRange(VisualizationWrapper *visualization,
+	const DataRange &range, bool *abort) {
+    const CpuTimeDataCache::DataVector &dataVector = dataCache()->dataVector();
+    
+    DataCoord c;
+    
+    c.setTime(range.beginTime());
+    c.setData(0.0);
+    
+    CpuTimeDataCache::DataVector::const_iterator begin =
+	std::lower_bound(dataVector.begin(), dataVector.end(), c, compareCoords);
+	
+    if(begin == dataVector.end()) {
+	/* Then the visualization is out of range. */
+	return;
+    }
+    else if(begin != dataVector.begin()) --begin;
+    
+    c.setTime(range.endTime());
+    
+    CpuTimeDataCache::DataVector::const_iterator end =
+	std::upper_bound(dataVector.begin(), dataVector.end(), c, compareCoords);
+    
+    if(end == dataVector.begin()) {
+	/* Then the visualization is out of range. */
+	return;
+    }
+    else if(end != dataVector.end()) ++end;
+    
+    visualization->lock();
+
+    for(; begin != (end-1); ++begin) {
+	visualization->drawLine((*begin), *(begin + 1));
+    }
+    
+    visualization->unlock();
+}
+
+DataRange GlobalUsageRenderer::defaultRange() const {
+    const CpuTimeDataCache::DataVector &dataVector = dataCache()->dataVector();
+    return DataRange(DataCoord(dataVector.front().time(), 0.0),
+	DataCoord(dataVector.back().time(), 1.5));
+}
+
+\end{lstlisting}
+
+To fully understand the code in the DataCache type, a quick background in calculating CPU usage is required. In
+UNIX-based operating systems, the kernel keeps track of the culumative processing time a process has consumed. This
+makes it easy to calculate the CPU usage for a given period, given $\Delta t$ and $\Delta C_{time}$:
+
+\begin{center}
+  \begin{math}
+    usage_{percent} = \Delta C_{time} / \Delta t
+  \end{math}
+\end{center}
+
+Note that this calculates a value between 0 and $n_{cores}$, where $n_{cores}$ is the number of SMP cores the computer
+in question posseses.\footnote{This is actually, for reference, similar to how load averages are calculated.}
+
+\section{Compiling}
+The next step is to add the module to the Aesalon build system. Contained within the \emph{module/modules/} directory
+is a file called \emph{build\_list}. Add the name of the directory to the end of the \emph{set()} call. Run \emph{make},
+and your module should be built automatically.
+
+\section{Output}
+Of course, this sort of visualization is very, very basic, and doesn't look like very much.
+Figure \ref{exampleModuleOutput} shows the basic output produced by this module.
+
+\begin{figure}[t]
+  \begin{center}
+    \includegraphics[scale=0.25]{exampleModuleScreenshot}
+  \end{center}
+  \caption{A screenshot of the example cpuTime module. \label{exampleModuleOutput}}
+\end{figure}
