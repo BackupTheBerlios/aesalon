@@ -97,6 +97,13 @@ void Visualization::drawBox(DataRange range) {
 		return;
 	}
 	QRectF rect(translate(range));
+	
+	if(rect.x() < 0) rect.setX(0.0);
+	else if(rect.x() > m_image.width()) rect.setX(m_image.width());
+	
+	if(rect.y() < 0) rect.setY(0.0);
+	else if(rect.y() > m_image.height()) rect.setY(m_image.height());
+	
 	m_painter.drawRect(rect);
 	m_controller->modifiedPoint(range.begin());
 	m_controller->modifiedPoint(range.end());
@@ -175,7 +182,7 @@ void Visualization::scale(qreal x, qreal y) {
 QPointF Visualization::translate(const DataCoord &coord) {
 	Timestamp xSize = m_range.endTime() - m_range.beginTime();
 	qreal ySize = m_range.endData() - m_range.beginData();
-	
+		
 	qreal xPercentage = ((qreal)coord.time() - (qreal)m_range.beginTime()) / qreal(xSize);
 	qreal yPercentage = (coord.data() - m_range.beginData()) / ySize;
 	
