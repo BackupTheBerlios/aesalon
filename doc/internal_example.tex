@@ -186,3 +186,97 @@ again, that is all that is required of it.
 
 And again, the code should be self-explanitory.
 
+\section{The renderer}
+The renderer module is far more complex than even the other two modules placed together. Two classes must be
+subclassed, as previously mentioned, and a third must be instantiated. To start off with the basics . . .
+
+\lstset{
+  caption={Example renderer, Controller.cpp source file.},
+  label={exampleRendererController}
+}
+\begin{lstlisting}
+#include "renderer/Controller.h"
+#include "DataCache.h"
+#include "GlobalUsageRenderer.h"
+
+extern "C" {
+
+RendererController *Instantiate() {
+    RendererController *controller = new RendererController();
+    ConcreteRendererFactory *factory = new ConcreteRendererFactory();
+    CpuTimeDataCache *dataCache = new CpuTimeDataCache();
+    controller->setDataCache(dataCache);
+    controller->setFactory(factory);
+
+    factory->registerRenderer("Global CPU usage",
+	new GlobalUsageRenderer(dataCache));
+
+    return controller;
+}
+
+} // extern "C"
+\end{lstlisting}
+
+Now, after this, two more classes are (obviously) required; \emph{CpuTimeDataCache} and \emph{GlobalUsageRenderer}. The
+definitions for the two:
+
+\lstset{
+  caption={Example renderer, DataCache.h header file.},
+  label={exampleRendererDataCacheHeader}
+}
+\begin{lstlisting}
+#ifndef DataCache_H
+#define DataCache_H
+
+#include <vector>
+
+#include "renderer/AbstractDataCache.h"
+#include "renderer/DataCoord.h"
+
+class CpuTimeDataCache : public AbstractRendererDataCache {
+public:
+    virtual ~CpuTimeDataCache();
+    
+    typedef std::vector<DataCoord> DataVector;
+private:
+    DataVector m_dataVector;
+    uint64_t m_lastCpuTime;
+public:
+    const DataVector &dataVector() const { return m_dataVector; }
+    virtual void processPacket(DataPacket *packet);
+};
+
+#endif
+
+\end{lstlisting}
+
+\lstset{
+  caption={Example renderer, GlobalUsageRenderer.h header file.},
+  label={exampleRendererGURendererHeader}
+}
+\begin{lstlisting}
+#ifndef GlobalUsageRenderer_H
+#define GlobalUsageRenderer_H
+
+#include "renderer/AbstractRenderer.h"
+#include "DataCache.h"
+
+class GlobalUsageRenderer : public AbstractRenderer<CpuTimeDataCache> {
+public:
+    GlobalUsageRenderer(CpuTimeDataCache *dataCache);
+    virtual ~GlobalUsageRenderer();
+private:
+public:
+    virtual void renderRange(VisualizationWrapper *visualization,
+	const DataRange &range, bool *abort);
+    virtual DataRange defaultRange() const;
+};
+
+#endif
+\end{lstlisting}
+
+Again, these two source files are very simple; they both define implementations of classes that have pure virtual
+methods.
+
+The definitions for the previous two headers:
+
