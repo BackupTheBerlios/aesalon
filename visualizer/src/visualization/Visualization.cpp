@@ -27,7 +27,7 @@ void Visualization::merge(Visualization *other) {
 	
 	m_painter.setBrush(Qt::white);
 	m_painter.setPen(Qt::NoPen);
-	m_painter.drawRect(otherRect);
+	m_painter.drawRect(otherRect.toRect());
 	m_painter.drawImage(otherRect.toRect(), other->m_image);
 	
 	other->unlock();

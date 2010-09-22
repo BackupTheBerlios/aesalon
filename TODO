@@ -1,6 +1,6 @@
 monitor:
 -   Improve Polisher API, provide interface to Analyzer.
--   Eliminate environment variable 'AesalonSearchPath' if possible; do special pass?
+-   Eliminate environment variable 'AesalonSearchPath' if possible; do special pass through configuration items? . . .
 
 dynamicMemory:
 -   Implement support for path compression.
@@ -8,8 +8,8 @@ dynamicMemory:
 
 doc:
 -   Write documentation for the Polisher API.
--   Finish example module, add Renderer module.
 
 visualizer:
 -   Get partial rendering working properly (no more black lines/empty spaces).
 -   Fix rendering issues; boxes not being displayed when out of range, etc.
+
