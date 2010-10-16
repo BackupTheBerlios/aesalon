@@ -19,7 +19,7 @@ Reader::~Reader() {
 void Reader::processPacket(DataPacket *packet) {
 	if(packet->dataSource.moduleID != 0) {
 		/* Handle it the normal way. */
-		Module::Module *module = m_mapper->module(packet->dataSource.moduleID);
+		Module *module = m_mapper->module(packet->dataSource.moduleID);
 		if(module != NULL) packet = module->processPacket(packet);
 		else {
 			LogSystem::logReaderMessage(Misc::StreamAsString() << "Received packet for unknown module ID #" << packet->dataSource.moduleID);
