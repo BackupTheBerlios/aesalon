@@ -17,7 +17,7 @@ Makefile
 version_info
 install
 install_manifest.txt
-build
+.mbuild
 
 # IDE (KDevelop 4) ignores
 *kdev*

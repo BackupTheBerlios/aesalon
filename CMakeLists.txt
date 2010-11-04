@@ -1,17 +1,9 @@
-# Use some CMake 2.6-specific features . . .
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
-# Project name is "aesalon", and the languages used are C and C++.
-project(aesalon C CXX)
+project(aesalon CXX)
 
-# Include the build configuration.
-include(build.config)
+include_directories(include)
 
-# Add the common include directory
-include_directories(common/include)
+add_subdirectory(monitor .mbuild)
+#add_subdirectory(
 
-# Add the source subdirectories.
-add_subdirectory(monitor monitor/build)
-add_subdirectory(module module/build)
-add_subdirectory(visualizer visualizer/build)
-add_subdirectory(tests tests/build)

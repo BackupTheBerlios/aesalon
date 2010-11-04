@@ -1,7 +1,0 @@
-set(testList
-    malloc_test
-    log_test
-    sleep_test
-    cpu_test
-    alloc_test
-)
