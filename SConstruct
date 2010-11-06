@@ -1,4 +1,2 @@
-env = Environment()
-
 SConscript("monitor/SConscript")
-
+SConscript("modules/SConscript")
