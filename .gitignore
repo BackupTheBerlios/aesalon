@@ -9,15 +9,8 @@ vgcore.*
 .*.swp
 *.sr.orig
 
-# Buildsystem (CMake) ignores
-CMakeFiles
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-version_info
-install
-install_manifest.txt
-.mbuild
+# Buildsystem (scons) ignores
+.sconsign.dblite
 
 # IDE (KDevelop 4) ignores
 *kdev*

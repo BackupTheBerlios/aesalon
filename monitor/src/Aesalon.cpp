@@ -1,6 +1,6 @@
 #include <iostream>
 #include "common/Exception.h"
-#include "Coordinator.h"
+#include "monitor/Coordinator.h"
 
 int main(int argc, char *argv[]) {
 	try {

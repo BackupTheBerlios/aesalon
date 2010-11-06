@@ -1,0 +1,8 @@
+import subprocess
+
+env = Environment()
+
+env.Append(CPPPATH = ['../../include/', '../../include/monitor/', '.'])
+env.Append(CCFLAGS = ['-W', '-Wall'])
+
+env.Program(target = "aesalon", source = Glob("*.cpp") + Glob("*/*.cpp"))
