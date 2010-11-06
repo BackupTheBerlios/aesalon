@@ -86,13 +86,16 @@ sub createSource {
 	if(@_[1] ne "") {
 		print FILE "#include \"" . (lc @_[1]) . "/@_[2].h\"\n\n";
 	}
+	else {
+		print FILE "#include \"@_[2].h\"\n\n";
+	}
 	
 	openNamespace(FILE, @_[3]);
-	openNamespace(FILE, @_[1]);
+	openNamespace(FILE, @_[1]) if @_[1] ne "";
 
 	print FILE "\n\n\n";
 
-	closeNamespace(FILE, @_[1]);
+	closeNamespace(FILE, @_[1]) if @_[1] ne "";
 	closeNamespace(FILE, @_[3]);
 
 	close(FILE);

@@ -25,28 +25,21 @@ ArgumentParser::~ArgumentParser() {
 	
 }
 
-void ArgumentParser::parse() {
+int ArgumentParser::parse() {
 	if(m_argv[0] == NULL) {
 		throw Common::ParsingException("Malformed argv given.");
 	}
 	
 	int i = 0;
 	
-	bool moreArguments = true;
-	
 	while(m_argv[++i] != NULL) {
-		if(!moreArguments) {
-			continue;
-		}
-		else if(m_argv[i][0] != '-' || m_argv[i][1] != '-') {
-			moreArguments = false;
-			continue;
+		if(m_argv[i][0] != '-' || m_argv[i][1] != '-') {
+			return i;
 		}
 		
 		std::string argument = &m_argv[i][2];
 		if(argument.length() == 0) {
-			moreArguments = false;
-			continue;
+			return i;
 		}
 		
 		std::string::size_type divider = argument.find('=');
@@ -54,6 +47,7 @@ void ArgumentParser::parse() {
 		if(divider == std::string::npos) item->setValue(true);
 		else item->setValue(argument.substr(divider+1));
 	}
+	return i;
 }
 
 } // namespace Config

@@ -6,6 +6,7 @@ include_directories(include)
 
 add_definitions(-W -Wall)
 
+include(build.config)
+
 add_subdirectory(monitor .mbuild)
-#add_subdirectory(
 

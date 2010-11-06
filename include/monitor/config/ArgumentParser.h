@@ -25,9 +25,7 @@ public:
 	ArgumentParser(Store *store, char **argv);
 	~ArgumentParser();
 	
-	void parse();
-private:
-	void parse(char *string);
+	int parse();
 };
 
 } // namespace Config
