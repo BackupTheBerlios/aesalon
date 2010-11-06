@@ -25,7 +25,6 @@ class Store {
 private:
 	typedef std::map<std::string, Group *> GroupMap;
 	GroupMap m_groupMap;
-	
 public:
 	Store();
 	~Store();
