@@ -33,13 +33,10 @@ void FileParser::parse(const std::string &filename, bool replace) {
 	
 	std::string group = "";
 	
-	while(!file.eof()) {
-		std::string line;
-		std::getline(file, line);
-		
+	std::string line;
+	while(std::getline(file, line)) {
 		/* If a line begins with a '#', then it is a comment. */
-		if(line[0] == '#') continue;
-		else if(line.length() == 0) continue;
+		if(line.length() == 0 || line[0] == '#') continue;
 		
 		std::string::size_type divider = line.find(' ');
 		

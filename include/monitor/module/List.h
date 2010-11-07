@@ -26,6 +26,8 @@ private:
 public:
 	List();
 	~List();
+	
+	void addModule(Module *module);
 };
 
 } // namespace Module

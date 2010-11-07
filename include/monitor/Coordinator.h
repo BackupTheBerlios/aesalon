@@ -13,6 +13,7 @@
 #define AesalonMonitor_Coordinator_H
 
 #include "config/Store.h"
+#include "module/List.h"
 
 namespace Monitor {
 
@@ -22,19 +23,22 @@ private:
 	char **m_argv;
 	Config::Store *m_store;
 	int m_argumentEndpoint;
+	Module::List *m_moduleList;
 public:
 	static Coordinator *instance() { return m_instance; }
 	Coordinator(char **argv);
 	~Coordinator();
 	
 	char **argv() const { return m_argv; }
-	int argumentEndpoint() const { return m_argumentEndpoint; }
 	Config::Store *store() const { return m_store; }
+	int argumentEndpoint() const { return m_argumentEndpoint; }
+	Module::List *moduleList() const { return m_moduleList; }
 	
 	void run();
 private:
 	void parseConfigs();
-	void usage();
+	std::string moduleRoot(const std::string &moduleName);
+	void usage(bool displayHelp);
 };
 
 } // namespace Monitor

@@ -21,12 +21,15 @@ namespace Monitor {
 namespace Config {
 
 class Group {
-private:
+public:
 	typedef std::map<std::string, Item *> ItemMap;
+private:
 	ItemMap m_itemMap;
 public:
 	Group();
 	~Group();
+	
+	const ItemMap &itemMap() const { return m_itemMap; }
 	
 	void addItem(Item *item);
 	Item *item(const std::string &name);

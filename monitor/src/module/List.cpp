@@ -14,7 +14,17 @@
 namespace Monitor {
 namespace Module {
 
+List::List() {
+	
+}
 
+List::~List() {
+	
+}
+
+void List::addModule(Module *module) {
+	m_moduleList.push_back(module);
+}
 
 } // namespace Module
 } // namespace Monitor

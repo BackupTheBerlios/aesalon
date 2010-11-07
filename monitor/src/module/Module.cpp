@@ -14,7 +14,13 @@
 namespace Monitor {
 namespace Module {
 
+Module::Module(Config::Store *store, const std::string &moduleName) {
+	
+}
 
+Module::~Module() {
+	
+}
 
 } // namespace Module
 } // namespace Monitor

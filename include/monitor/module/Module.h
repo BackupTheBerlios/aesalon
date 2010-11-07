@@ -23,7 +23,7 @@ class Module {
 private:
 	std::string m_moduleName;
 public:
-	Module(Config::Store *store);
+	Module(Config::Store *store, const std::string &moduleName);
 	~Module();
 };
 
