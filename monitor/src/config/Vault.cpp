@@ -5,22 +5,8 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file monitor/src/module/Module.cpp
+	@file monitor/src/config/Vault.cpp
 
 */
 
-#include "module/Module.h"
-
-namespace Monitor {
-namespace Module {
-
-Module::Module(Config::Vault *vault, const std::string &moduleName) {
-	
-}
-
-Module::~Module() {
-	
-}
-
-} // namespace Module
-} // namespace Monitor
+#include "config/Vault.h"

@@ -14,7 +14,7 @@
 
 #include <string>
 
-#include "config/Store.h"
+#include "config/Vault.h"
 
 namespace Monitor {
 namespace Module {
@@ -23,7 +23,7 @@ class Module {
 private:
 	std::string m_moduleName;
 public:
-	Module(Config::Store *store, const std::string &moduleName);
+	Module(Config::Vault *vault, const std::string &moduleName);
 	~Module();
 };
 

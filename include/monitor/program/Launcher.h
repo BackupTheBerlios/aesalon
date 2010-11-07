@@ -12,17 +12,17 @@
 #ifndef AesalonMonitor_Program_Launcher_H
 #define AesalonMonitor_Program_Launcher_H
 
-#include "config/Store.h"
+#include "config/Vault.h"
 
 namespace Monitor {
 namespace Program {
 
 class Launcher {
 private:
-	Config::Store *m_store;
+	Config::Vault *m_vault;
 	char **m_argv;
 public:
-	Launcher(Config::Store *store, char **argv);
+	Launcher(Config::Vault *vault, char **argv);
 	~Launcher();
 	
 	void startProcess();

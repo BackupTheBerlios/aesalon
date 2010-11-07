@@ -12,7 +12,7 @@
 #ifndef AesalonMonitor_Coordinator_H
 #define AesalonMonitor_Coordinator_H
 
-#include "config/Store.h"
+#include "config/Vault.h"
 #include "module/List.h"
 
 namespace Monitor {
@@ -21,8 +21,7 @@ class Coordinator {
 private:
 	static Coordinator *m_instance;
 	char **m_argv;
-	Config::Store *m_store;
-	int m_argumentEndpoint;
+	Config::Vault *m_vault;
 	Module::List *m_moduleList;
 public:
 	static Coordinator *instance() { return m_instance; }
@@ -30,8 +29,7 @@ public:
 	~Coordinator();
 	
 	char **argv() const { return m_argv; }
-	Config::Store *store() const { return m_store; }
-	int argumentEndpoint() const { return m_argumentEndpoint; }
+	Config::Vault *vault() const { return m_vault; }
 	Module::List *moduleList() const { return m_moduleList; }
 	
 	void run();

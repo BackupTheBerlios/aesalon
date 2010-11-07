@@ -1,0 +1,23 @@
+include "file.config"
+
+module M {
+    var = 4;
+	var += 4;
+	var = g, h;
+	var += g;
+}
+
+use cpuTime;
+
+tokens:
+    =
+	+=
+	{
+	}
+	"
+	;
+	,
+	include
+	module
+	use
+

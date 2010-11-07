@@ -10,44 +10,26 @@
 */
 
 #include <iostream>
+#include <cstring>
 
 #include "config/ArgumentParser.h"
-#include "common/ParsingException.h"
 
 namespace Monitor {
 namespace Config {
 
-ArgumentParser::ArgumentParser(Store *store, char **argv) : m_store(store), m_argv(argv) {
-	
-}
-
-ArgumentParser::~ArgumentParser() {
-	
-}
-
-int ArgumentParser::parse() {
-	if(m_argv[0] == NULL) {
-		throw Common::ParsingException("Malformed argv given.");
+int ArgumentParser::parse(Vault *vault, char **argv, int argc) {
+	int arg;
+	for(arg = 1; arg < argc; arg ++) {
+		if(std::strcmp(argv[arg], "--") == 0) {
+			arg ++;
+			break;
+		}
+		else if(std::strcmp(argv[arg], "--use-module") == 0) {
+			std::cout << "ArgumentParser: Using module " << argv[++arg] << std::endl;
+		}
 	}
 	
-	int i = 0;
-	
-	while(m_argv[++i] != NULL) {
-		if(m_argv[i][0] != '-' || m_argv[i][1] != '-') {
-			return i;
-		}
-		
-		std::string argument = &m_argv[i][2];
-		if(argument.length() == 0) {
-			return i;
-		}
-		
-		std::string::size_type divider = argument.find('=');
-		Item *item = m_store->item(argument.substr(0, divider));
-		if(divider == std::string::npos) item->setValue(true);
-		else item->setValue(argument.substr(divider+1));
-	}
-	return i;
+	return arg;
 }
 
 } // namespace Config

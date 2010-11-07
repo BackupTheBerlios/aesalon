@@ -14,7 +14,7 @@
 namespace Monitor {
 namespace Program {
 
-Launcher::Launcher(Config::Store *store, char **argv) : m_store(store), m_argv(argv) {
+Launcher::Launcher(Config::Vault *vault, char **argv) : m_vault(vault), m_argv(argv) {
 	
 }
 

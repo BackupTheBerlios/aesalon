@@ -5,27 +5,22 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/monitor/config/ArgumentParser.h
+	@file monitor/src/config/ConcreteVault.cpp
 
 */
 
-#ifndef AesalonMonitor_Config_ArgumentParser_H
-#define AesalonMonitor_Config_ArgumentParser_H
-
-#include "Vault.h"
+#include "config/ConcreteVault.h"
 
 namespace Monitor {
 namespace Config {
 
-class ArgumentParser {
-public:
-	/**
-		@return The argc corresponding to the first argv element that was not processed.
-	*/
-	int parse(Vault *vault, char **argv, int argc);
-};
+void ConcreteVault::set(const std::string &key, const std::string &value) {
+	m_data[key] = value;
+}
+
+std::string ConcreteVault::get(const std::string &key) {
+	return m_data[key];
+}
 
 } // namespace Config
 } // namespace Monitor
-
-#endif
