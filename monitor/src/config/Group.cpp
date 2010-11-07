@@ -35,5 +35,10 @@ Item *Group::item(const std::string &item) {
 	return i;
 }
 
+Item *Group::getItem(const std::string &item) {
+	return m_itemMap[item];
+}
+
+
 } // namespace Config
 } // namespace Monitor

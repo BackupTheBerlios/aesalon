@@ -35,6 +35,12 @@ Item *Store::item(const std::string &groupName, const std::string &itemName) {
 	return group(groupName)->item(itemName);
 }
 
+Item *Store::findItem(const std::string &groupName, const std::string &itemName) {
+	Group *group = m_groupMap[groupName];
+	if(group == NULL) return NULL;
+	return group->getItem(itemName);
+}
+
 Item *Store::item(const std::string &path) {
 	std::string::size_type i = path.find('.');
 	if(i != std::string::npos) return item(path.substr(0, i), path.substr(i+1));

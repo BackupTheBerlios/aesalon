@@ -30,7 +30,9 @@ public:
 	~Store();
 	
 	Group *group(const std::string &groupName);
+	Group *findGroup(const std::string &groupName);
 	Item *item(const std::string &groupName, const std::string &itemName);
+	Item *findItem(const std::string &groupName, const std::string &itemName);
 	Item *item(const std::string &path);
 };
 

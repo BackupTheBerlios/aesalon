@@ -32,6 +32,9 @@ public:
 	Config::Store *store() const { return m_store; }
 	
 	void run();
+private:
+	void parseConfigs();
+	void usage();
 };
 
 } // namespace Monitor

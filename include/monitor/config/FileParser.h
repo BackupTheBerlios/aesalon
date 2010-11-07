@@ -26,7 +26,7 @@ public:
 	FileParser(Store *store);
 	~FileParser();
 	
-	void parse(const std::string &filename);
+	void parse(const std::string &filename, bool replace = true);
 };
 
 } // namespace Config

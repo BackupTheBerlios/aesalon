@@ -26,7 +26,7 @@ FileParser::~FileParser() {
 
 }
 
-void FileParser::parse(const std::string &filename) {
+void FileParser::parse(const std::string &filename, bool replace) {
 	std::ifstream file(filename.c_str(), std::ios_base::in);
 	
 	if(!file.is_open()) return;
@@ -54,7 +54,11 @@ void FileParser::parse(const std::string &filename) {
 			if(divider == std::string::npos)
 				throw Common::ParsingException("Configuration file invalid: set command has no argument.");
 			
-			m_store->item(group, content.substr(0, divider))->setValue(content.substr(divider+1));
+			if(replace) m_store->item(group, content.substr(0, divider))->setValue(content.substr(divider+1));
+			else {
+				Item *item = m_store->findItem(group, content.substr(0, divider));
+				if(item) item->setValue(content.substr(divider+1));
+			}
 		}
 		else {
 			throw Common::ParsingException(Common::StreamAsString() << 

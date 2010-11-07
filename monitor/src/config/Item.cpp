@@ -56,7 +56,7 @@ long Item::longValue() const {
 
 bool Item::boolValue() const {
 	if(m_value == "true" || m_value == "True") return true;
-	if(m_value == "false" || m_value == "false") return false;
+	if(m_value == "false" || m_value == "false" || m_value == "") return false;
 	
 	throw Common::ParsingException(Common::StreamAsString()
 		<< "Cannot convert config item " << m_name

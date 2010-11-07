@@ -30,6 +30,7 @@ public:
 	
 	void addItem(Item *item);
 	Item *item(const std::string &name);
+	Item *getItem(const std::string &name);
 };
 
 } // namespace Config
