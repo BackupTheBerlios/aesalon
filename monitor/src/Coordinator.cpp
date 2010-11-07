@@ -11,6 +11,7 @@
 
 #include "Coordinator.h"
 #include "config/ArgumentParser.h"
+#include "common/Config.h"
 
 namespace Monitor {
 
@@ -26,6 +27,8 @@ void Coordinator::run() {
 	m_store = new Config::Store();
 	Config::ArgumentParser ap(m_store, m_argv);
 	m_argumentEndpoint = ap.parse();
+	
+	
 }
 
 } // namespace Monitor

@@ -12,10 +12,8 @@ vgcore.*
 # Buildsystem (scons) ignores
 .sconsign.dblite
 
-# IDE (Eclipse CDT) ignores
-.project
-.cdtproject
-.settings
+# IDE (KDevelop 4) ignores
+*kdev*
 
 # Valgrind file ignores
 valgrind.*

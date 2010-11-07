@@ -1,0 +1,9 @@
+#ifndef AesalonCommon_Config_H
+#define AesalonCommon_Config_H
+
+#define AesalonVersion "%(version)s"
+
+#define AesalonUserConfig "%(userConfig)s"
+#define AesalonGlobalConfig "%(globalConfig)s"
+
+#endif
