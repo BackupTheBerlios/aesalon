@@ -18,7 +18,7 @@ namespace Monitor {
 namespace Program {
 
 ProcessMonitor::ProcessMonitor(pid_t pid) : m_pid(pid) {
-	m_sharedMemory = new SharedMemory(Common::StreamAsString() << "aesalon-" << pid,
+	m_sharedMemory = new SharedMemory(Common::StreamAsString() << "AI-" << pid,
 		Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("shmSize")));
 }
 

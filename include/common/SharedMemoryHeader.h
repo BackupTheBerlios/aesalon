@@ -14,9 +14,9 @@
 
 #include <stdint.h>
 
-struct SharedMemoryHeader {
+typedef struct {
 	uint32_t size;
-};
+} SharedMemoryHeader;
 
 #define SharedMemoryDataOffset (sizeof(SharedMemoryHeader) + 16)
 

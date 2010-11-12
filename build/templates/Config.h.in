@@ -21,4 +21,6 @@
 #define AesalonUserConfig "%(userConfig)s"
 #define AesalonGlobalConfig "%(globalConfig)s"
 
+#define AesalonDefaultShmSize %(defaultShmSize)s
+
 #endif

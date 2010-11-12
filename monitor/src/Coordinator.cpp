@@ -19,8 +19,8 @@
 #include "common/Config.h"
 #include "program/Launcher.h"
 #include "module/Module.h"
-
 #include "config/ConcreteVault.h"
+#include "common/PathSanitizer.h"
 
 namespace Monitor {
 
@@ -64,17 +64,9 @@ void Coordinator::parseConfigs() {
 	
 	Config::ConcreteVault *vault = new Config::ConcreteVault();
 	
-	char *path = realpath(AesalonGlobalConfig, NULL);
-	if(path) parser.parse(vault, path);
-	free(path);
-	
-	path = realpath(AesalonUserConfig, NULL);
-	if(path) parser.parse(vault, path);
-	free(path);
-	
-	path = realpath(AesalonLocalConfig, NULL);
-	if(path) parser.parse(vault, path);
-	free(path);
+	parser.parse(vault, Common::PathSanitizer::sanitize(AesalonGlobalConfig));
+	parser.parse(vault, Common::PathSanitizer::sanitize(AesalonUserConfig));
+	parser.parse(vault, Common::PathSanitizer::sanitize(AesalonLocalConfig));
 	
 	Config::ArgumentParser argParser;
 	m_argcOffset = argParser.parse(vault, m_argv);

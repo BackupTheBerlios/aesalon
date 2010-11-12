@@ -22,16 +22,17 @@ namespace Common {
 class PathSanitizer {
 public:
 	static std::string sanitize(const std::string &filename) {
-		if(filename[0] == '/') return filename;
+		if(filename[0] == '/') return makeReal(filename);
 		
 		if(filename[0] == '~') {
 			char *homeDirectory = std::getenv("HOME");
-			if(homeDirectory == NULL) return filename;
+			if(homeDirectory == NULL) return makeReal(filename);
 			std::string path = filename;
 			path.replace(0, 1, homeDirectory);
-			return path;
+			return makeReal(path);
 		}
-		return filename;
+		
+		return makeReal(filename);
 	}
 	static std::string sanitize(const std::string &filename, const std::vector<std::string> &pathList) {
 		std::string sanitized = sanitize(filename);
@@ -43,6 +44,16 @@ public:
 		}
 		
 		return filename;
+	}
+private:
+	static std::string makeReal(const std::string &path) {
+		char *pathStr = realpath(path.c_str(), NULL);
+		if(pathStr != NULL) {
+			std::string temp = pathStr;
+			free(pathStr);
+			return temp;
+		}
+		return path;
 	}
 };
 

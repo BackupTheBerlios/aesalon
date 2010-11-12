@@ -49,6 +49,12 @@ void ConcreteVault::match(const std::string &pattern, std::vector<KeyPair> &item
 bool ConcreteVault::matches(const std::string &string, const std::string &pattern) {
 	if(string == pattern) return true;
 	else if(pattern == "*") return true;
+	
+	std::string::size_type starPos = pattern.find('*');
+	
+	if(starPos == std::string::npos) return false;
+	if(string.substr(0, starPos) == pattern.substr(0, starPos)) return true;
+	
 	return false;
 }
 

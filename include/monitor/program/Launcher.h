@@ -25,6 +25,8 @@ public:
 	~Launcher();
 	
 	void startProcess();
+private:
+	void setupEnvironment();
 };
 
 } // namespace Program

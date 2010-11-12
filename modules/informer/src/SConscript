@@ -1,0 +1,8 @@
+Import("env")
+
+env.Append(CPPPATH = ["../../../include/", "../../../../include/informer/"])
+env.Append(CCFLAGS = ["-W", "-Wall", "-DAesalonCollector"])
+env.Append(LIBS = ["rt"])
+
+env.SharedLibrary(target="collector", source=Glob("collector/*.c"))
+
