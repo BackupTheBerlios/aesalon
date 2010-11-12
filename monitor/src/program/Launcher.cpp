@@ -13,6 +13,9 @@
 
 #include <sys/wait.h>
 
+#include <string.h>
+#include <errno.h>
+
 #include "program/Launcher.h"
 
 #include "common/AssertionException.h"
@@ -54,6 +57,7 @@ void Launcher::startProcess() {
 	else if(childPid == 0) {
 		setenv("LD_PRELOAD", preload.c_str(), 1);
 		execv(m_argv[0], m_argv);
+		std::cout << m_argv[0] << ": " << strerror(errno) << std::endl;
 		exit(0);
 	}
 	else {

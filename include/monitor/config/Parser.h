@@ -32,7 +32,13 @@ private:
 		END_OF_FILE
 	};
 public:
+	/** Parses a single configuration file.
+		@note Assumes @a configFile is an absolute path.
+	*/
 	void parse(ConcreteVault *vault, const std::string &configFile);
+	/** Parses a directory's worth of module configuration files.
+		@note Assumes @a directory is absolute.
+	*/
 	void parseDirectory(ConcreteVault *vault, const std::string &directory);
 private:
 	void openFile(const std::string &configFile);

@@ -10,6 +10,8 @@
 */
 
 #include <iostream>
+#include <limits.h>
+#include <stdlib.h>
 
 #include "Coordinator.h"
 #include "config/ArgumentParser.h"
@@ -35,7 +37,14 @@ Coordinator::~Coordinator() {
 void Coordinator::run() {
 	parseConfigs();
 	
-	if(m_argv[m_argcOffset] == NULL || m_vault->get("help") == "true") {
+	if(m_vault->get("list-attributes") == "true") {
+		std::vector<Config::Vault::KeyPair> list;
+		m_vault->match("*", list);
+		for(std::vector<Config::Vault::KeyPair>::iterator i = list.begin(); i != list.end(); ++i) {
+			std::cout << "\"" << i->first << "\" ==> \"" << i->second << "\"\n";
+		}
+	}
+	else if(m_argv[m_argcOffset] == NULL || m_vault->get("help") == "true") {
 		usage(true);
 		return;
 	}
@@ -49,10 +58,19 @@ void Coordinator::parseConfigs() {
 	Config::Parser parser;
 	
 	Config::ConcreteVault *vault = new Config::ConcreteVault();
-	vault->set("PATH", ".");
-	parser.parse(vault, AesalonGlobalConfig);
-	parser.parse(vault, AesalonUserConfig);
-	parser.parse(vault, AesalonLocalConfig);
+	
+	char *path = realpath(AesalonGlobalConfig, NULL);
+	if(path) parser.parse(vault, path);
+	free(path);
+	
+	path = realpath(AesalonUserConfig, NULL);
+	if(path) parser.parse(vault, path);
+	free(path);
+	
+	path = realpath(AesalonLocalConfig, NULL);
+	if(path) parser.parse(vault, path);
+	free(path);
+	
 	Config::ArgumentParser argParser;
 	m_argcOffset = argParser.parse(vault, m_argv);
 	

@@ -18,6 +18,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <cstring>
+#include <libgen.h>
 
 #include "config/Parser.h"
 #include "common/ParsingException.h"
@@ -32,10 +33,7 @@ namespace Config {
 void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 	std::string currentModule;
 	
-	std::vector<std::string> paths;
-	vault->get("PATH", paths);
-	
-	openFile(Common::PathSanitizer::sanitize(configFile, paths));
+	openFile(configFile);
 	
 	if(!m_stream->is_open()) return;
 	
@@ -55,8 +53,19 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 			expectNextSymbol("{");
 		}
 		else if(tokenType == WORD && token == "search") {
-			Parser().parseDirectory(vault, expectNextToken(QUOTED_WORD));
+			char *dirpath = strdup(configFile.c_str());
+			dirpath = dirname(dirpath);
+			
+			std::string dirname = expectNextToken(QUOTED_WORD);
+			
+			if(dirname[0] != '/' && dirname[0] != '~') {
+				dirname = dirpath + dirname;
+			}
+			
+			Parser().parseDirectory(vault, dirname);
+			
 			expectNextSymbol(";");
+			free(dirpath);
 		}
 		else if(tokenType == SYMBOL && token == "}") {
 			if(currentModule != "") {
@@ -68,7 +77,7 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 			/*std::cout << "Parser: Using module \"" << expectNextToken(WORD) << "\"\n";*/
 			std::string moduleName = expectNextToken(WORD);
 			
-			Parser().parse(vault, Common::PathSanitizer::sanitize(moduleName + "/module.conf", paths));
+			vault->set("modules", moduleName);
 			
 			expectNextSymbol(";");
 		}
@@ -117,6 +126,9 @@ void Parser::parseDirectory(ConcreteVault *vault, const std::string &directory) 
 	DIR *dir = opendir(directory.c_str());
 	if(dir == NULL) return;
 	
+	vault->clear("::directory");
+	vault->set("::directory", directory);
+	
 	struct dirent *dent;
 	
 	while((dent = readdir(dir)) != NULL) {
@@ -134,6 +146,10 @@ void Parser::parseDirectory(ConcreteVault *vault, const std::string &directory) 
 		
 		if(S_ISDIR(s.st_mode)) {
 			parse(vault, possible + AesalonModuleConfigFileName);
+			std::string path = dent->d_name;
+			path += ":root";
+			vault->clear(path);
+			vault->set(path, possible);
 		}
 	}
 	

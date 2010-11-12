@@ -38,16 +38,6 @@ int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
 			vault->set(key, data);
 			arg ++;
 		}
-		else if(std::strcmp(argv[arg], "--append") == 0) {
-			/*std::cout << argv[arg+1] << std::endl;*/
-			std::string line = argv[arg+1];
-			std::string::size_type divider = line.find('=');
-			if(line[divider-1] != '+') {} // TODO: implement error
-			std::string key = line.substr(0, divider-1);
-			std::string data = line.substr(divider+1);
-			vault->set(key, data);
-			arg ++;
-		}
 		else if(std::strcmp(argv[arg], "--use-module") == 0) {
 			std::cout << "ArgumentParser: Using module " << argv[++arg] << std::endl;
 		}
@@ -56,6 +46,13 @@ int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
 		}
 		else if(std::strcmp(argv[arg], "--help") == 0) {
 			vault->set("help", "true");
+		}
+		else if(std::strcmp(argv[arg], "--list-attributes") == 0) {
+			vault->set("list-attributes", "true");
+		}
+		else if(std::strncmp(argv[arg], "--", 2) == 0) {
+			std::cout << "Unknown argument \"" << argv[arg] << "\".\n";
+			// TODO: do something about the error.
 		}
 		else break;
 	}
