@@ -14,14 +14,17 @@
 #include <fstream>
 #include <string>
 #include <cctype>
-#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <stdlib.h>
+#include <cstring>
 
 #include "config/Parser.h"
 #include "common/ParsingException.h"
 #include "common/StreamAsString.h"
 #include "common/PathSanitizer.h"
 #include "config/ConcreteVault.h"
+#include "common/Config.h"
 
 namespace Monitor {
 namespace Config {
@@ -50,6 +53,10 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 		else if(tokenType == WORD && token == "module") {
 			currentModule = expectNextToken(WORD);
 			expectNextSymbol("{");
+		}
+		else if(tokenType == WORD && token == "search") {
+			Parser().parseDirectory(vault, expectNextToken(QUOTED_WORD));
+			expectNextSymbol(";");
 		}
 		else if(tokenType == SYMBOL && token == "}") {
 			if(currentModule != "") {
@@ -104,6 +111,33 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 	}
 	
 	closeFile();
+}
+
+void Parser::parseDirectory(ConcreteVault *vault, const std::string &directory) {
+	DIR *dir = opendir(directory.c_str());
+	if(dir == NULL) return;
+	
+	struct dirent *dent;
+	
+	while((dent = readdir(dir)) != NULL) {
+		if(!strcmp(dent->d_name, ".") || !strcmp(dent->d_name, "..")) continue;
+		std::string possible = directory + "/";
+		possible += dent->d_name;
+		
+		struct stat s;
+		if(stat(possible.c_str(), &s) != 0) {
+			/* Cannot stat file, probably don't have permissions. */
+			continue;
+		}
+		
+		possible += "/";
+		
+		if(S_ISDIR(s.st_mode)) {
+			parse(vault, possible + AesalonModuleConfigFileName);
+		}
+	}
+	
+	closedir(dir);
 }
 
 void Parser::openFile(const std::string &configFile) {

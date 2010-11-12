@@ -13,6 +13,7 @@
 #include <cstring>
 
 #include "config/ArgumentParser.h"
+#include "config/Parser.h"
 #include "config/ConcreteVault.h"
 #include "common/PathSanitizer.h"
 
@@ -49,7 +50,9 @@ int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
 		}
 		else if(std::strcmp(argv[arg], "--use-module") == 0) {
 			std::cout << "ArgumentParser: Using module " << argv[++arg] << std::endl;
-			
+		}
+		else if(std::strcmp(argv[arg], "--search") == 0) {
+			Parser().parseDirectory(vault, argv[++arg]);
 		}
 		else if(std::strcmp(argv[arg], "--help") == 0) {
 			vault->set("help", "true");

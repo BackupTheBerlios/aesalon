@@ -33,6 +33,7 @@ private:
 	};
 public:
 	void parse(ConcreteVault *vault, const std::string &configFile);
+	void parseDirectory(ConcreteVault *vault, const std::string &directory);
 private:
 	void openFile(const std::string &configFile);
 	std::string nextToken(TokenType &type);
