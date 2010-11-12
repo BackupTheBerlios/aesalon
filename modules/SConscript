@@ -1,0 +1,5 @@
+modules = Glob("*/SConscript", strings=True)
+
+for module in modules:
+	SConscript(module)
+

@@ -44,6 +44,8 @@ void Coordinator::run() {
 		std::vector<Config::Vault::KeyPair> list;
 		m_vault->match("*", list);
 		for(std::vector<Config::Vault::KeyPair>::iterator i = list.begin(); i != list.end(); ++i) {
+			if(i->first[0] == ':' && i->first[1] == ':') continue;
+			
 			std::cout << "    * \"" << i->first << "\" ==> \"" << i->second << "\"\n";
 		}
 	}
@@ -88,12 +90,12 @@ void Coordinator::usage(bool displayHelp) {
 	std::cout << std::endl;
 	std::cout << "Usage: " << m_argv[0] << " [options] [--] executable [arguments]" << std::endl;
 	std::cout << "Options:" << std::endl;
-	std::cout << "\t--help:\n\t\tDisplays this usage message." << std::endl;
-	std::cout << "\t--version:\n\t\tDisplays version information." << std::endl;
-	std::cout << "\t--search <path>:\n\t\tSearches <path> for modules." << std::endl;
-	std::cout << "\t--use-module <module>:\n\t\tPrepares <module> for loading." << std::endl;
-	std::cout << "\t--set <attribute>[=value]:\n\t\tSets a module attribute." << std::endl;
-	std::cout << "\t--list-attributes:\n\t\tLists all the available attributes." << std::endl;
+	std::cout << "\t--help\n\t\tDisplays this usage message." << std::endl;
+	std::cout << "\t--version\n\t\tDisplays version information." << std::endl;
+	std::cout << "\t--search <path>\n\t\tSearches <path> for modules." << std::endl;
+	std::cout << "\t--use-module <module>\n\t\tPrepares <module> for loading." << std::endl;
+	std::cout << "\t--set <attribute>[=value]\n\t\tSets a module attribute." << std::endl;
+	std::cout << "\t--list-attributes\n\t\tLists all the available attributes." << std::endl;
 }
 
 } // namespace Monitor

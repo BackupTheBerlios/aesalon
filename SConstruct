@@ -64,3 +64,4 @@ createConfig("include/common/Config.h", "build/templates/Config.h.in", buildConf
 
 SConscript("monitor/SConscript")
 SConscript("modules/SConscript")
+SConscript("tests/SConscript")

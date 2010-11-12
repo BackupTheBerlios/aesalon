@@ -59,7 +59,7 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 			std::string dirname = expectNextToken(QUOTED_WORD);
 			
 			if(dirname[0] != '/' && dirname[0] != '~') {
-				dirname = dirpath + dirname;
+				dirname = Common::StreamAsString() << dirpath << "/" << dirname;
 			}
 			
 			Parser().parseDirectory(vault, dirname);
