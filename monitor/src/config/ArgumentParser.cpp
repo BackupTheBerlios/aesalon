@@ -26,7 +26,7 @@ int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
 			break;
 		}
 		else if(std::strcmp(argv[arg], "--set") == 0) {
-			std::cout << argv[arg+1] << std::endl;
+			/*std::cout << argv[arg+1] << std::endl;*/
 			std::string line = argv[arg+1];
 			std::string::size_type divider = line.find('=');
 			std::string key = line.substr(0, divider);
@@ -37,7 +37,7 @@ int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
 			arg ++;
 		}
 		else if(std::strcmp(argv[arg], "--append") == 0) {
-			std::cout << argv[arg+1] << std::endl;
+			/*std::cout << argv[arg+1] << std::endl;*/
 			std::string line = argv[arg+1];
 			std::string::size_type divider = line.find('=');
 			if(line[divider-1] != '+') {} // TODO: implement error

@@ -20,6 +20,7 @@
 #include "config/Parser.h"
 #include "common/ParsingException.h"
 #include "common/StreamAsString.h"
+#include "common/PathSanitizer.h"
 #include "config/ConcreteVault.h"
 
 namespace Monitor {
@@ -28,10 +29,10 @@ namespace Config {
 void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 	std::string currentModule;
 	
-	std::vector<Vault::KeyPair> paths;
-	vault->match("PATH", paths);
+	std::vector<std::string> paths;
+	vault->get("PATH", paths);
 	
-	openFile(findFile(configFile, paths));
+	openFile(Common::PathSanitizer::sanitize(configFile, paths));
 	
 	if(!m_stream->is_open()) return;
 	
@@ -62,8 +63,8 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 			
 			Parser().parse(vault, moduleName + "/module.conf");
 			paths.clear();
-			vault->match("PATH", paths);
-			findFile(vault->get(moduleName + ":collectorPath"), paths);
+			vault->get("PATH", paths);
+			Common::PathSanitizer::sanitize(vault->get(moduleName + ":collectorPath"), paths);
 			
 			expectNextSymbol(";");
 		}
@@ -84,8 +85,8 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 					
 					else vault->set(token, next);
 					
-					std::cout << "Set \"" << currentModule << "::" << token << "\" to \""
-						<< next << "\" with operator " << op << std::endl;
+					/*std::cout << "Set \"" << currentModule << "::" << token << "\" to \""
+						<< next << "\" with operator " << op << std::endl;*/
 				}
 				else throw Common::ParsingException("Invalid RHS");
 				
@@ -106,27 +107,6 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 	}
 	
 	closeFile();
-}
-
-std::string Parser::findFile(const std::string &filename, std::vector<Vault::KeyPair> &paths) {
-	if(filename[0] == '/') return filename;
-	
-	if(filename[0] == '~') {
-		char *homeDirectory = getenv("HOME");
-		if(homeDirectory == NULL) return filename;
-		std::string path = filename;
-		path.replace(0, 1, homeDirectory);
-		return path;
-	}
-	
-	for(std::vector<Vault::KeyPair>::const_iterator i = paths.begin(); i != paths.end(); ++i) {
-		std::string fullPath = i->second + "/";
-		fullPath += filename;
-		struct stat possibleStat;
-		if(stat(fullPath.c_str(), &possibleStat) == 0) return fullPath;
-	}
-	
-	return filename;
 }
 
 void Parser::openFile(const std::string &configFile) {

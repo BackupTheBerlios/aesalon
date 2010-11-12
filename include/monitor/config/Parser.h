@@ -34,7 +34,6 @@ private:
 public:
 	void parse(ConcreteVault *vault, const std::string &configFile);
 private:
-	std::string findFile(const std::string &filename, std::vector<Vault::KeyPair> &paths);
 	void openFile(const std::string &configFile);
 	std::string nextToken(TokenType &type);
 	std::string expectNextToken(TokenType expected);

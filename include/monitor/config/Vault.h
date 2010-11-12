@@ -23,9 +23,12 @@ public:
 	typedef std::pair<std::string, std::string> KeyPair;
 	virtual ~Vault() {}
 	
-	/** Returns the last value that @a key maps to. For all values, use @c match().
+	/** Returns the last value that @a key maps to.
 	*/
 	virtual std::string get(const std::string &key) = 0;
+	/** Stores all the values of @a key in @a values.
+	*/
+	virtual void get(const std::string &key, std::vector<std::string> &values) = 0;
 	/** Places the names of all strings that match @a pattern into @a keys. Note that
 		@a keys will not be cleared.
 	*/

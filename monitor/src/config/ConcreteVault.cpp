@@ -22,16 +22,22 @@ void ConcreteVault::clear(const std::string &key) {
 
 void ConcreteVault::set(const std::string &key, const std::string &value) {
 	m_data.insert(DataMap::value_type(key, value));
-	std::cout << "setting value, new multimap:" << std::endl;
+	/*std::cout << "setting value, new multimap:" << std::endl;
 	for(DataMap::const_iterator i = m_data.begin(); i != m_data.end(); ++i) {
         std::cout << "\t* \"" << i->first << "\"->\"" << i->second << "\"\n";
-    }
+    }*/
 }
 
 std::string ConcreteVault::get(const std::string &key) {
 	DataMap::iterator i = m_data.find(key);
 	if(i != m_data.end()) return m_data.find(key)->second;
 	return "";
+}
+
+void ConcreteVault::get(const std::string &pattern, std::vector<std::string> &values) {
+	for(DataMap::iterator i = m_data.begin(); i != m_data.end(); ++i) {
+		if(i->first == pattern) values.push_back(i->second);
+	}
 }
 
 void ConcreteVault::match(const std::string &pattern, std::vector<KeyPair> &items) {

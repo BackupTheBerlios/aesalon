@@ -32,7 +32,9 @@ public:
 	/** Re-implemented.
 	*/
 	virtual std::string get(const std::string &key);
-	
+	/** Re-implemented.
+	*/
+	virtual void get(const std::string &key, std::vector<std::string> &values);
 	/** Re-implemented.
 	*/
 	virtual void match(const std::string &pattern, std::vector<KeyPair> &items);
