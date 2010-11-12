@@ -18,11 +18,12 @@
 #include "config/Parser.h"
 #include "common/ParsingException.h"
 #include "common/StreamAsString.h"
+#include "config/ConcreteVault.h"
 
 namespace Monitor {
 namespace Config {
 
-void Parser::parse(Vault *vault, const std::string &configFile) {
+void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 	std::string currentModule;
 	
 	openFile(configFile);
@@ -49,11 +50,14 @@ void Parser::parse(Vault *vault, const std::string &configFile) {
 			else throw Common::ParsingException("Extra \"}\"");
 		}
 		else if(tokenType == WORD && token == "use") {
-			std::cout << "Parser: Using module \"" << expectNextToken(WORD) << "\"\n";
+			/*std::cout << "Parser: Using module \"" << expectNextToken(WORD) << "\"\n";*/
+			vault->set("LD_PRELOAD", expectNextToken(WORD));
 			expectNextSymbol(";");
 		}
 		else if(tokenType == WORD) {
 			std::string op = expectNextToken(SYMBOL);
+			
+			if(op == "=") vault->clear(token);
 			
 			do {
 				TokenType nextType;
@@ -62,7 +66,12 @@ void Parser::parse(Vault *vault, const std::string &configFile) {
 				//if(nextType == SYMBOL && next == ";") break;
 				
 				if(nextType == WORD || nextType == QUOTED_WORD) {
-					std::cout << "Set \"" << currentModule << "." << token << "\" to \""
+					if(currentModule != "") vault->set(
+						Common::StreamAsString() << currentModule << ":" << token, next);
+					
+					else vault->set(token, next);
+					
+					std::cout << "Set \"" << currentModule << "::" << token << "\" to \""
 						<< next << "\" with operator " << op << std::endl;
 				}
 				else throw Common::ParsingException("Invalid RHS");

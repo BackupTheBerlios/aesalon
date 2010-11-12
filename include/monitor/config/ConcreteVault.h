@@ -21,16 +21,25 @@ namespace Config {
 
 class ConcreteVault : public Vault {
 private:
-	typedef std::map<std::string, std::string> DataMap;
+	typedef std::multimap<std::string, std::string> DataMap;
 	DataMap m_data;
 public:
 	virtual ~ConcreteVault() {}
 	
+	virtual void clear(const std::string &key);
 	virtual void set(const std::string &key, const std::string &value);
 	
 	/** Re-implemented.
 	*/
 	virtual std::string get(const std::string &key);
+	
+	/** Re-implemented.
+	*/
+	virtual void match(const std::string &pattern, std::vector<KeyPair> &items);
+private:
+	/** Returns true if @a string matches @a pattern.
+	*/
+	bool matches(const std::string &string, const std::string &pattern);
 };
 
 } // namespace Config

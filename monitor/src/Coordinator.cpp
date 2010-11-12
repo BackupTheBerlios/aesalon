@@ -47,8 +47,8 @@ void Coordinator::run() {
 void Coordinator::parseConfigs() {
 	Config::Parser parser;
 	
-	Config::Vault *vault = new Config::ConcreteVault();
-	parser.parse(vault, /*AesalonLocalConfig*/ ".aesalon.conf");
+	Config::ConcreteVault *vault = new Config::ConcreteVault();
+	parser.parse(vault, AesalonLocalConfig);
 }
 
 std::string Coordinator::moduleRoot(const std::string &moduleName) {

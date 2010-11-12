@@ -13,18 +13,23 @@
 #define AesalonMonitor_Config_Vault_H
 
 #include <string>
+#include <vector>
 
 namespace Monitor {
 namespace Config {
 
 class Vault {
 public:
+	typedef std::pair<std::string, std::string> KeyPair;
 	virtual ~Vault() {}
 	
 	/** Returns the last value that @a key maps to. For all values, use @c match().
 	*/
 	virtual std::string get(const std::string &key) = 0;
-	//virtual void match(const std::string &pattern, std::vector<std::string> &keys) = 0;
+	/** Places the names of all strings that match @a pattern into @a keys. Note that
+		@a keys will not be cleared.
+	*/
+	virtual void match(const std::string &pattern, std::vector<KeyPair> &items) = 0;
 };
 
 } // namespace Config

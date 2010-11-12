@@ -19,6 +19,8 @@
 namespace Monitor {
 namespace Config {
 
+class ConcreteVault;
+
 class Parser {
 private:
 	std::ifstream *m_stream;
@@ -30,7 +32,7 @@ private:
 		END_OF_FILE
 	};
 public:
-	void parse(Vault *vault, const std::string &configFile);
+	void parse(ConcreteVault *vault, const std::string &configFile);
 private:
 	void openFile(const std::string &configFile);
 	std::string nextToken(TokenType &type);
