@@ -61,10 +61,7 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 			/*std::cout << "Parser: Using module \"" << expectNextToken(WORD) << "\"\n";*/
 			std::string moduleName = expectNextToken(WORD);
 			
-			Parser().parse(vault, moduleName + "/module.conf");
-			paths.clear();
-			vault->get("PATH", paths);
-			Common::PathSanitizer::sanitize(vault->get(moduleName + ":collectorPath"), paths);
+			Parser().parse(vault, Common::PathSanitizer::sanitize(moduleName + "/module.conf", paths));
 			
 			expectNextSymbol(";");
 		}
