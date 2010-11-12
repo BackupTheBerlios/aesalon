@@ -138,7 +138,7 @@ void Parser::parseDirectory(ConcreteVault *vault, const std::string &directory) 
 		
 		struct stat s;
 		if(stat(possible.c_str(), &s) != 0) {
-			/* Cannot stat file, probably don't have permissions. */
+			/* Cannot stat file, probably don't have access permissions. */
 			continue;
 		}
 		

@@ -70,6 +70,9 @@ void Launcher::startProcess() {
 	else {
 		siginfo_t sinfo;
 		waitid(P_PID, childPid, &sinfo, WEXITED);
+		if(sinfo.si_code == CLD_DUMPED || sinfo.si_code == CLD_KILLED)
+			Coordinator::instance()->setReturnValue(128 + sinfo.si_status);
+		else Coordinator::instance()->setReturnValue(sinfo.si_status);
 	}
 }
 
