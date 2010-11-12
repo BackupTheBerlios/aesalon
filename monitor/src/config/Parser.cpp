@@ -77,7 +77,7 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 			/*std::cout << "Parser: Using module \"" << expectNextToken(WORD) << "\"\n";*/
 			std::string moduleName = expectNextToken(WORD);
 			
-			vault->set("modules", moduleName);
+			vault->set("::modules", moduleName);
 			
 			expectNextSymbol(";");
 		}

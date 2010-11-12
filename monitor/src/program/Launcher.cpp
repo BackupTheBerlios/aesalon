@@ -38,16 +38,23 @@ Launcher::~Launcher() {
 void Launcher::startProcess() {
 	if(getenv("LD_PRELOAD")) throw Common::NYIException("Pre-existing LD_PRELOAD not handled.");
 	
-	std::vector<std::string> paths;
-	paths.clear();
-	Coordinator::instance()->vault()->get("PATH", paths);
-	std::vector<Config::Vault::KeyPair> preloads;
-	Coordinator::instance()->vault()->match("*:collectorPath", preloads);
+	/*std::vector<Config::Vault::KeyPair> preloads;
+	Coordinator::instance()->vault()->match("*:collectorPath", preloads);*/
+	std::vector<std::string> modules;
+	
+	Coordinator::instance()->vault()->get("::modules", modules);
 	
 	std::string preload;
 	
-	for(std::vector<Config::Vault::KeyPair>::iterator i = preloads.begin(); i != preloads.end(); ++i) {
-		std::cout << "preload path \"" << i->first << "/" << i->second << "\" found." << std::endl;
+	for(std::vector<std::string>::iterator i = modules.begin(); i != modules.end(); ++i) {
+		std::string moduleRoot = Coordinator::instance()->vault()->get(*i + ":root");
+		std::string collectorPath = Coordinator::instance()->vault()->get(*i + ":collectorPath");
+		if(collectorPath.length()) {
+			if(preload.length()) {
+				preload += ":";
+			}
+			preload += moduleRoot + collectorPath;
+		}
 	}
 	
 	pid_t childPid = fork();

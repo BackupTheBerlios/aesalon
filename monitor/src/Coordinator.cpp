@@ -37,14 +37,17 @@ Coordinator::~Coordinator() {
 void Coordinator::run() {
 	parseConfigs();
 	
-	if(m_vault->get("list-attributes") == "true") {
+	if(m_vault->get("::list-attributes") == "true") {
+		std::cout << "Listing all configuration keys and values." << std::endl;
+		std::cout << "Please note that many of these are auto-generated." << std::endl;
+		std::cout << "================" << std::endl;
 		std::vector<Config::Vault::KeyPair> list;
 		m_vault->match("*", list);
 		for(std::vector<Config::Vault::KeyPair>::iterator i = list.begin(); i != list.end(); ++i) {
-			std::cout << "\"" << i->first << "\" ==> \"" << i->second << "\"\n";
+			std::cout << "    * \"" << i->first << "\" ==> \"" << i->second << "\"\n";
 		}
 	}
-	else if(m_argv[m_argcOffset] == NULL || m_vault->get("help") == "true") {
+	else if(m_argv[m_argcOffset] == NULL || m_vault->get("::help") == "true") {
 		usage(true);
 		return;
 	}
