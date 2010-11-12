@@ -40,14 +40,9 @@ void Coordinator::run() {
 		return;
 	}
 	
-	/*if(m_argv[m_argumentEndpoint] == NULL || m_store->item("help")->boolValue()
-		|| m_store->item("version")->boolValue()) {
-		
-		usage(!m_store->item("version")->boolValue());
-		return;
-	}
+	Program::Launcher *launcher = new Program::Launcher(&m_argv[m_argcOffset]);
 	
-	Program::Launcher *launcher = new Program::Launcher(m_store, &m_argv[m_argumentEndpoint]);*/
+	launcher->startProcess();
 }
 
 void Coordinator::parseConfigs() {

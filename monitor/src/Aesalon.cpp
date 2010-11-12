@@ -6,6 +6,7 @@ int main(int argc, char *argv[]) {
 	try {
 		Monitor::Coordinator coordinator(argv);
 		coordinator.run();
+		return coordinator.returnValue();
 	}
 	catch(Common::Exception exception) {
 		std::cout << exception.message() << std::endl;

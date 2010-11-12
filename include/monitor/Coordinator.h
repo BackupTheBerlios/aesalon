@@ -24,6 +24,7 @@ private:
 	int m_argcOffset;
 	Config::Vault *m_vault;
 	Module::List *m_moduleList;
+	int m_returnValue;
 public:
 	static Coordinator *instance() { return m_instance; }
 	Coordinator(char **argv);
@@ -33,6 +34,8 @@ public:
 	Config::Vault *vault() const { return m_vault; }
 	int argcOffset() const { return m_argcOffset; }
 	Module::List *moduleList() const { return m_moduleList; }
+	int returnValue() const { return m_returnValue; }
+	void setReturnValue(int newValue) { m_returnValue = newValue; }
 	
 	void run();
 private:

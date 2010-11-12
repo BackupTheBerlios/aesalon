@@ -5,26 +5,27 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/monitor/program/Launcher.h
+	@file include/monitor/program/ProcessMonitor.h
 
 */
 
-#ifndef AesalonMonitor_Program_Launcher_H
-#define AesalonMonitor_Program_Launcher_H
+#ifndef AesalonMonitor_Program_ProcessMonitor_H
+#define AesalonMonitor_Program_ProcessMonitor_H
 
-#include "config/Vault.h"
+#include <sys/types.h>
+
+#include "SharedMemory.h"
 
 namespace Monitor {
 namespace Program {
 
-class Launcher {
+class ProcessMonitor {
 private:
-	char **m_argv;
+	pid_t m_pid;
+	SharedMemory *m_sharedMemory;
 public:
-	Launcher(char **argv);
-	~Launcher();
-	
-	void startProcess();
+	ProcessMonitor(pid_t pid);
+	~ProcessMonitor();
 };
 
 } // namespace Program

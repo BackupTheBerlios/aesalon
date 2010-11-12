@@ -9,12 +9,18 @@
 
 */
 
+#include <iostream>
+
 #include "program/Launcher.h"
+
+#include "common/AssertionException.h"
+#include "Coordinator.h"
+#include "common/StringTo.h"
 
 namespace Monitor {
 namespace Program {
 
-Launcher::Launcher(Config::Vault *vault, char **argv) : m_vault(vault), m_argv(argv) {
+Launcher::Launcher(char **argv) : m_argv(argv) {
 	
 }
 
@@ -23,7 +29,10 @@ Launcher::~Launcher() {
 }
 
 void Launcher::startProcess() {
-	
+	std::string s = Coordinator::instance()->vault()->get("shmSize");
+	std::cout << "shmSize: \"" << s << "\"\n";
+	std::cout << "size:" << Common::StringTo<int>(Coordinator::instance()->vault()->get("shmSize")) << std::endl;
+	throw Common::AssertionException("Size of shared memory must be a nonzero multiple of four.");
 }
 
 } // namespace Program

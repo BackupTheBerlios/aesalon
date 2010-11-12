@@ -2,5 +2,6 @@ Import("env")
 
 env.Append(CPPPATH = ["../../include/", "../../include/monitor/"])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonMonitor"])
+env.Append(LIBS = ["rt"])
 
 env.Program(target = "aesalon", source = Glob("*.cpp") + Glob("*/*.cpp"))
