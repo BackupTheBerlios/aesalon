@@ -14,6 +14,8 @@
 #include <fstream>
 #include <string>
 #include <cctype>
+#include <sys/stat.h>
+#include <stdlib.h>
 
 #include "config/Parser.h"
 #include "common/ParsingException.h"
@@ -26,7 +28,12 @@ namespace Config {
 void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 	std::string currentModule;
 	
-	openFile(configFile);
+	std::vector<Vault::KeyPair> paths;
+	vault->match("PATH", paths);
+	
+	openFile(findFile(configFile, paths));
+	
+	if(!m_stream->is_open()) return;
 	
 	for(;;) {
 		TokenType tokenType;
@@ -51,7 +58,13 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 		}
 		else if(tokenType == WORD && token == "use") {
 			/*std::cout << "Parser: Using module \"" << expectNextToken(WORD) << "\"\n";*/
-			vault->set("LD_PRELOAD", expectNextToken(WORD));
+			std::string moduleName = expectNextToken(WORD);
+			
+			Parser().parse(vault, moduleName + "/module.conf");
+			paths.clear();
+			vault->match("PATH", paths);
+			findFile(vault->get(moduleName + ":collectorPath"), paths);
+			
 			expectNextSymbol(";");
 		}
 		else if(tokenType == WORD) {
@@ -95,11 +108,29 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 	closeFile();
 }
 
+std::string Parser::findFile(const std::string &filename, std::vector<Vault::KeyPair> &paths) {
+	if(filename[0] == '/') return filename;
+	
+	if(filename[0] == '~') {
+		char *homeDirectory = getenv("HOME");
+		if(homeDirectory == NULL) return filename;
+		std::string path = filename;
+		path.replace(0, 1, homeDirectory);
+		return path;
+	}
+	
+	for(std::vector<Vault::KeyPair>::const_iterator i = paths.begin(); i != paths.end(); ++i) {
+		std::string fullPath = i->second + "/";
+		fullPath += filename;
+		struct stat possibleStat;
+		if(stat(fullPath.c_str(), &possibleStat) == 0) return fullPath;
+	}
+	
+	return filename;
+}
+
 void Parser::openFile(const std::string &configFile) {
 	m_stream = new std::ifstream(configFile.c_str());
-	if(!m_stream->is_open()) {
-		std::cout << "Error opening config file \"" << configFile << "\"\n";
-	}
 }
 
 std::string Parser::nextToken(TokenType &type) {

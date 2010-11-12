@@ -29,7 +29,9 @@ void ConcreteVault::set(const std::string &key, const std::string &value) {
 }
 
 std::string ConcreteVault::get(const std::string &key) {
-	return m_data.find(key)->second;
+	DataMap::iterator i = m_data.find(key);
+	if(i != m_data.end()) return m_data.find(key)->second;
+	return "";
 }
 
 void ConcreteVault::match(const std::string &pattern, std::vector<KeyPair> &items) {

@@ -21,6 +21,7 @@ class Coordinator {
 private:
 	static Coordinator *m_instance;
 	char **m_argv;
+	int m_argcOffset;
 	Config::Vault *m_vault;
 	Module::List *m_moduleList;
 public:
@@ -30,12 +31,12 @@ public:
 	
 	char **argv() const { return m_argv; }
 	Config::Vault *vault() const { return m_vault; }
+	int argcOffset() const { return m_argcOffset; }
 	Module::List *moduleList() const { return m_moduleList; }
 	
 	void run();
 private:
 	void parseConfigs();
-	std::string moduleRoot(const std::string &moduleName);
 	void usage(bool displayHelp);
 };
 

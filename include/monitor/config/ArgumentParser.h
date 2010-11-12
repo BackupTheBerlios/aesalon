@@ -17,12 +17,14 @@
 namespace Monitor {
 namespace Config {
 
+class ConcreteVault;
+
 class ArgumentParser {
 public:
 	/**
 		@return The argc corresponding to the first argv element that was not processed.
 	*/
-	int parse(Vault *vault, char **argv, int argc);
+	int parse(ConcreteVault *vault, char **argv);
 };
 
 } // namespace Config

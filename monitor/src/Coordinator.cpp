@@ -34,6 +34,12 @@ Coordinator::~Coordinator() {
 
 void Coordinator::run() {
 	parseConfigs();
+	
+	if(m_argv[m_argcOffset] == NULL || m_vault->get("help") == "true") {
+		usage(true);
+		return;
+	}
+	
 	/*if(m_argv[m_argumentEndpoint] == NULL || m_store->item("help")->boolValue()
 		|| m_store->item("version")->boolValue()) {
 		
@@ -48,12 +54,14 @@ void Coordinator::parseConfigs() {
 	Config::Parser parser;
 	
 	Config::ConcreteVault *vault = new Config::ConcreteVault();
+	vault->set("PATH", ".");
+	parser.parse(vault, AesalonGlobalConfig);
+	parser.parse(vault, AesalonUserConfig);
 	parser.parse(vault, AesalonLocalConfig);
-}
-
-std::string Coordinator::moduleRoot(const std::string &moduleName) {
-	std::string searchPath;
-	return "";
+	Config::ArgumentParser argParser;
+	m_argcOffset = argParser.parse(vault, m_argv);
+	
+	m_vault = vault;
 }
 
 void Coordinator::usage(bool displayHelp) {
