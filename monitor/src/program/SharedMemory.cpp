@@ -34,5 +34,16 @@ SharedMemory::~SharedMemory() {
 	shm_unlink(m_identifier.c_str());
 }
 
+void SharedMemory::wait() {
+	int result = 0;
+	while((result = sem_wait(&m_header->packetSemaphore)) != 0) {
+		
+	}
+}
+
+Packet *SharedMemory::readNext() {
+	return NULL;
+}
+
 } // namespace Program
 } // namespace Monitor

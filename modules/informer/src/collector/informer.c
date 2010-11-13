@@ -8,6 +8,7 @@
 
 #include "informer/Informer.h"
 #include "common/Config.h"
+#include "common/ConductorPacket.h"
 
 void __attribute__((constructor)) AI_Construct() {
 	printf("Constructing Informer . . .\n");
@@ -21,16 +22,26 @@ void __attribute__((constructor)) AI_Construct() {
 	/* Turn the size into kilobytes . . . */
 	SharedMemory.size = shmSize * 1024;
 	
-	
-	
 	SharedMemory.fd = shm_open(shmName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 	ftruncate(SharedMemory.fd, SharedMemory.size);
 	SharedMemory.data = mmap(NULL, SharedMemory.size, PROT_READ | PROT_WRITE, MAP_SHARED, SharedMemory.fd, 0);
+	
+	int conductorFd = AI_ConfigurationLong("::conductorFd");
+	pid_t pid = getpid();
+	
+	uint8_t header = ConductorPacket_NewProcess;
+	
+	write(conductorFd, &header, sizeof(header));
+	write(conductorFd, &pid, sizeof(pid));
 }
 
 void __attribute__((destructor)) AI_Destruct() {
 	munmap(SharedMemory.data, SharedMemory.size);
 	printf("Destructing Informer . . .\n");
+}
+
+void AI_SendPacket(Packet *packet) {
+	
 }
 
 const char *AI_ConfigurationString(const char *name) {

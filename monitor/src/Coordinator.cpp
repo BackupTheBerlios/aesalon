@@ -21,6 +21,7 @@
 #include "module/Module.h"
 #include "config/ConcreteVault.h"
 #include "common/PathSanitizer.h"
+#include "program/Conductor.h"
 
 namespace Monitor {
 
@@ -56,7 +57,13 @@ void Coordinator::run() {
 	
 	Program::Launcher *launcher = new Program::Launcher(&m_argv[m_argcOffset]);
 	
-	launcher->startProcess();
+	if(launcher->startProcess() == 0) {
+		Program::Conductor *conductor = new Program::Conductor(launcher->readFd());
+		
+		conductor->monitor();
+	}
+	
+	delete launcher;
 }
 
 void Coordinator::parseConfigs() {

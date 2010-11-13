@@ -15,9 +15,12 @@
 #include <stdint.h>
 
 #include "common/SharedMemoryHeader.h"
+#include "common/Packet.h"
 
 void __attribute__((constructor)) AI_Construct();
 void __attribute__((destructor)) AI_Destruct();
+
+void AI_sendPacket(Packet *packet);
 
 const char *AI_ConfigurationString(const char *name);
 int32_t AI_ConfigurationLong(const char *name);

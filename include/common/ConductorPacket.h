@@ -5,20 +5,18 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/common/PacketEncoding.h
+	@file include/common/ConductorPacket.h
 
 */
 
-#ifndef AesalonCommon_PacketEncoding_H
-#define AesalonCommon_PacketEncoding_H
+#ifndef AesalonCommon_ConductorPacket_H
+#define AesalonCommon_ConductorPacket_H
 
-#include "Packet.h"
+#include <stdint.h>
 
-enum Encodings {
-	Uint8,
-	Uint16,
-	Uint32,
-	Uint64
+enum {
+	ConductorPacket_NewProcess,
+	ConductorPacket_ModuleLoaded
 };
 
 #endif

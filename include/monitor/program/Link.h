@@ -5,33 +5,33 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/monitor/program/SharedMemory.h
+	@file include/monitor/program/Link.h
 
 */
 
-#ifndef AesalonMonitor_Program_SharedMemory_H
-#define AesalonMonitor_Program_SharedMemory_H
+#ifndef AesalonMonitor_Program_Link_H
+#define AesalonMonitor_Program_Link_H
 
-#include <string>
+#include <pthread.h>
 
-#include "common/SharedMemoryHeader.h"
+#include "SharedMemory.h"
+
 #include "common/Packet.h"
 
 namespace Monitor {
 namespace Program {
 
-class SharedMemory {
+class Link {
 private:
-	int m_fd;
-	uint8_t *m_memory;
-	SharedMemoryHeader *m_header;
-	std::string m_identifier;
+	SharedMemory *m_sharedMemory;
 public:
-	SharedMemory(std::string identifier, uint32_t size);
-	~SharedMemory();
+	Link(SharedMemory *sharedMemory);
+	~Link();
 	
-	void wait();
-	Packet *readNext();
+	SharedMemory *sharedMemory() const { return m_sharedMemory; }
+private:
+	static void *run(void *voidInstance);
+	Packet *nextPacket();
 };
 
 } // namespace Program

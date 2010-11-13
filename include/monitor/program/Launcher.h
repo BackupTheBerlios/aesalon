@@ -12,6 +12,8 @@
 #ifndef AesalonMonitor_Program_Launcher_H
 #define AesalonMonitor_Program_Launcher_H
 
+#include <sys/types.h>
+
 #include "config/Vault.h"
 
 namespace Monitor {
@@ -20,13 +22,16 @@ namespace Program {
 class Launcher {
 private:
 	char **m_argv;
+	int m_controllerFds[2];
 public:
 	Launcher(char **argv);
 	~Launcher();
 	
-	void startProcess();
+	pid_t startProcess();
+	int readFd() const { return m_controllerFds[0]; }
 private:
 	void setupEnvironment();
+	pid_t createProcess();
 };
 
 } // namespace Program

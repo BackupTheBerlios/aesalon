@@ -5,26 +5,19 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/common/SharedMemoryHeader.h
+	@file include/common/Packet.h
 
 */
 
-#ifndef AesalonCommon_SharedMemoryHeader_H
-#define AesalonCommon_SharedMemoryHeader_H
+#ifndef AesalonCommon_Packet_H
+#define AesalonCommon_Packet_H
 
 #include <stdint.h>
-#include <semaphore.h>
 
 typedef struct {
+	uint8_t *data;
 	uint32_t size;
-	
-	sem_t packetSemaphore;
-	
-	uint32_t dataStart;
-	uint32_t dataEnd;
-	sem_t endSemaphore;
-} SharedMemoryHeader;
-
-#define SharedMemoryDataOffset (sizeof(SharedMemoryHeader) + 16)
+	uint32_t dataSize;
+} Packet;
 
 #endif
