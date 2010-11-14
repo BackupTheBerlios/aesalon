@@ -14,12 +14,12 @@
 namespace Monitor {
 namespace Program {
 
-Link::Link(SharedMemory *sharedMemory) : m_sharedMemory(sharedMemory) {
-
+Link::Link(std::string name, uint32_t size) : m_sharedMemory(NULL) {
+	m_sharedMemory = new SharedMemory(name, size);
 }
 
 Link::~Link() {
-	
+	delete m_sharedMemory;
 }
 
 void *Link::run(void *voidInstance) {

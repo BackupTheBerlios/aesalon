@@ -20,6 +20,8 @@
 void __attribute__((constructor)) AI_Construct();
 void __attribute__((destructor)) AI_Destruct();
 
+void AI_createSHM();
+
 void AI_sendPacket(Packet *packet);
 
 const char *AI_ConfigurationString(const char *name);

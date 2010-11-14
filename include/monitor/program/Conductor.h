@@ -13,6 +13,9 @@
 #define AesalonMonitor_Program_Conductor_H
 
 #include <stdint.h>
+#include <list>
+
+#include "Link.h"
 
 namespace Monitor {
 namespace Program {
@@ -20,13 +23,14 @@ namespace Program {
 class Conductor {
 private:
 	int m_readFd;
+	std::list<Link *> m_linkList;
 public:
 	Conductor(int readFd) : m_readFd(readFd) {}
 	~Conductor();
 	
 	void monitor();
 private:
-	void newProcess();
+	void newLink();
 	void loadModule();
 };
 

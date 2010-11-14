@@ -30,23 +30,32 @@ void Conductor::monitor() {
 		/* If the read was interrupted by a signal, continue. */
 		else if(ret == -1 && errno == EINTR) continue;
 		
-		if(header == ConductorPacket_NewProcess) {
-			newProcess();
+		if(header == ConductorPacket_NewSHM) {
+			newLink();
 		}
-		else {
+		else if(header == ConductorPacket_ModuleLoaded) {
 			loadModule();
 		}
 	}
 }
 
-void Conductor::newProcess() {
-	pid_t pid;
-	read(m_readFd, &pid, sizeof(pid));
+void Conductor::newLink() {
+	uint16_t length;
+	read(m_readFd, &length, sizeof(length));
+	char name[256];
+	read(m_readFd, name, length);
 	
-	std::cout << "New process with PID " << pid << " recognized." << std::endl;
+	/*std::cout << "New process with PID " << pid << " recognized." << std::endl;*/
+	
+	std::cout << "NewLink packet received, name is \"" << name << "\"\n";
 }
 
 void Conductor::loadModule() {
+	uint16_t length;
+	read(m_readFd, &length, sizeof(length));
+	char name[256];
+	read(m_readFd, name, length);
+	
 	
 }
 

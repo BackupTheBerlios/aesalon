@@ -25,7 +25,7 @@ class Link {
 private:
 	SharedMemory *m_sharedMemory;
 public:
-	Link(SharedMemory *sharedMemory);
+	Link(std::string name, uint32_t size);
 	~Link();
 	
 	SharedMemory *sharedMemory() const { return m_sharedMemory; }

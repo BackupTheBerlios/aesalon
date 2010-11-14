@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 enum {
-	ConductorPacket_NewProcess,
+	ConductorPacket_NewSHM,
 	ConductorPacket_ModuleLoaded
 };
 

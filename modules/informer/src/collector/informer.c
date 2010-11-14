@@ -5,13 +5,28 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <dlfcn.h>
 
 #include "informer/Informer.h"
 #include "common/Config.h"
 #include "common/ConductorPacket.h"
 
 void __attribute__((constructor)) AI_Construct() {
-	printf("Constructing Informer . . .\n");
+	printf("**** Constructing Informer . . .\n");
+	
+	AI_createSHM();
+}
+
+void __attribute__((destructor)) AI_Destruct() {
+	/*printf("Destructing Informer . . .\n");*/
+	if(SharedMemory.data) {
+		munmap(SharedMemory.data, SharedMemory.size);
+		SharedMemory.data = NULL, SharedMemory.size = 0;
+	}
+}
+
+void AI_createSHM() {
 	char shmName[256] = {0};
 	
 	sprintf(shmName, "AI-%i", getpid());
@@ -27,17 +42,13 @@ void __attribute__((constructor)) AI_Construct() {
 	SharedMemory.data = mmap(NULL, SharedMemory.size, PROT_READ | PROT_WRITE, MAP_SHARED, SharedMemory.fd, 0);
 	
 	int conductorFd = AI_ConfigurationLong("::conductorFd");
-	pid_t pid = getpid();
 	
-	uint8_t header = ConductorPacket_NewProcess;
+	uint8_t header = ConductorPacket_NewSHM;
 	
 	write(conductorFd, &header, sizeof(header));
-	write(conductorFd, &pid, sizeof(pid));
-}
-
-void __attribute__((destructor)) AI_Destruct() {
-	munmap(SharedMemory.data, SharedMemory.size);
-	printf("Destructing Informer . . .\n");
+	uint16_t length = strlen(shmName) + 1;
+	write(conductorFd, &length, sizeof(length));
+	write(conductorFd, shmName, length);
 }
 
 void AI_SendPacket(Packet *packet) {
@@ -67,4 +78,15 @@ int32_t AI_ConfigurationLong(const char *name) {
 int AI_ConfigurationBool(const char *name) {
 	const char *s = AI_ConfigurationString(name);
 	return s == NULL || s[0] == 0 || !strcmp(s, "false");
+}
+
+pid_t fork() {
+	pid_t (*realFork)();
+	
+	*(void **)(&realFork) = dlsym(RTLD_NEXT, "fork");
+	
+	pid_t value = realFork();
+	if(value == 0) AI_createSHM();
+	
+	return value;
 }
