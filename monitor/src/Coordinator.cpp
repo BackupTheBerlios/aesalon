@@ -45,7 +45,8 @@ void Coordinator::run() {
 		std::vector<Config::Vault::KeyPair> list;
 		m_vault->match("*", list);
 		for(std::vector<Config::Vault::KeyPair>::iterator i = list.begin(); i != list.end(); ++i) {
-			if(i->first[0] == ':' && i->first[1] == ':') continue;
+			// NOTE: left out for debugging purposes
+			//if(i->first[0] == ':' && i->first[1] == ':') continue;
 			
 			std::cout << "    * \"" << i->first << "\" ==> \"" << i->second << "\"\n";
 		}

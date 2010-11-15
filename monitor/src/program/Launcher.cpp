@@ -90,15 +90,17 @@ void Launcher::setupEnvironment() {
 		preload += ":";
 	}
 	
+	preload += Coordinator::instance()->vault()->get("informer:root");
+	preload += Coordinator::instance()->vault()->get("informer:collectorPath");
+	
+	setenv("LD_PRELOAD", preload.c_str(), 1);
+	
+	std::string moduleEnv;
+	
 	for(std::vector<std::string>::iterator i = modules.begin(); i != modules.end(); ++i) {
 		std::string moduleRoot = Coordinator::instance()->vault()->get(*i + ":root");
 		std::string collectorPath = Coordinator::instance()->vault()->get(*i + ":collectorPath");
 		if(collectorPath.length()) {
-			if(preload.length()) {
-				preload += ":";
-			}
-			preload += moduleRoot + collectorPath;
-			
 			std::vector<Config::Vault::KeyPair> configItems;
 			Coordinator::instance()->vault()->match(*i + ":*", configItems);
 			
@@ -110,9 +112,11 @@ void Launcher::setupEnvironment() {
 				setenv(envName.c_str(), i->second.c_str(), 1);
 			}
 		}
+		moduleEnv += ",";
+		moduleEnv += *i;
 	}
-
-	setenv("LD_PRELOAD", preload.c_str(), 1);
+	
+	setenv("AC___moduleList", moduleEnv.c_str(), 1);
 }
 
 } // namespace Program

@@ -15,7 +15,19 @@
 void __attribute__((constructor)) AI_Construct() {
 	printf("**** Constructing Informer . . .\n");
 	
-	AI_createSHM();
+	AI_CreateSHM();
+	
+	const char *p = AI_ConfigurationString("::moduleList");
+	char moduleList[BUFSIZ];
+	strcpy(moduleList, p);
+	const char *moduleName;
+	char *save = NULL;
+	moduleName = strtok_r(moduleList, ", ", &save);
+	do {
+		if(moduleName == NULL) break;
+		printf("\"%s\"\n", moduleName);
+		if(strcmp(moduleName, "informer")) AI_LoadModule(moduleName);
+	} while((moduleName = strtok_r(NULL, ", ", &save)));
 }
 
 void __attribute__((destructor)) AI_Destruct() {
@@ -26,7 +38,7 @@ void __attribute__((destructor)) AI_Destruct() {
 	}
 }
 
-void AI_createSHM() {
+void AI_CreateSHM() {
 	char shmName[256] = {0};
 	
 	sprintf(shmName, "AI-%i", getpid());
@@ -53,6 +65,31 @@ void AI_createSHM() {
 
 void AI_SendPacket(Packet *packet) {
 	
+}
+
+void AI_LoadModule(const char *moduleName) {
+	char buffer[BUFSIZ];
+	strcpy(buffer, moduleName);
+	strcat(buffer, ":root");
+	const char *root = AI_ConfigurationString(buffer);
+	strcpy(buffer, moduleName);
+	strcat(buffer, ":collectorPath");
+	const char *collectorPath = AI_ConfigurationString(buffer);
+	strcpy(buffer, root);
+	strcat(buffer, collectorPath);
+#ifdef RTLD_DEEPBIND
+	void *handle = dlopen(buffer, RTLD_GLOBAL | RTLD_DEEPBIND | RTLD_NOW);
+#else
+	void *handle = dlopen(buffer, RTLD_GLOBAL | RTLD_NOW);
+#endif
+
+	int conductorFd = AI_ConfigurationLong("::conductorFd");
+	
+	uint8_t header = ConductorPacket_ModuleLoaded;
+	write(conductorFd, &header, sizeof(header));
+	uint16_t length = strlen(moduleName) + 1;
+	write(conductorFd, &length, sizeof(length));
+	write(conductorFd, moduleName, length);
 }
 
 const char *AI_ConfigurationString(const char *name) {
@@ -86,7 +123,7 @@ pid_t fork() {
 	*(void **)(&realFork) = dlsym(RTLD_NEXT, "fork");
 	
 	pid_t value = realFork();
-	if(value == 0) AI_createSHM();
+	if(value == 0) AI_CreateSHM();
 	
 	return value;
 }
