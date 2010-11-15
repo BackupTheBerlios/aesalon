@@ -58,9 +58,10 @@ void Coordinator::run() {
 	Program::Launcher *launcher = new Program::Launcher(&m_argv[m_argcOffset]);
 	
 	if(launcher->startProcess() == 0) {
-		Program::Conductor *conductor = new Program::Conductor(launcher->readFd());
-		
-		conductor->monitor();
+		std::cout << "In monitor process . . ." << std::endl;
+		Program::Conductor conductor(launcher->readFd());
+		conductor.monitor();
+		std::cout << "about to leave the scope . . ." << std::endl;
 	}
 	
 	delete launcher;

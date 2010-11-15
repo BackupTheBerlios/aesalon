@@ -24,11 +24,14 @@ namespace Program {
 class Link {
 private:
 	SharedMemory *m_sharedMemory;
+	pthread_t m_threadID;
 public:
 	Link(std::string name, uint32_t size);
 	~Link();
 	
 	SharedMemory *sharedMemory() const { return m_sharedMemory; }
+	
+	void listen();
 private:
 	static void *run(void *voidInstance);
 	Packet *nextPacket();

@@ -9,6 +9,8 @@
 
 */
 
+#include <iostream>
+
 #include "program/Link.h"
 
 namespace Monitor {
@@ -19,20 +21,34 @@ Link::Link(std::string name, uint32_t size) : m_sharedMemory(NULL) {
 }
 
 Link::~Link() {
-	delete m_sharedMemory;
+	std::cout << "Link destructing . . ." << std::endl;
+	if(m_sharedMemory != NULL) {
+		std::cout << "m_sharedMemory is not NULL, sending termination notice . . ." << std::endl;
+		m_sharedMemory->notifyTermination();
+		std::cout << "joining thread . . ." << std::endl;
+		pthread_join(m_threadID, NULL);
+	}
+	else std::cout << "m_sharedMemory is already NULL . . ." << std::endl;
+}
+
+void Link::listen() {
+	pthread_create(&m_threadID, NULL, run, NULL);
 }
 
 void *Link::run(void *voidInstance) {
+	std::cout << "Link::run() . . ." << std::endl;
 	Link *instance = reinterpret_cast<Link *>(voidInstance);
 	
-	while(true) {
-		instance->m_sharedMemory->wait();
+	Packet *packet = NULL;
+	
+	while((packet = instance->m_sharedMemory->readNext()) != NULL) {
+		std::cout << "Received packet!" << std::endl;
 	}
 	
-	return NULL;
-}
-
-Packet *Link::nextPacket() {
+	std::cout << "Link::run() read loop ended. NULL packet recieved." << std::endl;
+	
+	delete instance->m_sharedMemory;
+	instance->m_sharedMemory = NULL;
 	
 	return NULL;
 }

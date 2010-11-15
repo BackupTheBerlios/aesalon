@@ -9,6 +9,8 @@
 
 */
 
+#include <iostream>
+
 #include <sys/mman.h>
 #include <fcntl.h>
 
@@ -31,6 +33,7 @@ SharedMemory::SharedMemory(std::string identifier, uint32_t size) : m_identifier
 }
 
 SharedMemory::~SharedMemory() {
+	std::cout << "Unlinking " << m_identifier << " . . ." << std::endl;
 	shm_unlink(m_identifier.c_str());
 }
 
@@ -42,7 +45,17 @@ void SharedMemory::wait() {
 }
 
 Packet *SharedMemory::readNext() {
+	wait();
+	/* If the data start is the same as the end, then a NULL packet has been
+		sent -- otherwise known as the termination signal.
+	*/
+	if(m_header->dataStart == m_header->dataEnd) return NULL;
 	return NULL;
+}
+
+void SharedMemory::notifyTermination() {
+	/* Artificially create a termination signal by posting to the packet semaphore. */
+	sem_post(&m_header->packetSemaphore);
 }
 
 } // namespace Program

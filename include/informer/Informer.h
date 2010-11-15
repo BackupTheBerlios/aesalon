@@ -17,21 +17,39 @@
 #include "common/SharedMemoryHeader.h"
 #include "common/Packet.h"
 
+/** Constructor for the Informer module. Should be called from every module constructor.
+*/
 void __attribute__((constructor)) AI_Construct();
+/** Destructor for the Informer module. Should be called from every module destructor.
+*/
 void __attribute__((destructor)) AI_Destruct();
 
+/** Interally-used function; creates a shared memory block.
+*/
 void AI_CreateSHM();
 
+/** Sends a packet to the montor via the shared memory block.
+	@note If @a packet is NULL, then the corresponding link will terminate.
+*/
 void AI_SendPacket(Packet *packet);
 
+/** Calculates a unique timestamp for the current instant.
+*/
 uint64_t AI_Timestamp();
 
+/** Returns a configuration item, @a name, as a string.
+*/
 const char *AI_ConfigurationString(const char *name);
-int32_t AI_ConfigurationLong(const char *name);
+/** Returns a configuration item, @a name, as a long.
+*/
+long AI_ConfigurationLong(const char *name);
+/** Returns a configuration item, @a name, as a boolean integer.
+*/
 int AI_ConfigurationBool(const char *name);
 
 struct {
 	int fd;
+	uint64_t processHash;
 	uint8_t *data;
 	uint32_t size;
 	

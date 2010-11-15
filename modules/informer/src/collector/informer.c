@@ -16,7 +16,7 @@
 void __attribute__((constructor)) AI_Construct() {
 	printf("**** Constructing Informer . . .\n");
 	
-	AI_CreateSHM();
+	if(SharedMemory.data == NULL) AI_CreateSHM();
 }
 
 void __attribute__((destructor)) AI_Destruct() {
@@ -30,8 +30,8 @@ void __attribute__((destructor)) AI_Destruct() {
 void AI_CreateSHM() {
 	char shmName[256] = {0};
 	
-	uint64_t timestamp = AI_Timestamp();
-	sprintf(shmName, "AI-%lx", (timestamp ^ getpid()));
+	SharedMemory.processHash = AI_Timestamp() ^ getpid();
+	sprintf(shmName, "AI-%lx", SharedMemory.processHash);
 	
 	int32_t shmSize = AI_ConfigurationLong("informer:shmSize");
 	/* If shmSize is not specified, then set it to the compile-time size. */
@@ -54,6 +54,13 @@ void AI_CreateSHM() {
 }
 
 void AI_SendPacket(Packet *packet) {
+	if(packet == NULL) {
+		sem_post(&SharedMemory.header->packetSemaphore);
+		return;
+	}
+	
+	packet->processHash = SharedMemory.processHash;
+	
 	
 }
 
@@ -75,11 +82,11 @@ const char *AI_ConfigurationString(const char *name) {
 	return getenv(realname);
 }
 
-int32_t AI_ConfigurationLong(const char *name) {
+long AI_ConfigurationLong(const char *name) {
 	const char *s = AI_ConfigurationString(name);
 	if(s == NULL) return -1;
-	int32_t value;
-	sscanf(s, "%d", &value);
+	long value;
+	sscanf(s, "%ld", &value);
 	return value;
 }
 

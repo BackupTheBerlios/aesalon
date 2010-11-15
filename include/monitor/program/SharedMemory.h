@@ -32,6 +32,8 @@ public:
 	
 	void wait();
 	Packet *readNext();
+	
+	void notifyTermination();
 };
 
 } // namespace Program

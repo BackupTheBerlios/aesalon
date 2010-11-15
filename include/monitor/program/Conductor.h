@@ -30,7 +30,7 @@ public:
 	
 	void monitor();
 private:
-	void newLink();
+	Link *newLink(uint32_t size);
 	void loadModule();
 };
 
