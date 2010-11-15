@@ -25,7 +25,7 @@ private:
 	int m_readFd;
 	std::list<Link *> m_linkList;
 public:
-	Conductor(int readFd) : m_readFd(readFd) {}
+	Conductor(int readFd);
 	~Conductor();
 	
 	void monitor();

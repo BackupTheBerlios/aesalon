@@ -41,22 +41,24 @@ pid_t Launcher::startProcess() {
 	
 	pid_t childPid = createProcess();
 	
+	
 	pid_t monitorPid = fork();
 	if(monitorPid == -1) {
 		std::cout << "Could not fork . . ." << std::endl;
 		exit(1);
 	}
-	else if(monitorPid != 0) {
-		std::cout << "In original process, waiting on process . . ." << std::endl;
-		siginfo_t sinfo;
-		waitid(P_PID, childPid, &sinfo, WEXITED);
-		if(sinfo.si_code == CLD_DUMPED || sinfo.si_code == CLD_KILLED)
-			Coordinator::instance()->setReturnValue(128 + sinfo.si_status);
-		else Coordinator::instance()->setReturnValue(sinfo.si_status);
-		
-		std::cout << "process has terminated." << std::endl;
-	}
 	return monitorPid;
+}
+
+void Launcher::waitForChild(pid_t childPid) {
+	std::cout << "In original process, waiting on process . . ." << std::endl;
+	siginfo_t sinfo;
+	waitid(P_PID, childPid, &sinfo, WEXITED);
+	if(sinfo.si_code == CLD_DUMPED || sinfo.si_code == CLD_KILLED)
+		Coordinator::instance()->setReturnValue(128 + sinfo.si_status);
+	else Coordinator::instance()->setReturnValue(sinfo.si_status);
+	
+	std::cout << "Main Process: monitored process has terminated." << std::endl;
 }
 
 pid_t Launcher::createProcess() {

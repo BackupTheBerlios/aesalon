@@ -22,17 +22,23 @@ Link::Link(std::string name, uint32_t size) : m_sharedMemory(NULL) {
 
 Link::~Link() {
 	std::cout << "Link destructing . . ." << std::endl;
-	if(m_sharedMemory != NULL) {
-		std::cout << "m_sharedMemory is not NULL, sending termination notice . . ." << std::endl;
-		m_sharedMemory->notifyTermination();
-		std::cout << "joining thread . . ." << std::endl;
-		pthread_join(m_threadID, NULL);
-	}
-	else std::cout << "m_sharedMemory is already NULL . . ." << std::endl;
 }
 
 void Link::listen() {
+	std::cout << "Link: creating thread . . ." << std::endl;
 	pthread_create(&m_threadID, NULL, run, NULL);
+}
+
+void Link::terminate() {
+	std::cout << "Link::terminate() called . . .\n";
+	
+	if(m_sharedMemory != NULL) {
+		std::cout << "m_sharedMemory is not NULL, sending termination notice . . ." << std::endl;
+		m_sharedMemory->notifyTermination();
+	}
+	
+	std::cout << "Link::terminate(): joining thread . . ." << std::endl;
+	pthread_join(m_threadID, NULL);
 }
 
 void *Link::run(void *voidInstance) {

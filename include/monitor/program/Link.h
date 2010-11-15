@@ -32,6 +32,7 @@ public:
 	SharedMemory *sharedMemory() const { return m_sharedMemory; }
 	
 	void listen();
+	void terminate();
 private:
 	static void *run(void *voidInstance);
 	Packet *nextPacket();

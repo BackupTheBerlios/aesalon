@@ -29,6 +29,8 @@ public:
 	
 	pid_t startProcess();
 	int readFd() const { return m_controllerFds[0]; }
+	
+	void waitForChild();
 private:
 	void setupEnvironment();
 	pid_t createProcess();

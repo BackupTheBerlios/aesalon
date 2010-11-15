@@ -57,11 +57,17 @@ void Coordinator::run() {
 	
 	Program::Launcher *launcher = new Program::Launcher(&m_argv[m_argcOffset]);
 	
-	if(launcher->startProcess() == 0) {
+	pid_t monitored_pid = launcher->forkTarget();
+	
+	if(launcher->forkMonitor() == 0) {  // the child
 		std::cout << "In monitor process . . ." << std::endl;
 		Program::Conductor conductor(launcher->readFd());
 		conductor.monitor();
 		std::cout << "about to leave the scope . . ." << std::endl;
+	}
+	else {
+		launcher->waitForChild(monitored_pid);
+		//launcher->
 	}
 	
 	delete launcher;
