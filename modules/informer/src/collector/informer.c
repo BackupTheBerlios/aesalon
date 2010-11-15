@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dlfcn.h>
+#include <time.h>
 
 #include "informer/Informer.h"
 #include "common/Config.h"
@@ -16,18 +17,6 @@ void __attribute__((constructor)) AI_Construct() {
 	printf("**** Constructing Informer . . .\n");
 	
 	AI_CreateSHM();
-	
-	const char *p = AI_ConfigurationString("::moduleList");
-	char moduleList[BUFSIZ];
-	strcpy(moduleList, p);
-	const char *moduleName;
-	char *save = NULL;
-	moduleName = strtok_r(moduleList, ", ", &save);
-	do {
-		if(moduleName == NULL) break;
-		printf("\"%s\"\n", moduleName);
-		if(strcmp(moduleName, "informer")) AI_LoadModule(moduleName);
-	} while((moduleName = strtok_r(NULL, ", ", &save)));
 }
 
 void __attribute__((destructor)) AI_Destruct() {
@@ -41,7 +30,8 @@ void __attribute__((destructor)) AI_Destruct() {
 void AI_CreateSHM() {
 	char shmName[256] = {0};
 	
-	sprintf(shmName, "AI-%i", getpid());
+	uint64_t timestamp = AI_Timestamp();
+	sprintf(shmName, "AI-%lx", (timestamp ^ getpid()));
 	
 	int32_t shmSize = AI_ConfigurationLong("informer:shmSize");
 	/* If shmSize is not specified, then set it to the compile-time size. */
@@ -67,29 +57,10 @@ void AI_SendPacket(Packet *packet) {
 	
 }
 
-void AI_LoadModule(const char *moduleName) {
-	char buffer[BUFSIZ];
-	strcpy(buffer, moduleName);
-	strcat(buffer, ":root");
-	const char *root = AI_ConfigurationString(buffer);
-	strcpy(buffer, moduleName);
-	strcat(buffer, ":collectorPath");
-	const char *collectorPath = AI_ConfigurationString(buffer);
-	strcpy(buffer, root);
-	strcat(buffer, collectorPath);
-#ifdef RTLD_DEEPBIND
-	void *handle = dlopen(buffer, RTLD_GLOBAL | RTLD_DEEPBIND | RTLD_NOW);
-#else
-	void *handle = dlopen(buffer, RTLD_GLOBAL | RTLD_NOW);
-#endif
-
-	int conductorFd = AI_ConfigurationLong("::conductorFd");
-	
-	uint8_t header = ConductorPacket_ModuleLoaded;
-	write(conductorFd, &header, sizeof(header));
-	uint16_t length = strlen(moduleName) + 1;
-	write(conductorFd, &length, sizeof(length));
-	write(conductorFd, moduleName, length);
+uint64_t AI_Timestamp() {
+	struct timespec t;
+	clock_gettime(CLOCK_REALTIME, &t);
+	return (t.tv_sec * 1000000) + t.tv_nsec;
 }
 
 const char *AI_ConfigurationString(const char *name) {

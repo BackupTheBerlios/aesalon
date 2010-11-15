@@ -21,9 +21,10 @@ void __attribute__((constructor)) AI_Construct();
 void __attribute__((destructor)) AI_Destruct();
 
 void AI_CreateSHM();
-void AI_LoadModule(const char *moduleName);
 
 void AI_SendPacket(Packet *packet);
+
+uint64_t AI_Timestamp();
 
 const char *AI_ConfigurationString(const char *name);
 int32_t AI_ConfigurationLong(const char *name);

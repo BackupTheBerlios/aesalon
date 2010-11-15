@@ -11,7 +11,3 @@ void __attribute__((constructor)) AC_Construct() {
 void __attribute__((destructor)) AC_Destruct() {
 
 }
-
-void *malloc(size_t size) {
-	return NULL;
-}
