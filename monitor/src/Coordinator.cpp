@@ -55,22 +55,16 @@ void Coordinator::run() {
 		return;
 	}
 	
-	Program::Launcher *launcher = new Program::Launcher(&m_argv[m_argcOffset]);
+	Program::Launcher launcher(&m_argv[m_argcOffset]);
 	
-	pid_t monitored_pid = launcher->forkTarget();
+	launcher.forkTarget();
 	
-	if(launcher->forkMonitor() == 0) {  // the child
-		std::cout << "In monitor process . . ." << std::endl;
-		Program::Conductor conductor(launcher->readFd());
-		conductor.monitor();
-		std::cout << "about to leave the scope . . ." << std::endl;
-	}
-	else {
-		launcher->waitForChild(monitored_pid);
-		//launcher->
-	}
+	std::cout << "In monitor process . . ." << std::endl;
+	Program::Conductor conductor(launcher.readFd());
+	conductor.monitor();
 	
-	delete launcher;
+	launcher.waitForChild();
+	conductor.join();
 }
 
 void Coordinator::parseConfigs() {

@@ -29,11 +29,9 @@ Conductor::Conductor(int readFd) : m_readFd(readFd) {
 Conductor::~Conductor() {
 	std::cout << "Conductor destructing . . ." << std::endl;
 	for(std::list<Link *>::iterator i = m_linkList.begin(); i != m_linkList.end(); ++ i) {
-		std::cout << "    Conductor::~Conductor(): terminating . . ." << std::endl;
-		(*i)->terminate();
-		std::cout << "    Conductor::~Conductor(): terminated!" << std::endl;
 		delete (*i);
 	}
+	
 	std::cout << "Conductor destructed" << std::endl;
 }
 
@@ -60,6 +58,12 @@ void Conductor::monitor() {
 		}
 	}
 	std::cout << "Conductor::monitor finished!" << std::endl;
+}
+
+void Conductor::join() {
+	for(std::list<Link *>::iterator i = m_linkList.begin(); i != m_linkList.end(); ++ i) {
+		(*i)->terminate();
+	}
 }
 
 Link *Conductor::newLink(uint32_t size) {

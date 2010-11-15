@@ -29,7 +29,10 @@ public:
 	~Conductor();
 	
 	void monitor();
+	
+	void join();
 private:
+	static void *run(void *voidInstance);
 	Link *newLink(uint32_t size);
 	void loadModule();
 };

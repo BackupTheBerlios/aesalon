@@ -36,47 +36,36 @@ Launcher::~Launcher() {
 	
 }
 
-pid_t Launcher::startProcess() {
+pid_t Launcher::forkTarget() {
 	setupEnvironment();
 	
-	pid_t childPid = createProcess();
-	
-	
-	pid_t monitorPid = fork();
-	if(monitorPid == -1) {
+	m_targetPid = fork();
+	if(m_targetPid == -1) {
 		std::cout << "Could not fork . . ." << std::endl;
 		exit(1);
 	}
-	return monitorPid;
-}
-
-void Launcher::waitForChild(pid_t childPid) {
-	std::cout << "In original process, waiting on process . . ." << std::endl;
-	siginfo_t sinfo;
-	waitid(P_PID, childPid, &sinfo, WEXITED);
-	if(sinfo.si_code == CLD_DUMPED || sinfo.si_code == CLD_KILLED)
-		Coordinator::instance()->setReturnValue(128 + sinfo.si_status);
-	else Coordinator::instance()->setReturnValue(sinfo.si_status);
-	
-	std::cout << "Main Process: monitored process has terminated." << std::endl;
-}
-
-pid_t Launcher::createProcess() {
-	pid_t childPid = fork();
-	if(childPid == -1) {
-		std::cout << "Could not fork . . ." << std::endl;
-		exit(1);
-	}
-	else if(childPid == 0) {
+	else if(m_targetPid == 0) {
 		close(m_controllerFds[0]);
 		execvp(m_argv[0], m_argv);
 		std::cout << m_argv[0] << ": " << strerror(errno) << std::endl;
 		exit(0);
 	}
 	
+	/* Close the write end of the pipe in the monitoring process. */
 	close(m_controllerFds[1]);
 	
-	return childPid;
+	return m_targetPid;
+}
+
+void Launcher::waitForChild() {
+	std::cout << "In original process, waiting on process . . ." << std::endl;
+	siginfo_t sinfo;
+	waitid(P_PID, m_targetPid, &sinfo, WEXITED);
+	if(sinfo.si_code == CLD_DUMPED || sinfo.si_code == CLD_KILLED)
+		Coordinator::instance()->setReturnValue(128 + sinfo.si_status);
+	else Coordinator::instance()->setReturnValue(sinfo.si_status);
+	
+	std::cout << "Main Process: monitored process has terminated." << std::endl;
 }
 
 void Launcher::setupEnvironment() {
