@@ -13,6 +13,7 @@
 #define AesalonInformer_Informer_H
 
 #include <stdint.h>
+#include <pthread.h>
 
 #include "common/SharedMemoryHeader.h"
 #include "common/Packet.h"
@@ -53,12 +54,17 @@ inline void AI_AppendUint64(Packet *packet, uint64_t value);
 inline void AI_AppendTimestamp(Packet *packet);
 
 struct {
-	int fd;
-	uint64_t processHash;
-	uint8_t *data;
-	uint32_t size;
+	struct {
+		int fd;
+		uint64_t processHash;
+		uint8_t *data;
+		uint32_t size;
+		
+		SharedMemoryHeader *header;
+	} SharedMemory;
 	
-	SharedMemoryHeader *header;
-} SharedMemory;
+	pthread_t monitorThreads[128];
+	int monitorThreadCount;
+} InformerData;
 
 #endif
