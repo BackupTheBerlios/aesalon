@@ -50,8 +50,7 @@ void AI_CreateSHM() {
 	sem_init(&SharedMemory.header->overflowSemaphore, 1, 0);
 	sem_init(&SharedMemory.header->sendSemaphore, 1, 0);
 	
-	
-	SharedMemory.header->size = shmSize;
+	SharedMemory.header->size = SharedMemory.size;
 	SharedMemory.header->dataOffset =
 		SharedMemory.header->dataStart =
 		SharedMemory.header->dataEnd =
@@ -80,12 +79,33 @@ uint32_t AI_RemainingSpace() {
 }
 
 void AI_WriteData(void *data, size_t length) {
-	memcpy(SharedMemory.data + SharedMemory.header->dataStart, data, length);
-	SharedMemory.header->dataEnd += length;
+	/* If dataStart <= dataEnd, then the used memory is a contigious chunk. */
+	if(SharedMemory.header->dataStart <= SharedMemory.header->dataEnd) {
+		/* Two possible scenarios: the data fits on the end . . . */
+		if(length < (SharedMemory.header->size  - SharedMemory.header->dataEnd)) {
+			memcpy(SharedMemory.data + SharedMemory.header->dataEnd, data, length);
+			SharedMemory.header->dataEnd += length;
+		}
+		/* And the data does not fit on the end. */
+		else {
+			size_t over = length - (SharedMemory.header->size - SharedMemory.header->dataEnd);
+			size_t under = length - over;
+			
+			memcpy(SharedMemory.data + SharedMemory.header->dataEnd, data, under);
+			
+			memcpy(SharedMemory.data + SharedMemory.header->dataOffset, data + under, over);
+			
+			SharedMemory.header->dataEnd = SharedMemory.header->dataOffset + over;
+		}
+	}
+	/* Else the used memory is in two separate chunks. */
+	else {
+		memcpy(SharedMemory.data + SharedMemory.header->dataEnd, data, length);
+		SharedMemory.header->dataEnd += length;
+	}
 }
 
 void AI_SendPacket(Packet *packet) {
-	printf("Sending packet . . .\n");
 	if(packet == NULL) {
 		sem_post(&SharedMemory.header->packetSemaphore);
 		return;
@@ -94,21 +114,16 @@ void AI_SendPacket(Packet *packet) {
 	packet->sourceHash = (SharedMemory.processHash ^ pthread_self());
 	
 	uint32_t size = sizeof(packet->sourceHash) + sizeof(packet->usedSize) + packet->usedSize;
-	printf("Waiting for %u to become > %u . . .\n", AI_RemainingSpace, size);
 	while(AI_RemainingSpace() < size) {
 		SharedMemory.header->overflow = 1;
-		printf("Waiting upon overflow semaphore . . .\n");
-		printf("\tRemaining: %u Size: %u\n", AI_RemainingSpace(), size);
 		sem_wait(&SharedMemory.header->overflowSemaphore);
 	}
 	SharedMemory.header->overflow = 0;
 	
-	printf("\twriting data . . .\n");
 	AI_WriteData(&packet->sourceHash, sizeof(packet->sourceHash));
 	AI_WriteData(&packet->usedSize, sizeof(packet->usedSize));
 	AI_WriteData(packet->data, packet->usedSize);
 	
-	printf("\tposting semaphores . . .\n");
 	sem_post(&SharedMemory.header->packetSemaphore);
 	sem_post(&SharedMemory.header->sendSemaphore);
 }
@@ -145,6 +160,12 @@ int AI_ConfigurationBool(const char *name) {
 }
 
 void AI_AppendUint64(Packet *packet, uint64_t value) {
+	memcpy(packet->data + packet->usedSize, &value, sizeof(value));
+	packet->usedSize += sizeof(value);
+}
+
+void AI_AppendTimestamp(Packet *packet) {
+	uint64_t value = AI_Timestamp();
 	memcpy(packet->data + packet->usedSize, &value, sizeof(value));
 	packet->usedSize += sizeof(value);
 }

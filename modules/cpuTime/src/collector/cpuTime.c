@@ -21,7 +21,6 @@ static void *sendTime(void *unused) {
 	while(isRunning) {
 		uint64_t exp;
 		read(timerFd, &exp, sizeof(exp));
-		printf("Sending time . . .\n");
 		uint8_t buffer[64];
 		
 		Packet packet;
@@ -33,6 +32,7 @@ static void *sendTime(void *unused) {
 		getrusage(RUSAGE_SELF, &ru);
 		
 		uint64_t value = (ru.ru_utime.tv_sec * 1000000000) + (ru.ru_utime.tv_usec * 1000);
+		AI_AppendTimestamp(&packet);
 		AI_AppendUint64(&packet, value);
 		
 		AI_SendPacket(&packet);
