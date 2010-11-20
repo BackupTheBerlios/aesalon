@@ -33,21 +33,17 @@ SharedMemory::SharedMemory(std::string identifier, uint32_t size) : m_identifier
 }
 
 SharedMemory::~SharedMemory() {
-	std::cout << "Unlinking " << m_identifier << " . . ." << std::endl;
 	shm_unlink(m_identifier.c_str());
 }
 
 void SharedMemory::wait() {
-	std::cout << "Acquiring lock . . ." << std::endl;
 	int result = 0;
 	while((result = sem_wait(&m_header->packetSemaphore)) != 0) {
 		
 	}
-	std::cout << "**** Lock acquired!" << std::endl;
 }
 
 Packet *SharedMemory::readNext() {
-	std::cout << "reading next packet . . ." << std::endl;
 	wait();
 	/* If the data start is the same as the end, then a NULL packet has been
 		sent -- otherwise known as the termination signal.

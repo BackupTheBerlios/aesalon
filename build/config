@@ -1,5 +1,5 @@
 {
-	"version": "0.3.9.0",
+	"version": "0.3.9.1",
 	"moduleConfigFileName": "module.conf",
 	"localConfig": ".aesalon.conf",
 	"userConfig": "~/.config/aesalon/aesalon.conf",

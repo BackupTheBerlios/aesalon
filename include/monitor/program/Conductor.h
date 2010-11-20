@@ -35,6 +35,7 @@ private:
 	static void *run(void *voidInstance);
 	Link *newLink(uint32_t size);
 	void loadModule();
+	void handleFork();
 };
 
 } // namespace Program

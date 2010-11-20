@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <dlfcn.h>
 #include <time.h>
+#include <pthread.h>
 
 #include "informer/Informer.h"
 #include "common/Config.h"
@@ -30,7 +31,7 @@ void __attribute__((destructor)) AI_Destruct() {
 void AI_CreateSHM() {
 	char shmName[256] = {0};
 	
-	SharedMemory.processHash = AI_Timestamp() ^ getpid();
+	SharedMemory.processHash = AI_Timestamp();
 	sprintf(shmName, "AI-%lx", SharedMemory.processHash);
 	
 	int32_t shmSize = AI_ConfigurationLong("informer:shmSize");
@@ -53,13 +54,18 @@ void AI_CreateSHM() {
 	write(conductorFd, shmName, length);
 }
 
+void AI_WriteData(void *data, size_t length) {
+	memcpy(SharedMemory.data + SharedMemory.header->dataStart, data, length);
+	SharedMemory.header->dataStart += length;
+}
+
 void AI_SendPacket(Packet *packet) {
 	if(packet == NULL) {
 		sem_post(&SharedMemory.header->packetSemaphore);
 		return;
 	}
 	
-	packet->processHash = SharedMemory.processHash;
+	packet->sourceHash = (SharedMemory.processHash ^ pthread_self());
 	
 	
 }
@@ -67,7 +73,7 @@ void AI_SendPacket(Packet *packet) {
 uint64_t AI_Timestamp() {
 	struct timespec t;
 	clock_gettime(CLOCK_REALTIME, &t);
-	return (t.tv_sec * 1000000) + t.tv_nsec;
+	return (t.tv_sec * 1000000000) + t.tv_nsec;
 }
 
 const char *AI_ConfigurationString(const char *name) {

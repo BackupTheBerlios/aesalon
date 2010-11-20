@@ -58,14 +58,11 @@ pid_t Launcher::forkTarget() {
 }
 
 void Launcher::waitForChild() {
-	std::cout << "In original process, waiting on process . . ." << std::endl;
 	siginfo_t sinfo;
 	waitid(P_PID, m_targetPid, &sinfo, WEXITED);
 	if(sinfo.si_code == CLD_DUMPED || sinfo.si_code == CLD_KILLED)
 		Coordinator::instance()->setReturnValue(128 + sinfo.si_status);
 	else Coordinator::instance()->setReturnValue(sinfo.si_status);
-	
-	std::cout << "Main Process: monitored process has terminated." << std::endl;
 }
 
 void Launcher::setupEnvironment() {

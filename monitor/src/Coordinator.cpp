@@ -59,7 +59,6 @@ void Coordinator::run() {
 	
 	launcher.forkTarget();
 	
-	std::cout << "In monitor process . . ." << std::endl;
 	Program::Conductor conductor(launcher.readFd());
 	conductor.monitor();
 	

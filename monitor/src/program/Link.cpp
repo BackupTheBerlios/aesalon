@@ -37,16 +37,13 @@ void Link::terminate() {
 }
 
 void *Link::run(void *voidInstance) {
-	std::cout << "Link::run() . . ." << std::endl;
 	Link *instance = reinterpret_cast<Link *>(voidInstance);
 	
 	Packet *packet = NULL;
 	
 	while((packet = instance->m_sharedMemory->readNext()) != NULL) {
-		std::cout << "Received packet!" << std::endl;
+		std::cout << "\tReceived packet!" << std::endl;
 	}
-	
-	std::cout << "Link::run() read loop ended. NULL packet recieved." << std::endl;
 	
 	delete instance->m_sharedMemory;
 	instance->m_sharedMemory = NULL;

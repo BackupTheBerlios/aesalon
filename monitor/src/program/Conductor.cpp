@@ -23,16 +23,12 @@ namespace Monitor {
 namespace Program {
 
 Conductor::Conductor(int readFd) : m_readFd(readFd) {
-	std::cout << "Conductor created." << std::endl;
 }
 
 Conductor::~Conductor() {
-	std::cout << "Conductor destructing . . ." << std::endl;
 	for(std::list<Link *>::iterator i = m_linkList.begin(); i != m_linkList.end(); ++ i) {
 		delete (*i);
 	}
-	
-	std::cout << "Conductor destructed" << std::endl;
 }
 
 void Conductor::monitor() {
@@ -40,9 +36,7 @@ void Conductor::monitor() {
 	uint32_t shmSize = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("informer:shmSize"));
 	
 	while(true) {
-		std::cout << "Conductor: waiting for packet header." << std::endl;
 		int ret = read(m_readFd, &header, sizeof(header));
-		std::cout << "Received packet header." << std::endl;
 		/* If ret == 0, then EOF was reached. */
 		if(ret == 0) break;
 		/* If the read was interrupted by a signal, continue. */
@@ -56,8 +50,10 @@ void Conductor::monitor() {
 		else if(header == ConductorPacket_ModuleLoaded) {
 			loadModule();
 		}
+		else if(header == ConductorPacket_Fork) {
+			handleFork();
+		}
 	}
-	std::cout << "Conductor::monitor finished!" << std::endl;
 }
 
 void Conductor::join() {
@@ -84,6 +80,13 @@ void Conductor::loadModule() {
 	read(m_readFd, &length, sizeof(length));
 	char name[256];
 	read(m_readFd, name, length);
+}
+
+void Conductor::handleFork() {
+	pid_t pid;
+	read(m_readFd, &pid, sizeof(pid));
+	std::cout << "Target process forked; new pid is " << pid << " . . .\n";
+	/* TODO: handle process forks properly (spawn off new monitor). */
 }
 
 } // namespace Program

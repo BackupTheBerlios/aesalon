@@ -16,7 +16,8 @@
 
 enum {
 	ConductorPacket_NewSHM,
-	ConductorPacket_ModuleLoaded
+	ConductorPacket_ModuleLoaded,
+	ConductorPacket_Fork,
 };
 
 #endif
