@@ -25,6 +25,7 @@ typedef struct {
 	uint32_t dataStart;
 	uint32_t dataEnd;
 	sem_t sendSemaphore;
+	sem_t readSemaphore;
 } SharedMemoryHeader;
 
 #define SharedMemoryDataOffset (sizeof(SharedMemoryHeader) + 16)

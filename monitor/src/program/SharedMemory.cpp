@@ -40,11 +40,12 @@ SharedMemory::~SharedMemory() {
 void SharedMemory::wait() {
 	int result = 0;
 	while((result = sem_wait(&m_header->packetSemaphore)) != 0) {
-		
+		std::cout << "semaphore error!" << std::endl;
 	}
 }
 
 Packet *SharedMemory::readNext() {
+	std::cout << "wait() called . . .\n";
 	wait();
 	/* If the data start is the same as the end, then a NULL packet has been
 		sent -- otherwise known as the termination signal.
@@ -53,18 +54,23 @@ Packet *SharedMemory::readNext() {
 	
 	Packet *packet = new Packet;
 	
-	/*
-	AI_WriteData(&packet->sourceHash, sizeof(packet->sourceHash));
-	AI_WriteData(&packet->usedSize, sizeof(packet->usedSize));
-	AI_WriteData(packet->data, packet->usedSize);
-	*/
+	sem_wait(&m_header->sendSemaphore);
 	
-	std::cout << "packet ready for reading . . ." << std::endl;
+	std::cout << "Reading packet . . ." << std::endl;
 	readData(&packet->sourceHash, sizeof(packet->sourceHash));
+	std::cout << "\tsourceHash: " << std::hex << packet->sourceHash << std::dec << std::endl;
 	readData(&packet->usedSize, sizeof(packet->usedSize));
+	std::cout << "\tusedSize: " << packet->usedSize << std::endl;
 	packet->dataSize = packet->usedSize;
 	packet->data = new uint8_t[packet->dataSize];
 	readData(packet->data, packet->dataSize);
+	
+	if(m_header->overflow) {
+		sem_post(&m_header->overflowSemaphore);
+		m_header->overflow = 0;
+	}
+	
+	sem_post(&m_header->sendSemaphore);
 	
 	return packet;
 }
@@ -75,7 +81,8 @@ void SharedMemory::notifyTermination() {
 }
 
 void SharedMemory::readData(void *buffer, size_t size) {
-	if(m_header->dataStart + size > m_header->size) {
+	if(m_header->dataStart + size >= m_header->size) {
+		std::cout << "Reading overflow data (might blow up . . .)\n";
 		int end_copy_size = (m_header->size - m_header->dataStart);
 		memcpy(buffer, m_memory + m_header->dataStart, end_copy_size);
 		

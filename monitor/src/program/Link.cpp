@@ -42,9 +42,12 @@ void *Link::run(void *voidInstance) {
 	Packet *packet = NULL;
 	
 	while((packet = instance->m_sharedMemory->readNext()) != NULL) {
-		std::cout << "\tReceived packet!" << std::endl;
+		/*std::cout << "\tReceived packet!" << std::endl;
 		std::cout << "first eight bytes translate to: " << ((uint64_t *)packet->data)[0] << std::endl;
-		std::cout << "second eight bytes translate to: " << ((uint64_t *)packet->data)[1] << std::endl;
+		std::cout << "second eight bytes translate to: " << ((uint64_t *)packet->data)[1] << std::endl;*/
+		
+		delete[] packet->data;
+		delete packet;
 	}
 	
 	delete instance->m_sharedMemory;

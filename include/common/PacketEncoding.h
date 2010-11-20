@@ -17,11 +17,11 @@
 #include "Packet.h"
 
 enum Encodings {
-	Uint8 = 0x01,
-	Uint16 = 0x02,
-	Uint32 = 0x03,
-	Uint64 = 0x04,
-	String = 0x05
+	PE_Uint8 = 0x01,
+	PE_Uint16 = 0x02,
+	PE_Uint32 = 0x03,
+	PE_Uint64 = 0x04,
+	PE_String = 0x05
 };
 
 #if 0
