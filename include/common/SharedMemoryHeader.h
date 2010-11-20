@@ -17,12 +17,14 @@
 
 typedef struct {
 	uint32_t size;
-	
 	sem_t packetSemaphore;
+	uint8_t overflow;
+	sem_t overflowSemaphore;
 	
+	uint32_t dataOffset;
 	uint32_t dataStart;
 	uint32_t dataEnd;
-	sem_t endSemaphore;
+	sem_t sendSemaphore;
 } SharedMemoryHeader;
 
 #define SharedMemoryDataOffset (sizeof(SharedMemoryHeader) + 16)
