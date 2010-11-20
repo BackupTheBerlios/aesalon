@@ -34,6 +34,8 @@ public:
 	Packet *readNext();
 	
 	void notifyTermination();
+private:
+	void readData(void *buffer, size_t size);
 };
 
 } // namespace Program

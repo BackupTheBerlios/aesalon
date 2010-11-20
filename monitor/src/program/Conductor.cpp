@@ -23,6 +23,7 @@ namespace Monitor {
 namespace Program {
 
 Conductor::Conductor(int readFd) : m_readFd(readFd) {
+	
 }
 
 Conductor::~Conductor() {

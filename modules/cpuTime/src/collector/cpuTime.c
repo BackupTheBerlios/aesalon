@@ -55,7 +55,6 @@ void __attribute__((constructor)) AM_Construct() {
 		interval = 100000;
 	}
 	interval *= 1000;
-	printf("interval: %i\n", interval);
 	
 	its.it_interval.tv_sec = interval / 1000000000;
 	its.it_interval.tv_nsec = interval % 1000000000;

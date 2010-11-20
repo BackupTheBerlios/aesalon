@@ -23,6 +23,7 @@ void __attribute__((constructor)) AI_Construct() {
 void __attribute__((destructor)) AI_Destruct() {
 	/*printf("Destructing Informer . . .\n");*/
 	if(SharedMemory.data) {
+		AI_SendPacket(NULL);
 		munmap(SharedMemory.data, SharedMemory.size);
 		SharedMemory.data = NULL, SharedMemory.size = 0;
 	}
@@ -48,7 +49,7 @@ void AI_CreateSHM() {
 	
 	sem_init(&SharedMemory.header->packetSemaphore, 1, 0);
 	sem_init(&SharedMemory.header->overflowSemaphore, 1, 0);
-	sem_init(&SharedMemory.header->sendSemaphore, 1, 0);
+	sem_init(&SharedMemory.header->sendSemaphore, 1, 1);
 	
 	SharedMemory.header->size = SharedMemory.size;
 	SharedMemory.header->dataOffset =
@@ -106,25 +107,25 @@ void AI_WriteData(void *data, size_t length) {
 }
 
 void AI_SendPacket(Packet *packet) {
-	if(packet == NULL) {
-		sem_post(&SharedMemory.header->packetSemaphore);
-		return;
+	sem_wait(&SharedMemory.header->sendSemaphore);
+	if(packet != NULL) {
+		packet->sourceHash = (SharedMemory.processHash ^ pthread_self());
+		
+		uint32_t size = sizeof(packet->sourceHash) + sizeof(packet->usedSize) + packet->usedSize;
+		while(AI_RemainingSpace() < size) {
+			SharedMemory.header->overflow = 1;
+			sem_wait(&SharedMemory.header->overflowSemaphore);
+		}
+		SharedMemory.header->overflow = 0;
+		
+		AI_WriteData(&packet->sourceHash, sizeof(packet->sourceHash));
+		AI_WriteData(&packet->usedSize, sizeof(packet->usedSize));
+		AI_WriteData(packet->data, packet->usedSize);
 	}
-	
-	packet->sourceHash = (SharedMemory.processHash ^ pthread_self());
-	
-	uint32_t size = sizeof(packet->sourceHash) + sizeof(packet->usedSize) + packet->usedSize;
-	while(AI_RemainingSpace() < size) {
-		SharedMemory.header->overflow = 1;
-		sem_wait(&SharedMemory.header->overflowSemaphore);
-	}
-	SharedMemory.header->overflow = 0;
-	
-	AI_WriteData(&packet->sourceHash, sizeof(packet->sourceHash));
-	AI_WriteData(&packet->usedSize, sizeof(packet->usedSize));
-	AI_WriteData(packet->data, packet->usedSize);
-	
 	sem_post(&SharedMemory.header->packetSemaphore);
+	int value;
+	sem_getvalue(&SharedMemory.header->packetSemaphore, &value);
+	printf("packetSemaphore value: %i\n", value);
 	sem_post(&SharedMemory.header->sendSemaphore);
 }
 
@@ -159,12 +160,12 @@ int AI_ConfigurationBool(const char *name) {
 	return s == NULL || s[0] == 0 || !strcmp(s, "false");
 }
 
-void AI_AppendUint64(Packet *packet, uint64_t value) {
+inline void AI_AppendUint64(Packet *packet, uint64_t value) {
 	memcpy(packet->data + packet->usedSize, &value, sizeof(value));
 	packet->usedSize += sizeof(value);
 }
 
-void AI_AppendTimestamp(Packet *packet) {
+inline void AI_AppendTimestamp(Packet *packet) {
 	uint64_t value = AI_Timestamp();
 	memcpy(packet->data + packet->usedSize, &value, sizeof(value));
 	packet->usedSize += sizeof(value);

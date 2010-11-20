@@ -13,6 +13,7 @@
 
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "program/SharedMemory.h"
 #include "common/AssertionException.h"
@@ -49,12 +50,42 @@ Packet *SharedMemory::readNext() {
 		sent -- otherwise known as the termination signal.
 	*/
 	if(m_header->dataStart == m_header->dataEnd) return NULL;
-	return NULL;
+	
+	Packet *packet = new Packet;
+	
+	/*
+	AI_WriteData(&packet->sourceHash, sizeof(packet->sourceHash));
+	AI_WriteData(&packet->usedSize, sizeof(packet->usedSize));
+	AI_WriteData(packet->data, packet->usedSize);
+	*/
+	
+	std::cout << "packet ready for reading . . ." << std::endl;
+	readData(&packet->sourceHash, sizeof(packet->sourceHash));
+	readData(&packet->usedSize, sizeof(packet->usedSize));
+	packet->dataSize = packet->usedSize;
+	packet->data = new uint8_t[packet->dataSize];
+	readData(packet->data, packet->dataSize);
+	
+	return packet;
 }
 
 void SharedMemory::notifyTermination() {
 	/* Artificially create a termination signal by posting to the packet semaphore. */
 	sem_post(&m_header->packetSemaphore);
+}
+
+void SharedMemory::readData(void *buffer, size_t size) {
+	if(m_header->dataStart + size > m_header->size) {
+		int end_copy_size = (m_header->size - m_header->dataStart);
+		memcpy(buffer, m_memory + m_header->dataStart, end_copy_size);
+		
+		memcpy((char *)buffer + end_copy_size, m_memory + m_header->dataOffset, size - end_copy_size);
+		m_header->dataStart = m_header->dataOffset + size - end_copy_size;
+	}
+	else {
+		memcpy(buffer, m_memory + m_header->dataStart, size);
+		m_header->dataStart += size;
+	}
 }
 
 } // namespace Program

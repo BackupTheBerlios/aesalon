@@ -49,8 +49,8 @@ int AI_ConfigurationBool(const char *name);
 
 /* Packet management functions. */
 
-void AI_AppendUint64(Packet *packet, uint64_t value);
-void AI_AppendTimestamp(Packet *packet);
+inline void AI_AppendUint64(Packet *packet, uint64_t value);
+inline void AI_AppendTimestamp(Packet *packet);
 
 struct {
 	int fd;
