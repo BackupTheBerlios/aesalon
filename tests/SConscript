@@ -1,0 +1,13 @@
+sources = Glob("*.c", strings=True) + Glob("*.cpp", strings=True)
+
+Import("env")
+
+env.Append(CPPPATH = ["../../include/", "../../include/monitor/"])
+env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonMonitor"])
+env.Append(LIBS = ["rt"])
+
+for test in sources:
+	targetName = test.split(".")[0]
+	env.Program(target = targetName, source = test)
+	print test
+

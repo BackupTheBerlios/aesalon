@@ -191,7 +191,9 @@ pid_t fork() {
 	*(void **)(&realFork) = dlsym(RTLD_NEXT, "fork");
 	
 	pid_t value = realFork();
-	if(value == 0) AI_CreateSHM();
+	if(value == 0) {
+		AI_CreateSHM();
+	}
 	
 	return value;
 }

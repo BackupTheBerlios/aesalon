@@ -74,7 +74,7 @@ Link *Conductor::newLink(uint32_t size) {
 	
 	/*std::cout << "New process with PID " << pid << " recognized." << std::endl;*/
 	
-	std::cout << "NewLink packet received, name is \"" << name << "\"\n";
+	std::cout << "[monitor] NewLink packet received, name is \"" << name << "\"\n";
 	
 	return new Link(name, size);
 }
@@ -89,7 +89,7 @@ void Conductor::loadModule() {
 void Conductor::handleFork() {
 	pid_t pid;
 	read(m_readFd, &pid, sizeof(pid));
-	std::cout << "Target process forked; new pid is " << pid << " . . .\n";
+	std::cout << "[monitor] Target process forked; new pid is " << pid << " . . .\n";
 	/* TODO: handle process forks properly (spawn off new monitor). */
 }
 

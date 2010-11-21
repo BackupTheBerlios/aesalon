@@ -25,8 +25,6 @@ SharedMemory::SharedMemory(std::string identifier, uint32_t size) : m_identifier
 	if(size == 0 || (size % 4) != 0)
 		throw Common::AssertionException("Size of shared memory must be a nonzero multiple of four.");
 	
-	size = 0x4000;
-	
 	m_fd = shm_open(identifier.c_str(), O_RDWR, 0);
 	
 	m_memory = static_cast<uint8_t *>(mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0));
