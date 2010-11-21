@@ -16,13 +16,13 @@
 #include "common/PacketEncoding.h"
 
 void __attribute__((constructor)) AI_Construct() {
-	printf("**** Constructing Informer . . .\n");
+	printf("[AI] **** Constructing Informer . . .\n");
 	
 	if(InformerData.SharedMemory.data == NULL) AI_CreateSHM();
 }
 
 void __attribute__((destructor)) AI_Destruct() {
-	printf("Destructing Informer . . .\n");
+	printf("[AI] Destructing Informer . . .\n");
 	if(InformerData.SharedMemory.data) {
 		AI_SendPacket(NULL);
 		munmap(InformerData.SharedMemory.data, InformerData.SharedMemory.size);
@@ -41,6 +41,7 @@ void AI_CreateSHM() {
 	if(shmSize == -1) shmSize = AesalonDefaultShmSize;
 	/* Turn the size into kilobytes . . . */
 	InformerData.SharedMemory.size = shmSize * 1024;
+	printf("[AI] Size of SHM is: %i\n", InformerData.SharedMemory.size);
 	
 	InformerData.SharedMemory.fd = shm_open(shmName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 	ftruncate(InformerData.SharedMemory.fd, InformerData.SharedMemory.size);
@@ -85,15 +86,19 @@ InformerData.SharedMemory.header->dataEnd;
 }
 
 void AI_WriteData(void *data, size_t length) {
+	printf("[AI] Writing %lu bytes . . .\n", length);
 	/* If dataStart <= dataEnd, then the used memory is a contigious chunk. */
 	if(InformerData.SharedMemory.header->dataStart <= InformerData.SharedMemory.header->dataEnd) {
 		/* Two possible scenarios: the data fits on the end . . . */
 		if(length < (InformerData.SharedMemory.header->size  - InformerData.SharedMemory.header->dataEnd)) {
+			printf("[AI] Normal case, writing memory in a single chunk.\n");
+			printf("[AI] Offset: %u\n", InformerData.SharedMemory.header->dataEnd);
 			memcpy(InformerData.SharedMemory.data + InformerData.SharedMemory.header->dataEnd, data, length);
 			InformerData.SharedMemory.header->dataEnd += length;
 		}
 		/* And the data does not fit on the end. */
 		else {
+			printf("[AI] Special case, writing memory in two chunks . . .\n");
 			size_t over = length - (InformerData.SharedMemory.header->size - InformerData.SharedMemory.header->dataEnd);
 			size_t under = length - over;
 			
@@ -120,20 +125,20 @@ void AI_SendPacket(Packet *packet) {
 		uint32_t size = sizeof(packet->sourceHash) + sizeof(packet->usedSize) + packet->usedSize;
 		while(AI_RemainingSpace() < size) {
 			InformerData.SharedMemory.header->overflow = 1;
-			printf("**** Overflow!\n");
+			printf("[AI] **** Overflow!\n");
 			sem_wait(&InformerData.SharedMemory.header->overflowSemaphore);
 		}
 		InformerData.SharedMemory.header->overflow = 0;
 		
 		AI_WriteData(&packet->sourceHash, sizeof(packet->sourceHash));
-		printf("Data size: %u\n", packet->usedSize);
+		printf("[AI] Data size: %u\n", packet->usedSize);
 		AI_WriteData(&packet->usedSize, sizeof(packet->usedSize));
 		AI_WriteData(packet->data, packet->usedSize);
 	}
 	sem_post(&InformerData.SharedMemory.header->packetSemaphore);
 	int value;
 	sem_getvalue(&InformerData.SharedMemory.header->packetSemaphore, &value);
-	printf("value of packetSemaphore: %i\n", value);
+	printf("[AI] value of packetSemaphore: %i\n", value);
 	sem_post(&InformerData.SharedMemory.header->sendSemaphore);
 }
 

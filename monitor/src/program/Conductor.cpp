@@ -18,6 +18,7 @@
 #include "common/ConductorPacket.h"
 #include "Coordinator.h"
 #include "common/StringTo.h"
+#include "common/Config.h"
 
 namespace Monitor {
 namespace Program {
@@ -35,6 +36,8 @@ Conductor::~Conductor() {
 void Conductor::monitor() {
 	uint8_t header;
 	uint32_t shmSize = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("informer:shmSize"));
+	if(shmSize == 0) shmSize = AesalonDefaultShmSize;
+	shmSize *= 1024;
 	
 	while(true) {
 		int ret = read(m_readFd, &header, sizeof(header));

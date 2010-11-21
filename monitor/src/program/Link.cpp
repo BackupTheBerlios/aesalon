@@ -50,6 +50,8 @@ void *Link::run(void *voidInstance) {
 		delete packet;
 	}
 	
+	std::cout << "[monitor] **** Link terminating!" << std::endl;
+	
 	delete instance->m_sharedMemory;
 	instance->m_sharedMemory = NULL;
 	

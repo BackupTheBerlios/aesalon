@@ -25,6 +25,8 @@ SharedMemory::SharedMemory(std::string identifier, uint32_t size) : m_identifier
 	if(size == 0 || (size % 4) != 0)
 		throw Common::AssertionException("Size of shared memory must be a nonzero multiple of four.");
 	
+	size = 0x4000;
+	
 	m_fd = shm_open(identifier.c_str(), O_RDWR, 0);
 	
 	m_memory = static_cast<uint8_t *>(mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0));
@@ -45,7 +47,7 @@ void SharedMemory::wait() {
 }
 
 Packet *SharedMemory::readNext() {
-	std::cout << "wait() called . . .\n";
+	std::cout << "[monitor] wait() called . . .\n";
 	wait();
 	/* If the data start is the same as the end, then a NULL packet has been
 		sent -- otherwise known as the termination signal.
@@ -56,11 +58,11 @@ Packet *SharedMemory::readNext() {
 	
 	sem_wait(&m_header->sendSemaphore);
 	
-	std::cout << "Reading packet . . ." << std::endl;
+	std::cout << "[monitor] Reading packet . . ." << std::endl;
 	readData(&packet->sourceHash, sizeof(packet->sourceHash));
-	std::cout << "\tsourceHash: " << std::hex << packet->sourceHash << std::dec << std::endl;
+	std::cout << "[monitor] \tsourceHash: " << std::hex << packet->sourceHash << std::dec << std::endl;
 	readData(&packet->usedSize, sizeof(packet->usedSize));
-	std::cout << "\tusedSize: " << packet->usedSize << std::endl;
+	std::cout << "[monitor] \tusedSize: " << packet->usedSize << std::endl;
 	packet->dataSize = packet->usedSize;
 	packet->data = new uint8_t[packet->dataSize];
 	readData(packet->data, packet->dataSize);
@@ -81,8 +83,10 @@ void SharedMemory::notifyTermination() {
 }
 
 void SharedMemory::readData(void *buffer, size_t size) {
+	std::cout << "[monitor] Reading " << size << " bytes . . .\n";
+	std::cout << "[monitor] \tReading from " << m_header->dataStart << std::endl;
 	if(m_header->dataStart + size >= m_header->size) {
-		std::cout << "Reading overflow data (might blow up . . .)\n";
+		std::cout << "[monitor] Reading overflow data (might blow up . . .)\n";
 		int end_copy_size = (m_header->size - m_header->dataStart);
 		memcpy(buffer, m_memory + m_header->dataStart, end_copy_size);
 		
