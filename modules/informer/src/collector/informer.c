@@ -59,7 +59,7 @@ void AI_CreateSHM() {
 	InformerData.SharedMemory.header->dataOffset =
 		InformerData.SharedMemory.header->dataStart =
 		InformerData.SharedMemory.header->dataEnd =
-			sizeof(SharedMemoryHeader) + 16;
+			SharedMemoryDataOffset;
 	
 	int conductorFd = AI_ConfigurationLong("::conductorFd");
 	
@@ -181,12 +181,13 @@ inline void AI_AppendUint64(Packet *packet, uint64_t value) {
 
 inline void AI_AppendTimestamp(Packet *packet) {
 	uint64_t value = AI_Timestamp();
-	memcpy(packet->data + packet->usedSize, &value, sizeof(value));
+	packet->data[packet->usedSize] = PE_Timestamp;
+	memcpy(packet->data + packet->usedSize + 1, &value, sizeof(value));
 	packet->usedSize += sizeof(value) + 1;
 }
 
 pid_t fork() {
-	pid_t (*realFork)();
+	pid_t (*realFork)() = NULL;
 	
 	*(void **)(&realFork) = dlsym(RTLD_NEXT, "fork");
 	

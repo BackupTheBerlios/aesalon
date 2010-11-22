@@ -16,6 +16,7 @@
 #include <list>
 
 #include "Link.h"
+#include "module/List.h"
 
 namespace Monitor {
 namespace Program {
@@ -24,6 +25,7 @@ class Conductor {
 private:
 	int m_readFd;
 	std::list<Link *> m_linkList;
+	Module::List *m_moduleList;
 public:
 	Conductor(int readFd);
 	~Conductor();

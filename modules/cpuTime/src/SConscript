@@ -5,5 +5,5 @@ env.Append(CCFLAGS = ["-W", "-Wall", "-DAesalonCollector"])
 env.Append(LIBS = ["rt"])
 
 env.SharedLibrary(target="collector", source=Glob("collector/*.c"))
-env.SharedLibrary(target="monitor", source=Glob("monitor/*.cpp"))
+env.SharedLibrary(target="polisher", source=Glob("polisher/*.cpp"))
 

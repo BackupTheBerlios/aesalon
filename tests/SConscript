@@ -9,5 +9,3 @@ env.Append(LIBS = ["rt"])
 for test in sources:
 	targetName = test.split(".")[0]
 	env.Program(target = targetName, source = test)
-	print test
-

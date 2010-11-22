@@ -24,13 +24,14 @@ namespace Monitor {
 namespace Program {
 
 Conductor::Conductor(int readFd) : m_readFd(readFd) {
-	
+	m_moduleList = new Module::List();
 }
 
 Conductor::~Conductor() {
 	for(std::list<Link *>::iterator i = m_linkList.begin(); i != m_linkList.end(); ++ i) {
 		delete (*i);
 	}
+	delete m_moduleList;
 }
 
 void Conductor::monitor() {
@@ -76,7 +77,7 @@ Link *Conductor::newLink(uint32_t size) {
 	
 	std::cout << "[monitor] NewLink packet received, name is \"" << name << "\"\n";
 	
-	return new Link(name, size);
+	return new Link(name, size, m_moduleList);
 }
 
 void Conductor::loadModule() {
@@ -84,6 +85,10 @@ void Conductor::loadModule() {
 	read(m_readFd, &length, sizeof(length));
 	char name[256];
 	read(m_readFd, name, length);
+	/*std::cout << "asked to load module \"" << name << "\"\n";*/
+	Module::Module *module = new Module::Module(name);
+	
+	m_moduleList->addModule(module);
 }
 
 void Conductor::handleFork() {

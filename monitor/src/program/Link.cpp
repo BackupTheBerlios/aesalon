@@ -16,7 +16,9 @@
 namespace Monitor {
 namespace Program {
 
-Link::Link(std::string name, uint32_t size) : m_sharedMemory(NULL) {
+Link::Link(std::string name, uint32_t size, Module::List *moduleList)
+	: m_sharedMemory(NULL), m_moduleList(moduleList) {
+	
 	m_sharedMemory = new SharedMemory(name, size);
 }
 

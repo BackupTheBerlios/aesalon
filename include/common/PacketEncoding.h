@@ -21,7 +21,8 @@ enum Encodings {
 	PE_Uint16 = 0x02,
 	PE_Uint32 = 0x03,
 	PE_Uint64 = 0x04,
-	PE_String = 0x05
+	PE_Timestamp = 0x05,
+	PE_String = 0x06
 };
 
 #if 0

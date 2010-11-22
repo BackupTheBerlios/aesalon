@@ -17,6 +17,7 @@
 #include "SharedMemory.h"
 
 #include "common/Packet.h"
+#include "module/List.h"
 
 namespace Monitor {
 namespace Program {
@@ -25,8 +26,9 @@ class Link {
 private:
 	SharedMemory *m_sharedMemory;
 	pthread_t m_threadID;
+	Module::List *m_moduleList;
 public:
-	Link(std::string name, uint32_t size);
+	Link(std::string name, uint32_t size, Module::List *moduleList);
 	~Link();
 	
 	SharedMemory *sharedMemory() const { return m_sharedMemory; }

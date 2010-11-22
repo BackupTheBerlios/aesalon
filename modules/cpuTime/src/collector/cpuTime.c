@@ -8,9 +8,10 @@
 #include <sys/resource.h>
 #include <sys/timerfd.h>
 #include <pthread.h>
+#include <string.h>
 
 #include "informer/Informer.h"
-#include "common/PacketEncoding.h"
+#include "common/ConductorPacket.h"
 
 int isRunning = 0;
 int timerFd;
@@ -65,7 +66,15 @@ void __attribute__((constructor)) AM_Construct() {
 	timerfd_settime(timerFd, 0, &its, NULL);
 	
 	pthread_create(&threadID, NULL, sendTime, NULL);
-
+	
+	int conductorFd = AI_ConfigurationLong("::conductorFd");
+	
+	uint8_t header = ConductorPacket_ModuleLoaded;
+	
+	write(conductorFd, &header, sizeof(header));
+	uint16_t length = strlen("cpuTime") + 1;
+	write(conductorFd, &length, sizeof(length));
+	write(conductorFd, "cpuTime", length);
 }
 
 void __attribute__((destructor)) AM_Destruct() {
