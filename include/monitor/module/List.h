@@ -28,6 +28,7 @@ public:
 	~List();
 	
 	void addModule(Module *module);
+	Module *module(ModuleID id);
 };
 
 } // namespace Module

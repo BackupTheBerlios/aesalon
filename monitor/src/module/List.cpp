@@ -15,7 +15,7 @@ namespace Monitor {
 namespace Module {
 
 List::List() {
-	
+	m_moduleList.push_back(NULL);
 }
 
 List::~List() {
@@ -24,6 +24,11 @@ List::~List() {
 
 void List::addModule(Module *module) {
 	m_moduleList.push_back(module);
+}
+
+Module *List::module(ModuleID id) {
+	if(id > m_moduleList.size()) return NULL;
+	return m_moduleList[id];
 }
 
 } // namespace Module
