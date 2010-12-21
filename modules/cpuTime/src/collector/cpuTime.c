@@ -42,6 +42,10 @@ static void *sendTime(void *unused) {
 }
 
 void __attribute__((constructor)) AM_Construct() {
+#ifndef TFD_CLOEXEC
+	#error "TFD_CLOEXEC must be defined; this is a Linux-specific feature available in 2.6.27 and later."
+#endif
+
 	/* NOTE: TFD_CLOEXEC was introduced in Linux 2.6.27; timerfd_create() is Linux-specific. */
 	if((timerFd = timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC)) == -1) {
 		printf("Failed to create timer . . .\n");
