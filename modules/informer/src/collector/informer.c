@@ -1,3 +1,5 @@
+#define AC_INFORMER
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -15,19 +17,24 @@
 #include "common/ConductorPacket.h"
 #include "common/PacketEncoding.h"
 
+static InformerData AI_InformerData;
+
 void __attribute__((constructor)) AI_Construct() {
 	printf("[AI] **** Constructing Informer . . .\n");
 	
-	if(InformerData.SharedMemory.data == NULL) AI_CreateSHM();
+	pid_t pid = getpid();
+	
+	uint32_t pathHash = 0;
+	
+	/* TODO: use CRC32 for this. */
+	
+	
+	
+	AI_InformerData.processID = pathHash ^ pid;
 }
 
 void __attribute__((destructor)) AI_Destruct() {
 	printf("[AI] Destructing Informer . . .\n");
-	if(InformerData.SharedMemory.data) {
-		AI_SendPacket(NULL);
-		munmap(InformerData.SharedMemory.data, InformerData.SharedMemory.size);
-		InformerData.SharedMemory.data = NULL, InformerData.SharedMemory.size = 0;
-	}
 }
 
 void AI_CreateSHM() {
@@ -171,30 +178,4 @@ long AI_ConfigurationLong(const char *name) {
 int AI_ConfigurationBool(const char *name) {
 	const char *s = AI_ConfigurationString(name);
 	return s == NULL || s[0] == 0 || !strcmp(s, "false");
-}
-
-inline void AI_AppendUint64(Packet *packet, uint64_t value) {
-	packet->data[packet->usedSize] = PE_Uint64;
-	memcpy(packet->data + packet->usedSize + 1, &value, sizeof(value));
-	packet->usedSize += sizeof(value) + 1;
-}
-
-inline void AI_AppendTimestamp(Packet *packet) {
-	uint64_t value = AI_Timestamp();
-	packet->data[packet->usedSize] = PE_Timestamp;
-	memcpy(packet->data + packet->usedSize + 1, &value, sizeof(value));
-	packet->usedSize += sizeof(value) + 1;
-}
-
-pid_t fork() {
-	pid_t (*realFork)() = NULL;
-	
-	*(void **)(&realFork) = dlsym(RTLD_NEXT, "fork");
-	
-	pid_t value = realFork();
-	if(value == 0) {
-		AI_CreateSHM();
-	}
-	
-	return value;
 }

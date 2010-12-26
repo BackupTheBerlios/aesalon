@@ -33,10 +33,10 @@ static void *sendTime(void *unused) {
 		getrusage(RUSAGE_SELF, &ru);
 		
 		uint64_t value = (ru.ru_utime.tv_sec * 1000000000) + (ru.ru_utime.tv_usec * 1000);
-		AI_AppendTimestamp(&packet);
+		/*AI_AppendTimestamp(&packet);
 		AI_AppendUint64(&packet, value);
 		
-		AI_SendPacket(&packet);
+		AI_SendPacket(&packet);*/
 	}
 	return NULL;
 }
