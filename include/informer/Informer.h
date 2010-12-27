@@ -17,6 +17,7 @@
 
 #include "common/SharedMemoryHeader.h"
 #include "common/Packet.h"
+#include "common/Config.h"
 
 #ifdef __GNUC__
 	#pragma GCC visibility push(hidden)
@@ -26,6 +27,30 @@
 	#error "No supported compiler found."
 #endif
 
+typedef enum {
+	PER_PROCESS,
+	PER_THREAD
+} LinkPropagationMode;
+
+//#ifdef AC_INFORMER
+
+struct Module_t {
+	const char *name;
+	LinkPropagationMode linkMode;
+};
+
+struct SMS_t {
+	int fd;
+	uint8_t *data;
+	uint32_t size;
+	
+	uint64_t smsID;
+	
+	SharedMemoryHeader *header;
+};
+
+//#endif
+
 /** Constructor for the Informer module. Should be called from every module constructor.
 */
 void __attribute__((constructor)) AC_EXPORT AI_Construct();
@@ -34,9 +59,11 @@ void __attribute__((constructor)) AC_EXPORT AI_Construct();
 void __attribute__((destructor)) AC_EXPORT AI_Destruct();
 
 #ifdef AC_INFORMER
-/** Interally-used function; creates a shared memory block.
+/** Interally-used function; creates a shared memory segment.
+	@param id The ID# of the SMS.
+	@param size The size, in kilobytes, of the SMS.
 */
-void AC_PRIVATE AI_CreateSHM();
+struct SMS_t AC_PRIVATE *AI_CreateSMS(uint64_t id, uint32_t size);
 #endif
 
 /** Sends a packet to the montor via a shared memory segment.
@@ -58,49 +85,33 @@ long AC_EXPORT AI_ConfigurationLong(const char *name);
 */
 int AC_EXPORT AI_ConfigurationBool(const char *name);
 
+pthread_t AC_EXPORT *AI_TargetThreadList(int *size);
+
 /** Returns 1 if data should be collected, 0 otherwise.
 */
 short AC_EXPORT AI_CollectionStatus();
 
-/** Stops collection for the current thread ID.
+/** Stops collection for the given thread ID.
 */
-void AC_PRIVATE AI_StopCollection();
+void AC_PRIVATE AI_StopCollection(pthread_t tid);
 /** Continues collection for the current thread ID.
 */
-void AC_PRIVATE AI_ContinueCollection();
+void AC_PRIVATE AI_ContinueCollection(pthread_t tid);
 
 //#ifdef AC_INFORMER
-
-struct SMS {
-	int fd;
-	uint8_t *data;
-	uint32_t size;
-	
-	uint32_t smsID;
-	
-	SharedMemoryHeader *header;
-};
-
-struct ThreadListItem {
-	pthread_t threadID;
-	ThreadListItem *next;
-};
-
-struct SMSListItem {
-	SMS *sms;
-	SMSListItem *next;
-};
 
 struct InformerData {
 	uint32_t processID;
 	
-	SMSListItem *smsList;
-	int smsListSize;
+	struct SMS_t smsList[AesalonInformerSMSListSize];
 	
-	ThreadListItem *threadList;
+	pthread_t monitorThreadList[AesalonInformerMonitorThreadListSize];
+	int monitorThreadListSize;
+	
+	pthread_t threadList[AesalonInformerThreadListSize];
 	int threadListSize;
 	
-	
+	int initialized;
 };
 
 //#endif

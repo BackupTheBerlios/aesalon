@@ -49,6 +49,9 @@ int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
 		else if(std::strcmp(argv[arg], "--help") == 0) {
 			vault->set("::help", "true");
 		}
+		else if(std::strcmp(argv[arg], "--version") == 0) {
+			vault->set("::version", "true");
+		}
 		else if(std::strcmp(argv[arg], "--list-attributes") == 0) {
 			vault->set("::list-attributes", "true");
 		}

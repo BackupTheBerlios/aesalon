@@ -4,5 +4,8 @@
 	"localConfig": ".aesalon.conf",
 	"userConfig": "~/.config/aesalon/aesalon.conf",
 	"globalConfig": "/etc/aesalon/aesalon.conf",
-	"defaultShmSize": 64
+	"defaultShmSize": 64,
+	"smsListSize": 256,
+	"threadListSize": 256,
+	"monitorThreadListSize": 32
 }

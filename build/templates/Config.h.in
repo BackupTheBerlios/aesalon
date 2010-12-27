@@ -23,4 +23,8 @@
 
 #define AesalonDefaultShmSize %(defaultShmSize)s
 
+#define AesalonInformerSMSListSize %(smsListSize)s
+#define AesalonInformerMonitorThreadListSize %(monitorThreadListSize)s
+#define AesalonInformerThreadListSize %(threadListSize)s
+
 #endif
