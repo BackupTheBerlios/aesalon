@@ -1,5 +1,3 @@
-#define AC_INFORMER
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,7 +15,56 @@
 #include "common/ConductorPacket.h"
 #include "common/PacketEncoding.h"
 
-static struct InformerData AI_InformerData;
+struct Module_t {
+	const char *name;
+	LinkPropagationMode linkMode;
+};
+
+struct SMS_t {
+	int fd;
+	uint8_t *data;
+	uint32_t size;
+	
+	/** The SMS ID is an XOR of pthread_self() and the process identifier.
+		(use 0 for pthread_self() for non-thread-specific SMSes).
+	*/
+	uint64_t smsID;
+	
+	SharedMemoryHeader *header;
+};
+
+struct InformerData_t {
+	uint64_t processID;
+	
+	struct SMS_t smsList[AesalonInformerSMSListSize];
+	int smsListSize;
+	
+	pthread_t monitorThreadList[AesalonInformerMonitorThreadListSize];
+	int monitorThreadListSize;
+	
+	pthread_t threadList[AesalonInformerThreadListSize];
+	int threadListSize;
+	
+	int initialized;
+};
+
+
+static struct InformerData_t AI_InformerData;
+
+/** Interally-used function; creates a shared memory segment.
+	@param id The ID# of the SMS.
+	@param size The size, in kilobytes, of the SMS.
+	@return A pointer to the new SMS instance.
+*/
+static struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size);
+
+/** Internally-used function; retrieves a SMS_t instance given its ID.
+	@param id The ID of the SMS to retrieve.
+	@return A pointer to the MS instance, or NULL if it was not found.
+*/
+static struct SMS_t *AI_GetSMS(uint64_t id);
+
+/* ------------------------------------------------------------------ */
 
 void __attribute__((constructor)) AI_Construct() {
 	/* By default, .initialized will be set to 0 (AI_InformerData is a global). */
@@ -91,7 +138,7 @@ struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size) {
 
 struct SMS_t *AI_GetSMS(uint64_t id) {
 	int centre = AI_InformerData.smsListSize / 2;
-	int size = AI_InformerData.smsListSize / 2;
+	int size = AI_InformerData.smsListSize / 4;
 	
 	while(size) {
 		if(id == AI_InformerData.smsList[centre]) return &AI_InformerData.smsList[centre];

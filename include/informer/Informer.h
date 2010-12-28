@@ -32,44 +32,12 @@ typedef enum {
 	PER_THREAD
 } LinkPropagationMode;
 
-//#ifdef AC_INFORMER
-
-struct Module_t {
-	const char *name;
-	LinkPropagationMode linkMode;
-};
-
-struct SMS_t {
-	int fd;
-	uint8_t *data;
-	uint32_t size;
-	
-	/** The SMS ID is an XOR of pthread_self() and the process identifier.
-		(use 0 for pthread_self() for non-thread-specific SMSes).
-	*/
-	uint64_t smsID;
-	
-	SharedMemoryHeader *header;
-};
-
-//#endif
-
 /** Constructor for the Informer module. Should be called from every module constructor.
 */
 void __attribute__((constructor)) AC_EXPORT AI_Construct();
 /** Destructor for the Informer module. Should be called from every module destructor.
 */
 void __attribute__((destructor)) AC_EXPORT AI_Destruct();
-
-#ifdef AC_INFORMER
-/** Interally-used function; creates a shared memory segment.
-	@param id The ID# of the SMS.
-	@param size The size, in kilobytes, of the SMS.
-*/
-struct SMS_t AC_PRIVATE *AI_CreateSMS(uint64_t id, uint32_t size);
-
-struct SMS_t AC_PRIVATE *AI_GetSMS(uint64_t id);
-#endif
 
 /** Sends a packet to the montor via a shared memory segment.
 	@note If @a packet is NULL, then the corresponding link will terminate.
@@ -95,32 +63,6 @@ pthread_t AC_EXPORT *AI_TargetThreadList(int *size);
 /** Returns 1 if data should be collected, 0 otherwise.
 */
 short AC_EXPORT AI_CollectionStatus();
-
-/** Stops collection for the given thread ID.
-*/
-void AC_PRIVATE AI_StopCollection(pthread_t tid);
-/** Continues collection for the current thread ID.
-*/
-void AC_PRIVATE AI_ContinueCollection(pthread_t tid);
-
-//#ifdef AC_INFORMER
-
-struct InformerData {
-	uint64_t processID;
-	
-	struct SMS_t smsList[AesalonInformerSMSListSize];
-	int smsListSize;
-	
-	pthread_t monitorThreadList[AesalonInformerMonitorThreadListSize];
-	int monitorThreadListSize;
-	
-	pthread_t threadList[AesalonInformerThreadListSize];
-	int threadListSize;
-	
-	int initialized;
-};
-
-//#endif
 
 #ifdef __GNUC__
 	#pragma GCC visibility pop
