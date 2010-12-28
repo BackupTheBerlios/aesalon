@@ -18,6 +18,7 @@
 struct Module_t {
 	const char *name;
 	LinkPropagationMode linkMode;
+	uint16_t moduleID;
 };
 
 struct SMS_t {
@@ -35,6 +36,9 @@ struct SMS_t {
 
 struct InformerData_t {
 	uint64_t processID;
+	
+	struct Module_t moduleList[AesalonInformerModuleListSize];
+	int moduleListSize;
 	
 	struct SMS_t smsList[AesalonInformerSMSListSize];
 	int smsListSize;
@@ -64,6 +68,8 @@ static struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size);
 */
 static struct SMS_t *AI_GetSMS(uint64_t id);
 
+static int AI_CompareSMS(const void *key, const void *object);
+
 /* ------------------------------------------------------------------ */
 
 void __attribute__((constructor)) AI_Construct() {
@@ -76,21 +82,44 @@ void __attribute__((constructor)) AI_Construct() {
 	memset(AI_InformerData.smsList, 0, sizeof(struct SMS_t)*AesalonInformerSMSListSize);
 	memset(AI_InformerData.threadList, 0, sizeof(pthread_t)*AesalonInformerThreadListSize);
 	
+	AI_StopCollection(pthread_self());
+	
 	pid_t pid = getpid();
 	
-	uint32_t pathHash = 0;
+	char filename[1024];
 	
-	/* TODO: use CRC32 for this. */
+	int fd = open("/proc/self/cmdline", O_RDONLY);
+	
+	read(fd, filename, sizeof(filename));
+	
+	close(fd);
+	
+	/* String hashing algorithm: djb2. */
+	
+	uint64_t pathHash = 0;
+	int c = 0;
+	char *p = filename;
+	while((c = (*p++))) {
+		pathHash = c + (pathHash << 6) + (pathHash << 16) - pathHash;
+	}
+	
+	printf("Path hash: %lx\n", pathHash);
+	
+	pathHash &= ~0xffff;
 	
 	AI_InformerData.processID = pathHash ^ pid;
+	
+	AI_CreateSMS(AI_InformerData.processID, 4);
+	
+	AI_ContinueCollection(pthread_self());
 }
 
 void __attribute__((destructor)) AI_Destruct() {
 	printf("[AI] Destructing Informer . . .\n");
 }
 
-struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size) {
-	char shmName[256] = {0};
+static struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size) {
+	char smsName[256] = {0};
 	int i = 0;
 	
 	if(AI_InformerData.smsListSize == AesalonInformerSMSListSize) {
@@ -98,7 +127,7 @@ struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size) {
 		return NULL;
 	}
 	
-	sprintf(shmName, "/AI-%lx", id);
+	sprintf(smsName, "/AI-%lx", id);
 	
 	struct SMS_t *sms = NULL;
 	
@@ -118,7 +147,7 @@ struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size) {
 	
 	printf("[AI] Size of SMS is: %i\n", size);
 	
-	sms->fd = shm_open(shmName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+	sms->fd = shm_open(smsName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 	ftruncate(sms->fd, size);
 	sms->data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, sms->fd, 0);
 	
@@ -136,21 +165,16 @@ struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size) {
 	return sms;
 }
 
-struct SMS_t *AI_GetSMS(uint64_t id) {
-	int centre = AI_InformerData.smsListSize / 2;
-	int size = AI_InformerData.smsListSize / 4;
-	
-	while(size) {
-		if(id == AI_InformerData.smsList[centre]) return &AI_InformerData.smsList[centre];
-		
-		if(id > AI_InformerData.smsList[centre]) centre += size;
-		else if(id < AI_InformerData.smsList[centre]) centre -= size;
-		
-		size /= 2;
-	}
-	
-	if(AI_InformerData.smsList[centre] == id) return &AI_InformerData.smsList[centre];
-	return NULL;
+static struct SMS_t *AI_GetSMS(uint64_t id) {
+	return bsearch(&id, AI_InformerData.smsList, AI_InformerData.smsListSize, sizeof(struct SMS_t *), AI_CompareSMS);
+}
+
+static int AI_CompareSMS(const void *key, const void *voidObject) {
+	uint64_t id = *(uint64_t *)key;
+	struct SMS_t *object = (struct SMS_t *)voidObject;
+	if(id < object->smsID) return -1;
+	else if(id > object->smsID) return 1;
+	return 0;
 }
 
 uint32_t AI_RemainingSpace(struct SMS_t *sms) {

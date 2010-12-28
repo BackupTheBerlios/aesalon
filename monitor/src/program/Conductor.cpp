@@ -36,8 +36,8 @@ Conductor::~Conductor() {
 
 void Conductor::monitor() {
 	uint8_t header;
-	uint32_t shmSize = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("informer:shmSize"));
-	if(shmSize == 0) shmSize = AesalonDefaultShmSize;
+	uint32_t shmSize = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("informer:smsSize"));
+	if(shmSize == 0) shmSize = AesalonDefaultSMSSize;
 	shmSize *= 1024;
 	
 	while(true) {

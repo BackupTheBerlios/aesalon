@@ -1,11 +1,27 @@
+# Build configuration file for Aesalon.
+
 {
+	# The version of Aesalon.
 	"version": "0.3.9.1",
+	
+	# The name of the module configuration file in the module root.
 	"moduleConfigFileName": "module.conf",
+	# The path of the local configuration file.
 	"localConfig": ".aesalon.conf",
+	# The path of the user-wide configuration file.
 	"userConfig": "~/.config/aesalon/aesalon.conf",
+	# The path of the system-wide configuration file.
 	"globalConfig": "/etc/aesalon/aesalon.conf",
-	"defaultShmSize": 64,
+	
+	# The default size of an SMS.
+	"defaultSMSSize": 64,
+	
+	# The maximum number of SMSes the Informer can open.
 	"smsListSize": 256,
+	# The maximum number of threads the Informer can track.
 	"threadListSize": 256,
-	"monitorThreadListSize": 32
+	# The maximum number of threads that can be created by the monitoring modules.
+	"monitorThreadListSize": 32,
+	# The maximum number of modules that can be loaded at any given time.
+	"moduleListSize": 16,
 }

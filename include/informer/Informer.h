@@ -64,6 +64,10 @@ pthread_t AC_EXPORT *AI_TargetThreadList(int *size);
 */
 short AC_EXPORT AI_CollectionStatus();
 
+void AI_StopCollection(pthread_t tid);
+
+void AI_ContinueCollection(pthread_t tid);
+
 #ifdef __GNUC__
 	#pragma GCC visibility pop
 #else
