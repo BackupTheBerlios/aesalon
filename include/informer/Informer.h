@@ -44,6 +44,9 @@ struct SMS_t {
 	uint8_t *data;
 	uint32_t size;
 	
+	/** The SMS ID is an XOR of pthread_self() and the process identifier.
+		(use 0 for pthread_self() for non-thread-specific SMSes).
+	*/
 	uint64_t smsID;
 	
 	SharedMemoryHeader *header;
@@ -64,6 +67,8 @@ void __attribute__((destructor)) AC_EXPORT AI_Destruct();
 	@param size The size, in kilobytes, of the SMS.
 */
 struct SMS_t AC_PRIVATE *AI_CreateSMS(uint64_t id, uint32_t size);
+
+struct SMS_t AC_PRIVATE *AI_GetSMS(uint64_t id);
 #endif
 
 /** Sends a packet to the montor via a shared memory segment.
@@ -101,9 +106,10 @@ void AC_PRIVATE AI_ContinueCollection(pthread_t tid);
 //#ifdef AC_INFORMER
 
 struct InformerData {
-	uint32_t processID;
+	uint64_t processID;
 	
 	struct SMS_t smsList[AesalonInformerSMSListSize];
+	int smsListSize;
 	
 	pthread_t monitorThreadList[AesalonInformerMonitorThreadListSize];
 	int monitorThreadListSize;

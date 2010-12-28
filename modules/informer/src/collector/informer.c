@@ -33,10 +33,7 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	uint32_t pathHash = 0;
 	
-	
-	
 	/* TODO: use CRC32 for this. */
-	
 	
 	AI_InformerData.processID = pathHash ^ pid;
 }
@@ -49,19 +46,24 @@ struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size) {
 	char shmName[256] = {0};
 	int i = 0;
 	
+	if(AI_InformerData.smsListSize == AesalonInformerSMSListSize) {
+		fprintf(stderr, "Cannot create SMS: SMS list size exceeded.\n");
+		return NULL;
+	}
+	
 	sprintf(shmName, "/AI-%lx", id);
 	
 	struct SMS_t *sms = NULL;
 	
-	for(; i < AesalonInformerSMSListSize; i ++) {
-		sms = &AI_InformerData.smsList[i];
-		if(sms->smsID == 0) break;
+	for(; i < AI_InformerData.smsListSize; i ++) {
+		if(AI_InformerData.smsList[i].smsID > id) break;
 	}
 	
-	if(i == AesalonInformerSMSListSize) {
-		fprintf(stderr, "Cannot create SMS: SMS list size exceeded.\n");
-		return NULL;
+	if(i != AI_InformerData.smsListSize) {
+		memmove(&AI_InformerData.smsList[i+1], &AI_InformerData.smsList[i],
+			sizeof(struct SMS_t)*(AI_InformerData.smsListSize-i));
 	}
+	sms = &AI_InformerData.smsList[i];
 	
 	size *= 1024;
 	
@@ -85,6 +87,23 @@ struct SMS_t *AI_CreateSMS(uint64_t id, uint32_t size) {
 			SharedMemoryDataOffset;
 	
 	return sms;
+}
+
+struct SMS_t *AI_GetSMS(uint64_t id) {
+	int centre = AI_InformerData.smsListSize / 2;
+	int size = AI_InformerData.smsListSize / 2;
+	
+	while(size) {
+		if(id == AI_InformerData.smsList[centre]) return &AI_InformerData.smsList[centre];
+		
+		if(id > AI_InformerData.smsList[centre]) centre += size;
+		else if(id < AI_InformerData.smsList[centre]) centre -= size;
+		
+		size /= 2;
+	}
+	
+	if(AI_InformerData.smsList[centre] == id) return &AI_InformerData.smsList[centre];
+	return NULL;
 }
 
 uint32_t AI_RemainingSpace(struct SMS_t *sms) {
@@ -227,3 +246,4 @@ void AI_ContinueCollection(pthread_t tid) {
 		i ++;
 	}
 }
+
