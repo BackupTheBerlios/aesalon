@@ -23,79 +23,40 @@
 namespace Monitor {
 namespace Program {
 
-Conductor::Conductor(int readFd) : m_readFd(readFd) {
-	m_moduleList = new Module::List();
+Conductor::Conductor() {
+	sem_init(&m_targetSemaphore, 0, 0);
 }
 
 Conductor::~Conductor() {
-	for(std::list<Link *>::iterator i = m_linkList.begin(); i != m_linkList.end(); ++ i) {
-		delete (*i);
+	
+}
+
+void Conductor::addTarget(pid_t targetPid) {
+	std::cout << "Adding " << targetPid << " as target PID . . ." << std::endl;
+	TargetProcess *tp = new TargetProcess(this, targetPid);
+	
+	m_targetList.push_back(tp);
+	
+	tp->startMonitoring();
+}
+
+void Conductor::removeTarget(TargetProcess *targetProcess) {
+	m_targetList.remove(targetProcess);
+	if(m_targetList.size() == 0) sem_post(&m_targetSemaphore);
+}	
+
+void Conductor::run() {
+	sem_wait(&m_targetSemaphore);
+	std::cout << "exiting Conductor::run() . . ." << std::endl;
+}
+
+pid_t Conductor::createDaemon() {
+	pid_t childPid = fork();
+	
+	if(childPid == -1) {
+		/* TODO: print error or do something. */
 	}
-	delete m_moduleList;
-}
-
-void Conductor::monitor() {
-	uint8_t header;
-	uint32_t shmSize = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("informer:smsSize"));
-	if(shmSize == 0) shmSize = AesalonDefaultSMSSize;
-	shmSize *= 1024;
-	
-	while(true) {
-		int ret = read(m_readFd, &header, sizeof(header));
-		/* If ret == 0, then EOF was reached. */
-		if(ret == 0) break;
-		/* If the read was interrupted by a signal, continue. */
-		else if(ret == -1 && errno == EINTR) continue;
-		
-		if(header == ConductorPacket_NewSHM) {
-			Link *link = newLink(shmSize);
-			m_linkList.push_back(link);
-			link->listen();
-		}
-		else if(header == ConductorPacket_ModuleLoaded) {
-			loadModule();
-		}
-		else if(header == ConductorPacket_Fork) {
-			handleFork();
-		}
-	}
-}
-
-void Conductor::join() {
-	for(std::list<Link *>::iterator i = m_linkList.begin(); i != m_linkList.end(); ++ i) {
-		(*i)->terminate();
-	}
-}
-
-Link *Conductor::newLink(uint32_t size) {
-	uint16_t length;
-	read(m_readFd, &length, sizeof(length));
-	char name[256];
-	read(m_readFd, name, length);
-	
-	/*std::cout << "New process with PID " << pid << " recognized." << std::endl;*/
-	
-	std::cout << "[monitor] NewLink packet received, name is \"" << name << "\"\n";
-	
-	return new Link(name, size, m_moduleList);
-}
-
-void Conductor::loadModule() {
-	uint16_t length;
-	read(m_readFd, &length, sizeof(length));
-	char name[256];
-	read(m_readFd, name, length);
-	/*std::cout << "asked to load module \"" << name << "\"\n";*/
-	Module::Module *module = new Module::Module(name);
-	
-	m_moduleList->addModule(module);
-}
-
-void Conductor::handleFork() {
-	pid_t pid;
-	read(m_readFd, &pid, sizeof(pid));
-	std::cout << "[monitor] Target process forked; new pid is " << pid << " . . .\n";
-	/* TODO: handle process forks properly (spawn off new monitor). */
+	return childPid;
 }
 
 } // namespace Program

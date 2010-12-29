@@ -14,30 +14,29 @@
 
 #include <stdint.h>
 #include <list>
+#include <semaphore.h>
 
 #include "Link.h"
 #include "module/List.h"
+#include "TargetProcess.h"
 
 namespace Monitor {
 namespace Program {
 
 class Conductor {
 private:
-	int m_readFd;
-	std::list<Link *> m_linkList;
-	Module::List *m_moduleList;
+	typedef std::list<TargetProcess *> TargetList;
+	TargetList m_targetList;
+	sem_t m_targetSemaphore;
 public:
-	Conductor(int readFd);
+	Conductor();
 	~Conductor();
 	
-	void monitor();
+	void addTarget(pid_t targetPid);
+	void removeTarget(TargetProcess *targetProcess);
+	void run();
 	
-	void join();
-private:
-	static void *run(void *voidInstance);
-	Link *newLink(uint32_t size);
-	void loadModule();
-	void handleFork();
+	pid_t createDaemon();
 };
 
 } // namespace Program

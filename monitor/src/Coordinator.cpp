@@ -57,13 +57,17 @@ void Coordinator::run() {
 	
 	Program::Launcher launcher(&m_argv[m_argcOffset]);
 	
-	launcher.forkTarget();
+	pid_t targetPid = launcher.forkTarget();
 	
-	Program::Conductor conductor(launcher.readFd());
-	conductor.monitor();
-	
-	launcher.waitForChild();
-	conductor.join();
+	Program::Conductor conductor;
+	pid_t conductorPid = conductor.createDaemon();
+	if(conductorPid == 0) {
+		conductor.addTarget(targetPid);
+		conductor.run();
+	}
+	else {
+		launcher.waitForChild();
+	}
 }
 
 void Coordinator::parseConfigs() {

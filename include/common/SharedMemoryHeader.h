@@ -18,6 +18,7 @@
 typedef struct {
 	uint32_t size;
 	sem_t packetSemaphore;
+	
 	uint8_t overflow;
 	sem_t overflowSemaphore;
 	

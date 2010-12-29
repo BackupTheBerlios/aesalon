@@ -22,6 +22,7 @@
 #define AesalonGlobalConfig "%(globalConfig)s"
 
 #define AesalonDefaultSMSSize %(defaultSMSSize)s
+#define AesalonControlSMSSize %(controlSMSSize)s
 
 #define AesalonInformerSMSListSize %(smsListSize)s
 #define AesalonInformerMonitorThreadListSize %(monitorThreadListSize)s
