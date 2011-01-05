@@ -27,11 +27,6 @@
 	#error "No supported compiler found."
 #endif
 
-typedef enum {
-	PER_PROCESS,
-	PER_THREAD
-} LinkPropagationMode;
-
 /** Constructor for the Informer module. Should be called from every module constructor.
 */
 void __attribute__((constructor)) AC_EXPORT AI_Construct();
@@ -39,10 +34,9 @@ void __attribute__((constructor)) AC_EXPORT AI_Construct();
 */
 void __attribute__((destructor)) AC_EXPORT AI_Destruct();
 
-/** Sends a packet to the montor via a shared memory segment.
-	@note If @a packet is NULL, then the corresponding link will terminate.
-*/
-void AC_EXPORT AI_SendPacket(Packet *packet);
+void AC_EXPORT AI_StartPacket(ModuleID moduleID);
+void AC_EXPORT *AI_PacketSpace(uint32_t size);
+void AC_EXPORT AI_EndPacket();
 
 /** Calculates a unique timestamp for the current instant.
 */

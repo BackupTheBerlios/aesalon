@@ -15,20 +15,28 @@
 #include <stdint.h>
 #include <semaphore.h>
 
-typedef struct {
-	uint32_t size;
+typedef struct SharedMemoryHeader_t SharedMemoryHeader_t;
+struct SharedMemoryHeader_t {
+	/** Overall size of SHM in pages. */
+	uint32_t shmSize;
+	
+	/** The size of the configuration data (in bytes). */
+	uint32_t configDataSize;
+	
+	/** The number of pages to use to store zone usage data in. */
+	uint32_t zoneUsagePages;
+	
+	/** The page offset that zones are created starting at. */
+	uint32_t zonePageOffset;
+	
+	/** The size of a zone, in pages. */
+	uint32_t zoneSize;
+	
+	/** The number of zones currently in use. */
+	uint32_t zoneCount;
+	
+	/** Packet semaphore: incremented when a packet is available for reading. */
 	sem_t packetSemaphore;
-	
-	uint8_t overflow;
-	sem_t overflowSemaphore;
-	
-	uint32_t dataOffset;
-	uint32_t dataStart;
-	uint32_t dataEnd;
-	sem_t sendSemaphore;
-	sem_t readSemaphore;
-} SharedMemoryHeader;
-
-#define SharedMemoryDataOffset (sizeof(SharedMemoryHeader) + 16)
+};
 
 #endif
