@@ -34,7 +34,7 @@ public:
 	
 	void join();
 private:
-	void *run(void *voidInstance);
+	static void *run(void *voidInstance);
 };
 
 } // namespace Program

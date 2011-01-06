@@ -36,13 +36,15 @@ public:
 	SharedMemory();
 	~SharedMemory();
 	
-	uint32_t zoneCount();
-	bool zoneActivated(uint32_t id);
-	ZoneHeader_t *zone(uint32_t id);
+	uint32_t zoneCount() const;
+	uint8_t *zoneWithPacket();
+	
+	void waitForPacket();
 private:
+	uint8_t *zone(uint32_t id);
 	void setupHeader();
 	void setupConfiguration();
-	void setupZoneUse();
+	void setupZones();
 };
 
 } // namespace Program

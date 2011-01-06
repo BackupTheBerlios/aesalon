@@ -14,11 +14,13 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <string.h>
+#include <errno.h>
 
 #include "program/SharedMemory.h"
 #include "common/AssertionException.h"
 #include "common/Config.h"
 #include "common/StreamAsString.h"
+#include "common/StringTo.h"
 #include "config/Vault.h"
 #include "Coordinator.h"
 
@@ -32,10 +34,31 @@ SharedMemory::SharedMemory() {
 	
 	setupHeader();
 	setupConfiguration();
+	setupZones();
 }
 
 SharedMemory::~SharedMemory() {
 	shm_unlink(m_shmName.c_str());
+}
+
+uint32_t SharedMemory::zoneCount() const {
+	return m_header->zoneCount;
+}
+
+uint8_t *SharedMemory::zoneWithPacket() {
+	for(uint32_t i = 0; i < m_header->zonesAllocated; i ++) {
+		if(m_zoneUseData[i] & (0x01 << (i % 8))) {
+			uint8_t *zoneData = zone(i);
+			ZoneHeader_t *zoneHeader = reinterpret_cast<ZoneHeader_t *>(zoneData);
+			if(sem_trywait(&zoneHeader->packetSemaphore) == -1 && errno == EAGAIN) continue;
+			return zoneData;
+		}
+	}
+	return NULL;
+}
+
+void SharedMemory::waitForPacket() {
+	sem_wait(&m_header->packetSemaphore);
 }
 
 void SharedMemory::setupHeader() {
@@ -45,6 +68,17 @@ void SharedMemory::setupHeader() {
 	
 	sem_init(&m_header->packetSemaphore, 1, 0);
 	sem_init(&m_header->resizeSemaphore, 1, 1);
+}
+
+uint8_t *SharedMemory::zone(uint32_t id) {
+	uint8_t *data = m_zoneMap[id];
+	if(data != NULL) return data;
+	
+	data = static_cast<uint8_t *>(mmap(NULL, AesalonPageSize*m_header->zoneSize,
+		PROT_READ | PROT_WRITE, MAP_SHARED, m_fd,
+		(m_header->zonePageOffset + id*m_header->zoneSize)*AesalonPageSize));
+	m_zoneMap[id] = data;
+	return data;
 }
 
 void SharedMemory::setupConfiguration() {
@@ -59,6 +93,7 @@ void SharedMemory::setupConfiguration() {
 	uint32_t offset = 0;
 	
 	for(std::vector<Config::Vault::KeyPair>::iterator i = configItems.begin(); i != configItems.end(); ++i) {
+		/* Ignore all internal items. */
 		if(i->first.find("::") == 0) continue;
 		
 		while((offset + i->first.length() + i->second.length() + 2) > m_header->configDataSize*AesalonPageSize) {
@@ -76,8 +111,12 @@ void SharedMemory::setupConfiguration() {
 	}
 }
 
-void SharedMemory::setupZoneUse() {
+void SharedMemory::setupZones() {
+	m_header->zoneCount = 0;
 	
+	m_header->zoneSize = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneSize"));
+	m_header->zoneUsagePages = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneUsePages"));
+	m_header->zonesAllocated = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("defaultZones"));
 }
 
 } // namespace Program
