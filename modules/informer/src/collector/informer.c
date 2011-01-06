@@ -9,6 +9,7 @@
 #include <dlfcn.h>
 #include <time.h>
 #include <pthread.h>
+#include <errno.h>
 
 #include "informer/Informer.h"
 #include "common/Config.h"
@@ -123,6 +124,8 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadCount = 1;
 	AI_InformerData.threadList[0] = self;
 	
+	printf("test: \"%s\"\n", AI_ConfigurationString("test"));
+	
 	AI_ContinueCollection(self);
 }
 
@@ -131,12 +134,17 @@ void __attribute__((destructor)) AI_Destruct() {
 }
 
 static void AI_OpenSHM(const char *name) {
+	printf("\"%s\"\n", name);
 	AI_InformerData.shmFd = shm_open(name, O_RDWR, S_IRUSR | S_IWUSR);
+	printf("shmFd: %i\n", AI_InformerData.shmFd);
+	printf("%s\n", strerror(errno));
 }
 
 static void AI_SetupHeader() {
 	AI_InformerData.shmHeader = mmap(NULL, AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd, 0);
+	printf("AI_InformerData.shmHeader: %p\n", AI_InformerData.shmHeader);
+	printf("%s\n", strerror(errno));
 }
 
 static void AI_SetupConfig() {
@@ -155,9 +163,18 @@ static void AI_SetupZoneUse() {
 }
 
 static void AI_SetupZone() {
-	if(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
+	/* Check if more memory is required. */
+	while(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
 		/* Allocate more memory. */
+		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
+		if(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
+			AI_InformerData.shmHeader->shmSize += AI_InformerData.shmHeader->zoneSize;
+			AI_InformerData.shmHeader->zonesAllocated ++;
+			ftruncate(AI_InformerData.shmFd, AI_InformerData.shmHeader->shmSize * AesalonPageSize);
+		}
+		sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
 	}
+	
 	uint32_t i;
 	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
 		if(AI_ZoneAvailable(i)) break;
@@ -174,7 +191,6 @@ static void AI_SetupZone() {
 	((ZoneHeader_t *)AI_Zone)->threadID = pthread_self();
 	sem_init(&((ZoneHeader_t *)AI_Zone)->packetSemaphore, 1, 0);
 	sem_init(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore, 1, 0);
-	
 }
 
 static int AI_ZoneAvailable(uint32_t id) {
@@ -199,23 +215,40 @@ static void AI_ClearZone(uint32_t id) {
 }
 
 static uint32_t AI_RemainingSpace() {
-	if(((ZoneHeader_t *)AI_Zone)->head <= ((ZoneHeader_t *)AI_Zone)->tail) {
-		return ((AI_InformerData.shmHeader->zoneSize*4096) - ZoneDataOffset)
-			- (((ZoneHeader_t *)AI_Zone)->tail - ((ZoneHeader_t *)AI_Zone)->head);
+	ZoneHeader_t *header = (ZoneHeader_t *)AI_Zone;
+	if(header->head <= header->tail) {
+		return ((AI_InformerData.shmHeader->zoneSize*AesalonPageSize) - ZoneDataOffset)
+			- (header->tail - header->head);
 	}
 	else {
-		return -1;
-		//return shm->header->dataStart - shm->header->dataOffset - shm->header->dataEnd;
+		return header->head - ZoneDataOffset - header->tail;
 	}
 }
 
 static void *AI_ReserveSpace(uint32_t amount) {
 	uint32_t remaining = AI_RemainingSpace();
+	ZoneHeader_t *header = (ZoneHeader_t *)AI_Zone;
+	/*uint32_t zoneDataSize = (AI_InformerData.shmHeader->zoneSize*AesalonPageSize) - ZoneDataOffset;*/
 	if(remaining < amount) {
-		((ZoneHeader_t *)AI_Zone)->overflow = amount - remaining;
-		sem_wait(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore);
+		header->overflow = amount - remaining;
+		sem_wait(&header->overflowSemaphore);
 	}
-	return NULL;
+	
+	/* If the head is less than (or equal to) the tail, then the used memory
+		is in one contiguous chunk, and the buffer has not wrapped yet. */
+	if(header->tail <= header->head) {
+/*		if(header->head + amount >= zoneDataSize) {
+			header->gapSize = (amount + header->head) - zoneDataSize;
+			amount += header->gapSize;
+			header->head = ZoneDataOffset;
+		}*/
+		
+		header->head += amount;
+		return &AI_Zone[header->head-amount];
+	}
+	else {
+		return NULL;
+	}
 }
 
 void AI_StartPacket(ModuleID moduleID) {
@@ -246,11 +279,12 @@ const char *AI_ConfigurationString(const char *name) {
 	while(1) {
 		const char *itemName = &AI_InformerData.configData[offset];
 		if(itemName == 0 || itemName[0] == 0) break;
+		
 		int nameLength = strlen(itemName)+1;
 		const char *itemData = &AI_InformerData.configData[offset+nameLength];
 		if(!strcmp(name, itemName)) return itemData;
 		
-		int dataLength = strlen(itemName)+1;
+		int dataLength = strlen(itemData)+1;
 		offset += nameLength + dataLength;
 	}
 	return NULL;

@@ -45,14 +45,10 @@ pid_t Launcher::forkTarget() {
 		exit(1);
 	}
 	else if(m_targetPid == 0) {
-		close(m_controllerFds[0]);
 		execvp(m_argv[0], m_argv);
 		std::cout << m_argv[0] << ": " << strerror(errno) << std::endl;
 		exit(0);
 	}
-	
-	/* Close the write end of the pipe in the monitoring process. */
-	close(m_controllerFds[1]);
 	
 	return m_targetPid;
 }
@@ -66,9 +62,9 @@ void Launcher::waitForChild() {
 }
 
 void Launcher::setupEnvironment() {
-	pipe(m_controllerFds);
+	/*setenv("AC___conductorFd", (Common::StreamAsString() << m_controllerFds[1]).operator std::string().c_str(), 1);*/
 	
-	setenv("AC___conductorFd", (Common::StreamAsString() << m_controllerFds[1]).operator std::string().c_str(), 1);
+	setenv("AesalonSHMName", (Common::StreamAsString() << "/Aesalon-" << getpid()).operator std::string().c_str(), 1);
 	
 	std::vector<std::string> modules;
 	
@@ -89,17 +85,6 @@ void Launcher::setupEnvironment() {
 				preload += ":";
 			}
 			preload += moduleRoot + collectorPath;
-			
-			std::vector<Config::Vault::KeyPair> configItems;
-			Coordinator::instance()->vault()->match(*i + ":*", configItems);
-			
-			for(std::vector<Config::Vault::KeyPair>::iterator i = configItems.begin(); i != configItems.end(); ++i) {
-				std::string envName = "AC_" + i->first;
-				for(std::string::size_type s = 0; s < envName.size(); s ++) {
-					if(envName[s] == ':') envName[s] = '_';
-				}
-				setenv(envName.c_str(), i->second.c_str(), 1);
-			}
 		}
 	}
 

@@ -17,83 +17,78 @@
 
 #include "program/SharedMemory.h"
 #include "common/AssertionException.h"
+#include "common/Config.h"
+#include "common/StreamAsString.h"
+#include "config/Vault.h"
+#include "Coordinator.h"
 
 namespace Monitor {
 namespace Program {
 
-SharedMemory::SharedMemory(std::string identifier, uint32_t size) : m_identifier(identifier) {
-	if(size == 0 || (size % 4) != 0)
-		throw Common::AssertionException("Size of shared memory must be a nonzero multiple of four.");
+SharedMemory::SharedMemory() {
+	m_shmName = Common::StreamAsString() << "/Aesalon-" << getpid();
 	
-	m_fd = shm_open(identifier.c_str(), O_RDWR, 0);
+	m_fd = shm_open(m_shmName.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+	std::cout << "m_fd: " << m_fd << std::endl;
+	std::cout << "\"" << m_shmName << "\"\n";
 	
-	m_memory = static_cast<uint8_t *>(mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0));
-	
-	// Yes, the reinterpret_cast<> is required. static_cast<> does not work for this.
-	m_header = reinterpret_cast<SharedMemoryHeader *>(m_memory);
+	setupHeader();
+	setupConfiguration();
 }
 
 SharedMemory::~SharedMemory() {
-	shm_unlink(m_identifier.c_str());
+	shm_unlink(m_shmName.c_str());
 }
 
-void SharedMemory::wait() {
-	int result = 0;
-	while((result = sem_wait(&m_header->packetSemaphore)) != 0) {
-		std::cout << "semaphore error!" << std::endl;
+void SharedMemory::setupHeader() {
+	ftruncate(m_fd, AesalonPageSize);
+	m_header = static_cast<SharedMemoryHeader_t *>(
+		mmap(NULL, AesalonPageSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0));
+	
+	sem_init(&m_header->packetSemaphore, 1, 0);
+	sem_init(&m_header->resizeSemaphore, 1, 1);
+}
+
+void SharedMemory::setupConfiguration() {
+#if 0
+	/* Original code */
+	std::vector<Config::Vault::KeyPair> configItems;
+	Coordinator::instance()->vault()->match(*i + ":*", configItems);
+	
+	for(std::vector<Config::Vault::KeyPair>::iterator i = configItems.begin(); i != configItems.end(); ++i) {
+		std::string envName = "AC_" + i->first;
+		for(std::string::size_type s = 0; s < envName.size(); s ++) {
+			if(envName[s] == ':') envName[s] = '_';
+		}
+		setenv(envName.c_str(), i->second.c_str(), 1);
 	}
-}
-
-Packet *SharedMemory::readNext() {
-	std::cout << "[monitor] wait() called . . .\n";
-	wait();
-	/* If the data start is the same as the end, then a NULL packet has been
-		sent -- otherwise known as the termination signal.
-	*/
-	if(m_header->dataStart == m_header->dataEnd) return NULL;
+#endif
+	char *configurationData = static_cast<char *>(
+		mmap(NULL, AesalonPageSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, AesalonPageSize));
+	m_header->configDataSize = 1;
+	ftruncate(m_fd, 2*AesalonPageSize);
 	
-	Packet *packet = new Packet;
+	std::vector<Config::Vault::KeyPair> configItems;
+	Coordinator::instance()->vault()->match("*", configItems);
 	
-	sem_wait(&m_header->sendSemaphore);
+	uint32_t offset = 0;
 	
-	std::cout << "[monitor] Reading packet . . ." << std::endl;
-	readData(&packet->sourceHash, sizeof(packet->sourceHash));
-	std::cout << "[monitor] \tsourceHash: " << std::hex << packet->sourceHash << std::dec << std::endl;
-	readData(&packet->usedSize, sizeof(packet->usedSize));
-	std::cout << "[monitor] \tusedSize: " << packet->usedSize << std::endl;
-	packet->dataSize = packet->usedSize;
-	packet->data = new uint8_t[packet->dataSize];
-	readData(packet->data, packet->dataSize);
-	
-	if(m_header->overflow) {
-		sem_post(&m_header->overflowSemaphore);
-		m_header->overflow = 0;
-	}
-	
-	sem_post(&m_header->sendSemaphore);
-	
-	return packet;
-}
-
-void SharedMemory::notifyTermination() {
-	/* Artificially create a termination signal by posting to the packet semaphore. */
-	sem_post(&m_header->packetSemaphore);
-}
-
-void SharedMemory::readData(void *buffer, size_t size) {
-	std::cout << "[monitor] Reading " << size << " bytes . . .\n";
-	std::cout << "[monitor] \tReading from " << m_header->dataStart << std::endl;
-	if(m_header->dataStart + size >= m_header->size) {
-		std::cout << "[monitor] Reading overflow data (might blow up . . .)\n";
-		int end_copy_size = (m_header->size - m_header->dataStart);
-		memcpy(buffer, m_memory + m_header->dataStart, end_copy_size);
+	for(std::vector<Config::Vault::KeyPair>::iterator i = configItems.begin(); i != configItems.end(); ++i) {
+		if(i->first.find("::") == 0) continue;
 		
-		memcpy((char *)buffer + end_copy_size, m_memory + m_header->dataOffset, size - end_copy_size);
-		m_header->dataStart = m_header->dataOffset + size - end_copy_size;
-	}
-	else {
-		memcpy(buffer, m_memory + m_header->dataStart, size);
-		m_header->dataStart += size;
+		/*std::cout << "name: \"" << i->first << "\"\n";
+		std::cout << "data: \"" << i->second << "\"\n";*/
+		/*if((offset + i->first.length() + i->second.length() + 2) > m_header->configDataSize*AesalonPageSize) {
+			std::cout << "More space required!" << std::endl;
+			munmap(configurationData, m_header->configDataSize*AesalonPageSize);
+			m_header->configDataSize ++;
+			configurationData = static_cast<char *>(
+				mmap(NULL, AesalonPageSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, AesalonPageSize));
+		}*/
+		memcpy(&configurationData[offset], i->first.c_str(), i->first.length()+1);
+		offset += i->first.length()+1;
+		memcpy(&configurationData[offset], i->second.c_str(), i->second.length()+1);
+		offset += i->second.length()+1;
 	}
 }
 

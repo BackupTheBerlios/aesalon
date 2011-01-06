@@ -54,19 +54,14 @@ void Coordinator::run() {
 		usage(true);
 		return;
 	}
-	
-	Program::Launcher launcher(&m_argv[m_argcOffset]);
-	
-	pid_t targetPid = launcher.forkTarget();
-	
-	Program::Conductor conductor;
-	pid_t conductorPid = conductor.createDaemon();
-	if(conductorPid == 0) {
-		conductor.addTarget(targetPid);
-		conductor.run();
-	}
 	else {
-		launcher.waitForChild();
+		Program::SharedMemory sharedMemory;
+		Program::Conductor conductor(&sharedMemory);
+		
+		Program::Launcher launcher(&m_argv[m_argcOffset]);
+		launcher.forkTarget();
+		
+		conductor.run();
 	}
 }
 

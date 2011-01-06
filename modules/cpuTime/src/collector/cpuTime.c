@@ -10,11 +10,16 @@
 #include <pthread.h>
 #include <string.h>
 
+#ifndef TFD_CLOEXEC
+	#error "TFD_CLOEXEC must be defined; this is a Linux-specific feature available in 2.6.27 and later."
+#endif
+
 #include "informer/Informer.h"
 
-int isRunning = 0;
-int timerFd;
-pthread_t threadID;
+static int isRunning = 0;
+static int timerFd;
+static pthread_t threadID;
+static ModuleID moduleID;
 
 static void *sendTime(void *unused) {
 	isRunning = 1;
@@ -23,28 +28,28 @@ static void *sendTime(void *unused) {
 		read(timerFd, &exp, sizeof(exp));
 		uint8_t buffer[64];
 		
-		/*Packet packet;
-		packet.data = buffer;
-		packet.dataSize = sizeof(buffer);
-		packet.usedSize = 0;*/
-		
 		struct rusage ru;
 		getrusage(RUSAGE_SELF, &ru);
 		
 		uint64_t value = (ru.ru_utime.tv_sec * 1000000000) + (ru.ru_utime.tv_usec * 1000);
-		/*AI_AppendTimestamp(&packet);
-		AI_AppendUint64(&packet, value);
 		
-		AI_SendPacket(&packet);*/
+		AI_StartPacket(moduleID);
+		
+		void *packet = AI_PacketSpace(sizeof(value));
+		memcpy(packet, &value, sizeof(value));
+		
+		AI_EndPacket();
 	}
 	return NULL;
 }
 
 void __attribute__((constructor)) AM_Construct() {
-#ifndef TFD_CLOEXEC
-	#error "TFD_CLOEXEC must be defined; this is a Linux-specific feature available in 2.6.27 and later."
-#endif
-
+	/* Just in case, construct the Informer. */
+	AI_Construct();
+	
+	/* Retrieve the module ID# . . . */
+	moduleID = AI_ConfigurationLong("cpuTime:moduleID");
+	
 	/* NOTE: TFD_CLOEXEC was introduced in Linux 2.6.27; timerfd_create() is Linux-specific. */
 	if((timerFd = timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC)) == -1) {
 		printf("Failed to create timer . . .\n");

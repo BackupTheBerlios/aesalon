@@ -12,7 +12,8 @@
 #ifndef AesalonCommon_PolisherInterface_H
 #define AesalonCommon_PolisherInterface_H
 
-#include "Packet.h"
+#include "SHMPacket.h"
+#include "NetworkPacket.h"
 
 namespace Common {
 
@@ -20,7 +21,7 @@ class PolisherInterface {
 public:
 	virtual ~PolisherInterface() {}
 	
-	virtual Packet *polish(Packet *packet) = 0;
+	virtual NetworkPacket *polish(SHMPacketHeader_t *header, void *data) = 0;
 };
 
 } // namespace Common

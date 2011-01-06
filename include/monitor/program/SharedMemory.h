@@ -15,7 +15,6 @@
 #include <string>
 
 #include "common/SharedMemoryHeader.h"
-#include "common/Packet.h"
 
 namespace Monitor {
 namespace Program {
@@ -23,19 +22,15 @@ namespace Program {
 class SharedMemory {
 private:
 	int m_fd;
-	uint8_t *m_memory;
-	SharedMemoryHeader *m_header;
-	std::string m_identifier;
+	std::string m_shmName;
+	
+	SharedMemoryHeader_t *m_header;
 public:
-	SharedMemory(std::string identifier, uint32_t size);
+	SharedMemory();
 	~SharedMemory();
-	
-	void wait();
-	Packet *readNext();
-	
-	void notifyTermination();
 private:
-	void readData(void *buffer, size_t size);
+	void setupHeader();
+	void setupConfiguration();
 };
 
 } // namespace Program

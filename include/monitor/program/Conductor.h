@@ -16,27 +16,20 @@
 #include <list>
 #include <semaphore.h>
 
-#include "Link.h"
 #include "module/List.h"
-#include "TargetProcess.h"
+#include "SharedMemory.h"
 
 namespace Monitor {
 namespace Program {
 
 class Conductor {
 private:
-	typedef std::list<TargetProcess *> TargetList;
-	TargetList m_targetList;
-	sem_t m_targetSemaphore;
+	SharedMemory *m_sharedMemory;
 public:
-	Conductor();
+	Conductor(Monitor::Program::SharedMemory *sharedMemory);
 	~Conductor();
 	
-	void addTarget(pid_t targetPid);
-	void removeTarget(TargetProcess *targetProcess);
 	void run();
-	
-	pid_t createDaemon();
 };
 
 } // namespace Program

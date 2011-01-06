@@ -22,14 +22,12 @@ namespace Program {
 class Launcher {
 private:
 	char **m_argv;
-	int m_controllerFds[2];
 	pid_t m_targetPid;
 public:
 	Launcher(char **argv);
 	~Launcher();
 	
 	pid_t forkTarget();
-	int readFd() const { return m_controllerFds[0]; }
 	
 	void waitForChild();
 private:
