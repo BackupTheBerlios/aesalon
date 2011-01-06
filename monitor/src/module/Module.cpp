@@ -19,26 +19,25 @@
 namespace Monitor {
 namespace Module {
 
-Module::Module(const std::string &moduleName) {
+Module::Module(const std::string &moduleName) : m_loaded(false) {
 	std::string path =
 		Coordinator::instance()->vault()->get(moduleName + ":root")
 		+ Coordinator::instance()->vault()->get(moduleName + ":polisherPath");
 	
 	m_moduleHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
 	m_instance = NULL;
-	if(m_moduleHandle == NULL) {
-		std::cout << "Cannot open module: " << dlerror() << std::endl;
-	}
-	else {
+	if(m_moduleHandle != NULL) {
 		Common::PolisherInterface *(*instantiate)() = NULL;
 		
 		*(void **)(&instantiate) = dlsym(m_moduleHandle, "AP_Instantiate");
 		
 		if(instantiate == NULL) {
-			std::cout << "Module has no function AP_Instantiate() . . ." << std::endl;
+			/* This is an error. */
+			std::cout << "Module exists, but does not have AP_Instantiate() . . ." << std::endl;
 		}
 		else {
 			m_instance = instantiate();
+			if(m_instance) m_loaded = true;
 		}
 	}
 }

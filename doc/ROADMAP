@@ -1,0 +1,15 @@
+0.4.0: Working communication between informer and monitor, basic module support.
+	Estimated date: 02/11
+0.5.0: Working communication between monitor and visualizer, no visualizations.
+	Estimated date: 05/11
+0.6.0: Visualization framework complete.
+	Estimated date: 06/11
+0.7.0: Basic module visualizations.
+	Estimated date: 07/11
+0.8.0: Module implementations.
+	Estimated date: 08/11
+0.9.0: 32-bit support.
+	Estimated date: 09/11
+1.0.0: Polishing, release.
+	Estimated date: 10/11
+

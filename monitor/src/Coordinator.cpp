@@ -19,6 +19,7 @@
 #include "common/Config.h"
 #include "program/Launcher.h"
 #include "module/Module.h"
+#include "module/Loader.h"
 #include "config/ConcreteVault.h"
 #include "common/PathSanitizer.h"
 #include "program/Conductor.h"
@@ -55,13 +56,15 @@ void Coordinator::run() {
 		return;
 	}
 	else {
+		Module::Loader moduleLoader;
+		moduleLoader.loadModules();
 		Program::SharedMemory sharedMemory;
 		Program::Conductor conductor(&sharedMemory);
 		
 		Program::Launcher launcher(&m_argv[m_argcOffset]);
 		launcher.forkTarget();
 		
-		conductor.run();
+		conductor.run(moduleLoader.moduleList());
 	}
 }
 

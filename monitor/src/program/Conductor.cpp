@@ -31,7 +31,7 @@ Conductor::~Conductor() {
 	
 }
 
-void Conductor::run() {
+void Conductor::run(Module::List *moduleList) {
 	sleep(3);
 	std::cout << "exiting Conductor::run() . . ." << std::endl;
 }

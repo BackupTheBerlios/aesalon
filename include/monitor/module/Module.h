@@ -25,9 +25,13 @@ private:
 	std::string m_moduleName;
 	void *m_moduleHandle;
 	Common::PolisherInterface *m_instance;
+	bool m_loaded;
 public:
 	Module(const std::string &moduleName);
 	~Module();
+	
+	const std::string &moduleName() const { return m_moduleName; }
+	bool isLoaded() const { return m_loaded; }
 };
 
 } // namespace Module

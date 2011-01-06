@@ -76,5 +76,9 @@ void SharedMemory::setupConfiguration() {
 	}
 }
 
+void SharedMemory::setupZoneUse() {
+	
+}
+
 } // namespace Program
 } // namespace Monitor

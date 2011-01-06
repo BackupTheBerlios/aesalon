@@ -29,6 +29,7 @@ public:
 	
 	void addModule(Module *module);
 	Module *module(ModuleID id);
+	Module *module(std::string name);
 };
 
 } // namespace Module

@@ -13,8 +13,10 @@
 #define AesalonMonitor_Program_SharedMemory_H
 
 #include <string>
+#include <map>
 
 #include "common/SharedMemoryHeader.h"
+#include "common/ZoneHeader.h"
 
 namespace Monitor {
 namespace Program {
@@ -25,12 +27,22 @@ private:
 	std::string m_shmName;
 	
 	SharedMemoryHeader_t *m_header;
+	
+	uint8_t *m_zoneUseData;
+	
+	typedef std::map<uint32_t, uint8_t *> ZoneMap;
+	ZoneMap m_zoneMap;
 public:
 	SharedMemory();
 	~SharedMemory();
+	
+	uint32_t zoneCount();
+	bool zoneActivated(uint32_t id);
+	ZoneHeader_t *zone(uint32_t id);
 private:
 	void setupHeader();
 	void setupConfiguration();
+	void setupZoneUse();
 };
 
 } // namespace Program

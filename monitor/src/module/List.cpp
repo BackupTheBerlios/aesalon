@@ -31,5 +31,12 @@ Module *List::module(ModuleID id) {
 	return m_moduleList[id];
 }
 
+Module *List::module(std::string name) {
+	for(ModuleList::iterator i = m_moduleList.begin(); i != m_moduleList.end(); ++i) {
+		if((*i)->moduleName() == name) return *i;
+	}
+	return NULL;
+}
+
 } // namespace Module
 } // namespace Monitor
