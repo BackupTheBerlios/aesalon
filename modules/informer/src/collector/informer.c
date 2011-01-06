@@ -58,6 +58,10 @@ static void AI_SetupZoneUse();
 static void AI_SetupZone();
 static void *AI_ReserveSpace(uint32_t amount);
 
+static int AI_ZoneAvailable(uint32_t id);
+static void AI_MarkZone(uint32_t id);
+static void AI_ClearZone(uint32_t id);
+
 /** Internally-used function to calculate the amount of space remaining in the zone for
 	the current thread.
 	@param zoneID The zone to calculate the remaining space.
@@ -144,10 +148,54 @@ static void AI_SetupZoneUse() {
 	AI_InformerData.zoneUseData = mmap(NULL, AI_InformerData.shmHeader->zoneUsagePages*AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
 		(AI_InformerData.shmHeader->configDataSize + 1)*AesalonPageSize);
+	
+	/* +1 for the header. */
+	AI_InformerData.shmHeader->zonePageOffset =
+		AI_InformerData.shmHeader->zoneUsagePages + AI_InformerData.shmHeader->configDataSize + 1;
 }
 
 static void AI_SetupZone() {
+	if(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
+		/* Allocate more memory. */
+	}
+	uint32_t i;
+	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
+		if(AI_ZoneAvailable(i)) break;
+	}
+	AI_MarkZone(i);
+	AI_Zone = mmap(NULL,
+		(AI_InformerData.shmHeader->zonePageOffset + i*AI_InformerData.shmHeader->zoneSize)*AesalonPageSize,
+		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
+		AI_InformerData.shmHeader->zoneSize*AesalonPageSize);
 	
+	((ZoneHeader_t *)AI_Zone)->head = ((ZoneHeader_t *)AI_Zone)->tail = ZoneDataOffset;
+	((ZoneHeader_t *)AI_Zone)->overflow = 0;
+	((ZoneHeader_t *)AI_Zone)->processID = getpid();
+	((ZoneHeader_t *)AI_Zone)->threadID = pthread_self();
+	sem_init(&((ZoneHeader_t *)AI_Zone)->packetSemaphore, 1, 0);
+	sem_init(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore, 1, 0);
+	
+}
+
+static int AI_ZoneAvailable(uint32_t id) {
+	uint32_t byteOffset = id / 8;
+	uint32_t bitOffset = id % 8;
+	uint32_t mask = 0x01;
+	return AI_InformerData.zoneUseData[byteOffset] & (mask << bitOffset);
+}
+
+static void AI_MarkZone(uint32_t id) {
+	uint32_t byteOffset = id / 8;
+	uint32_t bitOffset = id % 8;
+	uint32_t mask = 0x01;
+	AI_InformerData.zoneUseData[byteOffset] |= (mask << bitOffset);
+}
+
+static void AI_ClearZone(uint32_t id) {
+	uint32_t byteOffset = id / 8;
+	uint32_t bitOffset = id % 8;
+	uint32_t mask = 0x01;
+	AI_InformerData.zoneUseData[byteOffset] &= ~(mask << bitOffset);
 }
 
 static uint32_t AI_RemainingSpace() {

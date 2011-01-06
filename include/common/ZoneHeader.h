@@ -20,7 +20,6 @@
 
 typedef struct ZoneHeader_t ZoneHeader_t;
 struct ZoneHeader_t {
-	
 	/** Head element of the data region for the circular buffer. */
 	uint32_t head;
 	

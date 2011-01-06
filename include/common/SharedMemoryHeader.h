@@ -35,8 +35,14 @@ struct SharedMemoryHeader_t {
 	/** The number of zones currently in use. */
 	uint32_t zoneCount;
 	
+	/** The number of zones that memory has been allocated for. */
+	uint32_t zonesAllocated;
+	
 	/** Packet semaphore: incremented when a packet is available for reading. */
 	sem_t packetSemaphore;
+	
+	/** Resizing semaphore; locked when a thread is resizing the SHM. */
+	sem_t resizeSemaphore;
 };
 
 #endif
