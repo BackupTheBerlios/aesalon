@@ -101,8 +101,6 @@ void __attribute__((constructor)) AI_Construct() {
 		pathHash = c + (pathHash << 6) + (pathHash << 16) - pathHash;
 	}
 	
-	printf("Path hash: %lx\n", pathHash);
-	
 	/* Clear the first 16 bits for the PID to be inserted properly. */
 	pathHash &= ~0xffff;
 	
@@ -124,8 +122,6 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadCount = 1;
 	AI_InformerData.threadList[0] = self;
 	
-	printf("test: \"%s\"\n", AI_ConfigurationString("test"));
-	
 	AI_ContinueCollection(self);
 }
 
@@ -134,17 +130,12 @@ void __attribute__((destructor)) AI_Destruct() {
 }
 
 static void AI_OpenSHM(const char *name) {
-	printf("\"%s\"\n", name);
 	AI_InformerData.shmFd = shm_open(name, O_RDWR, S_IRUSR | S_IWUSR);
-	printf("shmFd: %i\n", AI_InformerData.shmFd);
-	printf("%s\n", strerror(errno));
 }
 
 static void AI_SetupHeader() {
 	AI_InformerData.shmHeader = mmap(NULL, AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd, 0);
-	printf("AI_InformerData.shmHeader: %p\n", AI_InformerData.shmHeader);
-	printf("%s\n", strerror(errno));
 }
 
 static void AI_SetupConfig() {

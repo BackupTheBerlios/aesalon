@@ -29,8 +29,6 @@ SharedMemory::SharedMemory() {
 	m_shmName = Common::StreamAsString() << "/Aesalon-" << getpid();
 	
 	m_fd = shm_open(m_shmName.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-	std::cout << "m_fd: " << m_fd << std::endl;
-	std::cout << "\"" << m_shmName << "\"\n";
 	
 	setupHeader();
 	setupConfiguration();
@@ -50,19 +48,6 @@ void SharedMemory::setupHeader() {
 }
 
 void SharedMemory::setupConfiguration() {
-#if 0
-	/* Original code */
-	std::vector<Config::Vault::KeyPair> configItems;
-	Coordinator::instance()->vault()->match(*i + ":*", configItems);
-	
-	for(std::vector<Config::Vault::KeyPair>::iterator i = configItems.begin(); i != configItems.end(); ++i) {
-		std::string envName = "AC_" + i->first;
-		for(std::string::size_type s = 0; s < envName.size(); s ++) {
-			if(envName[s] == ':') envName[s] = '_';
-		}
-		setenv(envName.c_str(), i->second.c_str(), 1);
-	}
-#endif
 	char *configurationData = static_cast<char *>(
 		mmap(NULL, AesalonPageSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, AesalonPageSize));
 	m_header->configDataSize = 1;
@@ -76,15 +61,14 @@ void SharedMemory::setupConfiguration() {
 	for(std::vector<Config::Vault::KeyPair>::iterator i = configItems.begin(); i != configItems.end(); ++i) {
 		if(i->first.find("::") == 0) continue;
 		
-		/*std::cout << "name: \"" << i->first << "\"\n";
-		std::cout << "data: \"" << i->second << "\"\n";*/
-		/*if((offset + i->first.length() + i->second.length() + 2) > m_header->configDataSize*AesalonPageSize) {
-			std::cout << "More space required!" << std::endl;
+		while((offset + i->first.length() + i->second.length() + 2) > m_header->configDataSize*AesalonPageSize) {
 			munmap(configurationData, m_header->configDataSize*AesalonPageSize);
 			m_header->configDataSize ++;
+			ftruncate(m_fd, (m_header->configDataSize+1)*AesalonPageSize);
 			configurationData = static_cast<char *>(
-				mmap(NULL, AesalonPageSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, AesalonPageSize));
-		}*/
+				mmap(NULL, m_header->configDataSize*AesalonPageSize, PROT_READ | PROT_WRITE, MAP_SHARED,
+					m_fd, AesalonPageSize));
+		}
 		memcpy(&configurationData[offset], i->first.c_str(), i->first.length()+1);
 		offset += i->first.length()+1;
 		memcpy(&configurationData[offset], i->second.c_str(), i->second.length()+1);
