@@ -35,6 +35,7 @@ struct ZoneHeader_t {
 		should be incremented.
 	*/
 	int32_t overflow;
+	
 	/** The overflow semaphore, see @a overflow for description. */
 	sem_t overflowSemaphore;
 	

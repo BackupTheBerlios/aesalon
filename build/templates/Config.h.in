@@ -13,6 +13,8 @@
 #ifndef AesalonCommon_Config_H
 #define AesalonCommon_Config_H
 
+#include "Config.h.auto"
+
 #define AesalonVersion "%(version)s"
 
 #define AesalonModuleConfigFileName "%(moduleConfigFileName)s"
@@ -21,12 +23,6 @@
 #define AesalonUserConfig "%(userConfig)s"
 #define AesalonGlobalConfig "%(globalConfig)s"
 
-#define AesalonDefaultSMSSize %(defaultSMSSize)s
-#define AesalonControlSMSSize %(controlSMSSize)s
-
-#define AesalonInformerSMSListSize %(smsListSize)s
 #define AesalonInformerMonitorThreadListSize %(monitorThreadListSize)s
-#define AesalonInformerThreadListSize %(threadListSize)s
-#define AesalonInformerModuleListSize %(moduleListSize)s
 
 #endif

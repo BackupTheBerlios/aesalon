@@ -12,15 +12,7 @@
 
 #include "informer/Informer.h"
 #include "common/Config.h"
-#include "common/ConductorPacket.h"
-#include "common/PacketEncoding.h"
-
-typedef struct Module_t Module_t;
-
-struct Module_t {
-	const char *name;
-	uint16_t moduleID;
-};
+#include "common/ZoneHeader.h"
 
 typedef struct Zone_t Zone_t;
 struct Zone_t {
@@ -33,26 +25,44 @@ struct InformerData_t {
 	int initialized;
 	uint64_t processID;
 	
-	struct Module_t moduleList[AesalonInformerModuleListSize];
-	int moduleListSize;
-	
 	pthread_t monitorThreadList[AesalonInformerMonitorThreadListSize];
 	int monitorThreadListSize;
 	
-	pthread_t threadList[AesalonInformerThreadListSize];
+	pthread_t *threadList;
 	int threadListSize;
+	int threadCount;
 	
 	int shmFd;
+	
+	SharedMemoryHeader_t *shmHeader;
+	
+	const char *configData;
+	
+	uint8_t *zoneUseData;
 };
 
 static InformerData_t AI_InformerData;
 
-/** Interally-used function; creates a shared memory segment.
-	@param id The ID# of the SHM.
-	@param size The size, in kilobytes, of the SHM.
-	@return A pointer to the new SHM instance.
+static __thread uint8_t *AI_Zone = NULL;
+static __thread SHMPacketHeader_t *AI_ZonePacket = NULL;
+
+/** Interally-used function; opens shared memory for later use.
+	@param name The name of the SHM to use.
 */
-void AI_OpenSHM(const char *name);
+static void AI_OpenSHM(const char *name);
+
+static void AI_SetupHeader();
+static void AI_SetupConfig();
+static void AI_SetupZoneUse();
+
+static void AI_SetupZone();
+static void *AI_ReserveSpace(uint32_t amount);
+
+/** Internally-used function to calculate the amount of space remaining in the zone for
+	the current thread.
+	@param zoneID The zone to calculate the remaining space.
+*/
+static uint32_t AI_RemainingSpace();
 
 /* ------------------------------------------------------------------ */
 
@@ -63,9 +73,9 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	printf("[AI] **** Constructing Informer . . .\n");
 	
-	memset(AI_InformerData.threadList, 0, sizeof(pthread_t)*AesalonInformerThreadListSize);
+	pthread_t self = pthread_self();
 	
-	AI_StopCollection(pthread_self());
+	AI_StopCollection(self);
 	
 	pid_t pid = getpid();
 	
@@ -88,6 +98,7 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	printf("Path hash: %lx\n", pathHash);
 	
+	/* Clear the first 16 bits for the PID to be inserted properly. */
 	pathHash &= ~0xffff;
 	
 	AI_InformerData.processID = pathHash ^ pid;
@@ -97,63 +108,83 @@ void __attribute__((constructor)) AI_Construct() {
 		fprintf(stderr, "[aesalon] AesalonSHMName not set, aborting.\n");
 		exit(1);
 	}
+	AI_OpenSHM(shmName);
 	
-	AI_OpenSHM("");
+	AI_SetupHeader();
+	AI_SetupConfig();
+	AI_SetupZoneUse();
 	
-	AI_ContinueCollection(pthread_self());
+	AI_InformerData.threadList = malloc(sizeof(pthread_t) * 16);
+	AI_InformerData.threadListSize = 16;
+	AI_InformerData.threadCount = 1;
+	AI_InformerData.threadList[0] = self;
+	
+	AI_ContinueCollection(self);
 }
 
 void __attribute__((destructor)) AI_Destruct() {
 	printf("[AI] Destructing Informer . . .\n");
 }
 
-void AI_OpenSHM(const char *name) {
-	printf("[AI] Size of SHM is: %i\n", size);
-	
+static void AI_OpenSHM(const char *name) {
 	AI_InformerData.shmFd = shm_open(name, O_RDWR, S_IRUSR | S_IWUSR);
-	AI_InformerData.shm.data = mmap(NULL, AesalonSHMHeaderSize, PROT_READ | PROT_WRITE, MAP_SHARED,
-		AI_InformerData.shm.fd, 0);
 }
 
-uint32_t AI_RemainingSpace() {
-	if(shm->header->dataStart <= shm->header->dataEnd) {
-		return (shm->header->size - shm->header->dataOffset)
-			- (shm->header->dataEnd - shm->header->dataStart);
+static void AI_SetupHeader() {
+	AI_InformerData.shmHeader = mmap(NULL, AesalonPageSize,
+		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd, 0);
+}
+
+static void AI_SetupConfig() {
+	AI_InformerData.configData = mmap(NULL, AI_InformerData.shmHeader->configDataSize*AesalonPageSize,
+		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd, AesalonPageSize);
+}
+
+static void AI_SetupZoneUse() {
+	AI_InformerData.zoneUseData = mmap(NULL, AI_InformerData.shmHeader->zoneUsagePages*AesalonPageSize,
+		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
+		(AI_InformerData.shmHeader->configDataSize + 1)*AesalonPageSize);
+}
+
+static void AI_SetupZone() {
+	
+}
+
+static uint32_t AI_RemainingSpace() {
+	if(((ZoneHeader_t *)AI_Zone)->head <= ((ZoneHeader_t *)AI_Zone)->tail) {
+		return ((AI_InformerData.shmHeader->zoneSize*4096) - ZoneDataOffset)
+			- (((ZoneHeader_t *)AI_Zone)->tail - ((ZoneHeader_t *)AI_Zone)->head);
 	}
 	else {
-		return shm->header->dataStart - shm->header->dataOffset - shm->header->dataEnd;
+		return -1;
+		//return shm->header->dataStart - shm->header->dataOffset - shm->header->dataEnd;
 	}
 }
 
-void AI_WriteData(struct SHM_t *shm, void *data, size_t length) {
-	printf("[AI] Writing %lu bytes . . .\n", length);
-	/* If dataStart <= dataEnd, then the used memory is a contigious chunk. */
-	if(shm->header->dataStart <= shm->header->dataEnd) {
-		/* Two possible scenarios: the data fits on the end . . . */
-		if(length < (shm->header->size - shm->header->dataEnd)) {
-			printf("[AI] Normal case, writing memory in a single chunk.\n");
-			printf("[AI] Offset: %u\n", shm->header->dataEnd);
-			memcpy(shm->data + shm->header->dataEnd, data, length);
-			shm->header->dataEnd += length;
-		}
-		/* And the data does not fit on the end. */
-		else {
-			printf("[AI] Special case, writing memory in two chunks . . .\n");
-			size_t over = length - (shm->header->size - shm->header->dataEnd);
-			size_t under = length - over;
-			
-			memcpy(shm->data + shm->header->dataEnd, data, under);
-			
-			memcpy(shm->data + shm->header->dataOffset, data + under, over);
-			
-			shm->header->dataEnd = shm->header->dataOffset + over;
-		}
+static void *AI_ReserveSpace(uint32_t amount) {
+	uint32_t remaining = AI_RemainingSpace();
+	if(remaining < amount) {
+		((ZoneHeader_t *)AI_Zone)->overflow = amount - remaining;
+		sem_wait(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore);
 	}
-	/* Else the used memory is in two separate chunks. */
-	else {
-		memcpy(shm->data + shm->header->dataEnd, data, length);
-		shm->header->dataEnd += length;
-	}
+	return NULL;
+}
+
+void AI_StartPacket(ModuleID moduleID) {
+	if(AI_Zone == NULL) AI_SetupZone();
+	AI_ZonePacket = AI_ReserveSpace(sizeof(SHMPacketHeader_t));
+	AI_ZonePacket->packetSize = 0;
+	AI_ZonePacket->moduleID = moduleID;
+}
+
+void AC_EXPORT *AI_PacketSpace(uint32_t size) {
+	AI_ZonePacket->packetSize += size;
+	return AI_ReserveSpace(size);
+}
+
+void AC_EXPORT AI_EndPacket() {
+	AI_ZonePacket = NULL;
+	sem_post(&((ZoneHeader_t *)AI_Zone)->packetSemaphore);
 }
 
 uint64_t AI_Timestamp() {
@@ -163,15 +194,18 @@ uint64_t AI_Timestamp() {
 }
 
 const char *AI_ConfigurationString(const char *name) {
-	char realname[256] = {"AC_"};
-	int i = 0;
-	while(name[i]) {
-		if(name[i] == ':') realname[i+3] = '_';
-		else realname[i+3] = name[i];
-		i ++;
+	uint32_t offset = 0;
+	while(1) {
+		const char *itemName = &AI_InformerData.configData[offset];
+		if(itemName == 0 || itemName[0] == 0) break;
+		int nameLength = strlen(itemName)+1;
+		const char *itemData = &AI_InformerData.configData[offset+nameLength];
+		if(!strcmp(name, itemName)) return itemData;
+		
+		int dataLength = strlen(itemName)+1;
+		offset += nameLength + dataLength;
 	}
-	
-	return getenv(realname);
+	return NULL;
 }
 
 long AI_ConfigurationLong(const char *name) {
@@ -184,17 +218,19 @@ long AI_ConfigurationLong(const char *name) {
 
 int AI_ConfigurationBool(const char *name) {
 	const char *s = AI_ConfigurationString(name);
-	return s == NULL || s[0] == 0 || !strcmp(s, "false");
+	if(s == NULL) return 0;
+	return strcmp(s, "false") != 0;
 }
 
 pthread_t *AI_TargetThreadList(int *size) {
 	if(size == NULL) return NULL;
-	*size = AI_InformerData.threadListSize;
+	*size = AI_InformerData.threadCount;
 	
 	return AI_InformerData.threadList;
 }
 
 short AI_CollectionStatus() {
+	if(AI_InformerData.threadList == NULL) return 0;
 	pthread_t self = pthread_self();
 	int i = 0;
 	while(i < AI_InformerData.monitorThreadListSize) {

@@ -11,7 +11,6 @@
 #include <string.h>
 
 #include "informer/Informer.h"
-#include "common/ConductorPacket.h"
 
 int isRunning = 0;
 int timerFd;
@@ -24,10 +23,10 @@ static void *sendTime(void *unused) {
 		read(timerFd, &exp, sizeof(exp));
 		uint8_t buffer[64];
 		
-		Packet packet;
+		/*Packet packet;
 		packet.data = buffer;
 		packet.dataSize = sizeof(buffer);
-		packet.usedSize = 0;
+		packet.usedSize = 0;*/
 		
 		struct rusage ru;
 		getrusage(RUSAGE_SELF, &ru);
@@ -72,13 +71,6 @@ void __attribute__((constructor)) AM_Construct() {
 	pthread_create(&threadID, NULL, sendTime, NULL);
 	
 	int conductorFd = AI_ConfigurationLong("::conductorFd");
-	
-	uint8_t header = ConductorPacket_ModuleLoaded;
-	
-	write(conductorFd, &header, sizeof(header));
-	uint16_t length = strlen("cpuTime") + 1;
-	write(conductorFd, &length, sizeof(length));
-	write(conductorFd, "cpuTime", length);
 }
 
 void __attribute__((destructor)) AM_Destruct() {

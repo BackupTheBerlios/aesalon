@@ -49,19 +49,7 @@ env = Environment(
 
 Export('env')
 
-def createConfig(target, source, values):
-	outFile = file(str(target), "w")
-	inFile = file(str(source), "r")
-	outFile.write(inFile.read() % values)
-	inFile.close()
-	outFile.close()
-
-config = file("build/config", "r")
-buildConfig = eval(config.read())
-config.close()
-
-createConfig("include/common/Config.h", "build/templates/Config.h.in", buildConfig)
-
+SConscript("build/SConscript")
 SConscript("monitor/SConscript")
 SConscript("modules/SConscript")
 SConscript("tests/SConscript")

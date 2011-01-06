@@ -20,7 +20,7 @@ struct SharedMemoryHeader_t {
 	/** Overall size of SHM in pages. */
 	uint32_t shmSize;
 	
-	/** The size of the configuration data (in bytes). */
+	/** The size of the configuration data (in pages). */
 	uint32_t configDataSize;
 	
 	/** The number of pages to use to store zone usage data in. */

@@ -16,7 +16,7 @@
 #include <pthread.h>
 
 #include "common/SharedMemoryHeader.h"
-#include "common/Packet.h"
+#include "common/SHMPacket.h"
 #include "common/Config.h"
 
 #ifdef __GNUC__
@@ -52,6 +52,11 @@ long AC_EXPORT AI_ConfigurationLong(const char *name);
 */
 int AC_EXPORT AI_ConfigurationBool(const char *name);
 
+/** Returns the list of threads currently active for data collection
+	in the current process.
+	@param size A pointer to an integer to store the size of the list.
+	@return The list of target threads, with size @a size.
+*/
 pthread_t AC_EXPORT *AI_TargetThreadList(int *size);
 
 /** Returns 1 if data should be collected, 0 otherwise.

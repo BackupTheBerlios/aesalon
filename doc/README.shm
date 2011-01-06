@@ -1,0 +1,8 @@
+A few notes about the SHM used for communication . . .
+
+    The first page is entirely devoted to the header, which stores important
+information about the SHM as a whole, including the size of each zone, the
+global packet semaphore, and the size of the configuration data.
+    Immediately following the header page are the configuration page(s), the
+number of which is specified in the header. After the configuration page(s)
+come the zone-usage pages, then finally the zone pages themselves.
