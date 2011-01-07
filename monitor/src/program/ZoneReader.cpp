@@ -30,12 +30,12 @@ ZoneReader::~ZoneReader() {
 }
 
 void ZoneReader::start() {
-	m_threadID = pthread_self();
-	run(this);
+	pthread_create(&m_threadID, NULL, run, this);
 }
 
 void ZoneReader::startInThread() {
-	pthread_create(&m_threadID, NULL, run, this);
+	m_threadID = pthread_self();
+	run(this);
 }
 
 void ZoneReader::join() {
@@ -55,29 +55,39 @@ void *ZoneReader::run(void *voidInstance) {
 		
 		ZoneHeader_t *zoneHeader = reinterpret_cast<ZoneHeader_t *>(zoneData);
 		SHMPacketHeader_t *packetHeader = NULL;
-		/* TODO: handle case where packetHeader is not exactly where it should be, e.g. has wrapped. */
-		packetHeader = reinterpret_cast<SHMPacketHeader_t *>(zoneData + zoneHeader->head);
+		
+		uint32_t dataStart = 0;
+		
+		if(zoneHeader->head + sizeof(packetHeader) < zoneSize) {
+			packetHeader = reinterpret_cast<SHMPacketHeader_t *>(zoneData + zoneHeader->head);
+			dataStart = zoneHeader->head + sizeof(packetHeader);
+		}
+		else {
+			packetHeader = reinterpret_cast<SHMPacketHeader_t *>(zoneData + ZoneDataOffset);
+			dataStart = ZoneDataOffset + sizeof(packetHeader);
+		}
 		
 		uint32_t packetSize = packetHeader->packetSize;
 		uint8_t *packetData = NULL;
-		if(zoneHeader->head + packetHeader->packetSize < zoneSize) {
+		if(dataStart + packetHeader->packetSize < zoneSize) {
 			/* This is straightforwards, all the data is nice and contiguous. */
-			packetData = zoneData + zoneHeader->head + sizeof(SHMPacketHeader_t);
+			packetData = zoneData + dataStart + sizeof(SHMPacketHeader_t);
 			
-			zoneHeader->head += packetSize + sizeof(SHMPacketHeader_t);
+			zoneHeader->head = dataStart + packetSize;
 		}
 		else {
 			/* This is a bit more complex; the data is in two parts,
 				thus it needs to be copied into a temporary buffer. */
 			
-			uint32_t underSize = zoneSize - (zoneHeader->head + sizeof(packetHeader)) - zoneHeader->gapSize;
+			uint32_t underSize = zoneSize - dataStart - zoneHeader->gapSize;
 			uint32_t overSize = packetSize - underSize;
 			
 			if(packetBufferSize < packetSize) {
+				/* Replace this w/doubling behaviour? */
 				packetBuffer = static_cast<uint8_t *>(realloc(packetBuffer, packetSize));
 				packetBufferSize = packetSize;
 			}
-			memcpy(packetBuffer, zoneData + zoneHeader->head, underSize);
+			memcpy(packetBuffer, zoneData + dataStart, underSize);
 			memcpy(packetBuffer + underSize, zoneData + ZoneDataOffset, overSize);
 			
 			packetData = packetBuffer;

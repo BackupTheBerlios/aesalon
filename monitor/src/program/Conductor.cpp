@@ -19,6 +19,7 @@
 #include "common/StringTo.h"
 #include "common/Config.h"
 #include "common/StreamAsString.h"
+#include "program/ZoneReader.h"
 
 namespace Monitor {
 namespace Program {
@@ -32,7 +33,15 @@ Conductor::~Conductor() {
 }
 
 void Conductor::run(Module::List *moduleList) {
-	sleep(3);
+	std::list<ZoneReader *> readerList;
+	int readerCount = Common::StringTo<int>(Coordinator::instance()->vault()->get("zoneReaders"));
+	for(int i = 1; i < readerCount; i ++) {
+		ZoneReader *reader = new ZoneReader(m_sharedMemory, moduleList);
+		reader->start();
+		readerList.push_back(reader);
+	}
+	ZoneReader reader(m_sharedMemory, moduleList);
+	reader.startInThread();
 	std::cout << "exiting Conductor::run() . . ." << std::endl;
 }
 

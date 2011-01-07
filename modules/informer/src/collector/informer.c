@@ -320,7 +320,9 @@ void AI_StopCollection(pthread_t tid) {
 		AI_InformerData.monitorThreadListSize ++;
 	}
 	else {
-		fprintf(stderr, "Too many threads in monitor thread list, output data will be corrupted with Aesalon data.\n");
+		fprintf(stderr,
+			"Too many threads in monitor thread list, output data will be corrupted with Aesalon"
+			"collection-thread data.\n");
 		fprintf(stderr, "Increasing threadListSize in build/config may be a good idea.\n");
 	}
 }
