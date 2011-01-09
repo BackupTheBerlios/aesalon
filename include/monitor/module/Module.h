@@ -26,13 +26,11 @@ private:
 	void *m_polisherHandle;
 	void *m_preprocessorHandle;
 	Common::PolisherInterface *m_instance;
-	bool m_loaded;
 public:
 	Module(const std::string &moduleName);
 	~Module();
 	
 	const std::string &moduleName() const { return m_moduleName; }
-	bool isLoaded() const { return m_loaded; }
 private:
 	void loadPolisher();
 	void loadPreprocessor();

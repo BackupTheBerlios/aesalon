@@ -20,7 +20,7 @@
 namespace Monitor {
 namespace Module {
 
-Module::Module(const std::string &moduleName) : m_loaded(false) {
+Module::Module(const std::string &moduleName) : m_moduleName(moduleName) {
 	m_instance = NULL;
 	loadPreprocessor();
 	loadPolisher();
@@ -48,14 +48,17 @@ void Module::loadPolisher() {
 	}
 	else {
 		m_instance = instantiate();
-		if(m_instance) m_loaded = true;
 	}
 }
 
 void Module::loadPreprocessor() {
+	std::string ppPath = Coordinator::instance()->vault()->get(m_moduleName + ":preprocessorPath");
+	if(ppPath == "") return;
 	std::string path =
-		Coordinator::instance()->vault()->get(m_moduleName + ":root")
-		+ Coordinator::instance()->vault()->get(m_moduleName + ":preprocessorPath");
+		Coordinator::instance()->vault()->get(m_moduleName + ":root") + ppPath;
+	
+	std::cout << "moduleName: \"" << m_moduleName << "\"\n";
+	std::cout << "Trying to open shared library \"" << path << "\"\n";
 	
 	m_preprocessorHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
 	if(m_preprocessorHandle == NULL) return;

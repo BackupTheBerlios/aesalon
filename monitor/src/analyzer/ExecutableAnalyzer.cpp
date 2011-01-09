@@ -10,6 +10,7 @@
 */
 
 #include "analyzer/ExecutableAnalyzer.h"
+#include "analyzer/ElfAnalyzer.h"
 
 namespace Monitor {
 namespace Analyzer {
@@ -20,6 +21,12 @@ ExecutableAnalyzer::ExecutableAnalyzer(std::string filename) : m_filename(filena
 
 ExecutableAnalyzer::~ExecutableAnalyzer() {
 	
+}
+
+Config::Vault *ExecutableAnalyzer::analyzeExecutable(std::string filename) {
+	ElfAnalyzer elfAnalyzer(filename);
+	if(elfAnalyzer.analyzerVault()) return elfAnalyzer.analyzerVault();
+	return NULL;
 }
 
 } // namespace Analyzer

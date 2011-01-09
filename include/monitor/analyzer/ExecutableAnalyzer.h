@@ -27,6 +27,11 @@ public:
 	/** Config vault items are of the form SymbolName:SymbolAddress.
 	*/
 	virtual Config::Vault *analyzerVault() = 0;
+	
+	/** Analyzes an executable by trying various processing methods.
+		@return A configuration vault, or NULL if @a filename could not be parsed.
+	*/
+	static Config::Vault *analyzeExecutable(std::string filename);
 };
 
 } // namespace Analyzer

@@ -15,6 +15,7 @@
 #include <string.h>
 #include <iostream>
 #include <vector>
+#include <sys/mman.h>
 
 #include "analyzer/ElfAnalyzer.h"
 #include "config/ConcreteVault.h"
@@ -27,25 +28,30 @@ namespace Analyzer {
 ElfAnalyzer::ElfAnalyzer(std::string filename) : ExecutableAnalyzer(filename), m_vault(NULL) {
 	filename = Common::PathSanitizer::sanitize(filename);
 	m_fd = open(filename.c_str(), O_RDONLY);
-	if(readIdent()) {
+	
+	m_fileSize = lseek(m_fd, 0, SEEK_END);
+	m_file = reinterpret_cast<uint8_t *>(mmap(NULL, m_fileSize, PROT_READ, MAP_PRIVATE, m_fd, 0));
+	
+	if(identValid()) {
 		m_vault = new Config::ConcreteVault();
 		if(m_elfType == ELF32) {
-			parseElf<Elf32_Word, Elf32_Ehdr, Elf32_Shdr, Elf32_Sym>();
+			parseElf<ELF32_TYPES>();
 		}
 		else if(m_elfType == ELF64) {
-			parseElf<Elf64_Word, Elf64_Ehdr, Elf64_Shdr, Elf64_Sym>();
+			parseElf<ELF64_TYPES>();
 		}
 	}
 	close(m_fd);
+	munmap(m_file, m_fileSize);
 }
 
 ElfAnalyzer::~ElfAnalyzer() {
 	
 }
 
-bool ElfAnalyzer::readIdent() {
-	unsigned char ident[EI_NIDENT];
-	if(read(m_fd, ident, sizeof(ident)) != EI_NIDENT) return false;
+bool ElfAnalyzer::identValid() {
+	if(m_fileSize < EI_NIDENT) return false;
+	unsigned char *ident = reinterpret_cast<unsigned char *>(m_file);
 	if(strncmp(ELFMAG, (char *)ident, SELFMAG) != 0) return false;
 	
 	/* By this point, it's probably valid. */
@@ -65,7 +71,7 @@ bool ElfAnalyzer::readIdent() {
 	return true;
 }
 
-template<typename ElfWord, typename ELFHeader, typename SectionHeader, typename SymbolHeader>
+template<typename ELFHeader, typename SectionHeader, typename SymbolHeader>
 void ElfAnalyzer::parseElf() {
 	if(m_encoding != LSB_ENCODING) {
 		std::cout << "Don't know how to handle non-LSB encoding at the moment." << std::endl;
@@ -73,24 +79,54 @@ void ElfAnalyzer::parseElf() {
 	}
 	
 	lseek(m_fd, 0, SEEK_SET);
-	ELFHeader eheader;
-	if(read(m_fd, &eheader, sizeof(eheader)) != sizeof(eheader)) return;
+	ELFHeader *eheader;
+	eheader = reinterpret_cast<ELFHeader *>(m_file);
 	
-	std::vector<SectionHeader> sectionList;
+	SectionHeader *sections = reinterpret_cast<SectionHeader *>(m_file + eheader->e_shoff);
 	
-	/* Reserve 16 sections to start with. */
-	sectionList.reserve(16);
+	SectionHeader *shstrSection = sections + eheader->e_shstrndx;
+	const char *shstr = reinterpret_cast<char *>(m_file + shstrSection->sh_offset);
 	
-	SectionHeader sheader;
-	lseek(m_fd, eheader.e_shoff, SEEK_SET);
-	for(int shnum = 0; shnum < eheader.e_shnum; shnum ++) {
-		if(read(m_fd, &sheader, sizeof(sheader)) != sizeof(sheader)) {
-			return;
+	SymbolHeader *symtab = NULL;
+	int symtabSize = 0;
+	const char *strtab = NULL;
+	SymbolHeader *dynsym = NULL;
+	int dynsymSize = 0;
+	const char *dynstr = NULL;
+	
+	for(int i = 0; i < eheader->e_shnum; i ++) {
+		SectionHeader *section = &sections[i];
+		if(!strcmp(".symtab", shstr + section->sh_name)) {
+			symtab = reinterpret_cast<SymbolHeader *>(m_file + section->sh_offset);
+			symtabSize = section->sh_size / sizeof(SymbolHeader);
 		}
-		sectionList.push_back(sheader);
+		else if(!strcmp(".strtab", shstr + section->sh_name)) {
+			strtab = reinterpret_cast<char *>(m_file + section->sh_offset);
+		}
+		else if(!strcmp(".dynsym", shstr + section->sh_name)) {
+			dynsym = reinterpret_cast<SymbolHeader *>(m_file + section->sh_offset);
+			dynsymSize = section->sh_size / sizeof(SymbolHeader);
+		}
+		else if(!strcmp(".dynstr", shstr + section->sh_name)) {
+			dynstr = reinterpret_cast<char *>(m_file + section->sh_offset);
+		}
 	}
 	
-	
+	parseSymbols<SymbolHeader>(symtab, symtabSize, strtab);
+	parseSymbols<SymbolHeader>(dynsym, dynsymSize, dynstr);
+}
+
+template<typename SymbolHeader>
+void ElfAnalyzer::parseSymbols(SymbolHeader *symbols, int symbolCount, const char *stringTable) {
+	for(int i = 0; i < symbolCount; i ++) {
+		std::cout << "Parsing symbol \"" << stringTable + symbols[i].st_name << "\" . . .\n";
+		m_vault->set(
+			Common::StreamAsString() << "\"" << stringTable + symbols[i].st_name << "\":address",
+			Common::StreamAsString() << symbols[i].st_value);
+		m_vault->set(
+			Common::StreamAsString() << "\"" << stringTable + symbols[i].st_name << "\":size",
+			Common::StreamAsString() << symbols[i].st_size);
+	}
 }
 
 } // namespace Analyzer
