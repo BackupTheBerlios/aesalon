@@ -57,9 +57,6 @@ void Module::loadPreprocessor() {
 	std::string path =
 		Coordinator::instance()->vault()->get(m_moduleName + ":root") + ppPath;
 	
-	std::cout << "moduleName: \"" << m_moduleName << "\"\n";
-	std::cout << "Trying to open shared library \"" << path << "\"\n";
-	
 	m_preprocessorHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
 	if(m_preprocessorHandle == NULL) return;
 	

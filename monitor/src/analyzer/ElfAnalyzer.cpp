@@ -119,9 +119,9 @@ void ElfAnalyzer::parseElf() {
 template<typename SymbolHeader>
 void ElfAnalyzer::parseSymbols(SymbolHeader *symbols, int symbolCount, const char *stringTable) {
 	for(int i = 0; i < symbolCount; i ++) {
-		std::cout << "Parsing symbol \"" << stringTable + symbols[i].st_name << "\" . . .\n";
+		/*std::cout << "Parsing symbol \"" << stringTable + symbols[i].st_name << "\" . . .\n";*/
 		m_vault->set(
-			Common::StreamAsString() << "\"" << stringTable + symbols[i].st_name << "\":address",
+			Common::StreamAsString() << "\"" << stringTable + symbols[i].st_name << "\":value",
 			Common::StreamAsString() << symbols[i].st_value);
 		m_vault->set(
 			Common::StreamAsString() << "\"" << stringTable + symbols[i].st_name << "\":size",

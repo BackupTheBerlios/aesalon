@@ -94,6 +94,12 @@ void *ZoneReader::run(void *voidInstance) {
 			
 			zoneHeader->head = ZoneDataOffset + overSize;
 		}
+		
+		std::cout << "Received packet:" << std::endl;
+		std::cout << "\tsize: " << packetSize << std::endl;
+		std::cout << "\tmoduleID: " << packetHeader->moduleID << std::endl;
+		std::cout << "\tPID: " << zoneHeader->processID << std::endl;
+		std::cout << "\tTID: " << zoneHeader->threadID << std::endl;
 		/* TODO: process packet. Data is in packetData, size of packet is packetSize, and header is packetHeader. */
 		/* Other associated information such as the PID and TID of the source are in zoneHeader. */
 	}

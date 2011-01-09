@@ -21,14 +21,14 @@ class PolisherInterface {
 public:
 	virtual ~PolisherInterface() {}
 	
-	virtual NetworkPacket *polish(SHMPacketHeader_t *header, void *data) = 0;
+	virtual void polish(SHMPacketHeader_t *header, void *data) = 0;
 };
 
 } // namespace Common
 
 extern "C" {
 
-Common::PolisherInterface *AP_Instantiate();
+Common::PolisherInterface *AM_InstantiatePolisher();
 
 } // extern "C"
 

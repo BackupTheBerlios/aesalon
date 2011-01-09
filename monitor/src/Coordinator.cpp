@@ -57,9 +57,6 @@ void Coordinator::run() {
 		return;
 	}
 	else {
-		Config::Vault *executable = Analyzer::ExecutableAnalyzer::analyzeExecutable(m_argv[m_argcOffset]);
-		std::cout << "address of main(): " << std::hex << executable->get("\"main\":address") << std::dec << std::endl;
-	
 		Module::Loader moduleLoader;
 		moduleLoader.loadModules();
 		Program::SharedMemory sharedMemory;

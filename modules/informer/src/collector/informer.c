@@ -134,6 +134,13 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadList[0] = self;
 	
 	AI_ContinueCollection(self);
+	
+	printf("Starting packet . . .\n");
+	AI_StartPacket(0);
+	printf("Reserving space . . .\n");
+	AI_PacketSpace(32);
+	printf("Ending packet . . .\n");
+	AI_EndPacket();
 }
 
 void __attribute__((destructor)) AI_Destruct() {
@@ -159,6 +166,12 @@ static void AI_SetupZoneUse() {
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
 		(AI_InformerData.shmHeader->configDataSize + 1)*AesalonPageSize);
 	
+	printf("zoneUseData: %p\n", AI_InformerData.zoneUseData);
+	printf("\tsize: %x\n", AI_InformerData.shmHeader->zoneUsagePages*AesalonPageSize);
+	printf("\toffset: %x\n", (AI_InformerData.shmHeader->configDataSize + 1)*AesalonPageSize);
+	printf("\tfd: %i\n", AI_InformerData.shmFd);
+	printf("\tfirst byte: %p\n", &AI_InformerData.zoneUseData[0]);
+	
 	/* +1 for the header. */
 	AI_InformerData.shmHeader->zonePageOffset =
 		AI_InformerData.shmHeader->zoneUsagePages + AI_InformerData.shmHeader->configDataSize + 1;
@@ -167,6 +180,7 @@ static void AI_SetupZoneUse() {
 static void AI_SetupZone() {
 	/* Check if more memory is required. */
 	while(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
+		printf("Allocating more memory . . .\n");
 		/* Allocate more memory. */
 		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
 		if(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
@@ -177,10 +191,14 @@ static void AI_SetupZone() {
 		sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
 	}
 	
+	printf("Looking for zone . . . (allocated zones: %i)\n", AI_InformerData.shmHeader->zonesAllocated);
+	
 	uint32_t i;
 	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
+		printf("looping . . .\n");
 		if(AI_ZoneAvailable(i)) break;
 	}
+	printf("Zone ID: %i\n", i);
 	AI_MarkZone(i);
 	AI_Zone = mmap(NULL,
 		(AI_InformerData.shmHeader->zonePageOffset + i*AI_InformerData.shmHeader->zoneSize)*AesalonPageSize,
