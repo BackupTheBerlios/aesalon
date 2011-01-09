@@ -19,16 +19,12 @@
 
 namespace Monitor {
 
-namespace Config {
-class ConcreteVault;
-} // namespace Config
-
 namespace Module {
 
 class Loader {
 private:
 	static ModuleID m_last;
-	Config::ConcreteVault *m_vault;
+	Config::Vault *m_vault;
 	List *m_moduleList;
 public:
 	Loader();

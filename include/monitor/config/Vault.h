@@ -23,6 +23,13 @@ public:
 	typedef std::pair<std::string, std::string> KeyPair;
 	virtual ~Vault() {}
 	
+	/** Clears @a key to have no value.
+	*/
+	virtual void clear(const std::string &key) = 0;
+	/** Sets @a key to @a value.
+	*/
+	virtual void set(const std::string &key, const std::string &value) = 0;
+	
 	/** Returns the last value that @a key maps to.
 	*/
 	virtual std::string get(const std::string &key) = 0;

@@ -20,7 +20,7 @@ namespace Module {
 ModuleID Loader::m_last = 0;
 
 Loader::Loader() : m_moduleList(NULL) {
-	m_vault = dynamic_cast<Config::ConcreteVault *>(Coordinator::instance()->vault());
+	m_vault = Coordinator::instance()->vault();
 }
 
 Loader::~Loader() {
@@ -40,9 +40,6 @@ void Loader::loadModules() {
 void Loader::loadModule(std::string name) {
 	Module *module = new Module(name);
 	m_vault->set(name + ":moduleID", Common::StreamAsString() << ++m_last);
-	if(module->isLoaded()) {
-		
-	}
 }
 
 } // namespace Module

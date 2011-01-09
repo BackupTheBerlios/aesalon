@@ -15,35 +15,62 @@
 
 #include "module/Module.h"
 #include "monitor/Coordinator.h"
+#include "common/Preprocessor.h"
 
 namespace Monitor {
 namespace Module {
 
 Module::Module(const std::string &moduleName) : m_loaded(false) {
-	std::string path =
-		Coordinator::instance()->vault()->get(moduleName + ":root")
-		+ Coordinator::instance()->vault()->get(moduleName + ":polisherPath");
-	
-	m_moduleHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
 	m_instance = NULL;
-	if(m_moduleHandle != NULL) {
-		Common::PolisherInterface *(*instantiate)() = NULL;
-		
-		*(void **)(&instantiate) = dlsym(m_moduleHandle, "AP_Instantiate");
-		
-		if(instantiate == NULL) {
-			/* This is an error. */
-			std::cout << "Module exists, but does not have AP_Instantiate() . . ." << std::endl;
-		}
-		else {
-			m_instance = instantiate();
-			if(m_instance) m_loaded = true;
-		}
-	}
+	loadPreprocessor();
+	loadPolisher();
 }
 
 Module::~Module() {
-	dlclose(m_moduleHandle);
+	dlclose(m_polisherHandle);
+}
+
+void Module::loadPolisher() {
+	std::string path =
+		Coordinator::instance()->vault()->get(m_moduleName + ":root")
+		+ Coordinator::instance()->vault()->get(m_moduleName + ":polisherPath");
+	
+	m_polisherHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
+	if(m_polisherHandle == NULL) return;
+	
+	Common::PolisherInterface *(*instantiate)() = NULL;
+	
+	*(void **)(&instantiate) = dlsym(m_polisherHandle, "AM_InstantiatePolisher");
+	
+	if(instantiate == NULL) {
+		/* This is an error. */
+		std::cout << "Module exists, but does not have AM_InstantiatePolisher() . . ." << std::endl;
+	}
+	else {
+		m_instance = instantiate();
+		if(m_instance) m_loaded = true;
+	}
+}
+
+void Module::loadPreprocessor() {
+	std::string path =
+		Coordinator::instance()->vault()->get(m_moduleName + ":root")
+		+ Coordinator::instance()->vault()->get(m_moduleName + ":preprocessorPath");
+	
+	m_preprocessorHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
+	if(m_preprocessorHandle == NULL) return;
+	
+	Common::Preprocessor preprocessor;
+	
+	*(void **)(&preprocessor) = dlsym(m_polisherHandle, "AM_Preprocess");
+	
+	if(preprocessor == NULL) {
+		/* This is an error. */
+		std::cout << "Module exists, but does not have AM_Preprocess() . . ." << std::endl;
+	}
+	else {
+		preprocessor(Coordinator::instance()->vault());
+	}
 }
 
 } // namespace Module
