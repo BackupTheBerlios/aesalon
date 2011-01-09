@@ -135,6 +135,9 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	AI_ContinueCollection(self);
 	
+	printf("ID#: \"%s\"\n", AI_ConfigurationString("informer:moduleID"));
+	/*printf("data: %i\n", AI_InformerData.zoneUseData[0]);*/
+	
 	printf("Starting packet . . .\n");
 	AI_StartPacket(0);
 	printf("Reserving space . . .\n");
@@ -159,12 +162,28 @@ static void AI_SetupHeader() {
 static void AI_SetupConfig() {
 	AI_InformerData.configData = mmap(NULL, AI_InformerData.shmHeader->configDataSize*AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd, AesalonPageSize);
+	
+	printf("config size: %x\n", AI_InformerData.shmHeader->configDataSize*AesalonPageSize);
+	printf("config FD: %i\n", AI_InformerData.shmFd);
+	printf("config offset: %x\n", AesalonPageSize);
 }
 
 static void AI_SetupZoneUse() {
 	AI_InformerData.zoneUseData = mmap(NULL, AI_InformerData.shmHeader->zoneUsagePages*AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
 		(AI_InformerData.shmHeader->configDataSize + 1)*AesalonPageSize);
+	
+	printf("Total SHM size: %x\n", lseek(AI_InformerData.shmFd, 0, SEEK_END));
+	
+	char content[10240];
+	
+	int fd = open("/proc/self/maps", O_RDONLY);
+	
+	read(fd, content, sizeof(content));
+	
+	close(fd);
+	
+	write(STDOUT_FILENO, content, strlen(content));
 	
 	printf("zoneUseData: %p\n", AI_InformerData.zoneUseData);
 	printf("\tsize: %x\n", AI_InformerData.shmHeader->zoneUsagePages*AesalonPageSize);

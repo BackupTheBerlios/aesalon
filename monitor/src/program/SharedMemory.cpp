@@ -117,6 +117,9 @@ void SharedMemory::setupZones() {
 	m_header->zoneSize = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneSize"));
 	m_header->zoneUsagePages = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneUsePages"));
 	m_header->zonesAllocated = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("defaultZones"));
+	
+	ftruncate(m_fd, (1 + m_header->configDataSize + m_header->zoneUsagePages +
+		(m_header->zonesAllocated*m_header->zoneSize))*AesalonPageSize);
 }
 
 } // namespace Program
