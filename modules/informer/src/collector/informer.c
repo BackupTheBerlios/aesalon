@@ -135,14 +135,8 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	AI_ContinueCollection(self);
 	
-	printf("ID#: \"%s\"\n", AI_ConfigurationString("informer:moduleID"));
-	/*printf("data: %i\n", AI_InformerData.zoneUseData[0]);*/
-	
-	printf("Starting packet . . .\n");
 	AI_StartPacket(0);
-	printf("Reserving space . . .\n");
 	AI_PacketSpace(32);
-	printf("Ending packet . . .\n");
 	AI_EndPacket();
 }
 
@@ -162,34 +156,12 @@ static void AI_SetupHeader() {
 static void AI_SetupConfig() {
 	AI_InformerData.configData = mmap(NULL, AI_InformerData.shmHeader->configDataSize*AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd, AesalonPageSize);
-	
-	printf("config size: %x\n", AI_InformerData.shmHeader->configDataSize*AesalonPageSize);
-	printf("config FD: %i\n", AI_InformerData.shmFd);
-	printf("config offset: %x\n", AesalonPageSize);
 }
 
 static void AI_SetupZoneUse() {
 	AI_InformerData.zoneUseData = mmap(NULL, AI_InformerData.shmHeader->zoneUsagePages*AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
 		(AI_InformerData.shmHeader->configDataSize + 1)*AesalonPageSize);
-	
-	printf("Total SHM size: %x\n", lseek(AI_InformerData.shmFd, 0, SEEK_END));
-	
-	char content[10240];
-	
-	int fd = open("/proc/self/maps", O_RDONLY);
-	
-	read(fd, content, sizeof(content));
-	
-	close(fd);
-	
-	write(STDOUT_FILENO, content, strlen(content));
-	
-	printf("zoneUseData: %p\n", AI_InformerData.zoneUseData);
-	printf("\tsize: %x\n", AI_InformerData.shmHeader->zoneUsagePages*AesalonPageSize);
-	printf("\toffset: %x\n", (AI_InformerData.shmHeader->configDataSize + 1)*AesalonPageSize);
-	printf("\tfd: %i\n", AI_InformerData.shmFd);
-	printf("\tfirst byte: %p\n", &AI_InformerData.zoneUseData[0]);
 	
 	/* +1 for the header. */
 	AI_InformerData.shmHeader->zonePageOffset =
@@ -199,7 +171,6 @@ static void AI_SetupZoneUse() {
 static void AI_SetupZone() {
 	/* Check if more memory is required. */
 	while(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
-		printf("Allocating more memory . . .\n");
 		/* Allocate more memory. */
 		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
 		if(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
@@ -210,24 +181,26 @@ static void AI_SetupZone() {
 		sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
 	}
 	
-	printf("Looking for zone . . . (allocated zones: %i)\n", AI_InformerData.shmHeader->zonesAllocated);
-	
 	uint32_t i;
 	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
-		printf("looping . . .\n");
 		if(AI_ZoneAvailable(i)) break;
 	}
-	printf("Zone ID: %i\n", i);
+	if(i == AI_InformerData.shmHeader->zonesAllocated) {
+		/* Something went pretty seriously wrong. Perhaps another target jumped in and took the spot first? */
+		printf("Something very wrong occurred. Trying again . . .\n");
+		AI_SetupZone();
+	}
 	AI_MarkZone(i);
 	AI_Zone = mmap(NULL,
-		(AI_InformerData.shmHeader->zonePageOffset + i*AI_InformerData.shmHeader->zoneSize)*AesalonPageSize,
+		AI_InformerData.shmHeader->zoneSize*AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
-		AI_InformerData.shmHeader->zoneSize*AesalonPageSize);
+		(AI_InformerData.shmHeader->zonePageOffset + i*AI_InformerData.shmHeader->zoneSize)*AesalonPageSize);
 	
 	((ZoneHeader_t *)AI_Zone)->head = ((ZoneHeader_t *)AI_Zone)->tail = ZoneDataOffset;
 	((ZoneHeader_t *)AI_Zone)->overflow = 0;
 	((ZoneHeader_t *)AI_Zone)->processID = getpid();
 	((ZoneHeader_t *)AI_Zone)->threadID = pthread_self();
+	
 	sem_init(&((ZoneHeader_t *)AI_Zone)->packetSemaphore, 1, 0);
 	sem_init(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore, 1, 0);
 }
@@ -236,7 +209,7 @@ static int AI_ZoneAvailable(uint32_t id) {
 	uint32_t byteOffset = id / 8;
 	uint32_t bitOffset = id % 8;
 	uint32_t mask = 0x01;
-	return AI_InformerData.zoneUseData[byteOffset] & (mask << bitOffset);
+	return !(AI_InformerData.zoneUseData[byteOffset] & (mask << bitOffset));
 }
 
 static void AI_MarkZone(uint32_t id) {
@@ -282,8 +255,8 @@ static void *AI_ReserveSpace(uint32_t amount) {
 			header->head = ZoneDataOffset;
 		}*/
 		
-		header->head += amount;
-		return &AI_Zone[header->head-amount];
+		header->tail += amount;
+		return &AI_Zone[header->tail-amount];
 	}
 	else {
 		return NULL;
@@ -303,8 +276,14 @@ void AC_EXPORT *AI_PacketSpace(uint32_t size) {
 }
 
 void AC_EXPORT AI_EndPacket() {
+	printf("packet size: %i\n", AI_ZonePacket->packetSize);
 	AI_ZonePacket = NULL;
-	sem_post(&((ZoneHeader_t *)AI_Zone)->packetSemaphore);
+	
+	ZoneHeader_t *header = (ZoneHeader_t *)AI_Zone;
+	
+	sem_post(&header->packetSemaphore);
+	
+	sem_post(&AI_InformerData.shmHeader->packetSemaphore);
 }
 
 uint64_t AI_Timestamp() {

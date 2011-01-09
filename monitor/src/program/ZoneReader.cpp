@@ -50,6 +50,7 @@ void *ZoneReader::run(void *voidInstance) {
 	ZoneReader *instance = static_cast<ZoneReader *>(voidInstance);
 	while(true) {
 		instance->m_sharedMemory->waitForPacket();
+		
 		uint8_t *zoneData = instance->m_sharedMemory->zoneWithPacket();
 		if(zoneData == NULL) continue;
 		

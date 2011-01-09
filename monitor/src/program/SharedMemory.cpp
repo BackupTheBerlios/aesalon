@@ -50,7 +50,9 @@ uint8_t *SharedMemory::zoneWithPacket() {
 		if(m_zoneUseData[i] & (0x01 << (i % 8))) {
 			uint8_t *zoneData = zone(i);
 			ZoneHeader_t *zoneHeader = reinterpret_cast<ZoneHeader_t *>(zoneData);
+
 			if(sem_trywait(&zoneHeader->packetSemaphore) == -1 && errno == EAGAIN) continue;
+			
 			return zoneData;
 		}
 	}
@@ -77,6 +79,7 @@ uint8_t *SharedMemory::zone(uint32_t id) {
 	data = static_cast<uint8_t *>(mmap(NULL, AesalonPageSize*m_header->zoneSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, m_fd,
 		(m_header->zonePageOffset + id*m_header->zoneSize)*AesalonPageSize));
+	
 	m_zoneMap[id] = data;
 	return data;
 }
