@@ -12,19 +12,34 @@
 #ifndef AesalonMonitor_VCommunication_NetworkSink_H
 #define AesalonMonitor_VCommunication_NetworkSink_H
 
+#include <vector>
+
+#include <semaphore.h>
+
 #include "DataSink.h"
 
 namespace Monitor {
 namespace VCommunication {
 
 class NetworkSink : public DataSink {
+private:
+	sem_t m_accessLock;
+	int m_serverFd;
+	
+	typedef std::vector<int> ClientFdList;
+	ClientFdList m_clientFds;
 public:
 	NetworkSink();
 	~NetworkSink();
 	
 	/** Sink a packet across a network socket.
 	*/
-	virtual void sinkPacket(Packet *packet);
+	virtual void sinkPacket(Common::VPacket *packet);
+private:
+	void openSocket();
+	void closeSocket();
+	
+	void sendPacket(Common::VPacket *packet, int fd);
 };
 
 } // namespace VCommunication

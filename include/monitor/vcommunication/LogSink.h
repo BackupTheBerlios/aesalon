@@ -29,7 +29,7 @@ public:
 	
 	/** Sink a packet into a log file.
 	*/
-	virtual void sinkPacket(Packet *packet);
+	virtual void sinkPacket(Common::VPacket *packet);
 };
 
 } // namespace VCommunication

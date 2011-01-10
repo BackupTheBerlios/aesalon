@@ -40,7 +40,7 @@ LogSink::~LogSink() {
 	}
 }
 
-void LogSink::sinkPacket(Packet *packet) {
+void LogSink::sinkPacket(Common::VPacket *packet) {
 	if(m_fd == -1) return;
 	
 	sem_wait(&m_logLock);

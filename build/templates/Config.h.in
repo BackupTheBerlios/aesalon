@@ -25,4 +25,6 @@
 
 #define AesalonInformerMonitorThreadListSize %(monitorThreadListSize)s
 
+#define AesalonConnectionQueueLength %(connectionQueueLength)s
+
 #endif

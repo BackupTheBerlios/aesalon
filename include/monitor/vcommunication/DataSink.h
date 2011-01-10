@@ -12,7 +12,7 @@
 #ifndef AesalonMonitor_VCommunication_DataSink_H
 #define AesalonMonitor_VCommunication_DataSink_H
 
-#include "Packet.h"
+#include "common/VPacket.h"
 
 namespace Monitor {
 namespace VCommunication {
@@ -22,7 +22,7 @@ public:
 	/** "Sink" a packet, e.g. process it in whatever manner the implementation can.
 		@param packet The packet to sink.
 	*/
-	virtual void sinkPacket(Packet *packet) = 0;
+	virtual void sinkPacket(Common::VPacket *packet) = 0;
 };
 
 } // namespace VCommunication
