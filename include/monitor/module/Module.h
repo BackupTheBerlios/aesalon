@@ -15,7 +15,7 @@
 #include <string>
 
 #include "config/Vault.h"
-#include "common/PolisherInterface.h"
+#include "common/MarshallerInterface.h"
 
 namespace Monitor {
 namespace Module {
@@ -25,7 +25,7 @@ private:
 	std::string m_moduleName;
 	void *m_polisherHandle;
 	void *m_preprocessorHandle;
-	Common::PolisherInterface *m_instance;
+	Common::MarshallerInterface *m_instance;
 public:
 	Module(const std::string &moduleName);
 	~Module();
