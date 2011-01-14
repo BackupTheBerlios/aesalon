@@ -53,6 +53,12 @@ struct InformerData_t {
 	uint8_t *zoneUseData;
 };
 
+typedef struct ThreadSetup_t ThreadSetup_t;
+struct ThreadSetup_t {
+	void *(*fp)(void *);
+	void *argument;
+};
+
 static InformerData_t AI_InformerData;
 
 static __thread uint8_t *AI_Zone = NULL;
@@ -79,6 +85,8 @@ static void AI_ClearZone(uint32_t id);
 	@param zoneID The zone to calculate the remaining space.
 */
 static uint32_t AI_RemainingSpace();
+
+static void *AI_startMonitoringThread(void *arg);
 
 /* ------------------------------------------------------------------ */
 
@@ -390,3 +398,19 @@ void AI_ContinueCollection(pthread_t tid) {
 	}
 }
 
+void AI_CreateMonitoringThread(void *(func)(void *), void *arg) {
+	/* Declare this as __thread so that there are no multi-threading issues here. */
+	/* NOTE: this is a kludge to avoid using dynamically-allocated memory. */
+	static __thread ThreadSetup_t threadSetup;
+	threadSetup.fp = func;
+	threadSetup.argument = arg;
+	pthread_t pt;
+	/* TODO: use the actual pthread_create, not default. */
+	pthread_create(&pt, NULL, AI_startMonitoringThread, &threadSetup);
+	AI_StopCollection(pt);
+}
+
+void *AI_startMonitoringThread(void *arg) {
+	ThreadSetup_t *thread = arg;
+	return thread->fp(thread->argument);
+}

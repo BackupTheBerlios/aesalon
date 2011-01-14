@@ -1,7 +1,7 @@
 Import("env")
 
-env.Append(CPPPATH = ["../../../include/", "../../../../include/informer/"])
-env.Append(CCFLAGS = ["-W", "-Wall", "-DAesalonCollector", "-D_GNU_SOURCE"])
+#env.Append(CPPPATH = ["../../../include/"])
+env.Append(CCFLAGS = ["-W", "-Wall", "-D_GNU_SOURCE"])
 env.Append(LIBS = ["rt", "dl"])
 
 env.SharedLibrary(target="collector", source=Glob("collector/*.c"))

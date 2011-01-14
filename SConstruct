@@ -47,6 +47,9 @@ env = Environment(
 		'TERM' : os.environ['TERM'],
 		'HOME' : os.environ['HOME']})
 
+env.Append(CPPPATH = [os.environ["PWD"] + "/include/"])
+env.Append(includeRoot = os.environ["PWD"] + "/include/")
+
 Export('env')
 
 SConscript("build/SConscript")

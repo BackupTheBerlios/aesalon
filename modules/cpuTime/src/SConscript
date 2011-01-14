@@ -1,9 +1,9 @@
 Import("env")
 
-env.Append(CPPPATH = ["../../include/", "../../include/collector/"])
-env.Append(CCFLAGS = ["-W", "-Wall", "-DAesalonCollector"])
+#env.Append(CPPPATH = ["../../include/"])
+env.Append(CCFLAGS = ["-W", "-Wall"])
 env.Append(LIBS = ["rt"])
 
 env.SharedLibrary(target="collector", source=Glob("collector/*.c"))
-env.SharedLibrary(target="polisher", source=Glob("polisher/*.cpp"))
+env.SharedLibrary(target="marshaller", source=Glob("marshaller/*.cpp"))
 

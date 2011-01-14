@@ -70,6 +70,8 @@ void AC_EXPORT AI_StopCollection(pthread_t tid);
 */
 void AC_EXPORT AI_ContinueCollection(pthread_t tid);
 
+void AC_EXPORT AI_CreateMonitoringThread(void *(func)(void *), void *arg);
+
 #ifdef __GNUC__
 	#pragma GCC visibility pop
 #else
