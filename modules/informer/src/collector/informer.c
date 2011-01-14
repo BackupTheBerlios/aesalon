@@ -25,6 +25,7 @@
 #include "informer/Informer.h"
 #include "common/Config.h"
 #include "common/ZoneHeader.h"
+#include "common/StringToBool.h"
 
 typedef struct Zone_t Zone_t;
 struct Zone_t {
@@ -350,7 +351,7 @@ long AI_ConfigurationLong(const char *name) {
 int AI_ConfigurationBool(const char *name) {
 	const char *s = AI_ConfigurationString(name);
 	if(s == NULL) return 0;
-	return strcmp(s, "false") != 0;
+	return StringToBool(s);
 }
 
 pthread_t *AI_TargetThreadList(int *size) {

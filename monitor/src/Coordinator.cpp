@@ -24,6 +24,8 @@
 #include "common/PathSanitizer.h"
 #include "program/Conductor.h"
 #include "analyzer/ExecutableAnalyzer.h"
+#include "vcommunication/NetworkSink.h"
+#include "vcommunication/LogSink.h"
 
 namespace Monitor {
 
@@ -61,6 +63,10 @@ void Coordinator::run() {
 		moduleLoader.loadModules();
 		Program::SharedMemory sharedMemory;
 		Program::Conductor conductor(&sharedMemory);
+		
+		m_generalDataSink = new VCommunication::GeneralSink();
+		m_generalDataSink->addDataSink(new VCommunication::LogSink());
+		m_generalDataSink->addDataSink(new VCommunication::NetworkSink());
 		
 		Program::Launcher launcher(&m_argv[m_argcOffset]);
 		launcher.forkTarget();

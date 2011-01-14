@@ -14,6 +14,7 @@
 
 #include "config/Vault.h"
 #include "module/List.h"
+#include "vcommunication/GeneralSink.h"
 
 namespace Monitor {
 
@@ -24,6 +25,7 @@ private:
 	int m_argcOffset;
 	Config::Vault *m_vault;
 	Module::List *m_moduleList;
+	VCommunication::GeneralSink *m_generalDataSink;
 	int m_returnValue;
 public:
 	static Coordinator *instance() { return m_instance; }

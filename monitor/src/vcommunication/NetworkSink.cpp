@@ -16,6 +16,7 @@
 
 #include "vcommunication/NetworkSink.h"
 #include "common/StringTo.h"
+#include "common/StringToBool.h"
 #include "Coordinator.h"
 
 #include "common/Config.h"
@@ -49,7 +50,7 @@ void NetworkSink::sinkPacket(Common::VPacket *packet) {
 
 void NetworkSink::openSocket() {
 	m_serverFd = -1;
-	std::string port = Coordinator::instance()->vault()->get("tcp-port");
+	std::string port = Coordinator::instance()->vault()->get("tcpPort");
 	if(port == "") {
 		return;
 	}
@@ -96,11 +97,26 @@ void NetworkSink::openSocket() {
 		m_serverFd = -1;
 		return;
 	}
+	
+	int connectionCount = Common::StringTo<int>(Coordinator::instance()->vault()->get("networkWaitCount"));
+	bool shouldWait = Common::StringToBool(Coordinator::instance()->vault()->get("networkWait"));
+	if(shouldWait) waitForConnections(connectionCount);
 }
 
 void NetworkSink::closeSocket() {
 	if(m_serverFd != -1) {
 		close(m_serverFd);
+	}
+}
+
+void NetworkSink::waitForConnections(int connectionCount) {
+	for(int i = 0; i < connectionCount; i ++) {
+		int fd = accept(m_serverFd, NULL, NULL);
+		if(fd == -1) {
+			i --;
+			continue;
+		}
+		m_clientFds.push_back(fd);
 	}
 }
 

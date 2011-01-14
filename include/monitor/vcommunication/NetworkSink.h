@@ -38,6 +38,7 @@ public:
 private:
 	void openSocket();
 	void closeSocket();
+	void waitForConnections(int connectionCount);
 	
 	void sendPacket(Common::VPacket *packet, int fd);
 };
