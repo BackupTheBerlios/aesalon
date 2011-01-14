@@ -169,21 +169,35 @@ static void AI_SetupZoneUse() {
 }
 
 static void AI_SetupZone() {
+	printf("Setting up new zone . . .\n");
+	printf("\tActive zone count:    %i\n", AI_InformerData.shmHeader->zoneCount);
+	printf("\tAllocated zone count: %i\n", AI_InformerData.shmHeader->zonesAllocated);
 	/* Check if more memory is required. */
 	while(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
 		/* Allocate more memory. */
 		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
+		
 		if(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
 			AI_InformerData.shmHeader->shmSize += AI_InformerData.shmHeader->zoneSize;
+			
 			AI_InformerData.shmHeader->zonesAllocated ++;
+			
 			ftruncate(AI_InformerData.shmFd, AI_InformerData.shmHeader->shmSize * AesalonPageSize);
 		}
+		
 		sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
 	}
 	
 	uint32_t i;
 	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
-		if(AI_ZoneAvailable(i)) break;
+		int available = AI_ZoneAvailable(i);
+		if(available) {
+			printf("Zone %i is available!\n", i);
+		}
+		else {
+			printf("Zone %i is not available.\n", i);
+		}
+		if(available) break;
 	}
 	if(i == AI_InformerData.shmHeader->zonesAllocated) {
 		/* Something went pretty seriously wrong. Perhaps another target jumped in and took the spot first? */
@@ -203,6 +217,8 @@ static void AI_SetupZone() {
 	
 	sem_init(&((ZoneHeader_t *)AI_Zone)->packetSemaphore, 1, 0);
 	sem_init(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore, 1, 0);
+	
+	printf("Set up zone properly . . .\n");
 }
 
 static int AI_ZoneAvailable(uint32_t id) {
@@ -217,6 +233,7 @@ static void AI_MarkZone(uint32_t id) {
 	uint32_t bitOffset = id % 8;
 	uint32_t mask = 0x01;
 	AI_InformerData.zoneUseData[byteOffset] |= (mask << bitOffset);
+	AI_InformerData.shmHeader->zoneCount ++;
 }
 
 static void AI_ClearZone(uint32_t id) {
@@ -224,6 +241,7 @@ static void AI_ClearZone(uint32_t id) {
 	uint32_t bitOffset = id % 8;
 	uint32_t mask = 0x01;
 	AI_InformerData.zoneUseData[byteOffset] &= ~(mask << bitOffset);
+	AI_InformerData.shmHeader->zoneCount --;
 }
 
 static uint32_t AI_RemainingSpace() {

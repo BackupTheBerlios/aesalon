@@ -38,13 +38,14 @@ void Module::loadPolisher() {
 	m_polisherHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
 	if(m_polisherHandle == NULL) return;
 	
-	Common::PolisherInterface *(*instantiate)() = NULL;
+	Common::MarshallerInterface *(*instantiate)() = NULL;
 	
-	*(void **)(&instantiate) = dlsym(m_polisherHandle, "AM_InstantiatePolisher");
+	*(void **)(&instantiate) = dlsym(m_polisherHandle, "AM_InstantiateMarshaller");
 	
 	if(instantiate == NULL) {
 		/* This is an error. */
-		std::cout << "Module exists, but does not have AM_InstantiatePolisher() . . ." << std::endl;
+		std::cout << "Module exists, but does not have exported AM_InstantiateMarshaller() . . ." << std::endl;
+		std::cout << "\tDid you forget to place it in an extern \"C\" block?" << std::endl;
 	}
 	else {
 		m_instance = instantiate();

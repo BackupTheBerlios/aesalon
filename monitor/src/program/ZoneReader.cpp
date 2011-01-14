@@ -16,6 +16,7 @@
 #include "Coordinator.h"
 #include "common/Config.h"
 #include "common/StringTo.h"
+#include "common/SHMPacket.h"
 
 namespace Monitor {
 namespace Program {

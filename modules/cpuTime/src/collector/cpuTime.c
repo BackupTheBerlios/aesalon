@@ -23,15 +23,20 @@ static ModuleID moduleID;
 
 static void *sendTime(void *unused) {
 	isRunning = 1;
+	AI_StopCollection(pthread_self());
 	while(isRunning) {
 		uint64_t exp;
 		read(timerFd, &exp, sizeof(exp));
 		uint8_t buffer[64];
 		
+		/*if(AI_CollectionStatus() == 0) continue;*/
+		
 		struct rusage ru;
 		getrusage(RUSAGE_SELF, &ru);
 		
 		uint64_t value = (ru.ru_utime.tv_sec * 1000000000) + (ru.ru_utime.tv_usec * 1000);
+		
+		printf("Starting packet . . .\n");
 		
 		AI_StartPacket(moduleID);
 		
@@ -39,6 +44,8 @@ static void *sendTime(void *unused) {
 		memcpy(packet, &value, sizeof(value));
 		
 		AI_EndPacket();
+		
+		printf("Packet finished.\n");
 	}
 	return NULL;
 }
