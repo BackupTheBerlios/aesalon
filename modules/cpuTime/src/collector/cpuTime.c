@@ -40,8 +40,12 @@ static void *sendTime(void *unused) {
 		
 		AI_StartPacket(moduleID);
 		
+		printf("Packet started . . .\n");
+		
 		void *packet = AI_PacketSpace(sizeof(value));
 		memcpy(packet, &value, sizeof(value));
+		
+		printf("Ending packet . . .\n");
 		
 		AI_EndPacket();
 		
@@ -71,6 +75,8 @@ void __attribute__((constructor)) AM_Construct() {
 		interval = 100000;
 	}
 	interval *= 1000;
+	
+	printf("Interval in ns: %i\n", interval);
 	
 	its.it_interval.tv_sec = interval / 1000000000;
 	its.it_interval.tv_nsec = interval % 1000000000;

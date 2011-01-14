@@ -102,6 +102,7 @@ void SharedMemory::setupConfiguration() {
 		while((offset + i->first.length() + i->second.length() + 2) > m_header->configDataSize*AesalonPageSize) {
 			munmap(configurationData, m_header->configDataSize*AesalonPageSize);
 			m_header->configDataSize ++;
+			/* NOTE: the +1 is for the header. */
 			ftruncate(m_fd, (m_header->configDataSize+1)*AesalonPageSize);
 			configurationData = static_cast<char *>(
 				mmap(NULL, m_header->configDataSize*AesalonPageSize, PROT_READ | PROT_WRITE, MAP_SHARED,
@@ -121,8 +122,12 @@ void SharedMemory::setupZones() {
 	m_header->zoneUsagePages = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneUsePages"));
 	m_header->zonesAllocated = Common::StringTo<uint32_t>(Coordinator::instance()->vault()->get("defaultZones"));
 	
-	ftruncate(m_fd, (1 + m_header->configDataSize + m_header->zoneUsagePages +
-		(m_header->zonesAllocated*m_header->zoneSize))*AesalonPageSize);
+	m_header->shmSize = (1 + m_header->configDataSize + m_header->zoneUsagePages +
+		(m_header->zonesAllocated*m_header->zoneSize));
+	
+	std::cout << std::hex << "SHM final size: " << m_header->shmSize*AesalonPageSize << std::dec << std::endl;
+	std::cout << "\t in pages: " << m_header->shmSize << std::endl;
+	ftruncate(m_fd, m_header->shmSize*AesalonPageSize);
 }
 
 } // namespace Program

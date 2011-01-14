@@ -182,6 +182,7 @@ static void AI_SetupZone() {
 			
 			AI_InformerData.shmHeader->zonesAllocated ++;
 			
+			printf("New size: %i pages\n", AI_InformerData.shmHeader->shmSize);
 			ftruncate(AI_InformerData.shmFd, AI_InformerData.shmHeader->shmSize * AesalonPageSize);
 		}
 		
@@ -190,30 +191,33 @@ static void AI_SetupZone() {
 	
 	uint32_t i;
 	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
-		int available = AI_ZoneAvailable(i);
-		if(available) {
-			printf("Zone %i is available!\n", i);
-		}
-		else {
-			printf("Zone %i is not available.\n", i);
-		}
-		if(available) break;
+		if(AI_ZoneAvailable(i)) break;
 	}
 	if(i == AI_InformerData.shmHeader->zonesAllocated) {
 		/* Something went pretty seriously wrong. Perhaps another target jumped in and took the spot first? */
 		printf("Something very wrong occurred. Trying again . . .\n");
 		AI_SetupZone();
 	}
+	printf("Marking zone . . .\n");
 	AI_MarkZone(i);
+	printf("Zone marked, mapping . . .\n");
 	AI_Zone = mmap(NULL,
 		AI_InformerData.shmHeader->zoneSize*AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
 		(AI_InformerData.shmHeader->zonePageOffset + i*AI_InformerData.shmHeader->zoneSize)*AesalonPageSize);
 	
+	printf("Mapped, initializing . . .\n");
+	
+	printf("Mapping offset: %x\n",
+		(AI_InformerData.shmHeader->zonePageOffset + i*AI_InformerData.shmHeader->zoneSize)*AesalonPageSize);
+	printf("Mapping size: %x\n", AI_InformerData.shmHeader->zoneSize*AesalonPageSize);
+	
 	((ZoneHeader_t *)AI_Zone)->head = ((ZoneHeader_t *)AI_Zone)->tail = ZoneDataOffset;
 	((ZoneHeader_t *)AI_Zone)->overflow = 0;
 	((ZoneHeader_t *)AI_Zone)->processID = getpid();
 	((ZoneHeader_t *)AI_Zone)->threadID = pthread_self();
+	
+	printf("Setting up semaphores . . .\n");
 	
 	sem_init(&((ZoneHeader_t *)AI_Zone)->packetSemaphore, 1, 0);
 	sem_init(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore, 1, 0);
@@ -266,7 +270,7 @@ static void *AI_ReserveSpace(uint32_t amount) {
 	
 	/* If the head is less than (or equal to) the tail, then the used memory
 		is in one contiguous chunk, and the buffer has not wrapped yet. */
-	if(header->tail <= header->head) {
+	if(header->head <= header->tail) {
 /*		if(header->head + amount >= zoneDataSize) {
 			header->gapSize = (amount + header->head) - zoneDataSize;
 			amount += header->gapSize;
@@ -277,6 +281,7 @@ static void *AI_ReserveSpace(uint32_t amount) {
 		return &AI_Zone[header->tail-amount];
 	}
 	else {
+		printf("**** Second case, returning NULL.\n");
 		return NULL;
 	}
 }
