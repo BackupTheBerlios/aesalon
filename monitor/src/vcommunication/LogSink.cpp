@@ -11,6 +11,8 @@
 
 #include <string>
 #include <fcntl.h>
+#include <stdio.h>
+#include <iostream>
 
 #include "vcommunication/LogSink.h"
 
@@ -23,11 +25,13 @@ namespace VCommunication {
 LogSink::LogSink() {
 	std::string filename = Common::PathSanitizer::sanitize(Coordinator::instance()->vault()->get("logFile"));
 	
+	std::cout << "LogSink: \"" << filename << "\"\n";
+	
 	if(filename == "") {
 		m_fd = -1;
 	}
 	else {
-		m_fd = open(filename.c_str(), O_RDWR);
+		m_fd = open(filename.c_str(), O_RDWR | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
 	
 		sem_init(&m_logLock, 0, 1);
 	}
@@ -45,7 +49,19 @@ void LogSink::sinkPacket(Common::VPacket *packet) {
 	
 	sem_wait(&m_logLock);
 	
+	ModuleID moduleID = packet->moduleID();
+	write(m_fd, &moduleID, sizeof(moduleID));
 	
+	pid_t processID = packet->processID();
+	write(m_fd, &processID, sizeof(processID));
+	
+	pthread_t threadID = packet->threadID();
+	write(m_fd, &threadID, sizeof(threadID));
+	
+	uint32_t dataSize = packet->dataSize();
+	write(m_fd, &dataSize, sizeof(dataSize));
+	
+	write(m_fd, packet->data(), dataSize);
 	
 	sem_post(&m_logLock);
 }

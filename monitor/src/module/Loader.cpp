@@ -9,6 +9,8 @@
 
 */
 
+#include <iostream>
+
 #include "module/Loader.h"
 #include "config/ConcreteVault.h"
 #include "Coordinator.h"

@@ -1,6 +1,5 @@
 Import("env")
 
-#env.Append(CPPPATH = ["../../include/"])
 env.Append(CCFLAGS = ["-W", "-Wall"])
 env.Append(LIBS = ["rt"])
 

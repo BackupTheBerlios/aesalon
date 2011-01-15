@@ -89,6 +89,10 @@ static uint32_t AI_RemainingSpace();
 
 static void *AI_startMonitoringThread(void *arg);
 
+/* Prototype copied from pthread.h. */
+static int (*AI_pthreadCreate)(pthread_t *thread, const pthread_attr_t *attr,
+                          void *(*start_routine) (void *), void *arg);
+
 /* ------------------------------------------------------------------ */
 
 void __attribute__((constructor)) AI_Construct() {
@@ -101,6 +105,8 @@ void __attribute__((constructor)) AI_Construct() {
 	pthread_t self = pthread_self();
 	
 	AI_StopCollection(self);
+	
+	*(void **)&AI_pthreadCreate = dlsym(RTLD_NEXT, "pthread_create");
 	
 	pid_t pid = getpid();
 	
@@ -143,10 +149,6 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadList[0] = self;
 	
 	AI_ContinueCollection(self);
-	
-	AI_StartPacket(0);
-	AI_PacketSpace(32);
-	AI_EndPacket();
 }
 
 void __attribute__((destructor)) AI_Destruct() {
@@ -178,9 +180,6 @@ static void AI_SetupZoneUse() {
 }
 
 static void AI_SetupZone() {
-	printf("Setting up new zone . . .\n");
-	printf("\tActive zone count:    %i\n", AI_InformerData.shmHeader->zoneCount);
-	printf("\tAllocated zone count: %i\n", AI_InformerData.shmHeader->zonesAllocated);
 	/* Check if more memory is required. */
 	while(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
 		/* Allocate more memory. */
@@ -191,7 +190,6 @@ static void AI_SetupZone() {
 			
 			AI_InformerData.shmHeader->zonesAllocated ++;
 			
-			printf("New size: %i pages\n", AI_InformerData.shmHeader->shmSize);
 			ftruncate(AI_InformerData.shmFd, AI_InformerData.shmHeader->shmSize * AesalonPageSize);
 		}
 		
@@ -207,31 +205,19 @@ static void AI_SetupZone() {
 		printf("Something very wrong occurred. Trying again . . .\n");
 		AI_SetupZone();
 	}
-	printf("Marking zone . . .\n");
 	AI_MarkZone(i);
-	printf("Zone marked, mapping . . .\n");
 	AI_Zone = mmap(NULL,
 		AI_InformerData.shmHeader->zoneSize*AesalonPageSize,
 		PROT_READ | PROT_WRITE, MAP_SHARED, AI_InformerData.shmFd,
 		(AI_InformerData.shmHeader->zonePageOffset + i*AI_InformerData.shmHeader->zoneSize)*AesalonPageSize);
-	
-	printf("Mapped, initializing . . .\n");
-	
-	printf("Mapping offset: %x\n",
-		(AI_InformerData.shmHeader->zonePageOffset + i*AI_InformerData.shmHeader->zoneSize)*AesalonPageSize);
-	printf("Mapping size: %x\n", AI_InformerData.shmHeader->zoneSize*AesalonPageSize);
 	
 	((ZoneHeader_t *)AI_Zone)->head = ((ZoneHeader_t *)AI_Zone)->tail = ZoneDataOffset;
 	((ZoneHeader_t *)AI_Zone)->overflow = 0;
 	((ZoneHeader_t *)AI_Zone)->processID = getpid();
 	((ZoneHeader_t *)AI_Zone)->threadID = pthread_self();
 	
-	printf("Setting up semaphores . . .\n");
-	
 	sem_init(&((ZoneHeader_t *)AI_Zone)->packetSemaphore, 1, 0);
 	sem_init(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore, 1, 0);
-	
-	printf("Set up zone properly . . .\n");
 }
 
 static int AI_ZoneAvailable(uint32_t id) {
@@ -413,4 +399,26 @@ void AI_CreateMonitoringThread(void *(func)(void *), void *arg) {
 void *AI_startMonitoringThread(void *arg) {
 	ThreadSetup_t *thread = arg;
 	return thread->fp(thread->argument);
+}
+
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)(void *), void *arg) {
+	if(!AI_InformerData.initialized) AI_Construct();
+	
+	int returnValue = AI_pthreadCreate(thread, attr, start_routine, arg);
+	if(AI_InformerData.threadCount == AI_InformerData.threadListSize) {
+		pthread_t self = pthread_self();
+		AI_StopCollection(self);
+		
+		AI_InformerData.threadListSize *= 2;
+		
+		pthread_t *threadList = realloc(AI_InformerData.threadList,
+			sizeof(pthread_t) * AI_InformerData.threadListSize);
+		
+		AI_InformerData.threadList = threadList;
+		
+		AI_ContinueCollection(self);
+	}
+	AI_InformerData.threadList[AI_InformerData.threadCount] = *thread;
+	
+	return returnValue;
 }

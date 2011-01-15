@@ -24,7 +24,7 @@ class Module {
 private:
 	std::string m_moduleName;
 	ModuleID m_moduleID;
-	void *m_polisherHandle;
+	void *m_marshallerHandle;
 	void *m_preprocessorHandle;
 	Common::MarshallerInterface *m_instance;
 public:

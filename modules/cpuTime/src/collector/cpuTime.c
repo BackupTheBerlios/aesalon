@@ -9,6 +9,7 @@
 #include <sys/timerfd.h>
 #include <pthread.h>
 #include <string.h>
+#include <time.h>
 
 #ifndef TFD_CLOEXEC
 	#error "TFD_CLOEXEC must be defined; this is a Linux-specific feature available in 2.6.27 and later."
@@ -31,15 +32,27 @@ static void *sendTime(void *unused) {
 		
 		/*if(AI_CollectionStatus() == 0) continue;*/
 		
-		struct rusage ru;
-		getrusage(RUSAGE_SELF, &ru);
+		/*struct rusage ru;
+		getrusage(RUSAGE_SELF, &ru);*/
 		
-		uint64_t value = (ru.ru_utime.tv_sec * 1000000000) + (ru.ru_utime.tv_usec * 1000);
+		int targetListSize;
+		pthread_t *targetThreads = AI_TargetThreadList(&targetListSize);
 		
 		AI_StartPacket(moduleID);
+		void *packet = AI_PacketSpace(sizeof(uint64_t) * targetListSize);
 		
-		void *packet = AI_PacketSpace(sizeof(value));
-		memcpy(packet, &value, sizeof(value));
+		int i;
+		for(i = 0; i < targetListSize; i ++) {
+			uint64_t *value = (uint64_t *)packet + i;
+			
+			clockid_t clockID;
+			
+			pthread_getcpuclockid(targetThreads[i], &clockID);
+			
+			struct timespec tp;
+			clock_gettime(clockID, &tp);
+			*value = tp.tv_nsec + tp.tv_sec * 1000000000;
+		}
 		
 		AI_EndPacket();
 	}
@@ -52,7 +65,6 @@ void __attribute__((constructor)) AM_Construct() {
 	
 	/* Retrieve the module ID# . . . */
 	moduleID = AI_ConfigurationLong("cpuTime:moduleID");
-	printf("cpuTime:moduleID: %i\n", moduleID);
 	
 	/* NOTE: TFD_CLOEXEC was introduced in Linux 2.6.27; timerfd_create() is Linux-specific. */
 	if((timerFd = timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC)) == -1) {

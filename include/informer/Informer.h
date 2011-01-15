@@ -72,6 +72,10 @@ void AC_EXPORT AI_ContinueCollection(pthread_t tid);
 
 void AC_EXPORT AI_CreateMonitoringThread(void *(func)(void *), void *arg);
 
+/* Overloaded functions. */
+
+int AC_EXPORT pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
+
 #ifdef __GNUC__
 	#pragma GCC visibility pop
 #else

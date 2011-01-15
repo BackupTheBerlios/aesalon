@@ -9,7 +9,11 @@
 
 */
 
+#include <iostream>
+
 #include "module/List.h"
+#include "Coordinator.h"
+#include "common/StringTo.h"
 
 namespace Monitor {
 namespace Module {
@@ -23,10 +27,13 @@ List::~List() {
 }
 
 void List::addModule(Module *module) {
-	if(module->moduleID() >= m_moduleList.size()) {
+	ModuleID moduleID = Common::StringTo<ModuleID>(
+		Coordinator::instance()->vault()->get(module->moduleName() + ":moduleID"));
+	
+	if(moduleID >= m_moduleList.size()) {
 		m_moduleList.resize(module->moduleID()+1);
 	}
-	m_moduleList[module->moduleID()] = module;
+	m_moduleList[moduleID] = module;
 }
 
 Module *List::module(ModuleID id) {

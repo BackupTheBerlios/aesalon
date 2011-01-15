@@ -23,8 +23,6 @@ namespace Program {
 
 ZoneReader::ZoneReader(SharedMemory *sharedMemory, Module::List *moduleList, VCommunication::DataSink *dataSink)
 	: m_sharedMemory(sharedMemory), m_moduleList(moduleList), m_dataSink(dataSink) {
-	
-	std::cout << "moduleList: " << (void *)moduleList << std::endl;
 }
 
 ZoneReader::~ZoneReader() {

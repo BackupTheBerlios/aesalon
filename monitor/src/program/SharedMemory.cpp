@@ -125,8 +125,6 @@ void SharedMemory::setupZones() {
 	m_header->shmSize = (1 + m_header->configDataSize + m_header->zoneUsagePages +
 		(m_header->zonesAllocated*m_header->zoneSize));
 	
-	std::cout << std::hex << "SHM final size: " << m_header->shmSize*AesalonPageSize << std::dec << std::endl;
-	std::cout << "\t in pages: " << m_header->shmSize << std::endl;
 	ftruncate(m_fd, m_header->shmSize*AesalonPageSize);
 }
 

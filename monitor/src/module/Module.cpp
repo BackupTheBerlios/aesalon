@@ -28,20 +28,24 @@ Module::Module(const std::string &moduleName) : m_moduleName(moduleName) {
 }
 
 Module::~Module() {
-	dlclose(m_polisherHandle);
+	dlclose(m_marshallerHandle);
 }
 
 void Module::loadMarshaller() {
 	std::string path =
 		Coordinator::instance()->vault()->get(m_moduleName + ":root")
-		+ Coordinator::instance()->vault()->get(m_moduleName + ":polisherPath");
+		+ Coordinator::instance()->vault()->get(m_moduleName + ":marshallerPath");
 	
-	m_polisherHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
-	if(m_polisherHandle == NULL) return;
+	std::cout << path << std::endl;
+	
+	m_marshallerHandle = dlopen(path.c_str(), RTLD_LOCAL | RTLD_NOW);
+	if(m_marshallerHandle == NULL) {
+		return;
+	}
 	
 	Common::MarshallerInterface *(*instantiate)() = NULL;
 	
-	*(void **)(&instantiate) = dlsym(m_polisherHandle, "AM_InstantiateMarshaller");
+	*(void **)(&instantiate) = dlsym(m_marshallerHandle, "AM_InstantiateMarshaller");
 	
 	if(instantiate == NULL) {
 		/* This is an error. */
@@ -51,8 +55,6 @@ void Module::loadMarshaller() {
 	else {
 		m_instance = instantiate();
 	}
-	
-	m_moduleID = Common::StringTo<ModuleID>(Coordinator::instance()->vault()->get(m_moduleName + ":moduleID"));
 }
 
 void Module::loadPreprocessor() {
@@ -66,7 +68,7 @@ void Module::loadPreprocessor() {
 	
 	Common::Preprocessor preprocessor;
 	
-	*(void **)(&preprocessor) = dlsym(m_polisherHandle, "AM_Preprocess");
+	*(void **)(&preprocessor) = dlsym(m_marshallerHandle, "AM_Preprocess");
 	
 	if(preprocessor == NULL) {
 		/* This is an error. */
