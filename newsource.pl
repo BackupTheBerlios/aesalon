@@ -136,7 +136,8 @@ if($mode eq "monitor") {
 	createSource("monitor/src/", extractNamespace($ARGV[1]), "Monitor");
 }
 elsif($mode eq "visualizer") {
-
+	createHeader("include/visualizer/", extractNamespace($ARGV[1]), "Visualizer");
+	createSource("visualizer/src/", extractNamespace($ARGV[1]), "Visualizer");
 }
 elsif($mode eq "common") {
 	createHeader("include/common", extractNamespace($ARGV[1]), "Common");
