@@ -31,7 +31,3 @@ profile.*
 
 # Local ignores
 musings/
-
-# Qt 4 auto-moc'd files.
-moc_*.moc.cpp
-

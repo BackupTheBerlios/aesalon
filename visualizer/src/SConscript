@@ -5,7 +5,8 @@ Import("qtEnv")
 
 env = qtEnv
 
-env.Replace(QT4_MOCHSUFFIX = ".moc.cpp")
+env.Replace(QT4_MOCHSUFFIX = ".cpp")
+env.Replace(QT4_MOCHPREFIX = "../../visualizer/build/moc_")
 
 env.EnableQt4Modules(["QtCore", "QtGui", "QtNetwork"])
 

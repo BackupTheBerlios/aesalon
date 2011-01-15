@@ -13,10 +13,6 @@ int main(int argc, char *argv[]) {
 	QCoreApplication::setOrganizationName("aesalon");
 	QCoreApplication::setApplicationVersion(AesalonVersion);
 	
-	QTranslator translator;
-	translator.load("en_ca");
-	app.installTranslator(&translator);
-	
 	Visualizer::MainWindow mw;
 	mw.show();
 	

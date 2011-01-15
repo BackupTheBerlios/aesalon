@@ -17,22 +17,25 @@ if not sys.stdout.isatty():
       colors[key] = ''
 
 compile_source_message = '%sCompiling %s==> %s$SOURCE%s' % \
-   (colors['blue'], colors['purple'], colors['yellow'], colors['end'])
+	(colors['blue'], colors['purple'], colors['yellow'], colors['end'])
 
 compile_shared_source_message = '%sCompiling shared %s==> %s$SOURCE%s' % \
-   (colors['blue'], colors['purple'], colors['yellow'], colors['end'])
+	(colors['blue'], colors['purple'], colors['yellow'], colors['end'])
 
 link_program_message = '%sLinking Program %s==> %s$TARGET%s' % \
-   (colors['red'], colors['purple'], colors['yellow'], colors['end'])
+	(colors['red'], colors['purple'], colors['yellow'], colors['end'])
 
 link_library_message = '%sLinking Static Library %s==> %s$TARGET%s' % \
-   (colors['red'], colors['purple'], colors['yellow'], colors['end'])
+	(colors['red'], colors['purple'], colors['yellow'], colors['end'])
 
 ranlib_library_message = '%sRanlib Library %s==> %s$TARGET%s' % \
-   (colors['red'], colors['purple'], colors['yellow'], colors['end'])
+	(colors['red'], colors['purple'], colors['yellow'], colors['end'])
 
 link_shared_library_message = '%sLinking Shared Library %s==> %s$TARGET%s' % \
-   (colors['red'], colors['purple'], colors['yellow'], colors['end'])
+	(colors['red'], colors['purple'], colors['yellow'], colors['end'])
+
+moc_file_message = '%sMoc-ing%s ==> %s$SOURCE%s' % \
+	(colors['green'], colors['purple'], colors['yellow'], colors['end'])
 
 env = Environment(
 	CXXCOMSTR = compile_source_message,
@@ -43,6 +46,7 @@ env = Environment(
 	RANLIBCOMSTR = ranlib_library_message,
 	SHLINKCOMSTR = link_shared_library_message,
 	LINKCOMSTR = link_program_message,
+	MOCCOMSTR = moc_file_message,
 	
 	ENV = {'PATH' : os.environ['PATH'],
 		'TERM' : os.environ['TERM'],
