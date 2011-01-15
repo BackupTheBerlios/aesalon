@@ -92,7 +92,7 @@ void NetworkSink::openSocket() {
 		return;
 	}
 	
-	m_sockType = rp->ai_socktype;
+	m_sockType = rp->ai_family;
 	
 	freeaddrinfo(result);
 	
@@ -122,15 +122,25 @@ void NetworkSink::waitForConnections(int connectionCount) {
 			i --;
 			continue;
 		}
+#if INET6_ADDRSTRLEN > INET_ADDRSTRLEN
+		char buffer[INET6_ADDRSTRLEN];
+#else
+		char buffer[INET_ADDRSTRLEN];
+#endif
 		
-		char buffer[INET6_ADDRSTRLEN + 1];
+		void *address = NULL;
 		
-		const char *ret = inet_ntop(AF_INET, &peerAddress, buffer, sizeof(buffer));
-		std::cout << "ret: " << ret << std::endl;
+		if(m_sockType == AF_INET) {
+			struct sockaddr_in *sin = (struct sockaddr_in *)&peerAddress;
+			address = &sin->sin_addr;
+		}
+		else if(m_sockType == AF_INET6) {
+			struct sockaddr_in6 *sin = (struct sockaddr_in6 *)&peerAddress;
+			address = &sin->sin6_addr;
+		}
+		inet_ntop(m_sockType, address, buffer, sizeof(buffer));
 		
 		std::cout << "Client connected from " << buffer << std::endl;
-		
-		/*peerAddress.*/
 		
 		m_clientFds.push_back(fd);
 	}
