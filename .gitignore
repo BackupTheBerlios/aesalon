@@ -8,6 +8,7 @@ vgcore.*
 *.sr.orig 
 .*.swp
 *.sr.orig
+*.pyc
 
 # Buildsystem (scons) ignores
 .sconsign.dblite
@@ -30,4 +31,7 @@ profile.*
 
 # Local ignores
 musings/
+
+# Qt 4 auto-moc'd files.
+moc_*.moc.cpp
 

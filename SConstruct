@@ -55,6 +55,12 @@ env.Append(includeRoot = cwd + "/include/")
 
 Export('env')
 
+qtEnv = env.Clone()
+qt4 = Tool("qt4", toolpath=["build/tools"])
+qt4(qtEnv)
+
+Export("qtEnv")
+
 SConscript("build/SConscript")
 SConscript("monitor/SConscript")
 SConscript("modules/SConscript")

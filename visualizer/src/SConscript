@@ -1,53 +1,19 @@
 import sys
 import subprocess
 
-Import("env")
+Import("qtEnv")
 
-env = env.Clone()
+env = qtEnv
+
+env.Replace(QT4_MOCHSUFFIX = ".moc.cpp")
+
+env.EnableQt4Modules(["QtCore", "QtGui", "QtNetwork"])
 
 visualizerIncludePath = env.Dictionary()["includeRoot"] + "/visualizer"
 
 env.Append(CPPPATH = [visualizerIncludePath])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonVisualizer"])
 
-pkgconfig = subprocess.Popen("pkg-config QtCore QtGui QtNetwork --cflags", stdout=subprocess.PIPE, shell=True)
-qtCFlags = pkgconfig.stdout.read()
-env.Append(CCFLAGS = qtCFlags.split())
-
-pkgconfig = subprocess.Popen("pkg-config QtCore QtGui QtNetwork --libs", stdout=subprocess.PIPE, shell=True)
-qtLibs = pkgconfig.stdout.read()
-env.Append(LIBS = qtLibs.split())
-
 sourceFiles = Glob("[!moc]*.cpp", strings=True) + Glob("[!moc]*/*.cpp", strings=True)
 
-headerFiles = Glob(visualizerIncludePath + "*.h", strings=True) + Glob(visualizerIncludePath + "*/*.h", strings=True)
-
-if len(headerFiles) > 0:
-	grep = subprocess.Popen(["grep", "-H", "Q_OBJECT"] + headerFiles, stdout=subprocess.PIPE)
-	mocHeaderLines = grep.stdout.readlines()
-else:
-	mocHeaderLines = []
-
-mocFiles = []
-
-def is_qobject(line):
-	line = line.split(":")[1:]
-	# TODO: actually check line here
-	return True
-
-def mocFile(headerName):
-	baseName = headerName.split("/")[-1:][0]
-	baseName = baseName[:baseName.rfind(".")]
-	
-	outputPath = "../build/moc-" + baseName + ".cpp"
-	
-	moc = subprocess.Popen(["moc", headerName, "-o", outputPath])
-	
-	global mocFiles
-	mocFiles += [outputPath]
-
-for header in mocHeaderLines:
-	if is_qobject(header.strip()):
-		mocFile(header.split(":")[0])
-
-env.Program(target = "aesalon_visualizer", source = sourceFiles + mocFiles)
+env.Program(target = "aesalon_visualizer", source = sourceFiles)
