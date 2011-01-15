@@ -30,7 +30,8 @@ namespace Common {
 /** C++ version of the StringToBool function. Returns the boolean representation of @a string.
 */
 inline bool StringToBool(const std::string &string) {
-	return StringToBool(string.c_str()) == 1;
+	if(string.length() == 0) return 0;
+	else return StringToBool(string.c_str()) == 1;
 }
 
 } // namespace Common

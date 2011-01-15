@@ -13,6 +13,7 @@
 #include <netdb.h>
 #include <string.h>
 #include <stdio.h>
+#include <arpa/inet.h>
 
 #include "vcommunication/NetworkSink.h"
 #include "common/StringTo.h"
@@ -91,6 +92,8 @@ void NetworkSink::openSocket() {
 		return;
 	}
 	
+	m_sockType = rp->ai_socktype;
+	
 	freeaddrinfo(result);
 	
 	if(listen(m_serverFd, AesalonConnectionQueueLength) == -1) {
@@ -99,7 +102,7 @@ void NetworkSink::openSocket() {
 	}
 	
 	int connectionCount = Common::StringTo<int>(Coordinator::instance()->vault()->get("networkWaitCount"));
-	bool shouldWait = Common::StringToBool(Coordinator::instance()->vault()->get("networkWait"));
+	bool shouldWait = true; //Common::StringToBool(Coordinator::instance()->vault()->get("networkWait"));
 	if(shouldWait) waitForConnections(connectionCount);
 }
 
@@ -110,12 +113,25 @@ void NetworkSink::closeSocket() {
 }
 
 void NetworkSink::waitForConnections(int connectionCount) {
+	std::cout << "Waiting for " << connectionCount << " connections . . ." << std::endl;
 	for(int i = 0; i < connectionCount; i ++) {
-		int fd = accept(m_serverFd, NULL, NULL);
+		struct sockaddr peerAddress;
+		socklen_t peerAddressSize = sizeof(peerAddress);
+		int fd = accept(m_serverFd, &peerAddress, &peerAddressSize);
 		if(fd == -1) {
 			i --;
 			continue;
 		}
+		
+		char buffer[INET6_ADDRSTRLEN + 1];
+		
+		const char *ret = inet_ntop(AF_INET, &peerAddress, buffer, sizeof(buffer));
+		std::cout << "ret: " << ret << std::endl;
+		
+		std::cout << "Client connected from " << buffer << std::endl;
+		
+		/*peerAddress.*/
+		
 		m_clientFds.push_back(fd);
 	}
 }

@@ -25,6 +25,7 @@ class NetworkSink : public DataSink {
 private:
 	sem_t m_accessLock;
 	int m_serverFd;
+	int m_sockType;
 	
 	typedef std::vector<int> ClientFdList;
 	ClientFdList m_clientFds;
