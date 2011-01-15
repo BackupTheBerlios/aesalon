@@ -10,11 +10,11 @@ visualizerIncludePath = env.Dictionary()["includeRoot"] + "/visualizer"
 env.Append(CPPPATH = [visualizerIncludePath])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonVisualizer"])
 
-pkgconfig = subprocess.Popen("pkg-config QtCore QtGui --cflags", stdout=subprocess.PIPE, shell=True)
+pkgconfig = subprocess.Popen("pkg-config QtCore QtGui QtNetwork --cflags", stdout=subprocess.PIPE, shell=True)
 qtCFlags = pkgconfig.stdout.read()
 env.Append(CCFLAGS = qtCFlags.split())
 
-pkgconfig = subprocess.Popen("pkg-config QtCore QtGui --libs", stdout=subprocess.PIPE, shell=True)
+pkgconfig = subprocess.Popen("pkg-config QtCore QtGui QtNetwork --libs", stdout=subprocess.PIPE, shell=True)
 qtLibs = pkgconfig.stdout.read()
 env.Append(LIBS = qtLibs.split())
 

@@ -2,7 +2,7 @@
 
 {
 	# The version of Aesalon.
-	"version": "0.3.9.1",
+	"version": "0.4.0",
 	
 	# The name of the module configuration file in the module root.
 	"moduleConfigFileName": "module.conf",

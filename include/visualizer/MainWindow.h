@@ -5,21 +5,23 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/visualizer//DisplayWindow.h
+	@file include/visualizer/MainWindow.h
 
 */
 
-#ifndef AesalonVisualizer_DisplayWindow_H
-#define AesalonVisualizer_DisplayWindow_H
+#include <QMainWindow>
 
-#include <QObject>
+#ifndef AesalonVisualizer_MainWindow_H
+#define AesalonVisualizer_MainWindow_H
 
 namespace Visualizer {
 
-class DisplayWindow : public QObject { Q_OBJECT
+class MainWindow : public QMainWindow { Q_OBJECT
 public:
-	DisplayWindow();
-	virtual ~DisplayWindow();
+	MainWindow();
+	virtual ~MainWindow();
+private:
+	void setupMenus();
 };
 
 } // namespace Visualizer

@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 
 colors = {}
 colors["cyan"]   = '\033[96m'
@@ -47,8 +48,10 @@ env = Environment(
 		'TERM' : os.environ['TERM'],
 		'HOME' : os.environ['HOME']})
 
-env.Append(CPPPATH = [os.environ["PWD"] + "/include/"])
-env.Append(includeRoot = os.environ["PWD"] + "/include/")
+cwd = subprocess.Popen("pwd", stdout=subprocess.PIPE).stdout.read().strip()
+
+env.Append(CPPPATH = [cwd + "/include/"])
+env.Append(includeRoot = cwd + "/include/")
 
 Export('env')
 
