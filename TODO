@@ -3,6 +3,7 @@
 
 ==== Monitor ====
 - Properly use DataSinks.
+- Implement a unified messaging system.
 
 ==== Marshaller ====
 - Allow access to the marshaller list for inter-module communication via "setup" function, to save function pointers etc.

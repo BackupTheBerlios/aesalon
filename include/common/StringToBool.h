@@ -17,7 +17,7 @@
 /** C version of the StringToBool function. Returns the boolean representation of @a string.
 */
 inline int StringToBool(const char *string) {
-	if(strcmp(string, "true") == 0 || strcmp(string, "True") == 0) return 1;
+	if(string != NULL && (strcmp(string, "true") == 0 || strcmp(string, "True") == 0)) return 1;
 	return 0;
 }
 
@@ -29,9 +29,9 @@ namespace Common {
 
 /** C++ version of the StringToBool function. Returns the boolean representation of @a string.
 */
-inline bool StringToBool(const std::string &string) {
-	if(string.length() == 0) return 0;
-	else return StringToBool(string.c_str()) == 1;
+bool StringToBool(const std::string &string) {
+	if(string.length() == 0) return false;
+	return ::StringToBool(string.c_str()) == 1;
 }
 
 } // namespace Common
