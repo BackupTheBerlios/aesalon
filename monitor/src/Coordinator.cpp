@@ -62,11 +62,12 @@ void Coordinator::run() {
 		Module::Loader moduleLoader;
 		moduleLoader.loadModules();
 		Program::SharedMemory sharedMemory;
-		Program::Conductor conductor(&sharedMemory);
 		
 		m_generalDataSink = new VCommunication::GeneralSink();
 		m_generalDataSink->addDataSink(new VCommunication::LogSink());
 		m_generalDataSink->addDataSink(new VCommunication::NetworkSink());
+		
+		Program::Conductor conductor(&sharedMemory, m_generalDataSink);
 		
 		Program::Launcher launcher(&m_argv[m_argcOffset]);
 		launcher.forkTarget();

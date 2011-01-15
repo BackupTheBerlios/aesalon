@@ -308,7 +308,6 @@ void AC_EXPORT *AI_PacketSpace(uint32_t size) {
 }
 
 void AC_EXPORT AI_EndPacket() {
-	printf("packet size: %i\n", AI_ZonePacket->packetSize);
 	AI_ZonePacket = NULL;
 	
 	ZoneHeader_t *header = (ZoneHeader_t *)AI_Zone;

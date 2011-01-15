@@ -21,9 +21,10 @@
 namespace Monitor {
 namespace Program {
 
-ZoneReader::ZoneReader(SharedMemory *sharedMemory, Module::List *moduleList) :
-	m_sharedMemory(sharedMemory), m_moduleList(moduleList) {
+ZoneReader::ZoneReader(SharedMemory *sharedMemory, Module::List *moduleList, VCommunication::DataSink *dataSink)
+	: m_sharedMemory(sharedMemory), m_moduleList(moduleList), m_dataSink(dataSink) {
 	
+	std::cout << "moduleList: " << (void *)moduleList << std::endl;
 }
 
 ZoneReader::~ZoneReader() {
@@ -102,8 +103,23 @@ void *ZoneReader::run(void *voidInstance) {
 		std::cout << "\tmoduleID: " << packetHeader->moduleID << std::endl;
 		std::cout << "\tPID: " << zoneHeader->processID << std::endl;
 		std::cout << "\tTID: " << zoneHeader->threadID << std::endl;
-		/* TODO: process packet. Data is in packetData, size of packet is packetSize, and header is packetHeader. */
-		/* Other associated information such as the PID and TID of the source are in zoneHeader. */
+		
+		Module::Module *module = instance->m_moduleList->module(packetHeader->moduleID);
+		if(module == NULL) {
+			std::cout << "Unknown packet received from module ID#" << packetHeader->moduleID << std::endl;
+			continue;
+		}
+		Common::MarshallerInterface *interface = module->marshallerInterface();
+		if(interface != NULL) {
+			Common::VPacket packet(
+				zoneHeader->processID,
+				zoneHeader->threadID,
+				packetHeader->moduleID,
+				packetData,
+				packetSize);
+			
+			interface->marhsall(instance->m_dataSink, &packet);
+		}
 	}
 	free(packetBuffer);
 	return NULL;

@@ -23,6 +23,7 @@ namespace Module {
 class Module {
 private:
 	std::string m_moduleName;
+	ModuleID m_moduleID;
 	void *m_polisherHandle;
 	void *m_preprocessorHandle;
 	Common::MarshallerInterface *m_instance;
@@ -30,9 +31,12 @@ public:
 	Module(const std::string &moduleName);
 	~Module();
 	
+	ModuleID moduleID() const { return m_moduleID; }
+	
 	const std::string &moduleName() const { return m_moduleName; }
+	Common::MarshallerInterface *marshallerInterface() const { return m_instance; }
 private:
-	void loadPolisher();
+	void loadMarshaller();
 	void loadPreprocessor();
 };
 

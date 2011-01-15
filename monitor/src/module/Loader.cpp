@@ -21,6 +21,7 @@ ModuleID Loader::m_last = 0;
 
 Loader::Loader() : m_moduleList(NULL) {
 	m_vault = Coordinator::instance()->vault();
+	m_moduleList = new List();
 }
 
 Loader::~Loader() {
@@ -40,6 +41,7 @@ void Loader::loadModules() {
 void Loader::loadModule(std::string name) {
 	Module *module = new Module(name);
 	m_vault->set(name + ":moduleID", Common::StreamAsString() << ++m_last);
+	m_moduleList->addModule(module);
 }
 
 } // namespace Module

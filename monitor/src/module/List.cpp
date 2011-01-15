@@ -23,7 +23,10 @@ List::~List() {
 }
 
 void List::addModule(Module *module) {
-	m_moduleList.push_back(module);
+	if(module->moduleID() >= m_moduleList.size()) {
+		m_moduleList.resize(module->moduleID()+1);
+	}
+	m_moduleList[module->moduleID()] = module;
 }
 
 Module *List::module(ModuleID id) {

@@ -36,20 +36,12 @@ static void *sendTime(void *unused) {
 		
 		uint64_t value = (ru.ru_utime.tv_sec * 1000000000) + (ru.ru_utime.tv_usec * 1000);
 		
-		printf("Starting packet . . .\n");
-		
 		AI_StartPacket(moduleID);
-		
-		printf("Packet started . . .\n");
 		
 		void *packet = AI_PacketSpace(sizeof(value));
 		memcpy(packet, &value, sizeof(value));
 		
-		printf("Ending packet . . .\n");
-		
 		AI_EndPacket();
-		
-		printf("Packet finished.\n");
 	}
 	return NULL;
 }
@@ -60,6 +52,7 @@ void __attribute__((constructor)) AM_Construct() {
 	
 	/* Retrieve the module ID# . . . */
 	moduleID = AI_ConfigurationLong("cpuTime:moduleID");
+	printf("cpuTime:moduleID: %i\n", moduleID);
 	
 	/* NOTE: TFD_CLOEXEC was introduced in Linux 2.6.27; timerfd_create() is Linux-specific. */
 	if((timerFd = timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC)) == -1) {

@@ -24,7 +24,8 @@
 namespace Monitor {
 namespace Program {
 
-Conductor::Conductor(SharedMemory *sharedMemory) : m_sharedMemory(sharedMemory) {
+Conductor::Conductor(SharedMemory *sharedMemory, VCommunication::DataSink *dataSink)
+	: m_sharedMemory(sharedMemory), m_dataSink(dataSink) {
 	
 }
 
@@ -36,11 +37,11 @@ void Conductor::run(Module::List *moduleList) {
 	std::list<ZoneReader *> readerList;
 	int readerCount = Common::StringTo<int>(Coordinator::instance()->vault()->get("zoneReaders"));
 	for(int i = 1; i < readerCount; i ++) {
-		ZoneReader *reader = new ZoneReader(m_sharedMemory, moduleList);
+		ZoneReader *reader = new ZoneReader(m_sharedMemory, moduleList, m_dataSink);
 		reader->start();
 		readerList.push_back(reader);
 	}
-	ZoneReader reader(m_sharedMemory, moduleList);
+	ZoneReader reader(m_sharedMemory, moduleList, m_dataSink);
 	reader.startInThread();
 	std::cout << "exiting Conductor::run() . . ." << std::endl;
 }

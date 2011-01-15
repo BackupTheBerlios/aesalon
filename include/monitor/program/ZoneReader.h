@@ -16,6 +16,7 @@
 
 #include "module/List.h"
 #include "SharedMemory.h"
+#include "vcommunication/DataSink.h"
 
 namespace Monitor {
 namespace Program {
@@ -25,8 +26,9 @@ private:
 	SharedMemory *m_sharedMemory;
 	Module::List *m_moduleList;
 	pthread_t m_threadID;
+	VCommunication::DataSink *m_dataSink;
 public:
-	ZoneReader(SharedMemory *sharedMemory, Module::List *moduleList);
+	ZoneReader(SharedMemory *sharedMemory, Module::List *moduleList, VCommunication::DataSink *dataSink);
 	~ZoneReader();
 	
 	void start();

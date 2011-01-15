@@ -103,10 +103,7 @@ void NetworkSink::openSocket() {
 	
 	int connectionCount = Common::StringTo<int>(Coordinator::instance()->vault()->get("networkWaitCount"));
 	
-	std::string s = Coordinator::instance()->vault()->get("networkWait");
-	
-	std::cout << "\"" << s << "\"\n";
-	bool shouldWait = Common::StringToBool(s);
+	bool shouldWait = Common::StringToBool(Coordinator::instance()->vault()->get("networkWait"));
 	if(shouldWait) waitForConnections(connectionCount);
 }
 

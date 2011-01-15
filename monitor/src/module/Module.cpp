@@ -16,6 +16,7 @@
 #include "module/Module.h"
 #include "monitor/Coordinator.h"
 #include "common/Preprocessor.h"
+#include "common/StringTo.h"
 
 namespace Monitor {
 namespace Module {
@@ -23,14 +24,14 @@ namespace Module {
 Module::Module(const std::string &moduleName) : m_moduleName(moduleName) {
 	m_instance = NULL;
 	loadPreprocessor();
-	loadPolisher();
+	loadMarshaller();
 }
 
 Module::~Module() {
 	dlclose(m_polisherHandle);
 }
 
-void Module::loadPolisher() {
+void Module::loadMarshaller() {
 	std::string path =
 		Coordinator::instance()->vault()->get(m_moduleName + ":root")
 		+ Coordinator::instance()->vault()->get(m_moduleName + ":polisherPath");
@@ -50,6 +51,8 @@ void Module::loadPolisher() {
 	else {
 		m_instance = instantiate();
 	}
+	
+	m_moduleID = Common::StringTo<ModuleID>(Coordinator::instance()->vault()->get(m_moduleName + ":moduleID"));
 }
 
 void Module::loadPreprocessor() {

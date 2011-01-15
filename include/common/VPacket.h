@@ -27,7 +27,8 @@ private:
 	void *m_data;
 	uint32_t m_dataSize;
 public:
-	VPacket(pid_t processID, pthread_t threadID, ModuleID moduleID, void *data, uint32_t dataSize);
+	VPacket(pid_t processID, pthread_t threadID, ModuleID moduleID, void *data, uint32_t dataSize)
+		: m_processID(processID), m_threadID(threadID), m_moduleID(moduleID), m_data(data), m_dataSize(dataSize) {}
 	~VPacket() {}
 	
 	pid_t processID() const { return m_processID; }

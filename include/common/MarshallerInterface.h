@@ -13,6 +13,7 @@
 #define AesalonCommon_MarshallerInterface_H
 
 #include "VPacket.h"
+#include "vcommunication/DataSink.h"
 
 namespace Common {
 
@@ -20,7 +21,7 @@ class MarshallerInterface {
 public:
 	virtual ~MarshallerInterface() {}
 	
-	virtual void marhsall(VPacket *packet) = 0;
+	virtual void marhsall(Monitor::VCommunication::DataSink *dataSink, VPacket *packet) = 0;
 };
 
 } // namespace Common

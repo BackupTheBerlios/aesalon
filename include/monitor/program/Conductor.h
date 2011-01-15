@@ -18,6 +18,7 @@
 
 #include "module/List.h"
 #include "SharedMemory.h"
+#include "vcommunication/DataSink.h"
 
 namespace Monitor {
 namespace Program {
@@ -25,8 +26,9 @@ namespace Program {
 class Conductor {
 private:
 	SharedMemory *m_sharedMemory;
+	VCommunication::DataSink *m_dataSink;
 public:
-	Conductor(Monitor::Program::SharedMemory *sharedMemory);
+	Conductor(Monitor::Program::SharedMemory *sharedMemory, VCommunication::DataSink *dataSink);
 	~Conductor();
 	
 	void run(Module::List *moduleList);
