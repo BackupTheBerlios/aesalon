@@ -52,10 +52,10 @@ void LogSink::sinkPacket(Common::VPacket *packet) {
 	ModuleID moduleID = packet->moduleID();
 	write(m_fd, &moduleID, sizeof(moduleID));
 	
-	pid_t processID = packet->processID();
+	uint32_t processID = packet->processID();
 	write(m_fd, &processID, sizeof(processID));
 	
-	pthread_t threadID = packet->threadID();
+	uint32_t threadID = packet->threadID();
 	write(m_fd, &threadID, sizeof(threadID));
 	
 	uint32_t dataSize = packet->dataSize();

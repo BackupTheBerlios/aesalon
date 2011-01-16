@@ -1,6 +1,6 @@
-Serialization format:
+Serialization format: (all values LSB)
 -	ModuleID (2 bytes)
--	PID (2 bytes)
--	TID (2 bytes)
+-	PID (4 bytes)
+-	TID (4 bytes)
 -	dataSize (4 bytes)
 -	data (dataSize bytes)

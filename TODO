@@ -10,4 +10,3 @@
 ==== Collector ====
 Informer:
 - Re-implement AI_ReserveSpace. It looks a tad flaky.
-- Establish a consistent thread addressing scheme.

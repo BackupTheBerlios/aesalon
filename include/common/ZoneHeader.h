@@ -47,10 +47,10 @@ struct ZoneHeader_t {
 	uint32_t gapSize;
 	
 	/** The PID that the zone's data comes from. */
-	pid_t processID;
+	uint32_t processID;
 	
 	/** The thread ID the zone's data comes from. */
-	pthread_t threadID;
+	uint32_t threadID;
 };
 
 #endif

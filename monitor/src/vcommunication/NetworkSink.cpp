@@ -151,10 +151,10 @@ void NetworkSink::sendPacket(Common::VPacket *packet, int fd) {
 	ModuleID moduleID = packet->moduleID();
 	write(fd, &moduleID, sizeof(moduleID));
 	
-	pid_t processID = packet->processID();
+	uint32_t processID = packet->processID();
 	write(fd, &processID, sizeof(processID));
 	
-	pthread_t threadID = packet->threadID();
+	uint32_t threadID = packet->threadID();
 	write(fd, &threadID, sizeof(threadID));
 	
 	uint32_t dataSize = packet->dataSize();

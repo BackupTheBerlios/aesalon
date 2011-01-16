@@ -43,6 +43,14 @@ struct SharedMemoryHeader_t {
 	
 	/** Resizing semaphore; locked when a thread is resizing the SHM. */
 	sem_t resizeSemaphore;
+	
+	/** The last process ID; used to assign 4-byte thread IDs dynamically.
+	*/
+	uint32_t lastProcessID;
+	
+	/** The last thread ID; used to assign 4-byte thread IDs dynamically.
+	*/
+	uint32_t lastThreadID;
 };
 
 #endif

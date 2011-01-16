@@ -12,8 +12,7 @@
 #ifndef AesalonCommon_VPacket_H
 #define AesalonCommon_VPacket_H
 
-#include <sys/types.h>
-#include <pthread.h>
+#include <stdint.h>
 
 #include "ModuleID.h"
 
@@ -21,18 +20,18 @@ namespace Common {
 
 class VPacket {
 private:
-	pid_t m_processID;
-	pthread_t m_threadID;
+	uint32_t m_processID;
+	uint32_t m_threadID;
 	ModuleID m_moduleID;
 	void *m_data;
 	uint32_t m_dataSize;
 public:
-	VPacket(pid_t processID, pthread_t threadID, ModuleID moduleID, void *data, uint32_t dataSize)
+	VPacket(uint32_t processID, uint32_t threadID, ModuleID moduleID, void *data, uint32_t dataSize)
 		: m_processID(processID), m_threadID(threadID), m_moduleID(moduleID), m_data(data), m_dataSize(dataSize) {}
 	~VPacket() {}
 	
-	pid_t processID() const { return m_processID; }
-	pthread_t threadID() const { return m_threadID; }
+	uint32_t processID() const { return m_processID; }
+	uint32_t threadID() const { return m_threadID; }
 	ModuleID moduleID() const { return m_moduleID; }
 	
 	void *data() const { return m_data; }

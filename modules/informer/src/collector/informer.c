@@ -213,8 +213,8 @@ static void AI_SetupZone() {
 	
 	((ZoneHeader_t *)AI_Zone)->head = ((ZoneHeader_t *)AI_Zone)->tail = ZoneDataOffset;
 	((ZoneHeader_t *)AI_Zone)->overflow = 0;
-	((ZoneHeader_t *)AI_Zone)->processID = getpid();
-	((ZoneHeader_t *)AI_Zone)->threadID = pthread_self();
+	((ZoneHeader_t *)AI_Zone)->processID = ++AI_InformerData.shmHeader->lastProcessID;
+	((ZoneHeader_t *)AI_Zone)->threadID = ++AI_InformerData.shmHeader->lastThreadID;
 	
 	sem_init(&((ZoneHeader_t *)AI_Zone)->packetSemaphore, 1, 0);
 	sem_init(&((ZoneHeader_t *)AI_Zone)->overflowSemaphore, 1, 0);
