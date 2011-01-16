@@ -54,6 +54,7 @@ env = Environment(
 
 cwd = subprocess.Popen("pwd", stdout=subprocess.PIPE).stdout.read().strip()
 
+env.Append(projectRoot = cwd)
 env.Append(CPPPATH = [cwd + "/include/"])
 env.Append(includeRoot = cwd + "/include/")
 
