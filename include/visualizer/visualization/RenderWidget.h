@@ -15,10 +15,14 @@
 #include <QObject>
 #include <QWidget>
 
+#include <QGraphicsView>
+
 namespace Visualizer {
 namespace Visualization {
 
 class RenderWidget : public QWidget { Q_OBJECT
+private:
+	QGraphicsView *m_view;
 public:
 	RenderWidget();
 	virtual ~RenderWidget();

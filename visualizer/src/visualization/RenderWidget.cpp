@@ -15,12 +15,14 @@ namespace Visualizer {
 namespace Visualization {
 
 RenderWidget::RenderWidget() {
-
+	m_view = new QGraphicsView();
 }
 
 RenderWidget::~RenderWidget() {
 
 }
+
+
 
 } // namespace Visualization
 } // namespace Visualizer
