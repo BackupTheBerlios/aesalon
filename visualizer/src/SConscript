@@ -15,6 +15,6 @@ visualizerIncludePath = env.Dictionary()["includeRoot"] + "/visualizer"
 env.Append(CPPPATH = [visualizerIncludePath])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonVisualizer"])
 
-sourceFiles = Glob("[!moc]*.cpp", strings=True) + Glob("[!moc]*/*.cpp", strings=True)
+sourceFiles = Glob("*.cpp", strings=True) + Glob("*/*.cpp", strings=True)
 
 env.Program(target = "aesalon_visualizer", source = sourceFiles)

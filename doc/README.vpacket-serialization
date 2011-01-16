@@ -1,0 +1,6 @@
+Serialization format:
+-	ModuleID (2 bytes)
+-	PID (2 bytes)
+-	TID (2 bytes)
+-	dataSize (4 bytes)
+-	data (dataSize bytes)
