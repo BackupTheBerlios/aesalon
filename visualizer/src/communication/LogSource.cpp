@@ -14,7 +14,7 @@
 namespace Visualizer {
 namespace Communication {
 
-LogSource::LogSource(const QString &filename) {
+LogSource::LogSource(const QString &filename) : m_packet(0, 0, 0, NULL, 0) {
 	m_file = new QFile(filename);
 }
 
@@ -28,8 +28,19 @@ bool LogSource::open() {
 
 Common::VPacket *LogSource::nextPacket() {
 	ModuleID moduleID;
+	uint32_t pid, tid, dataSize;
 	
-	return NULL;
+	m_data = m_file->read(sizeof(moduleID) + sizeof(pid)*3);
+	moduleID = *reinterpret_cast<ModuleID *>(m_data.data());
+	pid = *reinterpret_cast<uint32_t *>(m_data.data() + sizeof(moduleID));
+	tid = *reinterpret_cast<uint32_t *>(m_data.data() + sizeof(moduleID) + sizeof(pid));
+	dataSize = *reinterpret_cast<uint32_t *>(m_data.data() + sizeof(moduleID) + sizeof(pid)*2);
+	
+	m_data = m_file->read(dataSize);
+	
+	m_packet = Common::VPacket(pid, tid, moduleID, m_data.data(), dataSize);
+	
+	return &m_packet;
 }
 
 } // namespace Communication

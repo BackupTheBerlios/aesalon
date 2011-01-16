@@ -17,6 +17,10 @@
 namespace Visualizer {
 namespace Communication {
 
+/** Represents a single source of collected data.
+	This class's implementations may not be thread-safe, and should only be
+	used from a single thread concurrently.
+*/
 class DataSource {
 public:
 	virtual ~DataSource() {}
@@ -30,6 +34,7 @@ public:
 	/** Returns the next available packet. This function may block.
 		@return The next packet, or NULL if there are no more packets
 			forthcoming (e.g. the socket has closed, EOF, etc.)
+			This packet should NOT be freed by the caller.
 	*/
 	virtual Common::VPacket *nextPacket() = 0;
 };

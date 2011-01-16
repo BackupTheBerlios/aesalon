@@ -23,6 +23,8 @@ namespace Communication {
 class LogSource : public DataSource {
 private:
 	QFile *m_file;
+	QByteArray m_data;
+	Common::VPacket m_packet;
 public:
 	LogSource(const QString &filename);
 	virtual ~LogSource();
