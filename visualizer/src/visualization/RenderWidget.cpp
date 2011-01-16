@@ -22,7 +22,5 @@ RenderWidget::~RenderWidget() {
 
 }
 
-
-
 } // namespace Visualization
 } // namespace Visualizer
