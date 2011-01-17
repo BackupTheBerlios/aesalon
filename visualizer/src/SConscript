@@ -9,6 +9,7 @@ projectRoot = env.Dictionary()["projectRoot"] + "/"
 
 env.Replace(QT4_MOCHSUFFIX = ".cpp")
 env.Replace(QT4_MOCHPREFIX = projectRoot + "visualizer/build/moc_")
+env.Replace(QT4_QRCCXXPREFIX = projectRoot + "visualizer/build/qrc_")
 
 automocPath = [
 	projectRoot + "visualizer/src/",
@@ -29,6 +30,6 @@ visualizerIncludePath = env.Dictionary()["includeRoot"] + "/visualizer"
 env.Append(CPPPATH = [visualizerIncludePath])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonVisualizer"])
 
-sourceFiles = Glob("*.cpp", strings=True) + Glob("*/*.cpp", strings=True)
+sourceFiles = Glob("*.cpp", strings=True) + Glob("*/*.cpp", strings=True) + Glob("*.qrc", strings=True)
 
 env.Program(target = "aesalon_visualizer", source = sourceFiles)

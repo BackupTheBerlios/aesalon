@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <QTranslator>
 
-#include "MainWindow.h"
+#include "RootWindow.h"
 
 #include "common/Config.h"
 
@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
 	QCoreApplication::setOrganizationName("aesalon");
 	QCoreApplication::setApplicationVersion(AesalonVersion);
 	
-	Visualizer::MainWindow mw;
-	mw.show();
+	Visualizer::RootWindow rw;
+	rw.show();
 	
 	return app.exec();
 }
