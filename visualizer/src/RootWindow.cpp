@@ -12,7 +12,6 @@
 #include "RootWindow.h"
 #include <QMenuBar>
 #include <QStyle>
-#include <QDockWidget>
 #include <QLabel>
 
 namespace Visualizer {
@@ -31,7 +30,7 @@ void RootWindow::initialSetup() {
 	setMinimumHeight(400);
 	
 	/* Icon . . . */
-	setWindowIcon(QIcon(":/data/aesalon-icon-96x96.png"));
+	setWindowIcon(QIcon(":/icon.png"));
 	
 	/* Menus . . . */
 	QMenu *menu = NULL;
@@ -47,12 +46,11 @@ void RootWindow::initialSetup() {
 		tr("&Close"));
 	connect(action, SIGNAL(triggered(bool)), SLOT(close()));
 	
-	QDockWidget *testWidget = new QDockWidget(tr("Test"), this);
-	testWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	testWidget->setWidget(new QLabel("Testing"));
-	addDockWidget(Qt::LeftDockWidgetArea, testWidget);
+	m_splitter = new QSplitter();
 	
-	setCentralWidget(new QLabel("main"));
+	m_splitter->setOrientation(Qt::Horizontal);
+	
+	setCentralWidget(m_splitter);
 }
 
 void RootWindow::newRootWindow() {

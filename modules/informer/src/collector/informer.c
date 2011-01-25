@@ -392,7 +392,7 @@ void AI_CreateMonitoringThread(void *(func)(void *), void *arg) {
 	threadSetup.argument = arg;
 	pthread_t pt;
 	/* TODO: use the actual pthread_create, not default. */
-	pthread_create(&pt, NULL, AI_startMonitoringThread, &threadSetup);
+	AI_pthreadCreate(&pt, NULL, AI_startMonitoringThread, &threadSetup);
 	AI_StopCollection(pt);
 }
 

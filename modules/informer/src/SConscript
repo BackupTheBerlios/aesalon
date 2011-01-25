@@ -1,6 +1,5 @@
 Import("env")
 
-#env.Append(CPPPATH = ["../../../include/"])
 env.Append(CCFLAGS = ["-W", "-Wall", "-D_GNU_SOURCE"])
 env.Append(LIBS = ["rt", "dl"])
 
