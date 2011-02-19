@@ -46,11 +46,8 @@ void RootWindow::initialSetup() {
 		tr("&Close"));
 	connect(action, SIGNAL(triggered(bool)), SLOT(close()));
 	
-	m_splitter = new QSplitter();
-	
-	m_splitter->setOrientation(Qt::Horizontal);
-	
-	setCentralWidget(m_splitter);
+	m_mdiArea = new QMdiArea(this);
+	setCentralWidget(m_mdiArea);
 }
 
 void RootWindow::newRootWindow() {

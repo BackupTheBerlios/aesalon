@@ -12,14 +12,14 @@
 #ifndef AesalonVisualizer_RootWindow_H
 #define AesalonVisualizer_RootWindow_H
 
-#include <QSplitter>
 #include <QMainWindow>
+#include <QMdiArea>
 
 namespace Visualizer {
 
 class RootWindow : public QMainWindow { Q_OBJECT
 private:
-	QSplitter *m_splitter;
+	QMdiArea *m_mdiArea;
 public:
 	RootWindow();
 	virtual ~RootWindow();
