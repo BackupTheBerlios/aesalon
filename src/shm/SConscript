@@ -1,0 +1,5 @@
+Import("env")
+
+env.StaticLibrary(target = "shm-read", source = Glob("read/*.cpp"))
+env.StaticLibrary(target = "shm-write", source = Glob("write/*.c"))
+

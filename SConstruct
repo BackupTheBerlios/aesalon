@@ -57,6 +57,7 @@ cwd = subprocess.Popen("pwd", stdout=subprocess.PIPE).stdout.read().strip()
 env.Append(projectRoot = cwd)
 env.Append(CPPPATH = [cwd + "/include/"])
 env.Append(includeRoot = cwd + "/include/")
+env.Append(CCFLAGS = ["-W", "-Wall", "-g"])
 
 Export('env')
 
