@@ -1,0 +1,4 @@
+dirglob = Glob("*/SConscript", strings=True)
+
+for path in dirglob:
+	SConscript(path)

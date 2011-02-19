@@ -67,7 +67,4 @@ qt4(qtEnv)
 Export("qtEnv")
 
 SConscript("build/SConscript")
-SConscript("monitor/SConscript")
-SConscript("modules/SConscript")
-SConscript("tests/SConscript")
-SConscript("visualizer/SConscript")
+SConscript("src/SConscript", variant_dir=".build", duplicate=0)

@@ -1,8 +1,5 @@
 Import("env")
 
-monitorIncludePath = env.Dictionary()["includeRoot"] + "/monitor"
-
-env.Append(CPPPATH = [monitorIncludePath])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonMonitor"])
 env.Append(LIBS = ["rt"])
 

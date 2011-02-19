@@ -12,6 +12,7 @@ vgcore.*
 
 # Buildsystem (scons) ignores
 .sconsign.dblite
+.build
 
 # IDE (KDevelop 4) ignores
 *kdev*

@@ -21,6 +21,6 @@ config = file("config", "r")
 buildConfig = eval(config.read())
 config.close()
 
-createConfig("../include/common/Config.h", "templates/Config.h.in", buildConfig)
+createConfig("../include/Config.h", "templates/Config.h.in", buildConfig)
 
-generateConfig("../include/common/Config.h.auto")
+generateConfig("../include/Config.h.auto")
