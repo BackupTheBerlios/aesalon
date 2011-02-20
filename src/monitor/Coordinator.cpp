@@ -15,6 +15,7 @@
 #include "monitor/ArgumentParser.h"
 #include "config/Parser.h"
 #include "util/PathSanitizer.h"
+#include "util/MessageSystem.h"
 
 namespace Monitor {
 

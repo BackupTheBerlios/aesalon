@@ -11,6 +11,7 @@
 #include "Exception.h"
 
 #include "monitor/Coordinator.h"
+#include "util/MessageSystem.h"
 
 int main(int argc, char *argv[]) {
 	try {

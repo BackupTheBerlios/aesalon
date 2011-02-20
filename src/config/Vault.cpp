@@ -12,7 +12,7 @@
 namespace Config {
 
 Vault::Vault() {
-
+	
 }
 
 void Vault::clear(const std::string &key) {

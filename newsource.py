@@ -67,7 +67,6 @@ public:
 	"cppHeaderEnd":
 """
 #endif
-
 """
 }
 

@@ -15,7 +15,7 @@
 
 #include "config/Parser.h"
 #include "util/StreamAsString.h"
-#include "config/ParsingException.h"
+#include "util/MessageSystem.h"
 #include "Config.h"
 
 namespace Config {
@@ -61,7 +61,7 @@ void Parser::parse(Vault *vault, const std::string &configFile) {
 			if(currentModule != "") {
 				currentModule = "";
 			}
-			else throw ParsingException("Extra \"}\"");
+			else Message(Fatal, "Extra \"}\" in config file.");
 		}
 		else if(tokenType == WORD && token == "use") {
 			/*std::cout << "Parser: Using module \"" << expectNextToken(WORD) << "\"\n";*/
@@ -91,20 +91,18 @@ void Parser::parse(Vault *vault, const std::string &configFile) {
 					/*std::cout << "Set \"" << currentModule << "::" << token << "\" to \""
 						<< next << "\" with operator " << op << std::endl;*/
 				}
-				else throw ParsingException("Invalid RHS");
+				else Message(Fatal, "Invalid RHS");
 				
 				std::string sym = expectNextToken(SYMBOL);
 				if(sym == ";") break;
 				else if(sym == ",") {}
 				else {
-					throw ParsingException(Util::StreamAsString()
-						<< "Expected \",\" or \";\", got \"" << sym << "\"");
+					Message(Fatal, "Expected \",\" or \";\", got \"" << sym << "\"");
 				}
 			} while(true);
 		}
 		else {
-			throw ParsingException(Util::StreamAsString()
-				<< "Syntax error at token \"" << token << "\"");
+			Message(Fatal, "Syntax error at token \"" << token << "\"");
 		}
 		//std::cout << "\"" << token << "\"\n";
 	}
@@ -198,8 +196,7 @@ std::string Parser::nextToken(TokenType &type) {
 		std::string rest;
 		stream >> rest;
 		
-		throw ParsingException(Util::StreamAsString()
-			<< "Unrecognized token: \"+" << rest << "\"");
+		Message(Fatal, "Unrecognized token: \"+" << rest << "\"");
 	}
 	else {
 		std::string token;
@@ -215,8 +212,8 @@ std::string Parser::expectNextToken(TokenType expected) {
 	std::string token = nextToken(actual);
 	
 	if(actual != expected) {
-		throw ParsingException(Util::StreamAsString()
-			<< "Expected " << nameOf(expected) << " token, found " << nameOf(actual)
+		Message(Fatal,
+			"Expected " << nameOf(expected) << " token, found " << nameOf(actual)
 			<< " token: \"" << token << "\"");
 	}
 	
@@ -226,8 +223,7 @@ std::string Parser::expectNextToken(TokenType expected) {
 void Parser::expectNextSymbol(const std::string &symbol) {
 	std::string s = expectNextToken(SYMBOL);
 	if(symbol != s) {
-		throw ParsingException(Util::StreamAsString()
-			<< "Expected token \"" << symbol << "\", got \"" << s << "\"");
+		Message(Fatal, "Expected token \"" << symbol << "\", got \"" << s << "\"");
 	}
 }
 
