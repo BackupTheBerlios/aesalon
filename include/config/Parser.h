@@ -1,25 +1,20 @@
-/**
-	Aesalon, a tool to visualize a program's behaviour at run-time.
-	Copyright (C) 2010, Aesalon Development Team.
-
-	Aesalon is distributed under the terms of the GNU GPLv3. For more
-	licensing information, see the file LICENSE included with the distribution.
+/** Aesalon, a tool to visualize program behaviour in real time.
+	Copyright (C) 2009-2011, Aesalon development team.
 	
-	@file include/monitor/config/Parser.h
-
+	Aesalon is distributed under the terms of the GNU GPLv3. See
+	the included file LICENSE for more information.
+	
+	@file include/config/Parser.h
 */
 
-#ifndef AesalonMonitor_Config_Parser_H
-#define AesalonMonitor_Config_Parser_H
+#ifndef AesalonConfig_Parser_H
+#define AesalonConfig_Parser_H
 
-#include <iosfwd>
+#include <fstream>
 
 #include "Vault.h"
 
-namespace Monitor {
 namespace Config {
-
-class ConcreteVault;
 
 class Parser {
 private:
@@ -32,14 +27,8 @@ private:
 		END_OF_FILE
 	};
 public:
-	/** Parses a single configuration file.
-		@note Assumes @a configFile is an absolute path.
-	*/
-	void parse(ConcreteVault *vault, const std::string &configFile);
-	/** Parses a directory's worth of module configuration files.
-		@note Assumes @a directory is absolute.
-	*/
-	void parseDirectory(ConcreteVault *vault, const std::string &directory);
+	void parse(Vault *vault, const std::string &configFile);
+	void parseDirectory(Vault *vault, const std::string &directory);
 private:
 	void openFile(const std::string &configFile);
 	std::string nextToken(TokenType &type);
@@ -52,6 +41,6 @@ private:
 };
 
 } // namespace Config
-} // namespace Monitor
 
 #endif
+

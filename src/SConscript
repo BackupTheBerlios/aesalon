@@ -1,4 +1,14 @@
+Import("env")
+
 dirglob = Glob("*/SConscript", strings=True)
+
+# Construct linking path first . . .
+for path in dirglob:
+	dirname = path[:path.find('/')]
+	env.Append(LIBPATH = ["#.build/" + dirname])
+#	print env.Dump("LIBPATH")
 
 for path in dirglob:
 	SConscript(path)
+
+#print env.Dump()

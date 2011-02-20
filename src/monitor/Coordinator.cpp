@@ -1,31 +1,20 @@
-/**
-	Aesalon, a tool to visualize a program's behaviour at run-time.
-	Copyright (C) 2010, Aesalon Development Team.
-
-	Aesalon is distributed under the terms of the GNU GPLv3. For more
-	licensing information, see the file LICENSE included with the distribution.
+/** Aesalon, a tool to visualize program behaviour in real time.
+	Copyright (C) 2009-2011, Aesalon development team.
 	
-	@file monitor/src/Coordinator.cpp
-
+	Aesalon is distributed under the terms of the GNU GPLv3. See
+	the included file LICENSE for more information.
+	
+	@file src/monitor/Coordinator.cpp
 */
 
 #include <iostream>
-#include <limits.h>
-#include <stdlib.h>
 
-#include "Coordinator.h"
-#include "config/ArgumentParser.h"
+#include "Config.h"
+
+#include "monitor/Coordinator.h"
+#include "monitor/ArgumentParser.h"
 #include "config/Parser.h"
-#include "common/Config.h"
-#include "program/Launcher.h"
-#include "module/Module.h"
-#include "module/Loader.h"
-#include "config/ConcreteVault.h"
-#include "common/PathSanitizer.h"
-#include "program/Conductor.h"
-#include "analyzer/ExecutableAnalyzer.h"
-#include "vcommunication/NetworkSink.h"
-#include "vcommunication/LogSink.h"
+#include "util/PathSanitizer.h"
 
 namespace Monitor {
 
@@ -44,7 +33,8 @@ void Coordinator::run() {
 	
 	if(m_vault->get("::list-attributes") == "true") {
 		std::cout << "Listing all configuration keys and values." << std::endl;
-		std::cout << "Please note that many of these are auto-generated." << std::endl;
+		std::cout << "Please note that many of these are auto-generated," << std::endl;
+		std::cout << "\tand thus their values may be non-canonical/sensible." << std::endl;
 		std::cout << "================" << std::endl;
 		std::vector<Config::Vault::KeyPair> list;
 		m_vault->match("*", list);
@@ -54,41 +44,26 @@ void Coordinator::run() {
 			std::cout << "    * \"" << i->first << "\" ==> \"" << i->second << "\"\n";
 		}
 	}
+	else if(m_vault->get("::version") == "true") {
+		usage(false);
+	}
 	else if(m_argv[m_argcOffset] == NULL || m_vault->get("::help") == "true") {
 		usage(true);
-		return;
 	}
 	else {
-		Module::Loader moduleLoader;
-		moduleLoader.loadModules();
-		Program::SharedMemory sharedMemory;
 		
-		m_generalDataSink = new VCommunication::GeneralSink();
-		m_generalDataSink->addDataSink(new VCommunication::LogSink());
-		m_generalDataSink->addDataSink(new VCommunication::NetworkSink());
-		
-		Program::Conductor conductor(&sharedMemory, m_generalDataSink);
-		
-		Program::Launcher launcher(&m_argv[m_argcOffset]);
-		launcher.forkTarget();
-		
-		conductor.run(moduleLoader.moduleList());
 	}
 }
 
 void Coordinator::parseConfigs() {
 	Config::Parser parser;
+	m_vault = new Config::Vault();
 	
-	Config::ConcreteVault *vault = new Config::ConcreteVault();
+	parser.parse(m_vault, Util::PathSanitizer::sanitize(AesalonMonitorGlobalConfig));
+	parser.parse(m_vault, Util::PathSanitizer::sanitize(AesalonMonitorUserConfig));
+	parser.parse(m_vault, Util::PathSanitizer::sanitize(AesalonMonitorLocalConfig));
 	
-	parser.parse(vault, Common::PathSanitizer::sanitize(AesalonGlobalConfig));
-	parser.parse(vault, Common::PathSanitizer::sanitize(AesalonUserConfig));
-	parser.parse(vault, Common::PathSanitizer::sanitize(AesalonLocalConfig));
-	
-	Config::ArgumentParser argParser;
-	m_argcOffset = argParser.parse(vault, m_argv);
-	
-	m_vault = vault;
+	m_argcOffset = ArgumentParser::parse(m_vault, m_argv);
 }
 
 void Coordinator::usage(bool displayHelp) {

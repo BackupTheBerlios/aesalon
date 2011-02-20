@@ -1,20 +1,18 @@
-/**
-	Aesalon, a tool to visualize a program's behaviour at run-time.
-	Copyright (C) 2010, Aesalon Development Team.
-
-	Aesalon is distributed under the terms of the GNU GPLv3. For more
-	licensing information, see the file LICENSE included with the distribution.
+/** Aesalon, a tool to visualize program behaviour in real time.
+	Copyright (C) 2009-2011, Aesalon development team.
 	
-	@file include/common/StreamAsString.h
-
+	Aesalon is distributed under the terms of the GNU GPLv3. See
+	the included file LICENSE for more information.
+	
+	@file include/util/StreamAsString.h
 */
 
-#ifndef AesalonCommon_StreamAsString_H
-#define AesalonCommon_StreamAsString_H
+#ifndef AesalonUtil_StreamAsString_H
+#define AesalonUtil_StreamAsString_H
 
 #include <sstream>
 
-namespace Common {
+namespace Util {
 
 class StreamAsString {
 public:
@@ -48,6 +46,7 @@ private:
     std::ostringstream stream;
 };
 
-} // namespace Common
+} // namespace Util
 
 #endif
+

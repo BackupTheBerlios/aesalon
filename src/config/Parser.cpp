@@ -1,36 +1,26 @@
-/**
-	Aesalon, a tool to visualize a program's behaviour at run-time.
-	Copyright (C) 2010, Aesalon Development Team.
-
-	Aesalon is distributed under the terms of the GNU GPLv3. For more
-	licensing information, see the file LICENSE included with the distribution.
+/** Aesalon, a tool to visualize program behaviour in real time.
+	Copyright (C) 2009-2011, Aesalon development team.
 	
-	@file monitor/src/config/Parser.cpp
-
+	Aesalon is distributed under the terms of the GNU GPLv3. See
+	the included file LICENSE for more information.
+	
+	@file src/config/Parser.cpp
 */
 
-#include <iostream>  // for debugging
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <cctype>
-#include <sys/types.h>
-#include <dirent.h>
-#include <stdlib.h>
 #include <cstring>
+#include <cstdlib>
 #include <libgen.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 #include "config/Parser.h"
-#include "common/ParsingException.h"
-#include "common/StreamAsString.h"
-#include "common/PathSanitizer.h"
-#include "config/ConcreteVault.h"
-#include "common/Config.h"
+#include "util/StreamAsString.h"
+#include "config/ParsingException.h"
+#include "Config.h"
 
-namespace Monitor {
 namespace Config {
 
-void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
+void Parser::parse(Vault *vault, const std::string &configFile) {
 	std::string currentModule;
 	
 	openFile(configFile);
@@ -59,19 +49,19 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 			std::string dirname = expectNextToken(QUOTED_WORD);
 			
 			if(dirname[0] != '/' && dirname[0] != '~') {
-				dirname = Common::StreamAsString() << dirpath << "/" << dirname;
+				dirname = Util::StreamAsString() << dirpath << "/" << dirname;
 			}
 			
 			Parser().parseDirectory(vault, dirname);
 			
 			expectNextSymbol(";");
-			free(dirpath);
+			std::free(dirpath);
 		}
 		else if(tokenType == SYMBOL && token == "}") {
 			if(currentModule != "") {
 				currentModule = "";
 			}
-			else throw Common::ParsingException("Extra \"}\"");
+			else throw ParsingException("Extra \"}\"");
 		}
 		else if(tokenType == WORD && token == "use") {
 			/*std::cout << "Parser: Using module \"" << expectNextToken(WORD) << "\"\n";*/
@@ -94,26 +84,26 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 				
 				if(nextType == WORD || nextType == QUOTED_WORD) {
 					if(currentModule != "") vault->set(
-						Common::StreamAsString() << currentModule << ":" << token, next);
+						Util::StreamAsString() << currentModule << ":" << token, next);
 					
 					else vault->set(token, next);
 					
 					/*std::cout << "Set \"" << currentModule << "::" << token << "\" to \""
 						<< next << "\" with operator " << op << std::endl;*/
 				}
-				else throw Common::ParsingException("Invalid RHS");
+				else throw ParsingException("Invalid RHS");
 				
 				std::string sym = expectNextToken(SYMBOL);
 				if(sym == ";") break;
 				else if(sym == ",") {}
 				else {
-					throw Common::ParsingException(Common::StreamAsString()
+					throw ParsingException(Util::StreamAsString()
 						<< "Expected \",\" or \";\", got \"" << sym << "\"");
 				}
 			} while(true);
 		}
 		else {
-			throw Common::ParsingException(Common::StreamAsString()
+			throw ParsingException(Util::StreamAsString()
 				<< "Syntax error at token \"" << token << "\"");
 		}
 		//std::cout << "\"" << token << "\"\n";
@@ -122,7 +112,7 @@ void Parser::parse(ConcreteVault *vault, const std::string &configFile) {
 	closeFile();
 }
 
-void Parser::parseDirectory(ConcreteVault *vault, const std::string &directory) {
+void Parser::parseDirectory(Vault *vault, const std::string &directory) {
 	DIR *dir = opendir(directory.c_str());
 	if(dir == NULL) return;
 	
@@ -208,7 +198,7 @@ std::string Parser::nextToken(TokenType &type) {
 		std::string rest;
 		stream >> rest;
 		
-		throw Common::ParsingException(Common::StreamAsString()
+		throw ParsingException(Util::StreamAsString()
 			<< "Unrecognized token: \"+" << rest << "\"");
 	}
 	else {
@@ -225,7 +215,7 @@ std::string Parser::expectNextToken(TokenType expected) {
 	std::string token = nextToken(actual);
 	
 	if(actual != expected) {
-		throw Common::ParsingException(Common::StreamAsString()
+		throw ParsingException(Util::StreamAsString()
 			<< "Expected " << nameOf(expected) << " token, found " << nameOf(actual)
 			<< " token: \"" << token << "\"");
 	}
@@ -236,7 +226,7 @@ std::string Parser::expectNextToken(TokenType expected) {
 void Parser::expectNextSymbol(const std::string &symbol) {
 	std::string s = expectNextToken(SYMBOL);
 	if(symbol != s) {
-		throw Common::ParsingException(Common::StreamAsString()
+		throw ParsingException(Util::StreamAsString()
 			<< "Expected token \"" << symbol << "\", got \"" << s << "\"");
 	}
 }
@@ -266,4 +256,3 @@ const char *Parser::nameOf(TokenType type) const {
 }
 
 } // namespace Config
-} // namespace Monitor

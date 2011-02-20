@@ -1,26 +1,21 @@
-/**
-	Aesalon, a tool to visualize a program's behaviour at run-time.
-	Copyright (C) 2010, Aesalon Development Team.
-
-	Aesalon is distributed under the terms of the GNU GPLv3. For more
-	licensing information, see the file LICENSE included with the distribution.
+/** Aesalon, a tool to visualize program behaviour in real time.
+	Copyright (C) 2009-2011, Aesalon development team.
 	
-	@file monitor/src/config/ArgumentParser.cpp
-
+	Aesalon is distributed under the terms of the GNU GPLv3. See
+	the included file LICENSE for more information.
+	
+	@file src/monitor/ArgumentParser.cpp
 */
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
-#include "config/ArgumentParser.h"
+#include "monitor/ArgumentParser.h"
 #include "config/Parser.h"
-#include "config/ConcreteVault.h"
-#include "common/PathSanitizer.h"
 
 namespace Monitor {
-namespace Config {
 
-int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
+int ArgumentParser::parse(Config::Vault *vault, char **argv) {
 	int arg;
 	for(arg = 1; argv[arg] != NULL; arg ++) {
 		if(std::strcmp(argv[arg], "--") == 0) {
@@ -44,7 +39,7 @@ int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
 			/*std::cout << "ArgumentParser: Using module " << argv[++arg] << std::endl;*/
 		}
 		else if(std::strcmp(argv[arg], "--search") == 0) {
-			Parser().parseDirectory(vault, argv[++arg]);
+			Config::Parser().parseDirectory(vault, argv[++arg]);
 		}
 		else if(std::strcmp(argv[arg], "--help") == 0) {
 			vault->set("::help", "true");
@@ -65,5 +60,4 @@ int ArgumentParser::parse(ConcreteVault *vault, char **argv) {
 	return arg;
 }
 
-} // namespace Config
 } // namespace Monitor

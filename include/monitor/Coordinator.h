@@ -1,20 +1,16 @@
-/**
-	Aesalon, a tool to visualize a program's behaviour at run-time.
-	Copyright (C) 2010, Aesalon Development Team.
-
-	Aesalon is distributed under the terms of the GNU GPLv3. For more
-	licensing information, see the file LICENSE included with the distribution.
+/** Aesalon, a tool to visualize program behaviour in real time.
+	Copyright (C) 2009-2011, Aesalon development team.
+	
+	Aesalon is distributed under the terms of the GNU GPLv3. See
+	the included file LICENSE for more information.
 	
 	@file include/monitor/Coordinator.h
-
 */
 
 #ifndef AesalonMonitor_Coordinator_H
 #define AesalonMonitor_Coordinator_H
 
 #include "config/Vault.h"
-#include "module/List.h"
-#include "vcommunication/GeneralSink.h"
 
 namespace Monitor {
 
@@ -24,8 +20,6 @@ private:
 	char **m_argv;
 	int m_argcOffset;
 	Config::Vault *m_vault;
-	Module::List *m_moduleList;
-	VCommunication::GeneralSink *m_generalDataSink;
 	int m_returnValue;
 public:
 	static Coordinator *instance() { return m_instance; }
@@ -35,7 +29,6 @@ public:
 	char **argv() const { return m_argv; }
 	Config::Vault *vault() const { return m_vault; }
 	int argcOffset() const { return m_argcOffset; }
-	Module::List *moduleList() const { return m_moduleList; }
 	int returnValue() const { return m_returnValue; }
 	void setReturnValue(int newValue) { m_returnValue = newValue; }
 	
@@ -48,3 +41,4 @@ private:
 } // namespace Monitor
 
 #endif
+

@@ -1,48 +1,43 @@
-/**
-	Aesalon, a tool to visualize a program's behaviour at run-time.
-	Copyright (C) 2010, Aesalon Development Team.
-
-	Aesalon is distributed under the terms of the GNU GPLv3. For more
-	licensing information, see the file LICENSE included with the distribution.
+/** Aesalon, a tool to visualize program behaviour in real time.
+	Copyright (C) 2009-2011, Aesalon development team.
 	
-	@file include/monitor/config/Vault.h
-
+	Aesalon is distributed under the terms of the GNU GPLv3. See
+	the included file LICENSE for more information.
+	
+	@file include/config/Vault.h
 */
 
-#ifndef AesalonMonitor_Config_Vault_H
-#define AesalonMonitor_Config_Vault_H
+#ifndef AesalonConfig_Vault_H
+#define AesalonConfig_Vault_H
 
+#include <map>
 #include <string>
 #include <vector>
 
-namespace Monitor {
 namespace Config {
 
 class Vault {
 public:
 	typedef std::pair<std::string, std::string> KeyPair;
-	virtual ~Vault() {}
+private:
+	typedef std::multimap<std::string, std::string> DataMap;
+	DataMap m_dataMap;
+public:
+	Vault();
 	
-	/** Clears @a key to have no value.
-	*/
-	virtual void clear(const std::string &key) = 0;
-	/** Sets @a key to @a value.
-	*/
-	virtual void set(const std::string &key, const std::string &value) = 0;
+	void clear(const std::string &key);
+	void set(const std::string &key, const std::string &value);
 	
-	/** Returns the last value that @a key maps to.
-	*/
-	virtual std::string get(const std::string &key) = 0;
-	/** Stores all the values of @a key in @a values.
-	*/
-	virtual void get(const std::string &key, std::vector<std::string> &values) = 0;
-	/** Places the names of all strings that match @a pattern into @a keys. Note that
-		@a keys will not be cleared.
-	*/
-	virtual void match(const std::string &pattern, std::vector<KeyPair> &items) = 0;
+	std::string get(const std::string &key);
+	
+	void get(const std::string &key, std::vector<std::string> &values);
+	
+	void match(const std::string &pattern, std::vector<KeyPair> &values);
+private:
+	bool matches(const std::string &string, const std::string &pattern);
 };
 
 } // namespace Config
-} // namespace Monitor
 
 #endif
+

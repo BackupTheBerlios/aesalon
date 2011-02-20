@@ -16,8 +16,7 @@ config = {
 	"incBase":		"include",
 	"guardBase":	"Aesalon",
 	"fileHeader":
-"""
-/** %(project)s, %(desc)s.
+"""/** %(project)s, %(desc)s.
 	Copyright (C) %(devyears)s, %(authors)s.
 	
 	%(project)s is distributed under the terms of the %(license)s. See
@@ -224,6 +223,20 @@ class CppSource(Generator):
 		fp.write(fileConfig["fileHeader"] % fileConfig)
 		if incPath != "":
 			fp.write(fileConfig["cSource"] % fileConfig)
+		
+		namespaceList = name.split("::")
+		if len(namespaceList) != 1:
+			className = namespaceList[-1]
+			namespaceList = namespaceList[:-1]
+			for namespace in namespaceList:
+				fileConfig["namespace"] = namespace
+				fp.write(fileConfig["openNamespace"] % fileConfig)
+			
+			fp.write("\n\n")
+			
+			for namespace in namespaceList[::-1]:
+				fileConfig["namespace"] = namespace
+				fp.write(fileConfig["closeNamespace"] % fileConfig)
 		
 		fp.close()
 

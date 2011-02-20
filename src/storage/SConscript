@@ -1,3 +1,0 @@
-Import("env")
-
-env.StaticLibrary(target = "storage", source = Glob("*.cpp") + Glob("*/*.cpp"))

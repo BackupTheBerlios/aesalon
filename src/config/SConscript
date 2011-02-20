@@ -1,3 +1,3 @@
 Import("env")
 
-env.StaticLibrary(target = "config", source = Glob("*.cpp") + Glob("*/*.cpp"))
+env.StaticLibrary(target = "aesalon-config", source = Glob("*.cpp") + Glob("*/*.cpp"))
