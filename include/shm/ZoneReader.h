@@ -5,12 +5,12 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/shm/ZoneReader.h
+	@file include/monitor/program/ZoneReader.h
 
 */
 
-#ifndef AesalonSHM_ZoneReader_H
-#define AesalonSHM_ZoneReader_H
+#ifndef AesalonMonitor_Program_ZoneReader_H
+#define AesalonMonitor_Program_ZoneReader_H
 
 #include <pthread.h>
 
@@ -18,7 +18,8 @@
 #include "SharedMemory.h"
 #include "vcommunication/DataSink.h"
 
-namespace SHM {
+namespace Monitor {
+namespace Program {
 
 class ZoneReader {
 private:
@@ -38,6 +39,7 @@ private:
 	static void *run(void *voidInstance);
 };
 
-} // namespace SHM
+} // namespace Program
+} // namespace Monitor
 
 #endif

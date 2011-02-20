@@ -5,12 +5,12 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/shm/SharedMemoryHeader.h
+	@file include/common/SharedMemoryHeader.h
 
 */
 
-#ifndef AesalonSHM_SharedMemoryHeader_H
-#define AesalonSHM_SharedMemoryHeader_H
+#ifndef AesalonCommon_SharedMemoryHeader_H
+#define AesalonCommon_SharedMemoryHeader_H
 
 #include <stdint.h>
 #include <semaphore.h>
