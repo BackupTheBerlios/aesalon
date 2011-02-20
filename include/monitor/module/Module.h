@@ -15,7 +15,7 @@
 #include <string>
 
 #include "config/Vault.h"
-#include "common/MarshallerInterface.h"
+#include "marshaller/Interface.h"
 
 namespace Monitor {
 namespace Module {

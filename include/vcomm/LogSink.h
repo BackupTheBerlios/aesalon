@@ -5,19 +5,18 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/monitor/vcommunication/LogSink.h
+	@file include/vcomm/LogSink.h
 
 */
 
-#ifndef AesalonMonitor_VCommunication_LogSink_H
-#define AesalonMonitor_VCommunication_LogSink_H
+#ifndef AesalonVComm_LogSink_H
+#define AesalonVComm_LogSink_H
 
 #include <semaphore.h>
 
 #include "DataSink.h"
 
-namespace Monitor {
-namespace VCommunication {
+namespace VComm {
 
 class LogSink : public DataSink {
 private:
@@ -32,7 +31,6 @@ public:
 	virtual void sinkPacket(Common::VPacket *packet);
 };
 
-} // namespace VCommunication
-} // namespace Monitor
+} // namespace VComm
 
 #endif

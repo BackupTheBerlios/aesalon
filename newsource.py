@@ -162,7 +162,8 @@ class CppHeader(Generator):
 		path += ".h"
 		filepath = os.path.join(config["incBase"], path)
 		
-		fp = file(filepath, "w")
+		#fp = file(filepath, "w")
+		fp = sys.stdout
 		
 		includeGuard = config["guardBase"] + " " + name.replace("/", "_")
 		includeGuard = includeGuard.replace("::", "_")
@@ -198,7 +199,7 @@ class CppHeader(Generator):
 		
 		fp.write(config["cppHeaderEnd"] % fileConfig)
 		
-		fp.close()
+		#fp.close()
 		
 		return path
 

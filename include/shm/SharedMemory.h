@@ -5,12 +5,12 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/monitor/program/SharedMemory.h
+	@file include/shm/SharedMemory.h
 
 */
 
-#ifndef AesalonMonitor_Program_SharedMemory_H
-#define AesalonMonitor_Program_SharedMemory_H
+#ifndef AesalonSHM_SharedMemory_H
+#define AesalonSHM_SharedMemory_H
 
 #include <string>
 #include <map>
@@ -18,8 +18,7 @@
 #include "common/SharedMemoryHeader.h"
 #include "common/ZoneHeader.h"
 
-namespace Monitor {
-namespace Program {
+namespace SHM {
 
 class SharedMemory {
 private:
@@ -47,7 +46,6 @@ private:
 	void setupZones();
 };
 
-} // namespace Program
-} // namespace Monitor
+} // namespace SHM
 
 #endif

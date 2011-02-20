@@ -5,12 +5,12 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/common/ZoneHeader.h
+	@file include/shm/ZoneHeader.h
 
 */
 
-#ifndef AesalonCommon_ZoneHeader_H
-#define AesalonCommon_ZoneHeader_H
+#ifndef AesalonSHM_ZoneHeader_H
+#define AesalonSHM_ZoneHeader_H
 
 #include <stdint.h>
 #include <semaphore.h>

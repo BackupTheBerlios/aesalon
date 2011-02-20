@@ -5,14 +5,14 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/common/MarshallerInterface.h
+	@file include/marshaller/Interface.h
 
 */
 
 #ifndef AesalonCommon_MarshallerInterface_H
 #define AesalonCommon_MarshallerInterface_H
 
-#include "VPacket.h"
+#include "vcomm/VPacket.h"
 #include "vcommunication/DataSink.h"
 
 namespace Common {

@@ -5,12 +5,12 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/common/SHMPacket.h
+	@file include/shm/SHMPacket.h
 
 */
 
-#ifndef AesalonCommon_SHMPacket_H
-#define AesalonCommon_SHMPacket_H
+#ifndef AesalonSHM_SHMPacket_H
+#define AesalonSHM_SHMPacket_H
 
 #include "ModuleID.h"
 

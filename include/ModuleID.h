@@ -5,21 +5,15 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/common/NetworkPacket.h
+	@file include/ModuleID.h
 
 */
 
-#ifndef AesalonCommon_NetworkPacket_H
-#define AesalonCommon_NetworkPacket_H
+#ifndef Aesalon_ModuleID_H
+#define Aesalon_ModuleID_H
 
-namespace Common {
+#include <stdint.h>
 
-class NetworkPacket {
-public:
-	NetworkPacket();
-	~NetworkPacket();
-};
-
-} // namespace Common
+typedef uint16_t ModuleID;
 
 #endif

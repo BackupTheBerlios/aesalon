@@ -5,18 +5,18 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. For more
 	licensing information, see the file LICENSE included with the distribution.
 	
-	@file include/common/VPacket.h
+	@file include/vcomm/VPacket.h
 
 */
 
-#ifndef AesalonCommon_VPacket_H
-#define AesalonCommon_VPacket_H
+#ifndef AesalonVComm_VPacket_H
+#define AesalonVComm_VPacket_H
 
 #include <stdint.h>
 
 #include "ModuleID.h"
 
-namespace Common {
+namespace VComm {
 
 class VPacket {
 private:
@@ -38,6 +38,6 @@ public:
 	uint32_t dataSize() const { return m_dataSize; }
 };
 
-} // namespace Common
+} // namespace VComm
 
 #endif
