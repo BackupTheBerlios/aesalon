@@ -13,6 +13,8 @@
 #include <cstring>
 
 #include "monitor/Launcher.h"
+#include "monitor/Coordinator.h"
+#include "util/MessageSystem.h"
 
 namespace Monitor {
 
@@ -24,7 +26,11 @@ Launcher::~Launcher() {
 
 }
 
-pid_t Launcher::forkTarget() {
+void Launcher::launch() {
+	forkTarget();
+}
+
+void Launcher::forkTarget() {
 	setupEnvironment();
 	
 	m_targetPid = fork();
@@ -33,16 +39,37 @@ pid_t Launcher::forkTarget() {
 		exit(1);
 	}
 	else if(m_targetPid == 0) {
+		Message(Debug, "m_argv[0]: " << m_argv[0]);
 		execvp(m_argv[0], m_argv);
-		std::cout << m_argv[0] << ": " << std::strerror(errno) << std::endl;
-		exit(0);
+		Message(Fatal, "Could not launch " << m_argv[0] << ": " << std::strerror(errno));
 	}
-	
-	return m_targetPid;
 }
 
 void Launcher::setupEnvironment() {
+	setenv("AesalonSHMName", (Util::StreamAsString() << "/Aesalon-" << getpid()).operator std::string().c_str(), 1);
 	
+	std::vector<std::string> modules;
+	
+	Coordinator::instance()->vault()->get("::modules", modules);
+	
+	std::string preload;
+	
+	if(getenv("LD_PRELOAD")) {
+		Message(Warning, "Replacing current LD_PRELOAD.");
+	}
+	
+	for(std::vector<std::string>::iterator i = modules.begin(); i != modules.end(); ++i) {
+		std::string moduleRoot = Coordinator::instance()->vault()->get(*i + ":root");
+		std::string collectorPath = Coordinator::instance()->vault()->get(*i + ":collectorPath");
+		if(collectorPath.length()) {
+			if(preload.length()) {
+				preload += ":";
+			}
+			preload += moduleRoot + collectorPath;
+		}
+	}
+	
+	setenv("LD_PRELOAD", preload.c_str(), 1);
 }
 
 } // namespace Monitor

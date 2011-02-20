@@ -197,6 +197,7 @@ std::string Parser::nextToken(TokenType &type) {
 		stream >> rest;
 		
 		Message(Fatal, "Unrecognized token: \"+" << rest << "\"");
+		return ""; // Never reached.
 	}
 	else {
 		std::string token;

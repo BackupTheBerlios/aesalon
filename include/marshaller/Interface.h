@@ -4,13 +4,21 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. See
 	the included file LICENSE for more information.
 	
-	@file src/monitor/Aesalon.cpp
+	@file include/marshaller/Interface.h
 */
 
-#include "monitor/Coordinator.h"
+#ifndef AesalonMarshaller_Interface_H
+#define AesalonMarshaller_Interface_H
 
-int main(int argc, char *argv[]) {
-	Monitor::Coordinator coordinator(argv);
-	coordinator.run();
-	return coordinator.returnValue();
-}
+namespace Marshaller {
+
+class Interface {
+public:
+	virtual ~Interface() {}
+	
+	
+};
+
+} // namespace Marshaller
+
+#endif

@@ -13,6 +13,7 @@
 
 #include "monitor/Coordinator.h"
 #include "monitor/ArgumentParser.h"
+#include "monitor/Launcher.h"
 #include "config/Parser.h"
 #include "util/PathSanitizer.h"
 #include "util/MessageSystem.h"
@@ -33,16 +34,14 @@ void Coordinator::run() {
 	parseConfigs();
 	
 	if(m_vault->get("::list-attributes") == "true") {
-		std::cout << "Listing all configuration keys and values." << std::endl;
-		std::cout << "Please note that many of these are auto-generated," << std::endl;
-		std::cout << "\tand thus their values may be non-canonical/sensible." << std::endl;
-		std::cout << "================" << std::endl;
+		Message(Log, "Listing all configuration keys and values.");
+		Message(Log, "Some auto-generated values may have non-canonical values.");
 		std::vector<Config::Vault::KeyPair> list;
 		m_vault->match("*", list);
 		for(std::vector<Config::Vault::KeyPair>::iterator i = list.begin(); i != list.end(); ++i) {
 			if(i->first[0] == ':' && i->first[1] == ':') continue;
 			
-			std::cout << "    * \"" << i->first << "\" ==> \"" << i->second << "\"\n";
+			Message(Log, "    * \"" << i->first << "\" ==> \"" << i->second << "\"");
 		}
 	}
 	else if(m_vault->get("::version") == "true") {
@@ -52,7 +51,9 @@ void Coordinator::run() {
 		usage(true);
 	}
 	else {
+		Launcher launcher(m_argv + m_argcOffset);
 		
+		launcher.launch();
 	}
 }
 

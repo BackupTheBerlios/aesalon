@@ -21,10 +21,11 @@ public:
 	Launcher(char **argv);
 	~Launcher();
 	
-	pid_t forkTarget();
+	void launch();
 	
-	void waitForChild();
 private:
+	void forkTarget();
+	void waitForChild();
 	void setupEnvironment();
 };
 
