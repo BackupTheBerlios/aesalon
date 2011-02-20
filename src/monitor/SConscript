@@ -2,6 +2,6 @@ Import("env")
 
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonMonitor"])
 env.Append(LIBS = ["rt"])
-env.Append(LIBS = ["aesalon-config", "aesalon-util"])
+env.Append(LIBS = ["aesalon-config", "aesalon-util", "aesalon-storage"])
 
 env.Program(target = "aesalon", source = Glob("*.cpp") + Glob("*/*.cpp"))
