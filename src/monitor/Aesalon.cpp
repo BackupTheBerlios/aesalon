@@ -23,9 +23,32 @@ int main(int argc, char *argv[]) {
 
 
 int main(int argc, char *argv[]) {
-	typedef Storage::RTree<int, int, 2> RTree;
+	typedef Storage::RTree<double, int, 1, 8, 2> RTree;
 	
 	RTree rt;
+	
+	RTree::Range range[] = {
+		RTree::Range(-2.0, 2.0)
+	};
+	RTree::Bound b(range);
+	rt.insert(b, 0);
+	
+	class Processor : public RTree::SearchProcessor {
+	public:
+		virtual bool process(const RTree::Bound &bound, int value) {
+			Message(Debug, "Found value " << value);
+		}
+	};
+	
+	Processor p;
+	
+	RTree::Range searchRange[] = {
+		RTree::Range(-3.0, 3.0)
+	};
+	
+	RTree::Bound sb(searchRange);
+	
+	rt.search(searchRange, &p);
 	
 	return 0;
 }
