@@ -17,7 +17,14 @@
 namespace Storage {
 
 /** An n-dimensional R-tree.
-	Note that Value must be either a basic type or a pointer.
+	Notes:
+	- Key must support a basic assignment specifier and also the element zero, plus all the usual arithmetic operators.
+		Using a non-elementary type is not a good idea.
+	- Value must be either a basic type or a pointer.
+	- Minimum <= Maximum/2. (Logic in code assumes this.)
+	- Maximum <= some reasonable number. Many linear searches through lists of this size take place.
+		A reasonable size is eight.
+	- Dimensions should be less than about six. Any more and you have other problems . . .
 */
 template<typename Key, typename Value, int Dimensions, int Maximum = 8, int Minimum = Maximum/2>
 class RTree {
@@ -60,7 +67,7 @@ public:
 			for(int i = 0; i < Dimensions; i ++) m_ranges[i] = ranges[i];
 		}
 		
-		void setRange(Range &range, int dimension) { m_ranges[dimension] = range; }
+		void setRange(const Range &range, int dimension) { m_ranges[dimension] = range; }
 		Range &range(int dimension) { return m_ranges[dimension]; }
 		const Range &range(int dimension) const { return m_ranges[dimension]; }
 		
@@ -69,6 +76,23 @@ public:
 				if(!m_ranges[i].overlaps(other.m_ranges[i])) return false;
 			}
 			return true;
+		}
+		
+		Key enlargementToCover(const Bound &other) const {
+			Key volume = 0;
+			
+			for(int j = 0; j < Dimensions; j ++) {
+				Key difference = other.m_ranges[j].enlargementToCover(m_ranges[j]);
+				if(difference == 0) continue;
+				
+				for(int k = 0; k < Dimensions; k ++) {
+					if(k == j) continue;
+					difference *= other.m_ranges[j].size();
+				}
+				volume += difference;
+			}
+			
+			return volume;
 		}
 		
 		void enclose(const Bound &other) {
@@ -108,12 +132,31 @@ protected:
 	public:
 		Node(bool isLeaf) : m_isLeaf(isLeaf), m_branchCount(0), m_parent(NULL) {}
 		bool isLeaf() const { return m_isLeaf; }
+		void setLeaf(bool leaf) { m_isLeaf = leaf; }
 		
 		Branch &branch(int which) { return m_branches[which]; }
 		int branchCount() const { return m_branchCount; }
 		void setBranchCount(int count) { m_branchCount = count; }
 		Node *parent() const { return m_parent; }
 		void setParent(Node *node) { m_parent = node; }
+		
+		Bound bound() const {
+			Bound result;
+			for(int i = 0; i < Dimensions; i ++) {
+				Key minimum, maximum;
+				for(int j = 0; j < branchCount(); j ++) {
+					if(j == 0) {
+						minimum = m_branches[j].bound.range(i).start();
+						maximum = m_branches[j].bound.range(i).end();
+						continue;
+					}
+					minimum = std::min(minimum, m_branches[j].bound.range(i).start());
+					maximum = std::max(maximum, m_branches[j].bound.range(i).end());
+				}
+				result.range(i) = Range(minimum, maximum);
+			}
+			return result;
+		}
 	};
 private:
 	Node *m_root;
@@ -171,14 +214,26 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum>::insert(
 		Message(Debug, "Leaf node new branch count: " << leaf->branchCount());
 	}
 	else {
+		Message(Debug, "Leaf node branch count is already at maximum, splitting node . . .");
 		Branch b;
 		b.bound = bound;
 		b.value = value;
 		ll = splitNode(leaf, b);
+		Message(Debug, "Node split, ll is " << ll);
 	}
 	
 	Message(Debug, "Calling adjustTree() . . .");
-	adjustTree(leaf, ll);
+	Node *result = adjustTree(leaf, ll);
+	if(result != NULL) {
+		Message(Debug, "**** Creating new root node!");
+		Node *newRoot = new Node(false);
+		newRoot->setBranchCount(2);
+		newRoot->branch(0).bound = m_root->bound();
+		newRoot->branch(0).node = m_root;
+		newRoot->branch(1).bound = result->bound();
+		newRoot->branch(1).node = result;
+		m_root = newRoot;
+	}
 	
 	Message(Debug, "Finished.");
 }
@@ -205,9 +260,15 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum>::search(
 		}
 	}
 	else {
+		Message(Debug, "Not in leaf node. Branch count: " << node->branchCount());
 		for(int i = 0; i < node->branchCount(); i ++) {
 			Branch &branch = node->branch(i);
-			if(branch.bound.overlaps(bound)) search(bound, branch.node, processor);
+			Message(Debug, "Considering branch #" << i);
+			if(branch.bound.overlaps(bound)) {
+				Message(Debug, "Branch overlaps bound, processing . . .");
+				search(bound, branch.node, processor);
+			}
+			else Message(Debug, "Branch does not overlap bound, ignoring.");
 		}
 	}
 }
@@ -223,25 +284,12 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		Node *smallestNode = NULL;
 		Key smallestVolume = 0;
 		for(int i = 0; i < node->branchCount(); i ++) {
-			Key volume = 0;
-			
-			Bound &nbound = node->branch(i).bound;
-			
-			for(int j = 0; j < Dimensions; j ++) {
-				Key difference = nbound.range(j).enlargementToCover(bound.range(j));
-				if(difference == 0) continue;
-				
-				for(int k = 0; k < Dimensions; k ++) {
-					if(k == j) continue;
-					difference *= nbound.range(j).size();
-				}
-				volume += difference;
-			}
+			Key volume = bound.enlargementToCover(node->branch(i).bound);
 			
 			if(volume < smallestVolume || smallestNode == NULL) smallestNode = node, smallestVolume = volume;
 			else if(volume == smallestVolume) {
 				/* TODO: implement tiebreaker. */
-				Message(Debug, "Tie-breaker not implemented!");
+				Message(Debug, "RTree: smallestVolume tie-breaker not implemented!");
 			}
 		}
 		
@@ -260,7 +308,10 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *n,
 		RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *nn) {
 	
+	Message(Debug, "Starting tree adjustment, nn is " << nn);
+	
 	while(n != m_root) {
+		Message(Debug, "*** Adjusting tree node . . .");
 		Node *p = n->parent();
 		
 		int i = 0;
@@ -318,30 +369,116 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 	}
 	list[Maximum] = branch;
 	
-	Key lowestValues[Dimensions];
-	Key highestValues[Dimensions];
-	Branch lowestBranches[Dimensions];
-	Branch highestBranches[Dimensions];
+	node->setBranchCount(0);
+	nn->setBranchCount(0);
 	
-	for(int i = 0; i < Dimensions; i ++) {
-		for(int j = 0; j < Maximum+1; j ++) {
-			if(lowestValues[i] > list[j].bound.range(i).start()) {
+	int highestStart[Dimensions];
+	int lowestEnd[Dimensions];
+	Key lowest[Dimensions];
+	Key highest[Dimensions];
+	
+	for(int j = 0; j < Maximum+1; j ++) {
+		for(int i = 0; i < Dimensions; i ++) {
+			const Range &iRange = list[j].bound.range(i);
+			if(j == 0) {
+				lowest[i] = iRange.start();
+				highest[i] = iRange.end();
+				highestStart[i] = 0;
+				lowestEnd[i] = 0;
+				continue;
 			}
-			//lowestValues[i] = std::min(lowestValues[i], list[j].bound.range(i).start());
-			//highestValues[i] = std::max(highestValues[i], list[j].bound.range(i).end());
+			lowest[i] = std::min(lowest[i], iRange.start());
+			highest[i] = std::max(highest[i], iRange.end());
+			
+			Range &itemRange = list[j].bound.range(i);
+			if(list[highestStart[i]].bound.range(i).start() > itemRange.start()) {
+				highestStart[i] = j;
+			}
+			if(list[lowestEnd[i]].bound.range(i).end() < itemRange.end()) {
+				lowestEnd[i] = j;
+			}
 		}
 	}
 	
+	Key maxSeparation = 0;
+	int maxIndex = -1;
+	
+	/* Create normalized separations. */
+	for(int i = 0; i < Dimensions; i ++) {
+		Key separation = 
+			(list[lowestEnd[i]].bound.range(i).end() - list[highestStart[i]].bound.range(i).start())
+			/ (highest[i]-lowest[i]);
+		
+		if(maxIndex == -1 || separation > maxSeparation) maxIndex = i, maxSeparation = separation;
+	}
+	
+	node->branch(0) = list[highestStart[maxIndex]];
+	node->setBranchCount(1);
+	nn->branch(0) = list[lowestEnd[maxIndex]];
+	nn->setBranchCount(1);
+	
+	Bound nodeBound = list[highestStart[maxIndex]].bound;
+	Bound nnBound = list[lowestEnd[maxIndex]].bound;
+	
+	/* Do the removal in the correct order . . . */
+	if(highestStart[maxIndex] > lowestEnd[maxIndex]) {
+		list[highestStart[maxIndex]] = list[listSize-1];
+		list[lowestEnd[maxIndex]] = list[listSize-2];
+		listSize -= 2;
+	}
+	else if(lowestEnd[maxIndex] > highestStart[maxIndex]) {
+		list[lowestEnd[maxIndex]] = list[listSize-1];
+		list[highestStart[maxIndex]] = list[listSize-2];
+		listSize -= 2;
+	}
+	/* They are one and the same . . . this should not happen! */
+	else {
+		Message(Fatal, "R-tree: degeneracy case, all entries are the same. Support NYI.");
+	}
+	
 	while(true) {
+		if(listSize == 0) break;
+		else if((node->branchCount() + listSize) == Minimum) {
+			for(int i = 0; i < listSize; i ++) {
+				node->branch(node->branchCount()) = list[i];
+				node->setBranchCount(node->branchCount()+1);
+			}
+			break;
+		}
+		else if((nn->branchCount() + listSize) == Minimum) {
+			for(int i = 0; i < listSize; i ++) {
+				nn->branch(node->branchCount()) = list[i];
+				nn->setBranchCount(node->branchCount()+1);
+			}
+			break;
+		}
+		/* PickNext algorithm for linear-time is to simply pick any item. Choose the last. */
+		Key volume1 = nodeBound.enlargementToCover(list[listSize-1].bound);
+		Key volume2 = nnBound.enlargementToCover(list[listSize-1].bound);
 		
-		// PickNext algorithm for linear-time is to simply pick any. Choose the first.
-		
+		if(volume1 < volume2) {
+			node->branch(node->branchCount()) = list[listSize-1];
+			node->setBranchCount(node->branchCount()+1);
+			nodeBound.enclose(list[listSize-1].bound);
+		}
+		else if(volume2 < volume1) {
+			nn->branch(node->branchCount()) = list[listSize-1];
+			nn->setBranchCount(nn->branchCount()+1);
+			nnBound.enclose(list[listSize-1].bound);
+		}
+		else {
+			Message(Warning, "RTree: splitNode tie-breaker NYI. Defaulting to node.");
+			node->branch(node->branchCount()) = list[listSize-1];
+			node->setBranchCount(node->branchCount()+1);
+			nodeBound.enclose(list[listSize-1].bound);
+		}
+		listSize --;
 	}
 	
 	node = NULL;
 	branch.node = NULL;
 	
-	return NULL;
+	return nn;
 }
 
 } // namespace Storage
