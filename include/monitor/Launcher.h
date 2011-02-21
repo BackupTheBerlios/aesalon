@@ -11,12 +11,14 @@
 #define AesalonMonitor_Launcher_H
 
 #include <sys/types.h>
+#include "SHMReader.h"
 
 namespace Monitor {
 
 class Launcher {
 	char **m_argv;
 	pid_t m_targetPid;
+	SHMReader *m_shmReader;
 public:
 	Launcher(char **argv);
 	~Launcher();

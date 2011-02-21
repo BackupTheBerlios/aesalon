@@ -69,8 +69,10 @@ void Coordinator::parseConfigs() {
 }
 
 void Coordinator::usage(bool displayHelp) {
-	std::cout << "Aesalon version " << AesalonVersion << ". Copyright (C) 2010 Aesalon Development Team." << std::endl;
+	std::cout << "Aesalon version " << AesalonVersion << ". Copyright (C) 2009-2011 Aesalon Development Team."
+		<< std::endl;
 	std::cout << "Aesalon is released under the GNU General Public License, version 3." << std::endl;
+	std::cout << "See the file LICENSE included with the distribution for more details." << std::endl;
 	
 	if(!displayHelp) return;
 	std::cout << std::endl;

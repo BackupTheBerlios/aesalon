@@ -33,6 +33,8 @@ void Launcher::launch() {
 void Launcher::forkTarget() {
 	setupEnvironment();
 	
+	m_shmReader = new SHMReader();
+	
 	m_targetPid = fork();
 	if(m_targetPid == -1) {
 		std::cout << "Could not fork . . ." << std::endl;

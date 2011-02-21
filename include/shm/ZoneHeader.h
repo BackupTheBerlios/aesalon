@@ -51,6 +51,8 @@ struct ZoneHeader {
 	uint32_t threadID;
 };
 
+#define ZoneDataOffset (sizeof(ZoneHeader)+16)
+
 #ifdef __cplusplus
 } // namespace SHM
 #endif

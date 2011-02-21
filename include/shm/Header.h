@@ -21,6 +21,9 @@ struct Header {
 typedef struct SHMHeader SHMHeader;
 struct SHMHeader {
 #endif
+	/** The overall size of the SHM in pages. */
+	uint32_t shmSize;
+
 	/** The size of the configuration data (in pages). */
 	uint32_t configDataSize;
 	

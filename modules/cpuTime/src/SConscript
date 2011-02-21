@@ -1,8 +1,0 @@
-Import("env")
-
-env.Append(CCFLAGS = ["-W", "-Wall"])
-env.Append(LIBS = ["rt"])
-
-env.SharedLibrary(target="collector", source=Glob("collector/*.c"))
-env.SharedLibrary(target="marshaller", source=Glob("marshaller/*.cpp"))
-

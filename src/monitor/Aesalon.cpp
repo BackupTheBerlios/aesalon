@@ -11,17 +11,15 @@
 
 #include "storage/RTree.h"
 
-#if 0
+#if 1
 int main(int argc, char *argv[]) {
-	
-	
 	Monitor::Coordinator coordinator(argv);
 	coordinator.run();
 	return coordinator.returnValue();
 }
-#endif
 
 
+#else
 int main(int argc, char *argv[]) {
 	typedef Storage::RTree<double, int, 1, 4, 2> RTree;
 	
@@ -34,6 +32,7 @@ int main(int argc, char *argv[]) {
 	rt.insert(b, 1);
 	b.setRange(RTree::Range(-1.5, 1.0), 0);
 	rt.insert(b, 2);
+	
 	b.setRange(RTree::Range(3.5, 6.0), 0);
 	rt.insert(b, 3);
 	b.setRange(RTree::Range(-6.0, -3.5), 0);
@@ -59,3 +58,4 @@ int main(int argc, char *argv[]) {
 	
 	return 0;
 }
+#endif

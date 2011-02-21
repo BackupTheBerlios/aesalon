@@ -82,15 +82,10 @@ uint8_t *SHMReader::getZone(uint32_t id) {
 }
 
 void *SHMReader::mapRegion(uint32_t start, uint32_t size) {
-	struct stat s;
-	if(fstat(m_fd, &s) != 0) {
-		Message(Fatal, "Could not fstat shared memory to determine size.");
-	}
-	
-	if(s.st_size > (start+size) * AesalonPageSize) {
+	if(m_header == NULL || m_header->shmSize < (start+size) * AesalonPageSize) {
 		if(m_header) sem_wait(&m_header->resizeSemaphore);
 		
-		Message(Debug, "Resizing SHM to " << start+size << " pages.");
+		Message(Debug, "Resizing SHM to " << start+size << " page(s).");
 		if(ftruncate(m_fd, (start+size) * AesalonPageSize) != 0) {
 			Message(Fatal, "Could not resize shared memory.");
 		}
@@ -141,9 +136,11 @@ void SHMReader::setupConfiguration() {
 }
 
 void SHMReader::setupZones() {
+	m_header->zoneCount = 0;
 	m_header->zoneSize = Util::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneSize"));
 	m_header->zoneUsagePages = Util::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneUsePages"));
-	m_header->zoneCount = 0;
+	
+	m_header->zonePageOffset = m_header->configDataSize + 1 + m_header->zoneUsagePages;
 }
 
 } // namespace Monitor
