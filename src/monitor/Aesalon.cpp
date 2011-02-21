@@ -13,7 +13,7 @@
 
 #include "storage/RTree.h"
 
-#if 0
+#if 1
 int main(int argc, char *argv[]) {
 	Monitor::Coordinator coordinator(argv);
 	coordinator.run();

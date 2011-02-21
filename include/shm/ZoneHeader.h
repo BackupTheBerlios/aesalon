@@ -15,9 +15,10 @@
 
 #ifdef __cplusplus
 namespace SHM {
-
+#define ZoneDataOffset (sizeof(SHM::ZoneHeader)+16)
 struct ZoneHeader {
 #else
+#define ZoneDataOffset (sizeof(ZoneHeader)+16)
 typedef struct ZoneHeader ZoneHeader;
 struct ZoneHeader {
 #endif
@@ -37,21 +38,11 @@ struct ZoneHeader {
 	/** The overflow semaphore, see @a overflow for description. */
 	sem_t overflowSemaphore;
 	
-	/** The size of the end-gap. This is used when a size larger than the remaining space on the end of the
-		circular buffer is required.
-		
-		A zero value indicates either the absence of a gap or the absence of a packet in that region of memory.
-		This value should be cleared whenever the gap is read.
-	*/
-	uint32_t gapSize;
-	
 	/** The ID of the process that the zone's data comes from. */
 	uint32_t processID;
 	/** The ID of the thread that the zone's data comes from. */
 	uint32_t threadID;
 };
-
-#define ZoneDataOffset (sizeof(ZoneHeader)+16)
 
 #ifdef __cplusplus
 } // namespace SHM

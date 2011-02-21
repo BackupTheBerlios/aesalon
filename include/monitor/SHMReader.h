@@ -35,9 +35,11 @@ public:
 	~SHMReader();
 	
 	uint32_t zoneCount();
-	uint8_t *zoneWithData();
+	int32_t zoneWithData();
 	
 	void waitForPacket();
+	
+	void readData(uint32_t zoneID, void *buffer, uint32_t size);
 private:
 	uint8_t *getZone(uint32_t id);
 	void *mapRegion(uint32_t start, uint32_t size);

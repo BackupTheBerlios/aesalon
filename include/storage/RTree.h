@@ -29,8 +29,10 @@ namespace Storage {
 	- Dimensions should be as small as possible; many linear operations take place on this number.
 		Six is a reasonable upper bound.
 	- FloatKey should be a version of Key that supports floating-point arithmetic (or at least non-integer division).
-	Unless otherwise noted, all algorithms are from the publication
-		R-Trees: A Dynamic Index Structure for Spatial Searching [Guttman, A].
+	Unless otherwise noted, all algorithms are from
+		A Guttman, R-Trees: A Dynamic Index Structure for Spatial Searching, 1984.
+	
+	@todo Improve condenseTree's handling of non-leaf nodes.
 */
 template<typename Key, typename Value, int Dimensions, int Maximum = 8, int Minimum = Maximum/2,
 	typename FloatKey = Key>

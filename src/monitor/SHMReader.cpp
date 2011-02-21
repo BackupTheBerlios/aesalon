@@ -43,7 +43,7 @@ uint32_t SHMReader::zoneCount() {
 	return m_header->zoneCount;
 }
 
-uint8_t *SHMReader::zoneWithData() {
+int32_t SHMReader::zoneWithData() {
 	for(uint32_t i = 0; i < m_header->zonesAllocated; i ++) {
 		if(m_zoneUseData[i % 8] & (0x01 << (i % 8))) {
 			uint8_t *zone = getZone(i);
@@ -57,14 +57,35 @@ uint8_t *SHMReader::zoneWithData() {
 			
 			if(sem_wait(&zheader->packetSemaphore) == -1 && errno == EAGAIN) continue;
 			
-			return zone;
+			return i;
 		}
 	}
-	return NULL;
+	return -1;
 }
 
 void SHMReader::waitForPacket() {
 	sem_wait(&m_header->packetSemaphore);
+}
+
+void SHMReader::readData(uint32_t zoneID, void *buffer, uint32_t size) {
+	uint8_t *zone = getZone(zoneID);
+	
+	SHM::ZoneHeader *header = reinterpret_cast<SHM::ZoneHeader *>(zone);
+	
+	/* Wait for the data to become available . . . */
+	
+	
+	/* Copy the data. */
+	uint32_t start1 = header->head + ZoneDataOffset;
+	uint32_t size1 = std::min(size, (m_header->zoneSize*AesalonPageSize)-start1);
+	
+	uint32_t size2 = size - size1;
+	uint32_t start2 = ZoneDataOffset;
+	
+	memcpy(buffer, zone + start1, size1);
+	if(size2 > 0) {
+		memcpy(static_cast<uint8_t *>(buffer) + size1, zone + start2, size2);
+	}
 }
 
 uint8_t *SHMReader::getZone(uint32_t id) {
@@ -82,7 +103,7 @@ uint8_t *SHMReader::getZone(uint32_t id) {
 }
 
 void *SHMReader::mapRegion(uint32_t start, uint32_t size) {
-	if(m_header == NULL || m_header->shmSize < (start+size) * AesalonPageSize) {
+	if(m_header == NULL || m_header->shmSize < (start+size)) {
 		if(m_header) sem_wait(&m_header->resizeSemaphore);
 		
 		Message(Debug, "Resizing SHM to " << start+size << " page(s).");

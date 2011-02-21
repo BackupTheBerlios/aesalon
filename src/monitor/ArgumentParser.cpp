@@ -12,6 +12,7 @@
 
 #include "monitor/ArgumentParser.h"
 #include "config/Parser.h"
+#include "util/MessageSystem.h"
 
 namespace Monitor {
 
@@ -51,8 +52,7 @@ int ArgumentParser::parse(Config::Vault *vault, char **argv) {
 			vault->set("::list-attributes", "true");
 		}
 		else if(std::strncmp(argv[arg], "--", 2) == 0) {
-			std::cout << "Unknown argument \"" << argv[arg] << "\".\n";
-			// TODO: do something about the error.
+			Message(Warning, "Unknown argument \"" << argv[arg] << "\".");
 		}
 		else break;
 	}

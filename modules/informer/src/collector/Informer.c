@@ -52,7 +52,7 @@ static THREAD_SPECIFIC PacketHeader *AI_ZonePacket = NULL;
 static void AI_SetupSHM();
 static void *AI_MapSHM(uint32_t start, uint32_t size);
 static void *AI_SetupZone();
-static void *AI_ReserveSpace();
+static void *AI_ReserveSpace(uint32_t size);
 
 void AI_SetupSHM() {
 	const char *shmName = getenv("AesalonSHMName");
@@ -70,21 +70,15 @@ void AI_SetupSHM() {
 }
 
 void *AI_MapSHM(uint32_t start, uint32_t size) {
-	struct stat s;
-	printf("shmFd: %i\n", AI_InformerData.shmFd);
-	if(fstat(AI_InformerData.shmFd, &s) != 0) {
-		fprintf(stderr, "Could not fstat shared memory to determine size: %s\n", strerror(errno));
-		exit(1);
-	}
-	
-	if(s.st_size > (start+size) * AesalonPageSize) {
-		if(AI_InformerData.shmHeader) sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
+	if(AI_InformerData.shmHeader != NULL && AI_InformerData.shmHeader->shmSize < (start+size)) {
+		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
 		
 		if(ftruncate(AI_InformerData.shmFd, (start+size) * AesalonPageSize) != 0) {
 			fprintf(stderr, "Could not resize shared memory.");
+			exit(1);
 		}
 		
-		if(AI_InformerData.shmHeader) sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
+		sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
 	}
 	
 	void *memory = 
@@ -139,8 +133,32 @@ static void *AI_SetupZone() {
 	return AI_Zone;
 }
 
-static void *AI_ReserveSpace() {
-	return NULL;
+static void *AI_ReserveSpace(uint32_t size) {
+	ZoneHeader *header = (ZoneHeader *)AI_Zone;
+	uint32_t remaining;
+	if(header->head <= header->tail) {
+		remaining = ((AI_InformerData.shmHeader->zoneSize*AesalonPageSize) - ZoneDataOffset)
+			- (header->tail - header->head);
+	}
+	else {
+		remaining = header->head - ZoneDataOffset - header->tail;
+	}
+	
+	if(remaining < size) {
+		header->overflow = size - remaining;
+		sem_wait(&header->overflowSemaphore);
+	}
+	
+	/* If the head is less than (or equal to) the tail, then the used memory
+		is in one contiguous chunk, and the buffer has not wrapped yet. */
+	if(header->head <= header->tail) {
+		header->tail += size;
+		return &AI_Zone[header->tail-size];
+	}
+	else {
+		printf("**** Second case, returning NULL.\n");
+		return NULL;
+	}
 }
 
 void __attribute__((constructor)) AI_Construct() {
@@ -151,6 +169,10 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	AI_SetupSHM();
 	
+	AI_InformerData.threadList = malloc(sizeof(pthread_t) * 16);
+	AI_InformerData.threadListSize = 16;
+	AI_InformerData.threadCount = 1;
+	AI_InformerData.threadList[0] = self;
 	
 	AI_ContinueCollection(self);
 }
@@ -162,10 +184,14 @@ void __attribute__((destructor)) AI_Destruct() {
 void AC_EXPORT AI_StartPacket(ModuleID moduleID) {
 	if(AI_Zone == NULL) AI_SetupZone();
 	AI_ZonePacket = AI_ReserveSpace(sizeof(PacketHeader));
+	AI_ZonePacket->packetSize = 0;
+	AI_ZonePacket->moduleID = moduleID;
+	
 }
 
 void AC_EXPORT *AI_PacketSpace(uint32_t size) {
-	return NULL;
+	AI_ZonePacket->packetSize += size;
+	return AI_ReserveSpace(size);
 }
 
 void AC_EXPORT AI_EndPacket() {

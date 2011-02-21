@@ -28,6 +28,8 @@ Launcher::~Launcher() {
 
 void Launcher::launch() {
 	forkTarget();
+	
+	
 }
 
 void Launcher::forkTarget() {
