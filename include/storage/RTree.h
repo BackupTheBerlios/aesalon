@@ -46,7 +46,11 @@ public:
 			Message(Debug, "Overlap test:");
 			Message(Debug, "\tm_start: " << m_start << "\t m_end: " << m_end);
 			Message(Debug, "\tother.m_start: " << other.m_start << "\tother.m_end: " << other.m_end);
-			if(m_start > other.m_end || other.m_start > m_end) return false;
+			if(m_start > other.m_end || other.m_start > m_end) {
+				Message(Debug, "\t+ Does not overlap . . .");
+				return false;
+			}
+			Message(Debug, "\t+ Overlaps . . .");
 			return true;
 		}
 		
@@ -340,22 +344,19 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 			// Add nn to p.
 			int count = p->branchCount();
 			if(count < Maximum) {
-				for(i = 0; i < nn->branchCount(); i ++) {
-					p->branch(count).bound.enclose(nn->branch(i).bound);
-				}
+				p->branch(count).bound = nn->bound();
 				p->branch(count).node = nn;
 				nn = NULL;
 				p->setBranchCount(p->branchCount()+1);
 			}
 			else {
-				// Invoke splitNode. TBI.
-				Message(Warning, "Splitting nodes in adjustTree untested.");
+				// Invoke splitNode to create pp.
 				
 				Branch b;
-				b.node = nn;
 				b.bound = nn->bound();
+				b.node = nn;
 				
-				nn = splitNode(n, b);
+				nn = splitNode(p, b);
 			}
 		}
 		
@@ -455,13 +456,10 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		if(listSize == 0) break;
 		else if((node->branchCount() + listSize) == Minimum) {
 			Message(Debug, "Node+listSize == Minimum, filling . . .");
-			Message(Debug, "listSize: " << listSize);
-			Message(Debug, "Before: " << node->branchCount());
 			for(int i = 0; i < listSize; i ++) {
 				node->branch(node->branchCount()) = list[i];
 				node->setBranchCount(node->branchCount()+1);
 			}
-			Message(Debug, "After: " << node->branchCount());
 			break;
 		}
 		else if((nn->branchCount() + listSize) == Minimum) {
@@ -484,7 +482,7 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		}
 		else if(volume2 < volume1) {
 			Message(Debug, "Adding to nn . . .");
-			nn->branch(node->branchCount()) = list[listSize-1];
+			nn->branch(nn->branchCount()) = list[listSize-1];
 			nn->setBranchCount(nn->branchCount()+1);
 			nnBound.enclose(list[listSize-1].bound);
 		}
