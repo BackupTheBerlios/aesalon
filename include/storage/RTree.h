@@ -251,24 +251,27 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum>::search(
 		for(int i = 0; i < node->branchCount(); i ++) {
 			Branch &branch = node->branch(i);
 			
-			Message(Debug, "Considering branch #" << i);
+			Message(Debug, "Considering leaf branch #" << i);
 			if(branch.bound.overlaps(bound)) {
-				Message(Debug, "Branch overlaps bound, processing . . .");
+				Message(Debug, "Leaf branch overlaps bound, processing . . .");
 				processor->process(branch.bound, branch.value);
 			}
-			else Message(Debug, "Branch does not overlap bound, ignoring.");
+			else Message(Debug, "Leaf branch does not overlap bound, ignoring.");
 		}
 	}
 	else {
 		Message(Debug, "Not in leaf node. Branch count: " << node->branchCount());
 		for(int i = 0; i < node->branchCount(); i ++) {
 			Branch &branch = node->branch(i);
-			Message(Debug, "Considering branch #" << i);
+			Message(Debug, "Considering non-leaf branch #" << i);
+			Message(Debug, "\tbranchCount():" << branch.node->branchCount());
 			if(branch.bound.overlaps(bound)) {
-				Message(Debug, "Branch overlaps bound, processing . . .");
+				Message(Debug, "Non-leaf branch overlaps bound, processing . . .");
 				search(bound, branch.node, processor);
 			}
-			else Message(Debug, "Branch does not overlap bound, ignoring.");
+			else {
+				Message(Debug, "Non-leaf branch does not overlap bound, ignoring.");
+			}
 		}
 	}
 }
@@ -362,7 +365,7 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 	nn->setParent(node->parent());
 	
 	Branch list[Maximum+1];
-	int listSize = Maximum-1;
+	int listSize = Maximum+1;
 	
 	for(int i = 0; i < Maximum; i ++) {
 		list[i] = node->branch(i);
@@ -439,16 +442,21 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 	while(true) {
 		if(listSize == 0) break;
 		else if((node->branchCount() + listSize) == Minimum) {
+			Message(Debug, "Node+listSize == Minimum, filling . . .");
+			Message(Debug, "listSize: " << listSize);
+			Message(Debug, "Before: " << node->branchCount());
 			for(int i = 0; i < listSize; i ++) {
 				node->branch(node->branchCount()) = list[i];
 				node->setBranchCount(node->branchCount()+1);
 			}
+			Message(Debug, "After: " << node->branchCount());
 			break;
 		}
 		else if((nn->branchCount() + listSize) == Minimum) {
+			Message(Debug, "nn+listSize == Minimum, filling . . .");
 			for(int i = 0; i < listSize; i ++) {
 				nn->branch(node->branchCount()) = list[i];
-				nn->setBranchCount(node->branchCount()+1);
+				nn->setBranchCount(nn->branchCount()+1);
 			}
 			break;
 		}
@@ -457,11 +465,13 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		Key volume2 = nnBound.enlargementToCover(list[listSize-1].bound);
 		
 		if(volume1 < volume2) {
+			Message(Debug, "Adding to node . . .");
 			node->branch(node->branchCount()) = list[listSize-1];
 			node->setBranchCount(node->branchCount()+1);
 			nodeBound.enclose(list[listSize-1].bound);
 		}
 		else if(volume2 < volume1) {
+			Message(Debug, "Adding to nn . . .");
 			nn->branch(node->branchCount()) = list[listSize-1];
 			nn->setBranchCount(nn->branchCount()+1);
 			nnBound.enclose(list[listSize-1].bound);
@@ -475,8 +485,9 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		listSize --;
 	}
 	
-	node = NULL;
-	branch.node = NULL;
+	Message(Debug, "\tBefore splitting, there were " << Maximum+1 << " elements.");
+	Message(Debug, "\tAfter splitting, there are " << node->branchCount() << " + " << nn->branchCount()
+		<< " elements.");
 	
 	return nn;
 }
