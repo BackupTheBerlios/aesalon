@@ -206,6 +206,7 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum>::insert(
 	Value value) {
 	
 	Message(Debug, "Beginning insertion of value " << value);
+	Message(Debug, "\tBound: " << bound.range(0).start() << ":" << bound.range(0).end());
 	
 	Message(Debug, "Calling chooseLeaf() . . .");
 	Node *leaf = chooseLeaf(bound), *ll = NULL;
@@ -277,6 +278,7 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum>::search(
 			}
 			else {
 				Message(Debug, "Non-leaf branch does not overlap bound, ignoring.");
+				//search(bound, branch.node, processor);
 			}
 		}
 	}
@@ -335,10 +337,9 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		}
 		
 		Bound &bound = p->branch(i).bound;
-		
-		for(; i < n->branchCount(); i ++) {
-			bound.enclose(p->branch(i).bound);
-		}
+		Message(Debug, "Before adjustment, branch bound is " << bound.range(0).start() << ":" << bound.range(0).end());
+		p->branch(i).bound = n->bound();
+		Message(Debug, "After adjustment, branch bound is " << bound.range(0).start() << ":" << bound.range(0).end());
 		
 		if(nn != NULL) {
 			// Add nn to p.
