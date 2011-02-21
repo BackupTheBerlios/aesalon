@@ -50,6 +50,12 @@ int main(int argc, char *argv[]) {
 	b.setRange(RTree::Range(86.2, 93.2), 0);
 	rt.insert(b, 10);
 	
+	b.setRange(RTree::Range(21.1, 27.9), 0);
+	rt.remove(b, 4);
+	b.setRange(RTree::Range(2.2, 8), 0);
+	rt.remove(b, 6);
+	b.setRange(RTree::Range(1.1, 5.3), 0);
+	rt.remove(b, 7);
 	
 	class Processor : public RTree::SearchProcessor {
 	public:
@@ -61,7 +67,7 @@ int main(int argc, char *argv[]) {
 	
 	Processor p;
 	
-	b.setRange(RTree::Range(86.2, 86.2), 0);
+	b.setRange(RTree::Range(0.0, 8.0), 0);
 	
 	rt.search(b, &p);
 	

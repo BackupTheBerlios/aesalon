@@ -11,6 +11,7 @@
 #define AesalonStorage_RTree_H
 
 #include <vector>
+#include <list>
 
 #include "util/MessageSystem.h"
 
@@ -19,14 +20,19 @@ namespace Storage {
 /** An n-dimensional R-tree.
 	Notes:
 	- Key must support a basic assignment specifier and also the element zero, plus all the usual arithmetic operators.
-		Using a non-elementary type is not a good idea.
+		Using an elementary type is a very good idea.
 	- Value must be either a basic type or a pointer.
 	- Minimum <= Maximum/2. (Logic in code assumes this.)
 	- Maximum <= some reasonable number. Many linear searches through lists of this size take place.
-		A reasonable size is eight.
-	- Dimensions should be less than about six. Any more and you have other problems . . .
+		A reasonable size is sixteen.
+	- Dimensions should be as small as possible; many linear operations take place on this number.
+		Six is a reasonable upper bound.
+	- FloatKey should be a version of Key that supports floating-point arithmetic (or at least non-integer division).
+	Unless otherwise noted, all algorithms are from the publication
+		R-Trees: A Dynamic Index Structure for Spatial Searching [Guttman, A].
 */
-template<typename Key, typename Value, int Dimensions, int Maximum = 8, int Minimum = Maximum/2>
+template<typename Key, typename Value, int Dimensions, int Maximum = 8, int Minimum = Maximum/2,
+	typename FloatKey = Key>
 class RTree {
 public:
 	class Range {
@@ -75,7 +81,7 @@ public:
 		Range &range(int dimension) { return m_ranges[dimension]; }
 		const Range &range(int dimension) const { return m_ranges[dimension]; }
 		
-		bool overlaps(const Bound &other) {
+		bool overlaps(const Bound &other) const {
 			for(int i = 0; i < Dimensions; i ++) {
 				if(!m_ranges[i].overlaps(other.m_ranges[i])) return false;
 			}
@@ -109,7 +115,7 @@ public:
 				else if(other.m_ranges[i].valid()) {
 					m_ranges[i] = other.m_ranges[i];
 				}
-				// If other.m_ranges[i] is not valid, nothing needs to be done.
+				/* If other.m_ranges[i] is not valid, nothing needs to be done. */
 			}
 		}
 	};
@@ -168,41 +174,59 @@ public:
 	RTree();
 	~RTree();
 	
+	/** Searches the tree for anything overlapping bound.
+		@param bound The bound to search for.
+		@param processor A search processor.
+	*/
 	void search(const Bound &bound, SearchProcessor *processor);
+	/** Inserts a value into the tree with a bound.
+		@param bound The bound to use.
+		@param value The value to insert.
+	*/
 	void insert(const Bound &bound, Value value);
+	/** Removes a value from the tree.
+		@param bound The bound to search.
+		@param value The value to remove.
+	*/
+	void remove(const Bound &bound, Value value);
 private:
 	void search(const Bound &bound, Node *node, SearchProcessor *processor);
 	
 	Node *chooseLeaf(const Bound &bound);
-	
 	Node *adjustTree(Node *n, Node *nn);
-	
 	Node *splitNode(Node *node, Branch &branch);
+	
+	Node *findLeaf(Node *node, const Bound &bound, Value value);
+	void condenseTree(Node *leaf);
 };
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum>
-RTree<Key, Value, Dimensions, Maximum, Minimum>::RTree() {
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::RTree() {
 	m_root = new Node(true);
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum>
-RTree<Key, Value, Dimensions, Maximum, Minimum>::~RTree() {
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::~RTree() {
 	
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum>
-void RTree<Key, Value, Dimensions, Maximum, Minimum>::search(
-	const RTree<Key, Value, Dimensions, Maximum, Minimum>::Bound &bound,
-	RTree<Key, Value, Dimensions, Maximum, Minimum>::SearchProcessor *processor) {
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::search(
+	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::SearchProcessor *processor) {
 	
 	Message(Debug, "Beginning search.");
 	
 	search(bound, m_root, processor);
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum>
-void RTree<Key, Value, Dimensions, Maximum, Minimum>::insert(
-	const RTree<Key, Value, Dimensions, Maximum, Minimum>::Bound &bound,
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::insert(
+	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
 	Value value) {
 	
 	Message(Debug, "Beginning insertion of value " << value);
@@ -245,11 +269,30 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum>::insert(
 	Message(Debug, "Finished.");
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum>
-void RTree<Key, Value, Dimensions, Maximum, Minimum>::search(
-	const RTree<Key, Value, Dimensions, Maximum, Minimum>::Bound &bound,
-	RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *node,
-	RTree<Key, Value, Dimensions, Maximum, Minimum>::SearchProcessor *processor) {
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::remove(
+	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
+	Value value) {
+	
+	Node *leaf = findLeaf(m_root, bound, value);
+	
+	condenseTree(leaf);
+	
+	if(!m_root->isLeaf() && m_root->branchCount() == 1) {
+		Node *newRoot = m_root->branch(0).node;
+		newRoot->setParent(NULL);
+		delete m_root;
+		m_root = newRoot;
+	}
+}
+
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::search(
+	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *node,
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::SearchProcessor *processor) {
 	
 	if(node == NULL) return;
 	
@@ -278,16 +321,16 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum>::search(
 			}
 			else {
 				Message(Debug, "Non-leaf branch does not overlap bound, ignoring.");
-				//search(bound, branch.node, processor);
 			}
 		}
 	}
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum>
-typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
-	RTree<Key, Value, Dimensions, Maximum, Minimum>::chooseLeaf(
-		const RTree<Key, Value, Dimensions, Maximum, Minimum>::Bound &bound) {
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::chooseLeaf(
+		const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound) {
 	
 	Node *node = m_root;
 	
@@ -317,11 +360,12 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 	return node;
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum>
-typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
-	RTree<Key, Value, Dimensions, Maximum, Minimum>::adjustTree(
-		RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *n,
-		RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *nn) {
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::adjustTree(
+		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *n,
+		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *nn) {
 	
 	Message(Debug, "Starting tree adjustment, nn is " << nn);
 	
@@ -342,7 +386,7 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		Message(Debug, "After adjustment, branch bound is " << bound.range(0).start() << ":" << bound.range(0).end());
 		
 		if(nn != NULL) {
-			// Add nn to p.
+			/* Add nn to p. */
 			int count = p->branchCount();
 			if(count < Maximum) {
 				p->branch(count).bound = nn->bound();
@@ -351,7 +395,7 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 				p->setBranchCount(p->branchCount()+1);
 			}
 			else {
-				// Invoke splitNode to create pp.
+				/* Invoke splitNode to create pp. */
 				
 				Branch b;
 				b.bound = nn->bound();
@@ -367,14 +411,14 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 	return nn;
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum>
-typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
-	RTree<Key, Value, Dimensions, Maximum, Minimum>::splitNode(
-		RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *node,
-		RTree<Key, Value, Dimensions, Maximum, Minimum>::Branch &branch) {
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::splitNode(
+		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *node,
+		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Branch &branch) {
 	
-	// Linear-time algorithm specified in original R-tree publication.
-	
+	/* This uses the linear-time algorithm specified in the publication. */
 	Node *nn = new Node(node->isLeaf());
 	nn->setParent(node->parent());
 	
@@ -501,6 +545,67 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 		<< " elements.");
 	
 	return nn;
+}
+
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::findLeaf(
+		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *node,
+		const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
+		Value value) {
+	
+	if(node->isLeaf()) {
+		for(int i = 0; i < node->branchCount(); i ++) {
+			if(node->branch(i).value == value) {
+				node->branch(i) = node->branch(node->branchCount()-1);
+				node->setBranchCount(node->branchCount()-1);
+				return node;
+			}
+		}
+		return NULL;
+	}
+	else {
+		for(int i = 0; i < node->branchCount(); i ++) {
+			if(bound.overlaps(node->branch(i).bound)) {
+				Node *result = findLeaf(node->branch(i).node, bound, value);
+				if(result != NULL) return result;
+			}
+		}
+	}
+	return NULL;
+}
+
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::condenseTree(
+		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *leaf) {
+	
+	Node *n = leaf;
+	std::list<Node *> removedNodes;
+	
+	while(m_root != n) {
+		Node *p = n->parent();
+		
+		int i;
+		for(i = 0; i < p->branchCount(); i ++) {
+			if(p->branch(i).node == n) break;
+		}
+		
+		if(n->branchCount() < Minimum) {
+			p->branch(i) = p->branch(p->branchCount()-1);
+			p->setBranchCount(p->branchCount()-1);
+			removedNodes.push_back(n);
+		}
+		else {
+			p->branch(i).bound = n->bound();
+		}
+		n = p;
+	}
+	
+	Message(Debug, "Reinserting " << removedNodes.size() << " nodes into tree.");
+	
+	
 }
 
 } // namespace Storage
