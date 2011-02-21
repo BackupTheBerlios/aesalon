@@ -6,12 +6,13 @@
 	
 	@file src/monitor/Aesalon.cpp
 */
+#include <stdlib.h>
 
 #include "monitor/Coordinator.h"
 
 #include "storage/RTree.h"
 
-#if 1
+#if 0
 int main(int argc, char *argv[]) {
 	Monitor::Coordinator coordinator(argv);
 	coordinator.run();
@@ -26,17 +27,13 @@ int main(int argc, char *argv[]) {
 	RTree rt;
 	
 	RTree::Bound b;
-	b.setRange(RTree::Range(-2.0, 2.0), 0);
-	rt.insert(b, 0);
-	b.setRange(RTree::Range(-1.0, 1.0), 0);
-	rt.insert(b, 1);
-	b.setRange(RTree::Range(-1.5, 1.0), 0);
-	rt.insert(b, 2);
 	
-	b.setRange(RTree::Range(3.5, 6.0), 0);
-	rt.insert(b, 3);
-	b.setRange(RTree::Range(-6.0, -3.5), 0);
-	rt.insert(b, 4);
+	for(int i = 0; i < 900; i ++) {
+		double start = (rand()%1000)/10.0;
+		double size = (rand()%100)/10.0;
+		b.setRange(RTree::Range(start, start+size), 0);
+		rt.insert(b, i);
+	}
 	
 	class Processor : public RTree::SearchProcessor {
 	public:

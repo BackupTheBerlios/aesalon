@@ -124,7 +124,7 @@ static void *AI_SetupZone() {
 		/* Just temporarily use recursion to fix the problem. Note: don't try this at home . . . */
 		AI_SetupZone();
 	}
-	AI_InformerData.zoneUseData[i/i] |= (0x01 << (i%8));
+	AI_InformerData.zoneUseData[i/8] |= (0x01 << (i%8));
 	
 	AI_Zone = AI_MapSHM(
 		AI_InformerData.shmHeader->zonePageOffset + (i*AI_InformerData.shmHeader->zoneSize),

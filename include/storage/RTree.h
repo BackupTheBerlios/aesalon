@@ -232,6 +232,8 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum>::insert(
 		newRoot->branch(0).node = m_root;
 		newRoot->branch(1).bound = result->bound();
 		newRoot->branch(1).node = result;
+		m_root->setParent(newRoot);
+		result->setParent(newRoot);
 		m_root = newRoot;
 	}
 	
@@ -284,12 +286,16 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 	Node *node = m_root;
 	
 	while(!node->isLeaf()) {
+		Message(Debug, "Node is not leaf node, continuing downwards . . .");
 		Node *smallestNode = NULL;
 		Key smallestVolume = 0;
 		for(int i = 0; i < node->branchCount(); i ++) {
 			Key volume = bound.enlargementToCover(node->branch(i).bound);
 			
-			if(volume < smallestVolume || smallestNode == NULL) smallestNode = node, smallestVolume = volume;
+			if(volume < smallestVolume || smallestNode == NULL) {
+				smallestNode = node->branch(i).node;
+				smallestVolume = volume;
+			}
 			else if(volume == smallestVolume) {
 				/* TODO: implement tiebreaker. */
 				Message(Debug, "RTree: smallestVolume tie-breaker not implemented!");
