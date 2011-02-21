@@ -22,16 +22,22 @@ int main(int argc, char *argv[]) {
 
 #else
 int main(int argc, char *argv[]) {
-	typedef Storage::RTree<double, int, 1, 4, 2> RTree;
+	typedef Storage::RTree<double, int, 3, 4, 2> RTree;
 	
 	RTree rt;
 	
 	RTree::Bound b;
 	
-	for(int i = 0; i < 900; i ++) {
+	for(int i = 0; i < 14; i ++) {
 		double start = (rand()%1000)/10.0;
 		double size = (rand()%100)/10.0;
 		b.setRange(RTree::Range(start, start+size), 0);
+		start = (rand()%1000)/10.0;
+		size = (rand()%100)/10.0;
+		b.setRange(RTree::Range(start, start+size), 1);
+		start = (rand()%1000)/10.0;
+		size = (rand()%100)/10.0;
+		b.setRange(RTree::Range(start, start+size), 2);
 		rt.insert(b, i);
 	}
 	
@@ -46,7 +52,9 @@ int main(int argc, char *argv[]) {
 	Processor p;
 	
 	RTree::Range searchRange[] = {
-		RTree::Range(-3.0, 3.0)
+		RTree::Range(-3000.0, 3000.0),
+		RTree::Range(-3000.0, 3000.0),
+		RTree::Range(-3000.0, 3000.0)
 	};
 	
 	RTree::Bound sb(searchRange);

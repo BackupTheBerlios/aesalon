@@ -345,11 +345,17 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum>::Node *
 				}
 				p->branch(count).node = nn;
 				nn = NULL;
+				p->setBranchCount(p->branchCount()+1);
 			}
 			else {
 				// Invoke splitNode. TBI.
-				Message(Fatal, "Splitting nodes in adjustTree NYI.");
-				//nn = splitNode(n);
+				Message(Warning, "Splitting nodes in adjustTree untested.");
+				
+				Branch b;
+				b.node = nn;
+				b.bound = nn->bound();
+				
+				nn = splitNode(n, b);
 			}
 		}
 		
