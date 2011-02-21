@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <list>
+#include <queue>
 
 #include "util/MessageSystem.h"
 
@@ -603,7 +604,38 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::condenseTree(
 		n = p;
 	}
 	
-	Message(Debug, "Reinserting " << removedNodes.size() << " nodes into tree.");
+	Message(Debug, "Reinserting " << removedNodes.size() << " node(s) into tree.");
+	
+	for(typename std::list<Node *>::iterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
+		Node *node = *i;
+		
+		if(node->isLeaf()) {
+			for(int i = 0; i < node->branchCount(); i ++) {
+				Branch &b = node->branch(i);
+				insert(b.bound, b.value);
+			}
+		}
+		/* TODO: implement better support for removal. This is horribly slow. */
+		else {
+			std::queue<Node *> q;
+			q.push(node);
+			while(q.size()) {
+				node = q.front();
+				q.pop();
+				if(node->isLeaf()) {
+					for(int i = 0; i < node->branchCount(); i ++) {
+						Branch &b = node->branch(i);
+						insert(b.bound, b.value);
+					}
+				}
+				else {
+					for(int i = 0; i < node->branchCount(); i ++) {
+						q.push(node->branch(i).node);
+					}
+				}
+			}
+		}
+	}
 	
 	
 }
