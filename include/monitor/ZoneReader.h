@@ -21,6 +21,8 @@ public:
 	ZoneReader(SHMReader *shmReader);
 	~ZoneReader();
 	
+	void run();
+	void start();
 private:
 	static void *run(void *voidInstance);
 };

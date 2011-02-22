@@ -21,14 +21,24 @@ ZoneReader::~ZoneReader() {
 
 }
 
+void ZoneReader::run() {
+	run(this);
+}
+
 void *ZoneReader::run(void *voidInstance) {
+	Message(Debug, "Beginning ZoneReader loop . . .");
 	ZoneReader *instance = static_cast<ZoneReader *>(voidInstance);
 	SHMReader *reader = instance->m_shmReader;
 	SHMReader::ReadBroker broker;
 	
 	while(true) {
+		Message(Debug, "Waiting for packet . . .");
+		reader->waitForPacket();
+		Message(Debug, "Packet semaphore incremented!");
 		int32_t zone = reader->zoneWithData();
 		if(zone == -1) break;
+		
+		Message(Debug, "Zone ID# to read from: " << zone);
 		
 		SHM::PacketHeader *packetHeader;
 		broker.setupRequest(zone, sizeof(SHM::PacketHeader));
@@ -37,6 +47,8 @@ void *ZoneReader::run(void *voidInstance) {
 		
 		Message(Log, "Recieved packet from module " << packetHeader->moduleID << ", size " << packetHeader->packetSize);
 	}
+	
+	Message(Debug, "Ending ZoneReader loop . . .");
 	
 	return NULL;
 }

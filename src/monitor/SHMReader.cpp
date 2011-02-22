@@ -69,7 +69,16 @@ int32_t SHMReader::zoneWithData() {
 			
 			SHM::ZoneHeader *zheader = reinterpret_cast<SHM::ZoneHeader *>(zone);
 			
-			if(sem_wait(&zheader->packetSemaphore) == -1 && errno == EAGAIN) continue;
+			int value;
+			sem_getvalue(&zheader->packetSemaphore, &value);
+			Message(Debug, "Semaphore value: " << value);
+			
+			if(sem_trywait(&zheader->packetSemaphore) == -1 && errno == EAGAIN) continue;
+			
+			Message(Debug, "trywait on zone " << i << "'s packet semaphore succeeded.");
+			
+			sem_getvalue(&zheader->packetSemaphore, &value);
+			Message(Debug, "Semaphore value: " << value);
 			
 			return i;
 		}
@@ -86,12 +95,16 @@ void SHMReader::processRequest(ReadBroker &request) {
 	
 	SHM::ZoneHeader *header = reinterpret_cast<SHM::ZoneHeader *>(zone);
 	
-	uint32_t start1 = header->head + ZoneDataOffset;
+	uint32_t start1 = header->head;
 	uint32_t size1 = std::min(
 		request.size(),
 		(m_header->zoneSize*AesalonPageSize - header->gapSize) - start1);
 	
 	uint32_t size2 = request.size() - size1;
+	
+	Message(Debug, "processRequest: sizes are " << size1 << " and " << size2);
+	Message(Debug, "\thead: " << header->head);
+	Message(Debug, "\ttail: " << header->tail);
 	
 	/* The difficult case; the data is in two segments. */
 	if(size2 > 0) {
@@ -104,6 +117,8 @@ void SHMReader::processRequest(ReadBroker &request) {
 	}
 	/* Otherwise, the simple case. */
 	else {
+		Message(Debug, "Simple case detected.");
+		Message(Debug, "\toffset: " << start1);
 		request.setData(zone + start1);
 		header->head += size1;
 	}
@@ -113,6 +128,10 @@ uint8_t *SHMReader::getZone(uint32_t id) {
 	if(id < m_zoneList.size() && m_zoneList[id] != NULL) {
 		return m_zoneList[id];
 	}
+	
+	Message(Debug,
+		"Zone start/size: " << m_header->zonePageOffset + id*m_header->zoneSize << "/" << m_header->zoneSize);
+	Message(Debug, "ZoneDataOffset: " << ZoneDataOffset);
 	
 	uint8_t *zone =
 		static_cast<uint8_t *>(mapRegion(m_header->zonePageOffset + id*m_header->zoneSize, m_header->zoneSize));
@@ -183,6 +202,8 @@ void SHMReader::setupZones() {
 	m_header->zoneUsagePages = Util::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneUsePages"));
 	
 	m_header->zonePageOffset = m_header->configDataSize + 1 + m_header->zoneUsagePages;
+	
+	m_zoneUseData = static_cast<uint8_t *>(mapRegion(m_header->configDataSize + 1, m_header->zoneUsagePages));
 }
 
 } // namespace Monitor

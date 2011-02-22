@@ -14,6 +14,7 @@
 
 #include "monitor/Launcher.h"
 #include "monitor/Coordinator.h"
+#include "monitor/ZoneReader.h"
 #include "util/MessageSystem.h"
 
 namespace Monitor {
@@ -29,7 +30,8 @@ Launcher::~Launcher() {
 void Launcher::launch() {
 	forkTarget();
 	
-	
+	ZoneReader *reader = new ZoneReader(m_shmReader);
+	reader->run();
 }
 
 void Launcher::forkTarget() {
