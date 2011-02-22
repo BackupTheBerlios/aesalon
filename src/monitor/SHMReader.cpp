@@ -24,6 +24,20 @@
 
 namespace Monitor {
 
+SHMReader::ReadBroker::ReadBroker() : m_temporaryBuffer(NULL), m_temporaryBufferSize(0) {
+	
+}
+
+SHMReader::ReadBroker::~ReadBroker() {
+	if(m_temporaryBuffer) delete[] m_temporaryBuffer;
+}
+
+void SHMReader::ReadBroker::resizeBuffer(uint32_t newSize) {
+	if(m_temporaryBufferSize >= newSize) return;
+	delete[] m_temporaryBuffer;
+	m_temporaryBuffer = new uint8_t[newSize];
+}
+
 SHMReader::SHMReader() : m_header(NULL) {
 	m_shmName = Util::StreamAsString() << "/Aesalon-" << getpid();
 	
@@ -67,24 +81,31 @@ void SHMReader::waitForPacket() {
 	sem_wait(&m_header->packetSemaphore);
 }
 
-void SHMReader::readData(uint32_t zoneID, void *buffer, uint32_t size) {
-	uint8_t *zone = getZone(zoneID);
+void SHMReader::processRequest(ReadBroker &request) {
+	uint8_t *zone = getZone(request.zoneID());
 	
 	SHM::ZoneHeader *header = reinterpret_cast<SHM::ZoneHeader *>(zone);
 	
-	/* Wait for the data to become available . . . */
-	
-	
-	/* Copy the data. */
 	uint32_t start1 = header->head + ZoneDataOffset;
-	uint32_t size1 = std::min(size, (m_header->zoneSize*AesalonPageSize)-start1);
+	uint32_t size1 = std::min(
+		request.size(),
+		(m_header->zoneSize*AesalonPageSize - header->gapSize) - start1);
 	
-	uint32_t size2 = size - size1;
-	uint32_t start2 = ZoneDataOffset;
+	uint32_t size2 = request.size() - size1;
 	
-	memcpy(buffer, zone + start1, size1);
+	/* The difficult case; the data is in two segments. */
 	if(size2 > 0) {
-		memcpy(static_cast<uint8_t *>(buffer) + size1, zone + start2, size2);
+		request.resizeBuffer(request.size());
+		memcpy(request.temporaryBuffer(), zone + start1, size1);
+		memcpy(request.temporaryBuffer() + size1, zone + ZoneDataOffset, size2);
+		header->gapSize = 0;
+		request.setData(request.temporaryBuffer());
+		header->head = size2;
+	}
+	/* Otherwise, the simple case. */
+	else {
+		request.setData(zone + start1);
+		header->head += size1;
 	}
 }
 

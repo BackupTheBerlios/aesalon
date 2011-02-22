@@ -24,28 +24,19 @@ ZoneReader::~ZoneReader() {
 void *ZoneReader::run(void *voidInstance) {
 	ZoneReader *instance = static_cast<ZoneReader *>(voidInstance);
 	SHMReader *reader = instance->m_shmReader;
-	
-	uint8_t *dataBuffer = new uint8_t[32];
-	uint32_t dataBufferSize = 32;
+	SHMReader::ReadBroker broker;
 	
 	while(true) {
 		int32_t zone = reader->zoneWithData();
 		if(zone == -1) break;
 		
-		SHM::PacketHeader packetHeader;
-		reader->readData(zone, &packetHeader, sizeof(packetHeader));
+		SHM::PacketHeader *packetHeader;
+		broker.setupRequest(zone, sizeof(SHM::PacketHeader));
+		reader->processRequest(broker);
+		packetHeader = static_cast<SHM::PacketHeader *>(broker.data());
 		
-		if(packetHeader.packetSize > dataBufferSize) {
-			while(packetHeader.packetSize > dataBufferSize) dataBufferSize *= 2;
-			delete[] dataBuffer;
-			dataBuffer = new uint8_t[dataBufferSize];
-		}
-		reader->readData(zone, dataBuffer, packetHeader.packetSize);
-		
-		Message(Log, "Recieved packet from module " << packetHeader.moduleID << ", size " << packetHeader.packetSize);
+		Message(Log, "Recieved packet from module " << packetHeader->moduleID << ", size " << packetHeader->packetSize);
 	}
-	
-	delete[] dataBuffer;
 	
 	return NULL;
 }

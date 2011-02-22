@@ -20,6 +20,34 @@
 namespace Monitor {
 
 class SHMReader {
+public:
+	class ReadBroker {
+	private:
+		uint8_t *m_temporaryBuffer;
+		uint32_t m_temporaryBufferSize;
+		uint32_t m_zoneID;
+		uint32_t m_size;
+		void *m_data;
+	public:
+		ReadBroker();
+		~ReadBroker();
+		
+		uint32_t zoneID() const { return m_zoneID; }
+		uint32_t size() const { return m_size; }
+		void *data() const { return m_data; }
+		
+		void setupRequest(uint32_t zoneID, uint32_t size) {
+			m_zoneID = zoneID;
+			m_size = size;
+		}
+	protected:
+		void resizeBuffer(uint32_t newSize);
+		uint8_t *temporaryBuffer() const { return m_temporaryBuffer; }
+		uint32_t temporaryBufferSize() const { return m_temporaryBufferSize; }
+		void setData(void *data) { m_data = data; }
+	private:
+		friend class SHMReader;
+	};
 private:
 	int m_fd;
 	std::string m_shmName;
@@ -39,7 +67,7 @@ public:
 	
 	void waitForPacket();
 	
-	void readData(uint32_t zoneID, void *buffer, uint32_t size);
+	void processRequest(ReadBroker &request);
 private:
 	uint8_t *getZone(uint32_t id);
 	void *mapRegion(uint32_t start, uint32_t size);

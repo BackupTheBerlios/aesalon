@@ -38,6 +38,9 @@ struct ZoneHeader {
 	/** The overflow semaphore, see @a overflow for description. */
 	sem_t overflowSemaphore;
 	
+	/** The size of the data gap at the end of the buffer. */
+	uint32_t gapSize;
+	
 	/** The ID of the process that the zone's data comes from. */
 	uint32_t processID;
 	/** The ID of the thread that the zone's data comes from. */
