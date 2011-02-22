@@ -67,10 +67,14 @@ void AI_SetupSHM() {
 	AI_InformerData.configData = AI_MapSHM(1, AI_InformerData.shmHeader->configDataSize);
 	AI_InformerData.zoneUseData =
 		AI_MapSHM(AI_InformerData.shmHeader->configDataSize+1, AI_InformerData.shmHeader->zoneUsagePages);
+	printf("zoneUseData: %p\n", AI_InformerData.zoneUseData);
 }
 
 void *AI_MapSHM(uint32_t start, uint32_t size) {
+	printf("start/size: %i/%i\n", start, size);
+	if(AI_InformerData.shmHeader != NULL) printf("Overall size: %i\n", AI_InformerData.shmHeader->shmSize);
 	if(AI_InformerData.shmHeader != NULL && AI_InformerData.shmHeader->shmSize < (start+size)) {
+		printf("Attempting to resize . . .\n");
 		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
 		
 		if(ftruncate(AI_InformerData.shmFd, (start+size) * AesalonPageSize) != 0) {
@@ -93,11 +97,14 @@ static void *AI_SetupZone() {
 	printf("\t Allocated zones: %i\n", AI_InformerData.shmHeader->zonesAllocated);
 	/* While more memory is required . . . */
 	while(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
+		printf("Decrementing resize semaphore . . .\n");
 		/* Allocate more memory. */
 		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
 		
+		printf("Decremented resize semaphore.\n");
+		
 		/* This seemingly-nonsensical statement is to account for the fact that during the wait above,
-			another thread may have jumped in and allocated a zone.
+			another thread may have jumped in and allocated a zone that can now be used.
 		*/
 		if(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
 			/* Allocate two zones per iteration. */
@@ -107,11 +114,16 @@ static void *AI_SetupZone() {
 			ftruncate(AI_InformerData.shmFd, AI_InformerData.shmHeader->shmSize * AesalonPageSize);
 		}
 		
+		printf("Incrementing resize semaphore.\n");
+		
 		sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
 	}
 	
+	printf("Allocated zones: %i\n", AI_InformerData.shmHeader->zonesAllocated);
+	
 	uint32_t i;
 	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
+		printf("About to read from zoneUseData . . .\n");
 		printf("zoneUseData[%i]: %x\n", i, AI_InformerData.zoneUseData[i]);
 		if((AI_InformerData.zoneUseData[i/8] & (0x01 << (i % 8))) == 0) break;
 	}

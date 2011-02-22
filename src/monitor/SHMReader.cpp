@@ -134,6 +134,7 @@ void *SHMReader::mapRegion(uint32_t start, uint32_t size) {
 		if(ftruncate(m_fd, (start+size) * AesalonPageSize) != 0) {
 			Message(Fatal, "Could not resize shared memory.");
 		}
+		if(m_header) m_header->shmSize = start+size;
 		
 		if(m_header) sem_post(&m_header->resizeSemaphore);
 	}
