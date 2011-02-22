@@ -144,12 +144,24 @@ static void *AI_SetupZone() {
 static void *AI_ReserveSpace(uint32_t size) {
 	ZoneHeader *header = (ZoneHeader *)AI_Zone;
 	uint32_t remaining;
-	if(header->head <= header->tail) {
-		remaining = ((AI_InformerData.shmHeader->zoneSize*AesalonPageSize) - ZoneDataOffset)
-			- (header->tail - header->head);
-	}
-	else {
+	/* Three cases for remaining check (and also below).
+		1) head > tail (memory is in two chunks)
+		2) head < tail (memory is in one chunk), tail+size >= zoneSize
+		3) head < tail (memory is in one chunk), tail+size < zoneSize
+	*/
+	if(header->head > header->tail) {
 		remaining = header->head - ZoneDataOffset - header->tail;
+	}
+	else if(header->head <= header->tail
+		&& (header->tail + size) < AI_InformerData.shmHeader->zoneSize*AesalonPageSize) {
+		
+		remaining = AI_InformerData.shmHeader->zoneSize*AesalonPageSize
+			- (header->tail - header->head) - ZoneDataOffset;
+	}
+	else if(header->head <= header->tail
+		&& (header->tail + size) >= AI_InformerData.shmHeader->zoneSize*AesalonPageSize) {
+		
+		remaining = header->head - ZoneDataOffset;
 	}
 	
 	if(remaining < size) {
@@ -157,18 +169,31 @@ static void *AI_ReserveSpace(uint32_t size) {
 		sem_wait(&header->overflowSemaphore);
 	}
 	
-	/* If the head is less than (or equal to) the tail, then the used memory
-		is in one contiguous chunk, and the buffer has not wrapped yet. */
-	if(header->head <= header->tail) {
-		printf("Increasing tail by %i\n", size);
+	if(header->head > header->tail) {
+		printf("Insertion case 1 . . .\n");
 		header->tail += size;
-		printf("New value: %i\n", header->tail);
-		return &AI_Zone[header->tail-size];
+		return AI_Zone + header->tail - size;
 	}
-	else {
-		printf("**** Second case, returning NULL.\n");
-		return NULL;
+	else if(header->head <= header->tail
+		&& (header->tail + size) < AI_InformerData.shmHeader->zoneSize*AesalonPageSize) {
+		
+		printf("Insertion case 2 . . .\n");
+		
+		header->tail += size;
+		return AI_Zone + header->tail - size;
 	}
+	else if(header->head <= header->tail
+		&& (header->tail + size) >= AI_InformerData.shmHeader->zoneSize*AesalonPageSize) {
+		
+		printf("Insertion case 3 . . .\n");
+		
+		header->gapSize = AI_InformerData.shmHeader->zoneSize*AesalonPageSize - header->tail;
+		header->tail = ZoneDataOffset + size;
+		return AI_Zone + ZoneDataOffset;
+	}
+	
+	printf("Something unforeseen occured. This should not have happened . . .\n");
+	return NULL;
 }
 
 void __attribute__((constructor)) AI_Construct() {
@@ -186,9 +211,12 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	AI_ContinueCollection(self);
 	
-	AI_StartPacket(16);
-	*(pid_t *)AI_PacketSpace(sizeof(pid_t)) = getpid();
-	AI_EndPacket();
+	ModuleID id = 0;
+	for(; ; id ++) {
+		usleep(100);
+		AI_StartPacket(id);
+		AI_EndPacket();
+	}
 }
 
 void __attribute__((destructor)) AI_Destruct() {
