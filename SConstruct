@@ -53,7 +53,7 @@ env = Environment(
 		'HOME' : os.environ['HOME']})
 
 env.Append(CPPPATH = ["#include/"])
-env.Append(CCFLAGS = ["-W", "-Wall", "-g"])
+env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-O3"])
 env.Append(LIBPATH = ["#.build"])
 
 Export('env')

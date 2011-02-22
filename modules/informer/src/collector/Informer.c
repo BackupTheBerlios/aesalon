@@ -67,14 +67,11 @@ void AI_SetupSHM() {
 	AI_InformerData.configData = AI_MapSHM(1, AI_InformerData.shmHeader->configDataSize);
 	AI_InformerData.zoneUseData =
 		AI_MapSHM(AI_InformerData.shmHeader->configDataSize+1, AI_InformerData.shmHeader->zoneUsagePages);
-	printf("zoneUseData: %p\n", AI_InformerData.zoneUseData);
 }
 
 void *AI_MapSHM(uint32_t start, uint32_t size) {
-	printf("start/size: %i/%i\n", start, size);
 	if(AI_InformerData.shmHeader != NULL) printf("Overall size: %i\n", AI_InformerData.shmHeader->shmSize);
 	if(AI_InformerData.shmHeader != NULL && AI_InformerData.shmHeader->shmSize < (start+size)) {
-		printf("Attempting to resize . . .\n");
 		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
 		
 		if(ftruncate(AI_InformerData.shmFd, (start+size) * AesalonPageSize) != 0) {
@@ -93,15 +90,10 @@ void *AI_MapSHM(uint32_t start, uint32_t size) {
 }
 
 static void *AI_SetupZone() {
-	printf("Setting up new zone . . .\n");
-	printf("\t Allocated zones: %i\n", AI_InformerData.shmHeader->zonesAllocated);
 	/* While more memory is required . . . */
 	while(AI_InformerData.shmHeader->zoneCount >= AI_InformerData.shmHeader->zonesAllocated) {
-		printf("Decrementing resize semaphore . . .\n");
 		/* Allocate more memory. */
 		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
-		
-		printf("Decremented resize semaphore.\n");
 		
 		/* This seemingly-nonsensical statement is to account for the fact that during the wait above,
 			another thread may have jumped in and allocated a zone that can now be used.
@@ -114,8 +106,6 @@ static void *AI_SetupZone() {
 			ftruncate(AI_InformerData.shmFd, AI_InformerData.shmHeader->shmSize * AesalonPageSize);
 		}
 		
-		printf("Incrementing resize semaphore.\n");
-		
 		sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
 	}
 	
@@ -123,8 +113,6 @@ static void *AI_SetupZone() {
 	
 	uint32_t i;
 	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
-		printf("About to read from zoneUseData . . .\n");
-		printf("zoneUseData[%i]: %x\n", i, AI_InformerData.zoneUseData[i]);
 		if((AI_InformerData.zoneUseData[i/8] & (0x01 << (i % 8))) == 0) break;
 	}
 	printf("Zone ID#: %i\n", i);
@@ -135,10 +123,6 @@ static void *AI_SetupZone() {
 		AI_SetupZone();
 	}
 	AI_InformerData.zoneUseData[i/8] |= (0x01 << (i%8));
-	
-	printf("Zone start/size: %i/%i\n",
-		AI_InformerData.shmHeader->zonePageOffset + (i*AI_InformerData.shmHeader->zoneSize),
-		AI_InformerData.shmHeader->zoneSize);
 	
 	AI_Zone = AI_MapSHM(
 		AI_InformerData.shmHeader->zonePageOffset + (i*AI_InformerData.shmHeader->zoneSize),
@@ -177,27 +161,25 @@ static void *AI_ReserveSpace(uint32_t size) {
 	}
 	
 	if(remaining < size) {
+		printf("Not enough space remaining!\n");
+		printf("remaining: %i\n", remaining);
 		header->overflow = size - remaining;
+		printf("Overflow: %i\n", header->overflow);
 		sem_wait(&header->overflowSemaphore);
 	}
 	
 	if(header->head > header->tail) {
-		printf("Insertion case 1 . . .\n");
 		header->tail += size;
 		return AI_Zone + header->tail - size;
 	}
 	else if(header->head <= header->tail
 		&& (header->tail + size) < AI_InformerData.shmHeader->zoneSize*AesalonPageSize) {
 		
-		printf("Insertion case 2 . . .\n");
-		
 		header->tail += size;
 		return AI_Zone + header->tail - size;
 	}
 	else if(header->head <= header->tail
 		&& (header->tail + size) >= AI_InformerData.shmHeader->zoneSize*AesalonPageSize) {
-		
-		printf("Insertion case 3 . . .\n");
 		
 		header->gapSize = AI_InformerData.shmHeader->zoneSize*AesalonPageSize - header->tail;
 		header->tail = ZoneDataOffset + size;
@@ -225,8 +207,8 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	ModuleID id = 0;
 	for(; ; id ++) {
-		usleep(100);
 		AI_StartPacket(id);
+		AI_PacketSpace(16);
 		AI_EndPacket();
 	}
 }
@@ -243,14 +225,12 @@ void AC_EXPORT AI_StartPacket(ModuleID moduleID) {
 }
 
 void AC_EXPORT *AI_PacketSpace(uint32_t size) {
-	printf("Reserving %i bytes in the current packet . . .\n", size);
 	AI_ZonePacket->packetSize += size;
 	return AI_ReserveSpace(size);
 }
 
 void AC_EXPORT AI_EndPacket() {
 	AI_ZonePacket = NULL;
-	printf("Incrementing zone packet semaphore . . .\n");
 	sem_post(&((ZoneHeader *)AI_Zone)->packetSemaphore);
 	sem_post(&AI_InformerData.shmHeader->packetSemaphore);
 }

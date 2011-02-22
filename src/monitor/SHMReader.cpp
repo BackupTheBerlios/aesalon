@@ -93,22 +93,39 @@ void SHMReader::processRequest(ReadBroker &request) {
 	
 	uint32_t size2 = request.size() - size1;
 	
-	Message(Debug, "Read start: " << start);
-	Message(Debug, "Read sizes: " << size1 << "/" << size2);
-	
 	/* The difficult case; the data is in two segments. */
 	if(size2 > 0) {
 		request.resizeBuffer(request.size());
 		memcpy(request.temporaryBuffer(), zone + start, size1);
 		memcpy(request.temporaryBuffer() + size1, zone + ZoneDataOffset, size2);
-		header->gapSize = 0;
 		request.setData(request.temporaryBuffer());
 		header->head = size2 + ZoneDataOffset;
+		if(header->overflow > 0) {
+			Message(Debug, "overflow > 0 in difficult case, reducing . . .");
+			header->overflow -= size1;
+			header->overflow -= header->gapSize;
+			header->overflow -= size2;
+			header->gapSize = 0;
+			if(header->overflow <= 0) {
+				Message(Debug, "Posting to overflow semaphore . . .");
+				sem_post(&header->overflowSemaphore);
+			}
+		}
+		else header->gapSize = 0;
 	}
 	/* Otherwise, the simple case. */
 	else {
 		request.setData(zone + start);
 		header->head += size1;
+		if(header->overflow > 0) {
+			Message(Debug, "overflow > 0, reducing . . .");
+			header->overflow -= size1;
+			Message(Debug, "New overflow: " << header->overflow);
+			if(header->overflow <= 0) {
+				Message(Debug, "Posting to overflow semaphore . . .");
+				sem_post(&header->overflowSemaphore);
+			}
+		}
 	}
 }
 
