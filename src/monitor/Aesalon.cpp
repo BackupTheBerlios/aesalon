@@ -20,7 +20,6 @@ int main(int argc, char *argv[]) {
 	return coordinator.returnValue();
 }
 
-
 #else
 int main(int argc, char *argv[]) {
 	typedef Storage::RTree<double, int, 1, 5, 2> RTree;

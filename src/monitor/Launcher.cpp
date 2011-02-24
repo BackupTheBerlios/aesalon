@@ -41,11 +41,11 @@ void Launcher::forkTarget() {
 	
 	m_targetPid = fork();
 	if(m_targetPid == -1) {
+		Message(Fatal, "Could not fork target " << m_argv[0] << ": " << std::strerror(errno));
 		std::cout << "Could not fork . . ." << std::endl;
 		exit(1);
 	}
 	else if(m_targetPid == 0) {
-		Message(Debug, "m_argv[0]: " << m_argv[0]);
 		execvp(m_argv[0], m_argv);
 		Message(Fatal, "Could not launch " << m_argv[0] << ": " << std::strerror(errno));
 	}

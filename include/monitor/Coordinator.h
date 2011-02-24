@@ -10,7 +10,10 @@
 #ifndef AesalonMonitor_Coordinator_H
 #define AesalonMonitor_Coordinator_H
 
+#include <vector>
+
 #include "config/Vault.h"
+#include "monitor/DataOutputController.h"
 
 namespace Monitor {
 
@@ -21,6 +24,7 @@ private:
 	int m_argcOffset;
 	Config::Vault *m_vault;
 	int m_returnValue;
+	DataOutputController *m_dataOutputController;
 public:
 	static Coordinator *instance() { return m_instance; }
 	Coordinator(char **argv);
@@ -31,6 +35,7 @@ public:
 	int argcOffset() const { return m_argcOffset; }
 	int returnValue() const { return m_returnValue; }
 	void setReturnValue(int newValue) { m_returnValue = newValue; }
+	DataOutputController *dataOutputController() const { return m_dataOutputController; }
 	
 	void run();
 private:

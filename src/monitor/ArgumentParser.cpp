@@ -24,25 +24,32 @@ int ArgumentParser::parse(Config::Vault *vault, char **argv) {
 			break;
 		}
 		else if(std::strcmp(argv[arg], "--set") == 0) {
+			if(argv[++arg] == NULL) {
+				Message(Warning, "Expected argument to --set.");
+				continue;
+			}
 			/*std::cout << argv[arg+1] << std::endl;*/
-			std::string line = argv[arg+1];
+			std::string line = argv[arg];
 			std::string::size_type divider = line.find('=');
 			std::string key = line.substr(0, divider);
 			std::string data = line.substr(divider+1);
 			vault->clear(key);
 			
 			vault->set(key, data);
-			
-			arg ++;
 		}
 		else if(std::strcmp(argv[arg], "--use-module") == 0) {
-			vault->set("::modules", argv[++arg]);
+			if(argv[++arg] == NULL) {
+				Message(Warning, "Expected argument to --use-module.");
+				continue;
+			}
+			vault->set("::modules", argv[arg]);
 			/*std::cout << "ArgumentParser: Using module " << argv[++arg] << std::endl;*/
 		}
 		else if(std::strcmp(argv[arg], "--search") == 0) {
 			Config::Parser().parseDirectory(vault, argv[++arg]);
 		}
-		else if(std::strcmp(argv[arg], "--help") == 0) {
+		else if(std::strcmp(argv[arg], "--help") == 0 ||
+			std::strcmp(argv[arg], "--usage") == 0) {
 			vault->set("::help", "true");
 		}
 		else if(std::strcmp(argv[arg], "--version") == 0) {
@@ -50,6 +57,13 @@ int ArgumentParser::parse(Config::Vault *vault, char **argv) {
 		}
 		else if(std::strcmp(argv[arg], "--list-attributes") == 0) {
 			vault->set("::list-attributes", "true");
+		}
+		else if(std::strcmp(argv[arg], "--output") == 0) {
+			if(argv[++arg] == NULL) {
+				Message(Warning, "Expected argument to --output.");
+				continue;
+			}
+			vault->set("::output", argv[arg]);
 		}
 		else if(std::strncmp(argv[arg], "--", 2) == 0) {
 			Message(Warning, "Unknown argument \"" << argv[arg] << "\".");

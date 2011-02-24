@@ -204,17 +204,10 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadList[0] = self;
 	
 	AI_ContinueCollection(self);
-	
-	ModuleID id = 0;
-	for(; ; id ++) {
-		AI_StartPacket(id);
-		AI_PacketSpace(16);
-		AI_EndPacket();
-	}
 }
 
 void __attribute__((destructor)) AI_Destruct() {
-
+	
 }
 
 void AC_EXPORT AI_StartPacket(ModuleID moduleID) {
