@@ -21,6 +21,8 @@ public:
 	virtual ~InformerMarshal();
 	
 	virtual Comm::Packet *marshal(Comm::Packet *packet);
+private:
+	void moduleLoaded(Comm::Packet *packet);
 };
 
 } // namespace Monitor

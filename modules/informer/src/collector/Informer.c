@@ -19,6 +19,7 @@
 #include "Config.h"
 
 #include "informer/Informer.h"
+#include "informer/PacketFormat.h"
 #include "shm/PacketHeader.h"
 #include "shm/ZoneHeader.h"
 #include "util/StringToBool.h"
@@ -70,7 +71,6 @@ void AI_SetupSHM() {
 }
 
 void *AI_MapSHM(uint32_t start, uint32_t size) {
-	if(AI_InformerData.shmHeader != NULL) printf("Overall size: %i\n", AI_InformerData.shmHeader->shmSize);
 	if(AI_InformerData.shmHeader != NULL && AI_InformerData.shmHeader->shmSize < (start+size)) {
 		sem_wait(&AI_InformerData.shmHeader->resizeSemaphore);
 		
@@ -109,13 +109,10 @@ static void *AI_SetupZone() {
 		sem_post(&AI_InformerData.shmHeader->resizeSemaphore);
 	}
 	
-	printf("Allocated zones: %i\n", AI_InformerData.shmHeader->zonesAllocated);
-	
 	uint32_t i;
 	for(i = 0; i < AI_InformerData.shmHeader->zonesAllocated; i ++) {
 		if((AI_InformerData.zoneUseData[i/8] & (0x01 << (i % 8))) == 0) break;
 	}
-	printf("Zone ID#: %i\n", i);
 	if(i == AI_InformerData.shmHeader->zonesAllocated) {
 		/* Something went pretty seriously wrong. Perhaps another target jumped in and took the spot first? */
 		printf("Something very wrong occurred. Trying again . . .\n");
@@ -206,6 +203,11 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_ContinueCollection(self);
 	
 	AI_StartPacket(0);
+	*(uint8_t *)AI_PacketSpace(1) = ModuleLoaded;
+	*(ModuleID *)AI_PacketSpace(sizeof(ModuleID)) = 0;
+	char *name = AI_PacketSpace(16);
+	strcpy(name, "Informer Module");
+	
 	AI_EndPacket();
 }
 
