@@ -25,6 +25,14 @@ void ZoneReader::run() {
 	run(this);
 }
 
+void ZoneReader::start() {
+	pthread_create(&m_threadID, NULL, run, this);
+}
+
+void ZoneReader::wait() {
+	pthread_join(m_threadID, NULL);
+}
+
 void *ZoneReader::run(void *voidInstance) {
 	Message(Debug, "Beginning ZoneReader loop . . .");
 	ZoneReader *instance = static_cast<ZoneReader *>(voidInstance);
@@ -47,6 +55,8 @@ void *ZoneReader::run(void *voidInstance) {
 		packetData = static_cast<uint8_t *>(broker.data());
 		
 		Message(Log, "Recieved packet from module " << packetHeader->moduleID << ", size " << packetHeader->packetSize);
+		
+		
 	}
 	
 	Message(Debug, "Ending ZoneReader loop . . .");

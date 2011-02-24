@@ -51,7 +51,8 @@ void Coordinator::run() {
 		usage(true);
 	}
 	else {
-		m_dataOutputController = new DataOutputController();
+		DataOutputController doc;
+		m_dataOutputController = &doc;
 		Launcher launcher(m_argv + m_argcOffset);
 		
 		launcher.launch();

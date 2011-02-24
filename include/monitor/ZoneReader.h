@@ -17,12 +17,14 @@ namespace Monitor {
 class ZoneReader {
 private:
 	SHMReader *m_shmReader;
+	pthread_t m_threadID;
 public:
 	ZoneReader(SHMReader *shmReader);
 	~ZoneReader();
 	
 	void run();
 	void start();
+	void wait();
 private:
 	static void *run(void *voidInstance);
 };

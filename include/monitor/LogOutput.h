@@ -11,6 +11,7 @@
 #define AesalonMonitor_LogOutput_H
 
 #include <string>
+#include <semaphore.h>
 
 #include "DataOutput.h"
 
@@ -19,6 +20,7 @@ namespace Monitor {
 class LogOutput : public DataOutput {
 private:
 	int m_fd;
+	sem_t m_logSemaphore;
 public:
 	LogOutput(std::string spec);
 	virtual ~LogOutput();

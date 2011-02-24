@@ -22,18 +22,23 @@ DataOutputController::DataOutputController() {
 	Coordinator::instance()->vault()->get("::output", outputVector);
 	
 	for(int i = 0; i < int(outputVector.size()); i ++) {
-		m_dataOutputVector.push_back(createOutput(outputVector[i]));
+		DataOutput *output = createOutput(outputVector[i]);
+		if(output != NULL) m_dataOutputVector.push_back(output);
 	}
 	
 	if(outputVector.size() == 0) Message(Warning, "No data outputs specified!");
 }
 
 DataOutputController::~DataOutputController() {
-
+	for(int i = 0; i < int(m_dataOutputVector.size()); i ++) {
+		delete m_dataOutputVector[i];
+	}
 }
 
 void DataOutputController::output(Comm::Packet *packet) {
-	
+	for(int i = 0; i < int(m_dataOutputVector.size()); i ++) {
+		m_dataOutputVector[i]->output(packet);
+	}
 }
 
 DataOutput *DataOutputController::createOutput(const std::string &spec) {
@@ -48,6 +53,7 @@ DataOutput *DataOutputController::createOutput(const std::string &spec) {
 	else if(type == "log") {
 		return new LogOutput(content);
 	}
+	else Message(Warning, "Unknown output type \"" << type << "\"");
 	return NULL;
 }
 

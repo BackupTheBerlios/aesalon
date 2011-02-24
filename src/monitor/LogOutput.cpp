@@ -21,6 +21,7 @@ LogOutput::LogOutput(std::string spec) {
 	if(m_fd == -1) {
 		Message(Fatal, "Could not open log file \"" << spec << "\": " << std::strerror(errno));
 	}
+	sem_init(&m_logSemaphore, 0, 1);
 }
 
 LogOutput::~LogOutput() {
@@ -28,7 +29,12 @@ LogOutput::~LogOutput() {
 }
 
 void LogOutput::output(Comm::Packet *packet) {
+	sem_wait(&m_logSemaphore);
 	
+	write(m_fd, &packet->header(), sizeof(packet->header()));
+	write(m_fd, packet->data(), packet->header().dataSize);
+	
+	sem_post(&m_logSemaphore);
 }
 
 } // namespace Monitor
