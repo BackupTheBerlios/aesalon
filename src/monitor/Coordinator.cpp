@@ -86,7 +86,7 @@ void Coordinator::usage(bool displayHelp) {
 	std::cout << "\t--version\n\t\tDisplays version information." << std::endl;
 	std::cout << "\t--search <path>\n\t\tSearches <path> for modules." << std::endl;
 	std::cout << "\t--use-module <module>\n\t\tPrepares <module> for loading." << std::endl;
-	std::cout << "\t--set <attribute>[=value]\n\t\tSets a module attribute." << std::endl;
+	std::cout << "\t--set <attribute>[=value]\n\t\tSets an attribute." << std::endl;
 	std::cout << "\t--list-attributes\n\t\tLists all the available attributes." << std::endl;
 }
 

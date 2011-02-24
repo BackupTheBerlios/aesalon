@@ -4,28 +4,28 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. See
 	the included file LICENSE for more information.
 	
-	@file include/monitor/Marshal.h
+	@file include/monitor/MarshalWrapper.h
 */
 
-#ifndef AesalonMonitor_Marshal_H
-#define AesalonMonitor_Marshal_H
+#ifndef AesalonMonitor_MarshalWrapper_H
+#define AesalonMonitor_MarshalWrapper_H
 
 #include <string>
 
-#include "marshaller/Interface.h"
+#include "marshal/Interface.h"
 
 namespace Monitor {
 
-class Marshal {
+class MarshalWrapper {
 private:
-	Marshaller::Interface *m_interface;
+	Marshal::Interface *m_interface;
 	void *m_moduleHandle;
 public:
-	Marshal(const std::string &moduleName);
-	Marshal(Marshaller::Interface *interface);
-	~Marshal();
+	MarshalWrapper(const std::string &moduleName);
+	MarshalWrapper(Marshal::Interface *interface);
+	~MarshalWrapper();
 	
-	Marshaller::Interface *interface() const { return m_interface; }
+	Marshal::Interface *interface() const { return m_interface; }
 private:
 	void load(const std::string &moduleName);
 };

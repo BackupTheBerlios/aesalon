@@ -10,12 +10,11 @@
 #ifndef AesalonMonitor_InformerMarshal_H
 #define AesalonMonitor_InformerMarshal_H
 
-#include "marshaller/Interface.h"
-#include "Marshal.h"
+#include "marshal/Interface.h"
 
 namespace Monitor {
 
-class InformerMarshal : public Marshaller::Interface {
+class InformerMarshal : public Marshal::Interface {
 public:
 	InformerMarshal();
 	virtual ~InformerMarshal();

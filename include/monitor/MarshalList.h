@@ -14,20 +14,20 @@
 #include <vector>
 #include <map>
 
-#include "Marshal.h"
+#include "monitor/MarshalWrapper.h"
 
 namespace Monitor {
 
 class MarshalList {
 protected:
-	typedef std::vector<Marshal *> MarshalVector;
+	typedef std::vector<MarshalWrapper *> MarshalVector;
 private:
 	MarshalVector m_marshalVector;
 public:
 	MarshalList();
 	~MarshalList();
 	
-	Marshal *marshal(ModuleID moduleID);
+	MarshalWrapper *marshal(ModuleID moduleID);
 	void loadMarshal(ModuleID moduleID, const std::string &name);
 };
 

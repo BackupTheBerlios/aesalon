@@ -14,7 +14,7 @@
 namespace Monitor {
 
 MarshalList::MarshalList() {
-	Marshal *marshal = new Marshal(new InformerMarshal());
+	MarshalWrapper *marshal = new MarshalWrapper(new InformerMarshal());
 	m_marshalVector.push_back(marshal);
 }
 
@@ -22,7 +22,7 @@ MarshalList::~MarshalList() {
 	
 }
 
-Marshal *MarshalList::marshal(ModuleID moduleID) {
+MarshalWrapper *MarshalList::marshal(ModuleID moduleID) {
 	if(moduleID >= m_marshalVector.size()) {
 		return NULL;
 	}
@@ -30,7 +30,7 @@ Marshal *MarshalList::marshal(ModuleID moduleID) {
 }
 
 void MarshalList::loadMarshal(ModuleID moduleID, const std::string &name) {
-	Marshal *marshal = new Marshal(name);
+	MarshalWrapper *marshal = new MarshalWrapper(name);
 	if(marshal->interface() == NULL) {
 		Message(Warning, "Could not load marshal for module " << name);
 		delete marshal;

@@ -192,7 +192,7 @@ void SHMReader::setupConfiguration() {
 	
 	uint32_t offset = 0;
 	
-	for(std::vector<Config::Vault::KeyPair>::iterator i = configItems.begin(); i != configItems.end(); ++i) {
+	for(std::vector<Config::Vault::KeyPair>::reverse_iterator i = configItems.rbegin(); i != configItems.rend(); ++i) {
 		/* Ignore all internal items. */
 		if(i->first.find("::") == 0) continue;
 		

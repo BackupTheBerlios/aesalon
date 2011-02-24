@@ -4,15 +4,15 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. See
 	the included file LICENSE for more information.
 	
-	@file include/marshaller/Interface.h
+	@file include/marshal/Interface.h
 */
 
-#ifndef AesalonMarshaller_Interface_H
-#define AesalonMarshaller_Interface_H
+#ifndef AesalonMarshal_Interface_H
+#define AesalonMarshal_Interface_H
 
 #include "comm/Packet.h"
 
-namespace Marshaller {
+namespace Marshal {
 
 class Interface {
 public:
@@ -21,6 +21,9 @@ public:
 	virtual Comm::Packet *marshal(Comm::Packet *packet) = 0;
 };
 
-} // namespace Marshaller
+} // namespace Marshal
+
+#define InstantiateMarshal(type) \
+	extern "C" { Marshal::Interface *AM_Instantiate() { return new type(); } }
 
 #endif

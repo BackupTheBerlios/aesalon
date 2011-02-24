@@ -65,7 +65,7 @@ void *ZoneReader::run(void *voidInstance) {
 		Comm::Packet packet(Comm::PacketHeader(packetHeader->moduleID, reader->zoneProcessID(zone),
 			reader->zoneThreadID(zone), packetHeader->packetSize), packetData);
 		
-		Marshal *marshal = marshalList->marshal(packetHeader->moduleID);
+		MarshalWrapper *marshal = marshalList->marshal(packetHeader->moduleID);
 		
 		if(marshal == NULL) doc->output(&packet);
 		else {

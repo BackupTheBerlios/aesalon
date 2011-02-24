@@ -202,13 +202,12 @@ void __attribute__((constructor)) AI_Construct() {
 	
 	AI_ContinueCollection(self);
 	
-	AI_StartPacket(0);
+	/*AI_StartPacket(0);
 	*(uint8_t *)AI_PacketSpace(1) = ModuleLoaded;
 	*(ModuleID *)AI_PacketSpace(sizeof(ModuleID)) = 0;
 	char *name = AI_PacketSpace(16);
 	strcpy(name, "Informer Module");
-	
-	AI_EndPacket();
+	AI_EndPacket();*/
 }
 
 void __attribute__((destructor)) AI_Destruct() {
@@ -234,11 +233,14 @@ void AC_EXPORT AI_EndPacket() {
 }
 
 const char *AI_ConfigurationString(const char *name) {
+	printf("In AI_ConfigurationString . . .\n");
 	uint32_t offset = 0;
 	while(1) {
 		const char *itemName = &AI_InformerData.configData[offset];
+		printf("itemName: %p\n", itemName);
 		if(itemName == 0 || itemName[0] == 0) break;
 		
+		printf("Considering config item \"%s\" . . .\n", itemName);
 		int nameLength = strlen(itemName)+1;
 		const char *itemData = &AI_InformerData.configData[offset+nameLength];
 		if(!strcmp(name, itemName)) return itemData;

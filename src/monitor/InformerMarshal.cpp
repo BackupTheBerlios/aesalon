@@ -53,6 +53,7 @@ Comm::Packet *InformerMarshal::marshal(Comm::Packet *packet) {
 }
 
 void InformerMarshal::moduleLoaded(Comm::Packet *packet) {
+	/* NOTE: the +1 is for the type byte. */
 	ModuleID id = *(reinterpret_cast<ModuleID *>(packet->data() + 1));
 	std::string name = reinterpret_cast<char *>(packet->data() + 1 + sizeof(ModuleID));
 	MarshalList *list = Coordinator::instance()->marshalList();

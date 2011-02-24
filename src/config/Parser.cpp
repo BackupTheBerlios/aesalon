@@ -71,6 +71,13 @@ void Parser::parse(Vault *vault, const std::string &configFile) {
 			
 			expectNextSymbol(";");
 		}
+		else if(tokenType == WORD && token == "output") {
+			std::string spec = expectNextToken(QUOTED_WORD);
+			
+			vault->set("::output", spec);
+			
+			expectNextSymbol(";");
+		}
 		else if(tokenType == WORD) {
 			std::string op = expectNextToken(SYMBOL);
 			
