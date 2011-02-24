@@ -65,6 +65,9 @@ public:
 	uint32_t zoneCount();
 	int32_t zoneWithData();
 	
+	uint32_t zoneProcessID(uint32_t zoneID);
+	uint32_t zoneThreadID(uint32_t zoneID);
+	
 	void waitForPacket();
 	
 	void processRequest(ReadBroker &request);

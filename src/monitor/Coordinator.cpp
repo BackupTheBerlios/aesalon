@@ -51,7 +51,9 @@ void Coordinator::run() {
 		usage(true);
 	}
 	else {
+		MarshalList marshalList;
 		DataOutputController doc;
+		m_marshalList = &marshalList;
 		m_dataOutputController = &doc;
 		Launcher launcher(m_argv + m_argcOffset);
 		

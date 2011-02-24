@@ -204,6 +204,9 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadList[0] = self;
 	
 	AI_ContinueCollection(self);
+	
+	AI_StartPacket(0);
+	AI_EndPacket();
 }
 
 void __attribute__((destructor)) AI_Destruct() {

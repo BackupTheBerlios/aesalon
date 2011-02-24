@@ -77,6 +77,16 @@ int32_t SHMReader::zoneWithData() {
 	return -1;
 }
 
+uint32_t SHMReader::zoneProcessID(uint32_t zoneID) {
+	SHM::ZoneHeader *header = reinterpret_cast<SHM::ZoneHeader *>(getZone(zoneID));
+	return header->processID;
+}
+
+uint32_t SHMReader::zoneThreadID(uint32_t zoneID) {
+	SHM::ZoneHeader *header = reinterpret_cast<SHM::ZoneHeader *>(getZone(zoneID));
+	return header->threadID;
+}
+
 void SHMReader::waitForPacket() {
 	sem_wait(&m_header->packetSemaphore);
 }

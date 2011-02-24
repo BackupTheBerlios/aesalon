@@ -14,6 +14,7 @@
 
 #include "config/Vault.h"
 #include "monitor/DataOutputController.h"
+#include "MarshalList.h"
 
 namespace Monitor {
 
@@ -25,6 +26,7 @@ private:
 	Config::Vault *m_vault;
 	int m_returnValue;
 	DataOutputController *m_dataOutputController;
+	MarshalList *m_marshalList;
 public:
 	static Coordinator *instance() { return m_instance; }
 	Coordinator(char **argv);
@@ -36,6 +38,7 @@ public:
 	int returnValue() const { return m_returnValue; }
 	void setReturnValue(int newValue) { m_returnValue = newValue; }
 	DataOutputController *dataOutputController() const { return m_dataOutputController; }
+	MarshalList *marshalList() const { return m_marshalList; }
 	
 	void run();
 private:

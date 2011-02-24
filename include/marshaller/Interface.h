@@ -10,13 +10,15 @@
 #ifndef AesalonMarshaller_Interface_H
 #define AesalonMarshaller_Interface_H
 
+#include "comm/Packet.h"
+
 namespace Marshaller {
 
 class Interface {
 public:
 	virtual ~Interface() {}
 	
-	
+	virtual Comm::Packet *marshal(Comm::Packet *packet) = 0;
 };
 
 } // namespace Marshaller

@@ -10,6 +10,9 @@
 #include "monitor/ZoneReader.h"
 #include "shm/PacketHeader.h"
 #include "util/MessageSystem.h"
+#include "comm/Packet.h"
+#include "monitor/Coordinator.h"
+#include "monitor/MarshalList.h"
 
 namespace Monitor {
 
@@ -39,6 +42,9 @@ void *ZoneReader::run(void *voidInstance) {
 	SHMReader *reader = instance->m_shmReader;
 	SHMReader::ReadBroker broker;
 	
+	MarshalList *marshalList = Coordinator::instance()->marshalList();
+	DataOutputController *doc = Coordinator::instance()->dataOutputController();
+	
 	while(true) {
 		reader->waitForPacket();
 		int32_t zone = reader->zoneWithData();
@@ -56,7 +62,16 @@ void *ZoneReader::run(void *voidInstance) {
 		
 		Message(Log, "Recieved packet from module " << packetHeader->moduleID << ", size " << packetHeader->packetSize);
 		
+		Comm::Packet packet(Comm::PacketHeader(packetHeader->moduleID, reader->zoneProcessID(zone),
+			reader->zoneThreadID(zone), packetHeader->packetSize), packetData);
 		
+		Marshal *marshal = marshalList->marshal(packetHeader->moduleID);
+		
+		if(marshal == NULL) doc->output(&packet);
+		else {
+			Comm::Packet *repacket = marshal->interface()->marshal(&packet);
+			if(repacket != NULL) doc->output(repacket);
+		}
 	}
 	
 	Message(Debug, "Ending ZoneReader loop . . .");
