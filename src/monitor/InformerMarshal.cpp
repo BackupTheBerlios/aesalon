@@ -73,6 +73,7 @@ void InformerMarshal::fileLoaded(Comm::Packet *packet) {
 	uint64_t fileOffset = *reinterpret_cast<uint64_t *>(packet->data() + 9);
 	std::string name = reinterpret_cast<char *>(packet->data() + 17);
 	Message(Debug, "Filename: " << name);
+	Coordinator::instance()->resolver()->parse(name);
 }
 
 } // namespace Monitor

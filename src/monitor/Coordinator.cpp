@@ -52,6 +52,7 @@ void Coordinator::run() {
 	}
 	else {
 		setupModuleIDs();
+		m_resolver = new SymbolResolver();
 		MarshalList marshalList;
 		DataOutputController doc;
 		m_marshalList = &marshalList;
@@ -59,6 +60,8 @@ void Coordinator::run() {
 		Launcher launcher(m_argv + m_argcOffset);
 		
 		launcher.launch();
+		
+		delete m_resolver;
 	}
 }
 

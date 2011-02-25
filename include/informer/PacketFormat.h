@@ -7,8 +7,8 @@
 	@file informer/PacketFormat.h
 */
 
-#ifndef AesalonInformerPacketFormat_H
-#define AesalonInformerPacketFormat_H
+#ifndef AesalonInformer_PacketFormat_H
+#define AesalonInformer_PacketFormat_H
 
 #ifdef __cplusplus
 namespace Informer {
@@ -24,6 +24,12 @@ enum PacketType {
 			- name: 8-bit ASCII string. (length specified by packet header's dataSize - sizeof(ModuleID) - 1).
 	*/
 	ModuleLoaded,
+	/** A new file was mapped to an executable page; the symbol data should be loaded from it.
+		Format:
+			- Base address (base address of memory map)
+			- File offset (which portion of the file is mapped)
+			- filename: 8-bit NULL-terminated ASCII string.
+	*/
 	FileLoaded,
 	NewThread,
 	NewProcess,

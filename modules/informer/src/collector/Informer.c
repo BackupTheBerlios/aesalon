@@ -213,7 +213,7 @@ void AI_SendInitialFiles() {
 		
 		*(uint64_t *)AI_PacketSpace(8) = baseAddress;
 		*(uint64_t *)AI_PacketSpace(8) = fileOffset;
-		char *packetFilename = AI_PacketSpace(strlen(filename));
+		char *packetFilename = AI_PacketSpace(strlen(filename)+1);
 		strcpy(packetFilename, filename);
 		
 		AI_EndPacket();

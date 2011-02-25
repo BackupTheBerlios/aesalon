@@ -156,7 +156,7 @@ protected:
 		Bound bound() const {
 			Bound result;
 			for(int i = 0; i < Dimensions; i ++) {
-				Key minimum, maximum;
+				Key minimum = 0, maximum = 0;
 				for(int j = 0; j < branchCount(); j ++) {
 					if(j == 0) {
 						minimum = m_branches[j].bound.range(i).start();
@@ -436,10 +436,10 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 	node->setBranchCount(0);
 	nn->setBranchCount(0);
 	
-	int highestStart[Dimensions];
-	int lowestEnd[Dimensions];
-	Key lowest[Dimensions];
-	Key highest[Dimensions];
+	int highestStart[Dimensions] = {0};
+	int lowestEnd[Dimensions] = {0};
+	Key lowest[Dimensions] = {0};
+	Key highest[Dimensions] = {0};
 	
 	for(int j = 0; j < Maximum+1; j ++) {
 		for(int i = 0; i < Dimensions; i ++) {
@@ -469,36 +469,50 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 	
 	/* Create normalized separations. */
 	for(int i = 0; i < Dimensions; i ++) {
-		Key separation = 
+		Key separation;
+		if(highest[i]-lowest[i] == 0) separation = 0;
+		else separation = 
 			(list[lowestEnd[i]].bound.range(i).end() - list[highestStart[i]].bound.range(i).start())
 			/ (highest[i]-lowest[i]);
 		
 		if(maxIndex == -1 || separation > maxSeparation) maxIndex = i, maxSeparation = separation;
 	}
 	
-	node->branch(0) = list[highestStart[maxIndex]];
-	node->setBranchCount(1);
-	nn->branch(0) = list[lowestEnd[maxIndex]];
-	nn->setBranchCount(1);
+	Bound nodeBound;
+	Bound nnBound;
 	
-	Bound nodeBound = list[highestStart[maxIndex]].bound;
-	Bound nnBound = list[lowestEnd[maxIndex]].bound;
+	if(highestStart[maxIndex] != lowestEnd[maxIndex]) {
+		node->branch(0) = list[highestStart[maxIndex]];
+		node->setBranchCount(1);
+		nn->branch(0) = list[lowestEnd[maxIndex]];
+		nn->setBranchCount(1);
 	
-	/* Do the removal in the correct order . . . */
-	if(highestStart[maxIndex] > lowestEnd[maxIndex]) {
-		list[highestStart[maxIndex]] = list[listSize-1];
-		list[lowestEnd[maxIndex]] = list[listSize-2];
-		listSize -= 2;
+		nodeBound = list[highestStart[maxIndex]].bound;
+		nnBound = list[lowestEnd[maxIndex]].bound;
+		
+		/* Do the removal in the correct order . . . */
+		if(highestStart[maxIndex] > lowestEnd[maxIndex]) {
+			list[highestStart[maxIndex]] = list[listSize-1];
+			list[lowestEnd[maxIndex]] = list[listSize-2];
+		}
+		else if(lowestEnd[maxIndex] > highestStart[maxIndex]) {
+			list[lowestEnd[maxIndex]] = list[listSize-1];
+			list[highestStart[maxIndex]] = list[listSize-2];
+		}
 	}
-	else if(lowestEnd[maxIndex] > highestStart[maxIndex]) {
-		list[lowestEnd[maxIndex]] = list[listSize-1];
-		list[highestStart[maxIndex]] = list[listSize-2];
-		listSize -= 2;
-	}
-	/* They are one and the same . . . this should not happen! */
+	/* They are one and the same . . . this only happens if all ranges are identical in this node.
+		Thus, any elements will do perfectly well.
+	*/
 	else {
-		Message(Fatal, "R-tree: degeneracy case, all entries are the same. Support NYI.");
+		node->branch(0) = list[listSize-1];
+		node->setBranchCount(1);
+		nn->branch(0) = list[listSize-2];
+		nn->setBranchCount(1);
+		
+		nodeBound = list[listSize-1].bound;
+		nnBound = list[listSize-2].bound;
 	}
+	listSize -= 2;
 	
 	while(true) {
 		if(listSize == 0) break;
