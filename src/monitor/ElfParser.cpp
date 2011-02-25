@@ -18,6 +18,7 @@
 #include "monitor/ElfParser.h"
 #include "util/PathSanitizer.h"
 #include "util/StreamAsString.h"
+#include "util/MessageSystem.h"
 
 namespace Monitor {
 
@@ -119,13 +120,6 @@ template<typename SymbolHeader>
 void ElfParser::parseSymbols(SymbolHeader *symbols, int symbolCount, const char *stringTable) {
 	for(int i = 0; i < symbolCount; i ++) {
 		m_processor->process(stringTable + symbols[i].st_name, symbols[i].st_value, symbols[i].st_size);
-		/*std::cout << "Parsing symbol \"" << stringTable + symbols[i].st_name << "\" . . .\n";*/
-		/*m_vault->set(
-			Util::StreamAsString() << "\"" << stringTable + symbols[i].st_name << "\":value",
-			Util::StreamAsString() << symbols[i].st_value);
-		m_vault->set(
-			Util::StreamAsString() << "\"" << stringTable + symbols[i].st_name << "\":size",
-			Util::StreamAsString() << symbols[i].st_size);*/
 	}
 }
 

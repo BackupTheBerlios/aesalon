@@ -52,14 +52,9 @@ public:
 		Key size() const { return m_end - m_start; }
 		
 		bool overlaps(const Range &other) const {
-			Message(Debug, "Overlap test:");
-			Message(Debug, "\tm_start: " << m_start << "\t m_end: " << m_end);
-			Message(Debug, "\tother.m_start: " << other.m_start << "\tother.m_end: " << other.m_end);
 			if(m_start > other.m_end || other.m_start > m_end) {
-				Message(Debug, "\t+ Does not overlap . . .");
 				return false;
 			}
-			Message(Debug, "\t+ Overlaps . . .");
 			return true;
 		}
 		
@@ -221,8 +216,6 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::search(
 	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
 	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::SearchProcessor *processor) {
 	
-	Message(Debug, "Beginning search.");
-	
 	search(bound, m_root, processor);
 }
 
@@ -232,32 +225,22 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::insert(
 	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
 	Value value) {
 	
-	Message(Debug, "Beginning insertion of value " << value);
-	Message(Debug, "\tBound: " << bound.range(0).start() << ":" << bound.range(0).end());
-	
-	Message(Debug, "Calling chooseLeaf() . . .");
 	Node *leaf = chooseLeaf(bound), *ll = NULL;
 	int count = leaf->branchCount();
 	if(count < Maximum) {
-		Message(Debug, "Leaf node count is less than the maximum, inserting as usual.");
 		leaf->branch(count).bound = bound;
 		leaf->branch(count).value = value;
 		leaf->setBranchCount(count+1);
-		Message(Debug, "Leaf node new branch count: " << leaf->branchCount());
 	}
 	else {
-		Message(Debug, "Leaf node branch count is already at maximum, splitting node . . .");
 		Branch b;
 		b.bound = bound;
 		b.value = value;
 		ll = splitNode(leaf, b);
-		Message(Debug, "Node split, ll is " << ll);
 	}
 	
-	Message(Debug, "Calling adjustTree() . . .");
 	Node *result = adjustTree(leaf, ll);
 	if(result != NULL) {
-		Message(Debug, "**** Creating new root node!");
 		Node *newRoot = new Node(false);
 		newRoot->setBranchCount(2);
 		newRoot->branch(0).bound = m_root->bound();
@@ -269,7 +252,6 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::insert(
 		m_root = newRoot;
 	}
 	
-	Message(Debug, "Finished.");
 }
 
 template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
@@ -300,30 +282,19 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::search(
 	if(node == NULL) return;
 	
 	if(node->isLeaf()) {
-		Message(Debug, "At leaf node! Branch count: " << node->branchCount());
 		for(int i = 0; i < node->branchCount(); i ++) {
 			Branch &branch = node->branch(i);
 			
-			Message(Debug, "Considering leaf branch #" << i);
 			if(branch.bound.overlaps(bound)) {
-				Message(Debug, "Leaf branch overlaps bound, processing . . .");
 				processor->process(branch.bound, branch.value);
 			}
-			else Message(Debug, "Leaf branch does not overlap bound, ignoring.");
 		}
 	}
 	else {
-		Message(Debug, "Not in leaf node. Branch count: " << node->branchCount());
 		for(int i = 0; i < node->branchCount(); i ++) {
 			Branch &branch = node->branch(i);
-			Message(Debug, "Considering non-leaf branch #" << i);
-			Message(Debug, "\tbranchCount():" << branch.node->branchCount());
 			if(branch.bound.overlaps(bound)) {
-				Message(Debug, "Non-leaf branch overlaps bound, processing . . .");
 				search(bound, branch.node, processor);
-			}
-			else {
-				Message(Debug, "Non-leaf branch does not overlap bound, ignoring.");
 			}
 		}
 	}
@@ -338,7 +309,6 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 	Node *node = m_root;
 	
 	while(!node->isLeaf()) {
-		Message(Debug, "Node is not leaf node, continuing downwards . . .");
 		Node *smallestNode = NULL;
 		Key smallestVolume = 0;
 		for(int i = 0; i < node->branchCount(); i ++) {
@@ -350,15 +320,12 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 			}
 			else if(volume == smallestVolume) {
 				/* TODO: implement tiebreaker. */
-				Message(Debug, "RTree: smallestVolume tie-breaker not implemented!");
+				//Message(Debug, "RTree: smallestVolume tie-breaker not implemented!");
 			}
 		}
 		
 		node = smallestNode;
 	}
-	
-	Message(Debug, "Found leaf node.");
-	Message(Debug, "Leaf node branch count: " << node->branchCount());
 	
 	return node;
 }
@@ -370,10 +337,7 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *n,
 		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *nn) {
 	
-	Message(Debug, "Starting tree adjustment, nn is " << nn);
-	
 	while(n != m_root) {
-		Message(Debug, "*** Adjusting tree node . . .");
 		Node *p = n->parent();
 		
 		int i = 0;
@@ -383,10 +347,7 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 			}
 		}
 		
-		Bound &bound = p->branch(i).bound;
-		Message(Debug, "Before adjustment, branch bound is " << bound.range(0).start() << ":" << bound.range(0).end());
 		p->branch(i).bound = n->bound();
-		Message(Debug, "After adjustment, branch bound is " << bound.range(0).start() << ":" << bound.range(0).end());
 		
 		if(nn != NULL) {
 			/* Add nn to p. */
@@ -517,7 +478,6 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 	while(true) {
 		if(listSize == 0) break;
 		else if((node->branchCount() + listSize) == Minimum) {
-			Message(Debug, "Node+listSize == Minimum, filling . . .");
 			for(int i = 0; i < listSize; i ++) {
 				node->branch(node->branchCount()) = list[i];
 				node->setBranchCount(node->branchCount()+1);
@@ -525,7 +485,6 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 			break;
 		}
 		else if((nn->branchCount() + listSize) == Minimum) {
-			Message(Debug, "nn+listSize == Minimum, filling . . .");
 			for(int i = 0; i < listSize; i ++) {
 				nn->branch(node->branchCount()) = list[i];
 				nn->setBranchCount(nn->branchCount()+1);
@@ -537,29 +496,23 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 		Key volume2 = nnBound.enlargementToCover(list[listSize-1].bound);
 		
 		if(volume1 < volume2) {
-			Message(Debug, "Adding to node . . .");
 			node->branch(node->branchCount()) = list[listSize-1];
 			node->setBranchCount(node->branchCount()+1);
 			nodeBound.enclose(list[listSize-1].bound);
 		}
 		else if(volume2 < volume1) {
-			Message(Debug, "Adding to nn . . .");
 			nn->branch(nn->branchCount()) = list[listSize-1];
 			nn->setBranchCount(nn->branchCount()+1);
 			nnBound.enclose(list[listSize-1].bound);
 		}
 		else {
-			Message(Warning, "RTree: splitNode tie-breaker NYI. Defaulting to node.");
+			//Message(Warning, "RTree: splitNode tie-breaker NYI. Defaulting to node.");
 			node->branch(node->branchCount()) = list[listSize-1];
 			node->setBranchCount(node->branchCount()+1);
 			nodeBound.enclose(list[listSize-1].bound);
 		}
 		listSize --;
 	}
-	
-	Message(Debug, "\tBefore splitting, there were " << Maximum+1 << " elements.");
-	Message(Debug, "\tAfter splitting, there are " << node->branchCount() << " + " << nn->branchCount()
-		<< " elements.");
 	
 	return nn;
 }

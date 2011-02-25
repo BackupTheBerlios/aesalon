@@ -53,6 +53,7 @@ void Coordinator::run() {
 	else {
 		setupModuleIDs();
 		m_resolver = new SymbolResolver();
+		m_mempool = new Storage::Mempool();
 		MarshalList marshalList;
 		DataOutputController doc;
 		m_marshalList = &marshalList;
@@ -62,6 +63,7 @@ void Coordinator::run() {
 		launcher.launch();
 		
 		delete m_resolver;
+		delete m_mempool;
 	}
 }
 
