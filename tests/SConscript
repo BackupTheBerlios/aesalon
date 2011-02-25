@@ -2,7 +2,9 @@ sources = Glob("*.c", strings=True) + Glob("*.cpp", strings=True)
 
 Import("env")
 
-env.Replace(LIBS = ["rt"])
+testsEnv = env.Clone()
+
+testsEnv.Append(LIBS = ["rt"])
 
 for test in sources:
 	targetName = test.split(".")[0]

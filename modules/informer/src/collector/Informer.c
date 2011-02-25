@@ -235,7 +235,7 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadCount = 1;
 	AI_InformerData.threadList[0] = self;
 	
-	AI_SendInitialFiles();
+	//AI_SendInitialFiles();
 	
 	AI_ContinueCollection(self);
 }
@@ -278,14 +278,11 @@ void AI_ModuleLoaded(const char *name) {
 }
 
 const char *AI_ConfigurationString(const char *name) {
-	printf("In AI_ConfigurationString . . .\n");
 	uint32_t offset = 0;
 	while(1) {
 		const char *itemName = &AI_InformerData.configData[offset];
-		printf("itemName: %p\n", itemName);
 		if(itemName == 0 || itemName[0] == 0) break;
 		
-		printf("Considering config item \"%s\" . . .\n", itemName);
 		int nameLength = strlen(itemName)+1;
 		const char *itemData = &AI_InformerData.configData[offset+nameLength];
 		if(!strcmp(name, itemName)) return itemData;

@@ -59,7 +59,7 @@ uint32_t SHMReader::zoneCount() {
 
 int32_t SHMReader::zoneWithData() {
 	for(uint32_t i = 0; i < m_header->zonesAllocated; i ++) {
-		if(m_zoneUseData[i % 8] & (0x01 << (i % 8))) {
+		if(m_zoneUseData[i/8] & (0x01 << (i%8))) {
 			uint8_t *zone = getZone(i);
 			
 			if(zone == NULL) {
