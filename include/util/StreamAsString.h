@@ -48,5 +48,11 @@ private:
 
 } // namespace Util
 
+/* Keep the above class working with QStrings (if in a program that uses Qt) . . . */
+#ifdef QT_VERSION
+std::ostream &operator<<(std::ostream &stream, const QString &string);
+#endif
+
+
 #endif
 

@@ -10,7 +10,7 @@
 #include "monitor/MarshalList.h"
 #include "util/MessageSystem.h"
 #include "monitor/InformerMarshal.h"
-#include "monitor/Coordinator.h"
+#include "config/GlobalVault.h"
 #include "util/StringTo.h"
 
 namespace Monitor {
@@ -38,7 +38,7 @@ void MarshalList::loadMarshal(const std::string &name) {
 		delete marshal;
 	}
 	else {
-		ModuleID moduleID = Util::StringTo<ModuleID>(Coordinator::instance()->vault()->get(name + ":moduleID"));
+		ModuleID moduleID = Util::StringTo<ModuleID>(Config::GlobalVault::instance()->get(name + ":moduleID"));
 		
 		if(moduleID >= m_marshalVector.size()) m_marshalVector.resize(moduleID+1);
 		m_marshalVector[moduleID] = marshal;

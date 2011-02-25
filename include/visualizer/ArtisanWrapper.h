@@ -23,6 +23,8 @@ private:
 public:
 	ArtisanWrapper(const QString &name);
 	~ArtisanWrapper();
+private:
+	void load(const QString &name);
 };
 
 } // namespace Visualizer

@@ -13,7 +13,7 @@
 #include <cstring>
 
 #include "monitor/Launcher.h"
-#include "monitor/Coordinator.h"
+#include "config/GlobalVault.h"
 #include "monitor/ZoneReader.h"
 #include "util/MessageSystem.h"
 
@@ -52,11 +52,12 @@ void Launcher::forkTarget() {
 }
 
 void Launcher::setupEnvironment() {
+	Config::Vault *vault = Config::GlobalVault::instance();
 	setenv("AesalonSHMName", (Util::StreamAsString() << "/Aesalon-" << getpid()).operator std::string().c_str(), 1);
 	
 	std::vector<std::string> modules;
 	
-	Coordinator::instance()->vault()->get("::modules", modules);
+	vault->get("::modules", modules);
 	
 	std::string preload;
 	
@@ -65,8 +66,8 @@ void Launcher::setupEnvironment() {
 	}
 	
 	for(std::vector<std::string>::iterator i = modules.begin(); i != modules.end(); ++i) {
-		std::string moduleRoot = Coordinator::instance()->vault()->get(*i + ":root");
-		std::string collectorPath = Coordinator::instance()->vault()->get(*i + ":collectorPath");
+		std::string moduleRoot = vault->get(*i + ":root");
+		std::string collectorPath = vault->get(*i + ":collectorPath");
 		if(collectorPath.length()) {
 			if(preload.length()) {
 				preload += ":";

@@ -24,6 +24,7 @@ private:
 	DataMap m_dataMap;
 public:
 	Vault();
+	virtual ~Vault() {}
 	
 	void clear(const std::string &key);
 	void set(const std::string &key, const std::string &value);

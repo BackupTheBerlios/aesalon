@@ -10,11 +10,13 @@
 #include <iostream>
 
 #include "monitor/Coordinator.h"
+#include "config/GlobalVault.h"
 
 #include "storage/RTree.h"
 
 #if 1
 int main(int argc, char *argv[]) {
+	Config::GlobalVault gv;
 	Monitor::Coordinator coordinator(argv);
 	coordinator.run();
 	return coordinator.returnValue();

@@ -25,7 +25,6 @@ private:
 	static Coordinator *m_instance;
 	char **m_argv;
 	int m_argcOffset;
-	Config::Vault *m_vault;
 	int m_returnValue;
 	DataOutputController *m_dataOutputController;
 	MarshalList *m_marshalList;
@@ -37,7 +36,6 @@ public:
 	~Coordinator();
 	
 	char **argv() const { return m_argv; }
-	Config::Vault *vault() const { return m_vault; }
 	int argcOffset() const { return m_argcOffset; }
 	int returnValue() const { return m_returnValue; }
 	void setReturnValue(int newValue) { m_returnValue = newValue; }
@@ -48,7 +46,6 @@ public:
 	
 	void run();
 private:
-	void parseConfigs();
 	void setupModuleIDs();
 	void usage(bool displayHelp);
 };

@@ -24,6 +24,10 @@ public:
 	virtual Viewport *viewport() = 0;
 };
 
+#define InstantiateArtisan(type) \
+	extern "C" { Artisan::Interface *AA_Instantiate() { return new type(); } }
+
+
 } // namespace Artisan
 
 #endif

@@ -16,7 +16,7 @@
 #include "Config.h"
 
 #include "monitor/SHMReader.h"
-#include "monitor/Coordinator.h"
+#include "config/GlobalVault.h"
 #include "util/StreamAsString.h"
 #include "util/MessageSystem.h"
 #include "util/StringTo.h"
@@ -188,7 +188,7 @@ void SHMReader::setupConfiguration() {
 	m_header->configDataSize = 1;
 	
 	std::vector<Config::Vault::KeyPair> configItems;
-	Coordinator::instance()->vault()->match("*", configItems);
+	Config::GlobalVault::instance()->match("*", configItems);
 	
 	uint32_t offset = 0;
 	
@@ -210,8 +210,8 @@ void SHMReader::setupConfiguration() {
 
 void SHMReader::setupZones() {
 	m_header->zoneCount = 0;
-	m_header->zoneSize = Util::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneSize"));
-	m_header->zoneUsagePages = Util::StringTo<uint32_t>(Coordinator::instance()->vault()->get("zoneUsePages"));
+	m_header->zoneSize = Util::StringTo<uint32_t>(Config::GlobalVault::instance()->get("monitor:zoneSize"));
+	m_header->zoneUsagePages = Util::StringTo<uint32_t>(Config::GlobalVault::instance()->get("monitor:zoneUsePages"));
 	
 	m_header->zonePageOffset = m_header->configDataSize + 1 + m_header->zoneUsagePages;
 	

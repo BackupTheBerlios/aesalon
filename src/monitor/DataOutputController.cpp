@@ -8,8 +8,7 @@
 */
 
 #include "monitor/DataOutputController.h"
-#include "config/Vault.h"
-#include "monitor/Coordinator.h"
+#include "config/GlobalVault.h"
 #include "monitor/LogOutput.h"
 
 #include "util/MessageSystem.h"
@@ -19,7 +18,7 @@ namespace Monitor {
 DataOutputController::DataOutputController() {
 	std::vector<std::string> outputVector;
 	
-	Coordinator::instance()->vault()->get("::output", outputVector);
+	Config::GlobalVault::instance()->get("monitor:output", outputVector);
 	
 	for(int i = 0; i < int(outputVector.size()); i ++) {
 		DataOutput *output = createOutput(outputVector[i]);

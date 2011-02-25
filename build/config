@@ -8,18 +8,11 @@
 	"moduleConfigFileName": "module.conf",
 	
 	# The path of the local configuration file.
-	"monitorLocalConfig": ".aesalon.conf",
+	"localConfig": ".aesalon.conf",
 	# The path of the user-wide configuration file.
-	"monitorUserConfig": "~/.config/aesalon/aesalon.conf",
+	"userConfig": "~/.config/aesalon/aesalon.conf",
 	# The path of the system-wide configuration file.
-	"monitorGlobalConfig": "/etc/aesalon/aesalon.conf",
-	
-	# The path of the local configuration file.
-	"visualizerLocalConfig": ".visualizer.conf",
-	# The path of the user-wide configuration file.
-	"visualizerUserConfig": "~/.config/aesalon/visualizer.conf",
-	# The path of the system-wide configuration file.
-	"visualizerGlobalConfig": "/etc/aesalon/visualizer.conf",
+	"globalConfig": "/etc/aesalon/aesalon.conf",
 	
 	# The maximum number of threads that can be created by the monitoring modules.
 	"monitorThreadListSize": 32,

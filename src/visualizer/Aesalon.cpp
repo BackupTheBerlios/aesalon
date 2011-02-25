@@ -11,9 +11,12 @@
 
 #include "visualizer/RootWindow.h"
 #include "util/MessageSystem.h"
+#include "config/GlobalVault.h"
 
 int main(int argc, char *argv[]) {
 	QApplication qapp(argc, argv);
+	
+	Config::GlobalVault gv;
 	
 	Visualizer::RootWindow rw;
 	rw.show();

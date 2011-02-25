@@ -15,6 +15,7 @@
 #include "monitor/ArgumentParser.h"
 #include "monitor/Launcher.h"
 #include "config/Parser.h"
+#include "config/GlobalVault.h"
 #include "util/PathSanitizer.h"
 #include "util/MessageSystem.h"
 
@@ -31,23 +32,24 @@ Coordinator::~Coordinator() {
 }
 
 void Coordinator::run() {
-	parseConfigs();
+	Config::Vault *vault = Config::GlobalVault::instance();
+	m_argcOffset = ArgumentParser::parse(vault, m_argv);
 	
-	if(m_vault->get("::list-attributes") == "true") {
+	if(vault->get("::list-attributes") == "true") {
 		Message(Log, "Listing all configuration keys and values.");
 		Message(Log, "Some auto-generated values may have non-canonical values.");
 		std::vector<Config::Vault::KeyPair> list;
-		m_vault->match("*", list);
+		vault->match("*", list);
 		for(std::vector<Config::Vault::KeyPair>::iterator i = list.begin(); i != list.end(); ++i) {
 			if(i->first[0] == ':' && i->first[1] == ':') continue;
 			
 			Message(Log, "    * \"" << i->first << "\" ==> \"" << i->second << "\"");
 		}
 	}
-	else if(m_vault->get("::version") == "true") {
+	else if(vault->get("::version") == "true") {
 		usage(false);
 	}
-	else if(m_argv[m_argcOffset] == NULL || m_vault->get("::help") == "true") {
+	else if(m_argv[m_argcOffset] == NULL || vault->get("::help") == "true") {
 		usage(true);
 	}
 	else {
@@ -67,17 +69,6 @@ void Coordinator::run() {
 	}
 }
 
-void Coordinator::parseConfigs() {
-	Config::Parser parser;
-	m_vault = new Config::Vault();
-	
-	parser.parse(m_vault, Util::PathSanitizer::sanitize(AesalonMonitorGlobalConfig));
-	parser.parse(m_vault, Util::PathSanitizer::sanitize(AesalonMonitorUserConfig));
-	parser.parse(m_vault, Util::PathSanitizer::sanitize(AesalonMonitorLocalConfig));
-	
-	m_argcOffset = ArgumentParser::parse(m_vault, m_argv);
-}
-
 void Coordinator::usage(bool displayHelp) {
 	std::cout << "Aesalon version " << AesalonVersion << ". Copyright (C) 2009-2011 Aesalon Development Team."
 		<< std::endl;
@@ -92,18 +83,19 @@ void Coordinator::usage(bool displayHelp) {
 	std::cout << "\t--version\n\t\tDisplays version information." << std::endl;
 	std::cout << "\t--search <path>\n\t\tSearches <path> for modules." << std::endl;
 	std::cout << "\t--use-module <module>\n\t\tPrepares <module> for loading." << std::endl;
-	std::cout << "\t--set <attribute>[=value]\n\t\tSets an attribute." << std::endl;
+	std::cout << "\t--set <attribute>[[+]=value]\n\t\tSets an attribute." << std::endl;
 	std::cout << "\t--list-attributes\n\t\tLists all the available attributes." << std::endl;
 }
 
 void Coordinator::setupModuleIDs() {
+	Config::Vault *vault = Config::GlobalVault::instance();
 	std::vector<std::string> moduleList;
-	m_vault->get("::modules", moduleList);
+	vault->get("::modules", moduleList);
 	
 	ModuleID nextID = 1;
 	
 	for(std::vector<std::string>::iterator i = moduleList.begin(); i != moduleList.end(); ++i) {
-		m_vault->set(Util::StreamAsString() << *i << ":moduleID", Util::StreamAsString() << nextID++);
+		vault->set(Util::StreamAsString() << *i << ":moduleID", Util::StreamAsString() << nextID++);
 	}
 }
 

@@ -10,7 +10,7 @@
 #include <dlfcn.h>
 
 #include "monitor/MarshalWrapper.h"
-#include "monitor/Coordinator.h"
+#include "config/GlobalVault.h"
 #include "util/MessageSystem.h"
 
 namespace Monitor {
@@ -28,8 +28,8 @@ MarshalWrapper::~MarshalWrapper() {
 }
 
 void MarshalWrapper::load(const std::string &moduleName) {
-	std::string moduleRoot = Coordinator::instance()->vault()->get(moduleName + ":root");
-	std::string marshalPath = Coordinator::instance()->vault()->get(moduleName + ":marshalPath");
+	std::string moduleRoot = Config::GlobalVault::instance()->get(moduleName + ":root");
+	std::string marshalPath = Config::GlobalVault::instance()->get(moduleName + ":marshalPath");
 	
 	/* Use RTLD_NOW so if there are any undefined symbols, they are caught now instead of later. */
 	m_handle = dlopen((moduleRoot + marshalPath).c_str(), RTLD_NOW | RTLD_LOCAL);

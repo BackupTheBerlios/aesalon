@@ -235,7 +235,7 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadCount = 1;
 	AI_InformerData.threadList[0] = self;
 	
-	//AI_SendInitialFiles();
+	AI_SendInitialFiles();
 	
 	AI_ContinueCollection(self);
 }
