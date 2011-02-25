@@ -1,4 +1,5 @@
 Import("env")
+Import("qtEnv")
 
 dirglob = Glob("*/SConscript", strings=True)
 
@@ -6,6 +7,7 @@ dirglob = Glob("*/SConscript", strings=True)
 for path in dirglob:
 	dirname = path[:path.find('/')]
 	env.Append(LIBPATH = ["#.build/" + dirname])
+	qtEnv.Append(LIBPATH = ["#.build/" + dirname])
 #	print env.Dump("LIBPATH")
 
 for path in dirglob:

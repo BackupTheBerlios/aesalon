@@ -24,10 +24,11 @@ enum PacketType {
 			- name: 8-bit ASCII string. (length specified by packet header's dataSize - sizeof(ModuleID) - 1).
 	*/
 	ModuleLoaded,
+	FileLoaded,
 	NewThread,
 	NewProcess,
 	ThreadExiting,
-	ProcessExiting
+	ProcessExiting,
 };
 
 #ifdef __cplusplus

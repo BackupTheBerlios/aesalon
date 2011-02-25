@@ -1,0 +1,32 @@
+import sys
+import subprocess
+
+Import("qtEnv")
+
+env = qtEnv
+
+env.Replace(QT4_MOCHSUFFIX = ".cpp")
+env.Replace(QT4_MOCHPREFIX = "#.build/visualizer/moc_")
+env.Replace(QT4_QRCCXXPREFIX = "#.build/qrc_")
+
+automocPath = [
+	"#src/visualizer/",
+	"#include/visualizer/"]
+
+dirType = type(Dir("."))
+
+for item in Glob("#src/visualizer/*") + Glob("#include/visualizer/*"):
+	if type(item) == dirType:
+		automocPath += [str(item)]
+
+env.Replace(QT4_AUTOMOC_CPPPATH = automocPath)
+
+env.EnableQt4Modules(["QtCore", "QtGui", "QtNetwork"])
+
+env.Append(CPPPATH = ["#include/"])
+env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonVisualizer"])
+env.Append(LIBS = ["aesalon-config", "aesalon-util", "aesalon-storage"])
+
+sourceFiles = Glob("*.cpp", strings=True) + Glob("*/*.cpp", strings=True) + Glob("*.qrc", strings=True)
+
+env.Program(target = "aesalon_visualizer", source = sourceFiles)

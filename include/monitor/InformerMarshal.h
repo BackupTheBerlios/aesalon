@@ -22,6 +22,7 @@ public:
 	virtual Comm::Packet *marshal(Comm::Packet *packet);
 private:
 	void moduleLoaded(Comm::Packet *packet);
+	void fileLoaded(Comm::Packet *packet);
 };
 
 } // namespace Monitor

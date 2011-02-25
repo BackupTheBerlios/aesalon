@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <limits.h>
 
 #include "Config.h"
 
@@ -54,6 +55,8 @@ static void AI_SetupSHM();
 static void *AI_MapSHM(uint32_t start, uint32_t size);
 static void *AI_SetupZone();
 static void *AI_ReserveSpace(uint32_t size);
+
+static void AI_SendInitialFiles();
 
 void AI_SetupSHM() {
 	const char *shmName = getenv("AesalonSHMName");
@@ -187,6 +190,38 @@ static void *AI_ReserveSpace(uint32_t size) {
 	return NULL;
 }
 
+void AI_SendInitialFiles() {
+	FILE *fp = fopen("/proc/self/maps", "r");
+	
+	char linebuffer[PATH_MAX + 128];
+	char filename[PATH_MAX];
+	int offset = 0;
+	while(fgets(linebuffer, sizeof(linebuffer), fp)) {
+		
+		uint64_t baseAddress;
+		char mode[5];
+		uint64_t fileOffset;
+		
+		
+		sscanf(linebuffer, "%lx-%s %s %lx %s %s %s", &baseAddress, filename,
+			mode, &fileOffset, filename, filename, filename);
+		
+		if(mode[2] != 'x' || filename[0] == '[') continue;
+		
+		AI_StartPacket(0);
+		*(uint8_t *)AI_PacketSpace(1) = FileLoaded;
+		
+		*(uint64_t *)AI_PacketSpace(8) = baseAddress;
+		*(uint64_t *)AI_PacketSpace(8) = fileOffset;
+		char *packetFilename = AI_PacketSpace(strlen(filename));
+		strcpy(packetFilename, filename);
+		
+		AI_EndPacket();
+	}
+	
+	fclose(fp);
+}
+
 void __attribute__((constructor)) AI_Construct() {
 	if(AI_InformerData.initialized == 1) return;
 	pthread_t self = pthread_self();
@@ -200,14 +235,9 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadCount = 1;
 	AI_InformerData.threadList[0] = self;
 	
-	AI_ContinueCollection(self);
+	AI_SendInitialFiles();
 	
-	/*AI_StartPacket(0);
-	*(uint8_t *)AI_PacketSpace(1) = ModuleLoaded;
-	*(ModuleID *)AI_PacketSpace(sizeof(ModuleID)) = 0;
-	char *name = AI_PacketSpace(16);
-	strcpy(name, "Informer Module");
-	AI_EndPacket();*/
+	AI_ContinueCollection(self);
 }
 
 void __attribute__((destructor)) AI_Destruct() {
