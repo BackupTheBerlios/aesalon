@@ -51,6 +51,7 @@ void Coordinator::run() {
 		usage(true);
 	}
 	else {
+		setupModuleIDs();
 		MarshalList marshalList;
 		DataOutputController doc;
 		m_marshalList = &marshalList;
@@ -88,6 +89,17 @@ void Coordinator::usage(bool displayHelp) {
 	std::cout << "\t--use-module <module>\n\t\tPrepares <module> for loading." << std::endl;
 	std::cout << "\t--set <attribute>[=value]\n\t\tSets an attribute." << std::endl;
 	std::cout << "\t--list-attributes\n\t\tLists all the available attributes." << std::endl;
+}
+
+void Coordinator::setupModuleIDs() {
+	std::vector<std::string> moduleList;
+	m_vault->get("::modules", moduleList);
+	
+	ModuleID nextID = 1;
+	
+	for(std::vector<std::string>::iterator i = moduleList.begin(); i != moduleList.end(); ++i) {
+		m_vault->set(Util::StreamAsString() << *i << ":moduleID", Util::StreamAsString() << nextID++);
+	}
 }
 
 } // namespace Monitor

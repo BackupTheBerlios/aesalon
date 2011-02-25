@@ -9,6 +9,10 @@ static pthread_t AM_threadID;
 static void *run(void *unused);
 
 static void *run(void *unused) {
+	ModuleID moduleID = AI_ConfigurationLong("cpuTime:moduleID");
+	printf("moduleID: %i\n", moduleID);
+	printf("*****\n");
+	sleep(2);
 	int64_t interval_us = AI_ConfigurationLong("cpuTime:interval");
 	/* If the interval is not set, use the default of 1 ms. */
 	if(interval_us == -1) interval_us = 1000;
@@ -24,7 +28,10 @@ static void *run(void *unused) {
 	while(1) {
 		struct timespec value;
 		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &value);
+		uint64_t timestamp = AI_Timestamp();
+		
 		AI_StartPacket(1);
+		*(uint64_t *)AI_PacketSpace(8) = timestamp;
 		*(uint64_t *)AI_PacketSpace(8) = value.tv_nsec + (value.tv_sec * 1000000000);
 		AI_EndPacket();
 		

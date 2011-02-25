@@ -43,6 +43,7 @@ public:
 	void run();
 private:
 	void parseConfigs();
+	void setupModuleIDs();
 	void usage(bool displayHelp);
 };
 

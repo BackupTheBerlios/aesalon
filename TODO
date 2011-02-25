@@ -7,5 +7,3 @@
 - Allow access to the marshaller list for inter-module communication via "setup" function, to save function pointers etc.
 
 ==== Collector ====
-Informer:
-- Re-implement AI_ReserveSpace. It looks a tad flaky.

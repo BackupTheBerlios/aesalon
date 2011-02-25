@@ -232,6 +232,12 @@ void AC_EXPORT AI_EndPacket() {
 	sem_post(&AI_InformerData.shmHeader->packetSemaphore);
 }
 
+uint64_t AC_EXPORT AI_Timestamp() {
+	struct timespec t;
+	clock_gettime(CLOCK_REALTIME, &t);
+	return (t.tv_sec * 1000000000) + t.tv_nsec;
+}
+
 const char *AI_ConfigurationString(const char *name) {
 	printf("In AI_ConfigurationString . . .\n");
 	uint32_t offset = 0;
