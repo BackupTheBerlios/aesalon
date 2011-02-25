@@ -31,7 +31,8 @@ void MarshalWrapper::load(const std::string &moduleName) {
 	std::string moduleRoot = Coordinator::instance()->vault()->get(moduleName + ":root");
 	std::string marshalPath = Coordinator::instance()->vault()->get(moduleName + ":marshalPath");
 	
-	m_handle = dlopen((moduleRoot + marshalPath).c_str(), RTLD_LAZY);
+	/* Use RTLD_NOW so if there are any undefined symbols, they are caught now instead of later. */
+	m_handle = dlopen((moduleRoot + marshalPath).c_str(), RTLD_NOW | RTLD_LOCAL);
 	if(m_handle == NULL) {
 		Message(Warning, "Could not open marshal library for module \"" << moduleName << "\":" << dlerror());
 		return;

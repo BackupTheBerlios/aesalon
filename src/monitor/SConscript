@@ -2,6 +2,7 @@ Import("env")
 
 monitorEnv = env.Clone()
 
+monitorEnv.Append(LINKFLAGS = ["-rdynamic"])
 monitorEnv.Append(LIBS = ["aesalon-config", "aesalon-util", "aesalon-storage"])
 monitorEnv.Append(LIBS = ["rt", "dl"])
 
