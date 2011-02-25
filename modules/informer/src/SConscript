@@ -1,7 +1,8 @@
 Import("env")
 
-env.Append(CCFLAGS = ["-W", "-Wall", "-D_GNU_SOURCE"])
-env.Append(LIBS = ["rt", "dl"])
+informerEnv = env.Clone()
 
-env.SharedLibrary(target="collector", source=Glob("collector/*.c"))
+informerEnv.Replace(LIBS = ["rt", "dl"])
+
+informerEnv.SharedLibrary(target="collector", source=Glob("collector/*.c"))
 

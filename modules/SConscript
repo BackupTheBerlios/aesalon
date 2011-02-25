@@ -1,5 +1,4 @@
-moduleList = Glob("*/SConscript")
+moduleList = Glob("*/SConscript", strings=True)
 
-for module in moduleList:
-	SConscript(moduleList)
+SConscript(moduleList)
 

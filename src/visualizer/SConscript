@@ -3,7 +3,7 @@ import subprocess
 
 Import("qtEnv")
 
-env = qtEnv
+env = qtEnv.Clone()
 
 env.Replace(QT4_MOCHSUFFIX = ".cpp")
 env.Replace(QT4_MOCHPREFIX = "#.build/visualizer/moc_")

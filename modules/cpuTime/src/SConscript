@@ -1,7 +1,9 @@
 Import("env")
 
-env.Append(CCFLAGS = ["-W", "-Wall", "-D_GNU_SOURCE"])
-env.Append(LIBS = ["rt", "dl"])
+collectorEnv = env.Clone()
+marshalEnv = env.Clone()
 
-env.SharedLibrary(target="collector", source=Glob("collector/*.c"))
-env.SharedLibrary(target="marshal", source=Glob("marshal/*.cpp"))
+collectorEnv.Append(LIBS = ["rt", "dl"])
+
+collectorEnv.SharedLibrary(target="collector", source=Glob("collector/*.c"))
+marshalEnv.SharedLibrary(target="marshal", source=Glob("marshal/*.cpp"))

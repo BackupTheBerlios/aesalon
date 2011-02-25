@@ -28,7 +28,7 @@ public:
 	~MarshalList();
 	
 	MarshalWrapper *marshal(ModuleID moduleID);
-	void loadMarshal(ModuleID moduleID, const std::string &name);
+	void loadMarshal(const std::string &name);
 };
 
 } // namespace Monitor

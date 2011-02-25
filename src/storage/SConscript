@@ -1,3 +1,5 @@
 Import("env")
 
-env.StaticLibrary(target = "aesalon-storage", source = Glob("*.cpp") + Glob("*/*.cpp"))
+storageEnv = env.Clone()
+
+storageEnv.StaticLibrary(target = "aesalon-storage", source = Glob("*.cpp") + Glob("*/*.cpp"))

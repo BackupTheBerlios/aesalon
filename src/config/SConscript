@@ -1,3 +1,5 @@
 Import("env")
 
+configEnv = env.Clone()
+
 env.StaticLibrary(target = "aesalon-config", source = Glob("*.cpp") + Glob("*/*.cpp"))

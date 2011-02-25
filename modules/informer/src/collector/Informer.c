@@ -244,28 +244,37 @@ void __attribute__((destructor)) AI_Destruct() {
 	
 }
 
-void AC_EXPORT AI_StartPacket(ModuleID moduleID) {
+void  AI_StartPacket(ModuleID moduleID) {
 	if(AI_Zone == NULL) AI_SetupZone();
 	AI_ZonePacket = AI_ReserveSpace(sizeof(PacketHeader));
 	AI_ZonePacket->packetSize = 0;
 	AI_ZonePacket->moduleID = moduleID;
 }
 
-void AC_EXPORT *AI_PacketSpace(uint32_t size) {
+void  *AI_PacketSpace(uint32_t size) {
 	AI_ZonePacket->packetSize += size;
 	return AI_ReserveSpace(size);
 }
 
-void AC_EXPORT AI_EndPacket() {
+void  AI_EndPacket() {
 	AI_ZonePacket = NULL;
 	sem_post(&((ZoneHeader *)AI_Zone)->packetSemaphore);
 	sem_post(&AI_InformerData.shmHeader->packetSemaphore);
 }
 
-uint64_t AC_EXPORT AI_Timestamp() {
+uint64_t AI_Timestamp() {
 	struct timespec t;
 	clock_gettime(CLOCK_REALTIME, &t);
 	return (t.tv_sec * 1000000000) + t.tv_nsec;
+}
+
+void AI_ModuleLoaded(const char *name) {
+	AI_StartPacket(0);
+	*(uint8_t *)AI_PacketSpace(1) = ModuleLoaded;
+	
+	int length = strlen(name)+1;
+	strcpy(AI_PacketSpace(length), name);
+	AI_EndPacket();
 }
 
 const char *AI_ConfigurationString(const char *name) {

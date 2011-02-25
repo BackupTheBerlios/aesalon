@@ -10,6 +10,8 @@
 #include "monitor/MarshalList.h"
 #include "util/MessageSystem.h"
 #include "monitor/InformerMarshal.h"
+#include "monitor/Coordinator.h"
+#include "util/StringTo.h"
 
 namespace Monitor {
 
@@ -29,13 +31,15 @@ MarshalWrapper *MarshalList::marshal(ModuleID moduleID) {
 	return m_marshalVector[moduleID];
 }
 
-void MarshalList::loadMarshal(ModuleID moduleID, const std::string &name) {
+void MarshalList::loadMarshal(const std::string &name) {
 	MarshalWrapper *marshal = new MarshalWrapper(name);
 	if(marshal->interface() == NULL) {
-		Message(Warning, "Could not load marshal for module " << name);
+		Message(Warning, "Could not load marshal for module " << name << ".");
 		delete marshal;
 	}
 	else {
+		ModuleID moduleID = Util::StringTo<ModuleID>(Coordinator::instance()->vault()->get(name + ":moduleID"));
+		
 		if(moduleID >= m_marshalVector.size()) m_marshalVector.resize(moduleID+1);
 		m_marshalVector[moduleID] = marshal;
 	}

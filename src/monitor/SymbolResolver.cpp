@@ -25,7 +25,6 @@ SymbolResolver::~SymbolResolver() {
 }
 
 void SymbolResolver::parse(const std::string &filename, uint64_t offset) {
-	Message(Debug, "Asked to parse \"" << filename << "\"");
 	class Processor : public ElfParser::Processor {
 	private:
 		RTree *m_rtree;

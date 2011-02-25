@@ -47,6 +47,8 @@ void __attribute__((constructor)) AC_EXPORT AM_Construct() {
 	AI_Construct();
 	
 	pthread_create(&AM_threadID, NULL, run, NULL);
+	
+	AI_ModuleLoaded("cpuTime");
 }
 
 void __attribute__((destructor)) AC_EXPORT AM_Destruct() {

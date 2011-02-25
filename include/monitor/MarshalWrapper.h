@@ -19,7 +19,7 @@ namespace Monitor {
 class MarshalWrapper {
 private:
 	Marshal::Interface *m_interface;
-	void *m_moduleHandle;
+	void *m_handle;
 public:
 	MarshalWrapper(const std::string &moduleName);
 	MarshalWrapper(Marshal::Interface *interface);

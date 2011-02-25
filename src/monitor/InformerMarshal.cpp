@@ -59,20 +59,17 @@ Comm::Packet *InformerMarshal::marshal(Comm::Packet *packet) {
 
 void InformerMarshal::moduleLoaded(Comm::Packet *packet) {
 	/* NOTE: the +1 is for the type byte. */
-	ModuleID id = *(reinterpret_cast<ModuleID *>(packet->data() + 1));
-	std::string name = reinterpret_cast<char *>(packet->data() + 1 + sizeof(ModuleID));
+	std::string name = reinterpret_cast<char *>(packet->data() + 1);
 	MarshalList *list = Coordinator::instance()->marshalList();
 	
-	Message(Debug, "Trying to load a marshal for ID#" << id << " with name \"" << name << "\"");
-	
-	list->loadMarshal(id, name);
+	list->loadMarshal(name);
 }
 
 void InformerMarshal::fileLoaded(Comm::Packet *packet) {
 	uint64_t baseAddress = *reinterpret_cast<uint64_t *>(packet->data() + 1);
 	uint64_t fileOffset = *reinterpret_cast<uint64_t *>(packet->data() + 9);
 	std::string name = reinterpret_cast<char *>(packet->data() + 17);
-	Message(Debug, "Filename: " << name);
+	
 	Coordinator::instance()->resolver()->parse(name, baseAddress);
 }
 
