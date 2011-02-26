@@ -3,7 +3,11 @@ Import("env")
 monitorEnv = env.Clone()
 
 monitorEnv.Append(LINKFLAGS = ["-rdynamic"])
-monitorEnv.Append(LIBS = ["aesalon-config", "aesalon-util", "aesalon-storage"])
+monitorEnv.Append(LINKFLAGS = ["-Xlinker", "--whole-archive", "-laesalon-config", "-laesalon-util", "-laesalon-storage", "-Xlinker", "--no-whole-archive"])
 monitorEnv.Append(LIBS = ["rt", "dl"])
 
-monitorEnv.Program(target = "aesalon", source = Glob("*.cpp") + Glob("*/*.cpp"))
+monitor = monitorEnv.Program(target = "aesalon", source = Glob("*.cpp") + Glob("*/*.cpp"))
+
+Import(["util", "config", "storage"])
+Depends(monitor, [util, config, storage])
+

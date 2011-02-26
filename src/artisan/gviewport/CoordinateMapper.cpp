@@ -16,9 +16,9 @@ CoordinateMapper::CoordinateMapper(double x, double y, double w, double h) : m_x
 	
 }
 
-void CoordinateMapper::map(uint64_t *fromx, uint64_t *fromy, double *tox, double *toy) {
-	*tox = *fromx - m_x;
-	*toy = *fromy - m_y;
+void CoordinateMapper::map(uint64_t fromx, uint64_t fromy, double *tox, double *toy) {
+	*tox = fromx - m_x;
+	*toy = fromy - m_y;
 	
 	*tox /= m_w;
 	*toy /= m_h;

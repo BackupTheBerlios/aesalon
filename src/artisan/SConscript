@@ -1,7 +1,25 @@
+Import("env")
 Import("qtEnv")
 
 artisanEnv = qtEnv.Clone()
 
+artisanEnv.Replace(QT4_MOCHSUFFIX = ".cpp")
+artisanEnv.Replace(QT4_MOCHPREFIX = "#.build/artisan/moc_")
+
+automocPath = [
+	"#src/visualizer/",
+	"#include/visualizer/"]
+
+dirType = type(Dir("."))
+
+for item in Glob("#src/artisan/*") + Glob("#include/artisan/*"):
+	if type(item) == dirType:
+		automocPath += [str(item)]
+
+artisanEnv.Replace(QT4_AUTOMOC_CPPPATH = automocPath)
+
 artisanEnv.EnableQt4Modules(["QtCore", "QtGui"])
 
-artisanEnv.StaticLibrary(target = "aesalon-artisan", source = Glob("*.cpp") + Glob("*/*.cpp"))
+artisan = artisanEnv.StaticLibrary(target = "aesalon-artisan", source = Glob("*.cpp") + Glob("*/*.cpp"))
+Export("artisan")
+

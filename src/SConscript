@@ -1,6 +1,6 @@
 Import("env")
 Import("qtEnv")
-
+"""
 dirglob = Glob("*/SConscript", strings=True)
 
 # Construct linking path first . . .
@@ -10,4 +10,12 @@ for path in dirglob:
 	qtEnv.Append(LIBPATH = ["#.build/" + dirname])
 
 for path in dirglob:
-	SConscript(path)
+	SConscript(path)"""
+
+dirs = "util config storage artisan monitor visualizer".split()
+
+for dir in dirs:
+	env.Append(LIBPATH="#.build/" + dir)
+	qtEnv.Append(LIBPATH="#.build/" + dir)
+
+SConscript(dirs=dirs)

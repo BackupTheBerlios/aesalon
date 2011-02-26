@@ -19,7 +19,7 @@
 namespace Artisan {
 namespace GViewport {
 
-class Viewport : public Artisan::Viewport {
+class Viewport : public Artisan::Viewport { Q_OBJECT
 private:
 	Data m_data;
 	RenderedImage m_rendered;
@@ -29,6 +29,8 @@ public:
 	
 	void addObject(Object *object);
 	void removeObject(Object *object);
+public slots:
+	void fitAll();
 };
 
 } // namespace GViewport

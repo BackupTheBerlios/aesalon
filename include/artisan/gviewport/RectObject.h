@@ -10,14 +10,17 @@
 #ifndef AesalonArtisan_GViewport_RectObject_H
 #define AesalonArtisan_GViewport_RectObject_H
 
+#include "Object.h"
 
 namespace Artisan {
 namespace GViewport {
 
-class RectObject {
+class RectObject : public Object {
 public:
-	RectObject();
-	~RectObject();
+	RectObject(uint64_t layer, uint64_t x, uint64_t y, uint64_t w, uint64_t h);
+	virtual ~RectObject();
+	
+	virtual void render(CoordinateMapper &mapper, QPainter &painter);
 };
 
 } // namespace GViewport

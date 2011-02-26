@@ -25,9 +25,13 @@ env.EnableQt4Modules(["QtCore", "QtGui", "QtNetwork"])
 
 env.Append(CPPPATH = ["#include/"])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonVisualizer"])
-env.Append(LIBS = ["aesalon-config", "aesalon-util", "aesalon-storage", "aesalon-artisan"])
 env.Append(LINKFLAGS = ["-rdynamic"])
+env.Append(LINKFLAGS = ["-Xlinker", "--whole-archive", "-laesalon-config", "-laesalon-util", "-laesalon-storage", "-laesalon-artisan", "-Xlinker", "--no-whole-archive"])
 
 sourceFiles = Glob("*.cpp", strings=True) + Glob("*/*.cpp", strings=True) + Glob("*.qrc", strings=True)
 
-env.Program(target = "aesalon_visualizer", source = sourceFiles)
+visualizer = env.Program(target = "aesalon_visualizer", source = sourceFiles)
+
+Import(["util", "config", "storage", "artisan"])
+Depends(visualizer, [util, config, storage, artisan])
+

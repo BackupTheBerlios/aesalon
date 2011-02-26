@@ -32,5 +32,9 @@ void Viewport::removeObject(Object *object) {
 	m_data.unlock();
 }
 
+void Viewport::fitAll() {
+
+}
+
 } // namespace GViewport
 } // namespace Artisan

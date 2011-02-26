@@ -26,7 +26,7 @@ public:
 	Renderer(Data &data);
 	~Renderer();
 public slots:
-	void render(TreeType::Bound bound, CoordinateMapper mapper);
+	void render(TreeType::Bound bound, CoordinateMapper mapper) {}
 signals:
 	void renderingFinished(RenderedImage image);
 };

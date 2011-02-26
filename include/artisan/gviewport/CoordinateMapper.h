@@ -20,9 +20,9 @@ private:
 	double m_x, m_y, m_w, m_h;
 public:
 	CoordinateMapper(double x, double y, double w, double h);
-	~CoordinateMapper();
+	~CoordinateMapper() {}
 	
-	void map(uint64_t *fromx, uint64_t *fromy, double *tox, double *toy);
+	void map(uint64_t fromx, uint64_t fromy, double *tox, double *toy);
 };
 
 } // namespace GViewport
