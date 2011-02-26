@@ -15,8 +15,11 @@
 #include <QVBoxLayout>
 #include <QPixmap>
 #include <QPushButton>
+#include <QMdiSubWindow>
 
 #include "visualizer/RootWindow.h"
+#include "visualizer/InputManagerWidget.h"
+#include "util/MessageSystem.h"
 
 namespace Visualizer {
 
@@ -25,7 +28,10 @@ RootWindow::RootWindow() {
 	setWindowIcon(QIcon(":/icon.png"));
 	
 	m_mdiArea = new QMdiArea();
+	//m_mdiArea->setViewMode(QMdiArea::TabbedView);
 	setCentralWidget(m_mdiArea);
+	
+	m_inputManager = new InputManager();
 	
 	createAboutBox();
 	
@@ -34,14 +40,27 @@ RootWindow::RootWindow() {
 	aesalonMenu->addAction(tr("&Quit"), qApp, SLOT(closeAllWindows()));
 	menuBar()->addMenu(aesalonMenu);
 	
+	QMenu *windowMenu = new QMenu(tr("&Window"));
+	windowMenu->addAction(tr("&Create input manager"), this, SLOT(createInputManager()));
+	menuBar()->addMenu(windowMenu);
+	
 	QMenu *helpMenu = new QMenu(tr("&Help"));
 	helpMenu->addAction(tr("&About . . ."), m_aboutAesalon, SLOT(show()));
 	helpMenu->addAction(tr("About &Qt . . ."), qApp, SLOT(aboutQt()));
 	menuBar()->addMenu(helpMenu);
+	
 }
 
 RootWindow::~RootWindow() {
 	
+}
+
+void RootWindow::createInputManager() {
+	InputManagerWidget *imw = new InputManagerWidget(m_inputManager);
+	QMdiSubWindow *msw = m_mdiArea->addSubWindow(imw);
+	msw->setAttribute(Qt::WA_DeleteOnClose);
+	msw->setWindowTitle(tr("Input manager"));
+	msw->show();
 }
 
 void RootWindow::createAboutBox() {

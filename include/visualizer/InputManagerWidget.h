@@ -4,32 +4,26 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. See
 	the included file LICENSE for more information.
 	
-	@file include/visualizer/RootWindow.h
+	@file include/visualizer/InputManagerWidget.h
 */
 
-#ifndef AesalonVisualizer_RootWindow_H
-#define AesalonVisualizer_RootWindow_H
+#ifndef AesalonVisualizer_InputManagerWidget_H
+#define AesalonVisualizer_InputManagerWidget_H
 
-#include <QMainWindow>
-#include <QMdiArea>
 #include <QWidget>
 
 #include "InputManager.h"
 
 namespace Visualizer {
 
-class RootWindow : public QMainWindow { Q_OBJECT
+class InputManagerWidget : public QWidget { Q_OBJECT
 private:
-	QMdiArea *m_mdiArea;
-	QWidget *m_aboutAesalon;
 	InputManager *m_inputManager;
 public:
-	RootWindow();
-	virtual ~RootWindow();
-private slots:
-	void createInputManager();
-private:
-	void createAboutBox();
+	InputManagerWidget(InputManager *inputManager);
+	virtual ~InputManagerWidget();
+	
+	
 };
 
 } // namespace Visualizer
