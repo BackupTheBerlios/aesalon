@@ -4,29 +4,31 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. See
 	the included file LICENSE for more information.
 	
-	@file include/artisan/gviewport/Viewport.h
+	@file include/artisan/gviewport/Data.h
 */
 
-#ifndef AesalonArtisan_GViewport_Viewport_H
-#define AesalonArtisan_GViewport_Viewport_H
+#ifndef AesalonArtisan_GViewport_Data_H
+#define AesalonArtisan_GViewport_Data_H
 
-#include "artisan/Viewport.h"
+#include <QMutex>
+
 #include "TreeType.h"
-#include "Object.h"
-#include "Data.h"
 
 namespace Artisan {
 namespace GViewport {
 
-class Viewport : public Artisan::Viewport {
+class Data {
 private:
-	Data m_data;
+	TreeType m_tree;
+	QMutex m_mutex;
 public:
-	Viewport();
-	virtual ~Viewport();
+	Data() {}
+	~Data() {}
 	
-	void addObject(Object *object);
-	void removeObject(Object *object);
+	TreeType &tree() { return m_tree; }
+	
+	void lock() { m_mutex.lock(); }
+	void unlock() { m_mutex.unlock(); }
 };
 
 } // namespace GViewport

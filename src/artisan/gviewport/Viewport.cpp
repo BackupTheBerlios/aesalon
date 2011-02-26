@@ -21,7 +21,15 @@ Viewport::~Viewport() {
 }
 
 void Viewport::addObject(Object *object) {
-	m_tree.insert(object->bound(), object);
+	m_data.lock();
+	m_data.tree().insert(object->bound(), object);
+	m_data.unlock();
+}
+
+void Viewport::removeObject(Object *object) {
+	m_data.lock();
+	m_data.tree().remove(object->bound(), object);
+	m_data.unlock();
 }
 
 } // namespace GViewport
