@@ -12,7 +12,7 @@
 namespace Artisan {
 namespace GViewport {
 
-Viewport::Viewport() {
+Viewport::Viewport() : m_rendered(RenderedImage(1, 1, 0.0, 0.0, 1.0, 1.0)) {
 	
 }
 

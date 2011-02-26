@@ -187,6 +187,11 @@ public:
 		@param value The value to remove.
 	*/
 	void remove(const Bound &bound, Value value);
+	
+	/** Returns the overall bounds of the tree.
+		@return The overall bounds of the tree.
+	*/
+	Bound bounds();
 private:
 	void search(const Bound &bound, Node *node, SearchProcessor *processor);
 	
@@ -270,6 +275,14 @@ void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::remove(
 		delete m_root;
 		m_root = newRoot;
 	}
+}
+
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
+	typename FloatKey>
+typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::bounds() {
+	
+	return m_root->bound();
 }
 
 template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,

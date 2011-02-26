@@ -1,6 +1,6 @@
 #include "Viewport.h"
 
-Viewport::Viewport() {
+Viewport::Viewport(DataStore *dataStore) : m_dataStore(dataStore) {
 
 }
 

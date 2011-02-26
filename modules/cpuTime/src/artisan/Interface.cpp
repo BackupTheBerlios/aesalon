@@ -4,17 +4,17 @@
 InstantiateArtisan(Interface)
 
 Interface::Interface() {
-	m_storage = new Storage();
+	m_storage = new DataStore();
 }
 
 Interface::~Interface() {
 
 }
 
-Artisan::Storage *Interface::storageObject() {
+Artisan::DataStore *Interface::dataStore() {
 	return m_storage;
 }
 
 Artisan::Viewport *Interface::createViewport() {
-	return new Viewport();
+	return new Viewport(m_storage);
 }

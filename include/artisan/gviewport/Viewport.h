@@ -14,6 +14,7 @@
 #include "TreeType.h"
 #include "Object.h"
 #include "Data.h"
+#include "RenderedImage.h"
 
 namespace Artisan {
 namespace GViewport {
@@ -21,6 +22,7 @@ namespace GViewport {
 class Viewport : public Artisan::Viewport {
 private:
 	Data m_data;
+	RenderedImage m_rendered;
 public:
 	Viewport();
 	virtual ~Viewport();

@@ -36,7 +36,7 @@ void DataInput::addData(QByteArray data) {
 		else if(m_artisanMap[packet.header().moduleID] != NULL) {
 			Artisan::Interface *interface;
 			if((interface = m_artisanMap[packet.header().moduleID]->interface()) != NULL)
-				interface->storageObject()->process(&packet);
+				interface->dataStore()->process(&packet);
 		}
 		/* If there is no artisan loaded for the packet, just ignore it. */
 		

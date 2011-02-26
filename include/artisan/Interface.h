@@ -10,7 +10,7 @@
 #ifndef AesalonArtisan_Interface_H
 #define AesalonArtisan_Interface_H
 
-#include "Storage.h"
+#include "DataStore.h"
 #include "Viewport.h"
 
 namespace Artisan {
@@ -19,7 +19,7 @@ class Interface {
 public:
 	virtual ~Interface() {}
 	
-	virtual Storage *storageObject() = 0;
+	virtual DataStore *dataStore() = 0;
 	
 	virtual Viewport *createViewport() = 0;
 };

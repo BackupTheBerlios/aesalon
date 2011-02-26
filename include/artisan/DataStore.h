@@ -4,19 +4,19 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. See
 	the included file LICENSE for more information.
 	
-	@file include/artisan/Storage.h
+	@file include/artisan/DataStore.h
 */
 
-#ifndef AesalonArtisan_Storage_H
-#define AesalonArtisan_Storage_H
+#ifndef AesalonArtisan_DataStore_H
+#define AesalonArtisan_DataStore_H
 
 #include "comm/Packet.h"
 
 namespace Artisan {
 
-class Storage {
+class DataStore {
 public:
-	virtual ~Storage() {}
+	virtual ~DataStore() {}
 	
 	virtual void process(Comm::Packet *packet) = 0;
 };
