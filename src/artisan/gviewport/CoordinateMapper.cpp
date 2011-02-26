@@ -9,6 +9,8 @@
 
 #include "artisan/gviewport/CoordinateMapper.h"
 
+#include "util/MessageSystem.h"
+
 namespace Artisan {
 namespace GViewport {
 
@@ -17,8 +19,12 @@ CoordinateMapper::CoordinateMapper(double x, double y, double w, double h) : m_x
 }
 
 void CoordinateMapper::map(double fromx, double fromy, double *tox, double *toy) const {
-	*tox = (fromx - m_x) / m_w;
-	*toy = (fromy - m_y) / m_h;
+	Message(Debug, "fromx: " << fromx);
+	Message(Debug, "fromy: " << fromy);
+	Message(Debug, "m_x: " << m_x);
+	Message(Debug, "m_y: " << m_y);
+	*tox = (fromx - 0) / m_w;
+	*toy = (fromy - 0) / m_h;
 }
 
 } // namespace GViewport

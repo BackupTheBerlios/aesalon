@@ -25,7 +25,9 @@ private:
 	Data &m_data;
 public:
 	Renderer(Data &data);
-	~Renderer();
+	virtual ~Renderer();
+protected:
+	virtual bool shouldRender(Object *object) { object = object; return true; }
 public slots:
 	void render(RenderRequest request);
 signals:

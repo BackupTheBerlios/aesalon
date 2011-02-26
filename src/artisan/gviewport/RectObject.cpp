@@ -8,6 +8,7 @@
 */
 
 #include <QRect>
+#include <QPoint>
 
 #include "artisan/gviewport/RectObject.h"
 
@@ -28,23 +29,27 @@ RectObject::~RectObject() {
 
 void RectObject::render(RenderedImage &image) {
 	Message(Debug, "Rendering RectObject . . .");
+	
+	Message(Debug, "m_bound.range(1).start(): " << m_bound.range(1).start());
+	Message(Debug, "m_bound.range(2).start(): " << m_bound.range(2).start());
+	Message(Debug, "m_bound.range(1).end(): " << m_bound.range(1).end());
+	Message(Debug, "m_bound.range(2).end(): " << m_bound.range(2).end());
+	
 	double x1, y1;
 	image.mapper().map(m_bound.range(1).start(), m_bound.range(2).start(), &x1, &y1);
 	double x2, y2;
 	image.mapper().map(m_bound.range(1).end(), m_bound.range(2).end(), &x2, &y2);
-	
-	Message(Debug, "Coordinates: (" << x1 << "," << y1 << "), (" << x2 << "," << y2 << ")");
 	
 	QPainter *painter = image.painter();
 	
 	painter->setPen(qRgb(0, 0, 0));
 	painter->setBrush(Qt::cyan);
 	
-	QRectF rf = QRectF(x1 * painter->device()->width(), y1 * painter->device()->height(),
-		(x2-x1) * painter->device()->width(), painter->device()->height() * (y2-y1));
+	Message(Debug, "x2-x1: " << x2 - x1);
+	Message(Debug, "y2-y1: " << y2 - y1);
 	
-	Message(Debug, "Modified Coordinates: (" << rf.left() << "," << rf.top() << "), (" << rf.right()
-		<< "," << rf.bottom() << ")");
+	QRectF rf = QRectF(QPointF(x1 * painter->device()->width(), y1 * painter->device()->height()),
+		QPointF((x2-x1) * painter->device()->width(), painter->device()->height() * (y2-y1)));
 	
 	painter->drawRect(rf);
 }

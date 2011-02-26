@@ -10,6 +10,8 @@
 #ifndef AesalonArtisan_GViewport_Viewport_H
 #define AesalonArtisan_GViewport_Viewport_H
 
+#include <QPoint>
+
 #include "artisan/Viewport.h"
 #include "TreeType.h"
 #include "Object.h"
@@ -25,17 +27,23 @@ private:
 	Data m_data;
 	RenderedImage m_rendered;
 	Renderer m_renderer;
+	QPoint m_previous;
 public:
 	Viewport();
 	virtual ~Viewport();
 	
 	void addObject(Object *object);
 	void removeObject(Object *object);
+	
+	void setDisplayRange(double x, double y, double w, double h);
 public slots:
-	void fitAll();
+	void fullRender();
 private slots:
 	void mergeWith(RenderedImage image);
 protected:
+	virtual void mouseMoveEvent(QMouseEvent *event);
+	virtual void mousePressEvent(QMouseEvent *event);
+	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void resizeEvent(QResizeEvent *event);
 	virtual void paintEvent(QPaintEvent *event);
 };

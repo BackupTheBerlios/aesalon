@@ -32,18 +32,19 @@ void Renderer::render(RenderRequest request) {
 	
 	class Processor : public TreeType::SearchProcessor {
 	private:
+		Renderer *m_renderer;
 		RenderedImage &m_image;
 	public:
-		Processor(RenderedImage &image) : m_image(image) {}
+		Processor(Renderer *renderer, RenderedImage &image) : m_renderer(renderer), m_image(image) {}
 		
 		virtual bool process(const TreeType::Bound &bound, Object *value) {
-			value->render(m_image);
+			if(m_renderer->shouldRender(value)) value->render(m_image);
 			
 			return true;
 		}
 	};
 	
-	Processor p(image);
+	Processor p(this, image);
 	
 	image.startPainting();
 	

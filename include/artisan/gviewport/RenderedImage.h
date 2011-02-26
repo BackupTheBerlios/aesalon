@@ -37,6 +37,8 @@ public:
 	void endPainting();
 	
 	void merge(const RenderedImage &other);
+	void shift(double x, double y);
+	void shiftPixels(int x, int y);
 	
 	void resize(int width, int height);
 	

@@ -50,14 +50,35 @@ void RenderedImage::merge(const RenderedImage &other) {
 	
 	m_mapper.map(other.m_w, other.m_h, &w, &h);
 	
-	Message(Debug, "Source data-rectangle: " << other.m_x << "," << other.m_y << ", size "
-		<< other.m_w << "x" << other.m_h);
-	Message(Debug, "Target data-rectangle: " << m_x << "," << m_y << ", size "
-		<< m_w << "x" << m_h);
-	Message(Debug, "Target rect: (" << x << "," << y << "), size " << w << "x" << h);
-	
 	m_painter->drawImage(QRectF(x*m_image.width(), y*m_image.height(), w*m_image.width(), h*m_image.height()),
 		other.m_image, other.m_image.rect());
+	
+	endPainting();
+}
+
+void RenderedImage::shift(double x, double y) {
+	double xOffset, yOffset;
+	m_mapper.map(x, y, &xOffset, &yOffset);
+	
+	shiftPixels(xOffset, yOffset);
+}
+
+void RenderedImage::shiftPixels(int x, int y) {
+	startPainting();
+	
+	QImage temp = m_image.copy();
+	
+	m_image.fill(qRgb(255, 255, 255));
+	
+	m_painter->drawImage(x, y, temp);
+	
+	double xP = double(x) / m_image.width();
+	double yP = double(y) / m_image.height();
+	
+	m_x += xP * m_w;
+	m_y += yP * m_h;
+	
+	m_mapper = CoordinateMapper(m_x, m_y, m_w, m_h);
 	
 	endPainting();
 }

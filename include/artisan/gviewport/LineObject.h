@@ -10,14 +10,17 @@
 #ifndef AesalonArtisan_GViewport_LineObject_H
 #define AesalonArtisan_GViewport_LineObject_H
 
+#include "Object.h"
 
 namespace Artisan {
 namespace GViewport {
 
-class LineObject {
+class LineObject : public Object {
 public:
-	LineObject();
-	~LineObject();
+	LineObject(double layer, double x1, double y1, double x2, double y2);
+	virtual ~LineObject();
+	
+	virtual void render(RenderedImage &image);
 };
 
 } // namespace GViewport

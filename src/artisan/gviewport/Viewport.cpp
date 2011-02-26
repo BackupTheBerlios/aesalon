@@ -19,6 +19,8 @@ namespace GViewport {
 Viewport::Viewport() : m_rendered(RenderedImage(1, 1, 0.0, 0.0, 1.0, 1.0)), m_renderer(m_data) {
 	setMinimumSize(120, 120);
 	
+	setMouseTracking(true);
+	
 	connect(&m_renderer, SIGNAL(renderingFinished(RenderedImage)), this, SLOT(mergeWith(RenderedImage)));
 }
 
@@ -38,13 +40,58 @@ void Viewport::removeObject(Object *object) {
 	m_data.unlock();
 }
 
-void Viewport::fitAll() {
+void Viewport::setDisplayRange(double x, double y, double w, double h) {
+	m_rendered = RenderedImage(width(), height(), x, y, w, h);
+}
 
+void Viewport::fullRender() {
+	TreeType::Bound bound;
+	bound.setRange(TreeType::Range(0.0, 1.0), 0);
+	bound.setRange(TreeType::Range(0.0, 1.0), 1);
+	bound.setRange(TreeType::Range(0.0, 1.0), 2);
+	RenderRequest request = RenderRequest(width(), height(), bound);
+	
+	m_renderer.render(request);
 }
 
 void Viewport::mergeWith(RenderedImage image) {
 	Message(Debug, "Merging images . . .");
 	m_rendered.merge(image);
+	update();
+}
+
+void Viewport::mouseMoveEvent(QMouseEvent *event) {
+	if(event->buttons() & Qt::LeftButton) {
+		int x = event->x() - m_previous.x();
+		int y = event->y() - m_previous.y();
+		
+		m_rendered.shiftPixels(x, y);
+		
+		m_previous = event->pos();
+		
+		Message(Debug, "m_rendered.mapper().x(): " <<  m_rendered.mapper().x());
+		Message(Debug, "m_rendered.mapper().y(): " <<  m_rendered.mapper().y());
+		Message(Debug, "m_rendered.mapper().w(): " <<  m_rendered.mapper().w());
+		Message(Debug, "m_rendered.mapper().h(): " <<  m_rendered.mapper().h());
+		
+		TreeType::Bound bound;
+		/* Just re-render the entire thing for the moment . . . */
+		bound.setRange(TreeType::Range(0.0, 1.0), 0);
+		bound.setRange(TreeType::Range(m_rendered.mapper().x(), m_rendered.mapper().x() + m_rendered.mapper().w()), 1);
+		bound.setRange(TreeType::Range(m_rendered.mapper().y(), m_rendered.mapper().y() + m_rendered.mapper().h()), 2);
+		
+		RenderRequest request = RenderRequest(width(), height(), bound);
+		
+		m_renderer.render(request);
+	}
+}
+
+void Viewport::mousePressEvent(QMouseEvent *event) {
+	m_previous = event->pos();
+}
+
+void Viewport::mouseReleaseEvent(QMouseEvent *event) {
+	
 }
 
 void Viewport::resizeEvent(QResizeEvent *event) {
@@ -63,6 +110,8 @@ void Viewport::resizeEvent(QResizeEvent *event) {
 void Viewport::paintEvent(QPaintEvent *event) {
 	m_rendered.drawOnto(this);
 }
+
+
 
 } // namespace GViewport
 } // namespace Artisan
