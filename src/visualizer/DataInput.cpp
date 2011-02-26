@@ -13,7 +13,8 @@
 
 namespace Visualizer {
 
-void DataInput::addData(QByteArray &data) {
+void DataInput::addData(QByteArray data) {
+	Message(Debug, "Data added . . .");
 	m_unprocessed += data;
 	
 	while(m_unprocessed.size() >= int(sizeof(Comm::PacketHeader))) {
@@ -23,6 +24,8 @@ void DataInput::addData(QByteArray &data) {
 		Comm::Packet packet(*header, reinterpret_cast<uint8_t *>(m_unprocessed.data()) + sizeof(Comm::PacketHeader));
 		
 		Message(Debug, "Processing packet of size " << header->dataSize);
+		
+		m_unprocessed.remove(0, sizeof(Comm::PacketHeader) + header->dataSize);
 	}
 }
 

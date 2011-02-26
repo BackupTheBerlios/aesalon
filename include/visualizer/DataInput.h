@@ -22,7 +22,7 @@ public:
 	DataInput() {}
 	virtual ~DataInput() {}
 public slots:
-	void addData(QByteArray &data);
+	void addData(QByteArray data);
 };
 
 } // namespace Visualizer

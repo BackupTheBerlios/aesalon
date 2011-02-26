@@ -8,15 +8,22 @@
 */
 
 #include "visualizer/InputManager.h"
+#include "util/MessageSystem.h"
 
 namespace Visualizer {
 
 InputManager::InputManager() {
-
+	
 }
 
 InputManager::~InputManager() {
+	
+}
 
+void InputManager::addInput(DataInput *input) {
+	Message(Debug, "Adding input . . .");
+	m_inputList.push_back(input);
+	emit inputAdded(input);
 }
 
 } // namespace Visualizer

@@ -10,12 +10,25 @@
 #ifndef AesalonVisualizer_InputManager_H
 #define AesalonVisualizer_InputManager_H
 
+#include <QObject>
+#include <QList>
+
+#include "DataInput.h"
+
 namespace Visualizer {
 
-class InputManager {
+class InputManager : public QObject { Q_OBJECT
+private:
+	QList<DataInput *> m_inputList;
 public:
 	InputManager();
 	virtual ~InputManager();
+	
+	QList<DataInput *> &inputList() { return m_inputList; }
+public slots:
+	void addInput(DataInput *input);
+signals:
+	void inputAdded(DataInput *input);
 };
 
 } // namespace Visualizer
