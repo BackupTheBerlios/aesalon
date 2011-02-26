@@ -12,12 +12,14 @@
 
 #include <string>
 #include <QHash>
+#include <QObject>
+#include <QList>
 
 #include "ArtisanWrapper.h"
 
 namespace Visualizer {
 
-class ArtisanManager {
+class ArtisanManager : QObject { Q_OBJECT
 protected:
 	typedef QHash<std::string, ArtisanWrapper *> ArtisanHash;
 private:
@@ -27,6 +29,10 @@ public:
 	~ArtisanManager();
 	
 	ArtisanWrapper *artisan(const std::string &name);
+	
+	QList<std::string> artisanList();
+signals:
+	void newArtisan(ArtisanWrapper *artisan);
 };
 
 } // namespace Visualizer

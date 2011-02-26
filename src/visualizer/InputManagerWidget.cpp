@@ -21,7 +21,7 @@ InputManagerWidget::InputManagerWidget(InputManager *inputManager) : m_inputMana
 	m_listWidget = new QListWidget();
 	layout->addWidget(m_listWidget);
 	
-	QPushButton *creatorButton = new QPushButton(tr("&Add input"));
+	QPushButton *creatorButton = new QPushButton(tr("Add &input"));
 	connect(creatorButton, SIGNAL(clicked()), this, SLOT(showCreator()));
 	layout->addWidget(creatorButton);
 	

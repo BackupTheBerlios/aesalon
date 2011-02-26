@@ -26,6 +26,7 @@ env.EnableQt4Modules(["QtCore", "QtGui", "QtNetwork"])
 env.Append(CPPPATH = ["#include/"])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonVisualizer"])
 env.Append(LIBS = ["aesalon-config", "aesalon-util", "aesalon-storage"])
+env.Append(LINKFLAGS = ["-rdynamic"])
 
 sourceFiles = Glob("*.cpp", strings=True) + Glob("*/*.cpp", strings=True) + Glob("*.qrc", strings=True)
 

@@ -28,6 +28,8 @@ public:
 	virtual ~RootWindow();
 private slots:
 	void createInputManager();
+	void createArtisanManager();
+	void addSubwindow(Artisan::Viewport *viewport);
 private:
 	void createAboutBox();
 };

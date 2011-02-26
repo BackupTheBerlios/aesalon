@@ -19,6 +19,7 @@
 
 #include "visualizer/RootWindow.h"
 #include "visualizer/InputManagerWidget.h"
+#include "visualizer/ArtisanManagerWidget.h"
 #include "util/MessageSystem.h"
 
 namespace Visualizer {
@@ -41,7 +42,10 @@ RootWindow::RootWindow() {
 	menuBar()->addMenu(aesalonMenu);
 	
 	QMenu *windowMenu = new QMenu(tr("&Window"));
-	windowMenu->addAction(tr("&Create input manager"), this, SLOT(createInputManager()));
+	windowMenu->addAction(tr("Create &input manager"), this, SLOT(createInputManager()));
+	menuBar()->addMenu(windowMenu);
+	
+	windowMenu->addAction(tr("Create &artisan manager"), this, SLOT(createArtisanManager()));
 	menuBar()->addMenu(windowMenu);
 	
 	QMenu *helpMenu = new QMenu(tr("&Help"));
@@ -60,6 +64,22 @@ void RootWindow::createInputManager() {
 	QMdiSubWindow *msw = m_mdiArea->addSubWindow(imw);
 	msw->setAttribute(Qt::WA_DeleteOnClose);
 	msw->setWindowTitle(tr("Input manager"));
+	msw->show();
+}
+
+void RootWindow::createArtisanManager() {
+	ArtisanManagerWidget *amw = new ArtisanManagerWidget(m_inputManager->artisanManager());
+	connect(amw, SIGNAL(newViewport(Artisan::Viewport *)), this, SLOT(addSubwindow(Artisan::Viewport *)));
+	QMdiSubWindow *msw = m_mdiArea->addSubWindow(amw);
+	msw->setAttribute(Qt::WA_DeleteOnClose);
+	msw->setWindowTitle(tr("Artisan manager"));
+	msw->show();
+}
+
+void RootWindow::addSubwindow(Artisan::Viewport *viewport) {
+	QMdiSubWindow *msw = m_mdiArea->addSubWindow(viewport);
+	msw->setAttribute(Qt::WA_DeleteOnClose);
+	msw->setWindowTitle(viewport->windowTitle());
 	msw->show();
 }
 

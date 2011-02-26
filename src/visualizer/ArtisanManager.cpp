@@ -34,4 +34,8 @@ ArtisanWrapper *ArtisanManager::artisan(const std::string &name) {
 	return (m_artisanHash[name] = artisan);
 }
 
+QList<std::string> ArtisanManager::artisanList() {
+	return m_artisanHash.keys();
+}
+
 } // namespace Visualizer
