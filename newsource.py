@@ -49,11 +49,11 @@ config = {
 """,
 	"openNamespace":
 """
-namespace %(namespace)s {
-""",
+namespace %(namespace)s {""",
 	
 	"cppClassDef":
 """
+
 class %(className)s {
 public:
 	%(className)s();
@@ -62,10 +62,10 @@ public:
 """,
 	"closeNamespace":
 """
-} // namespace %(namespace)s
-""",
+} // namespace %(namespace)s""",
 	"cppHeaderEnd":
 """
+
 #endif
 """
 }
@@ -133,6 +133,8 @@ class CSource(Generator):
 		if incPath != "":
 			fp.write(fileConfig["cSource"] % fileConfig)
 		
+		fp.write("\n")
+
 		fp.close()
 
 class CGenerator(Generator):

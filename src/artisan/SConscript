@@ -1,0 +1,7 @@
+Import("qtEnv")
+
+artisanEnv = qtEnv.Clone()
+
+artisanEnv.EnableQt4Modules(["QtCore", "QtGui"])
+
+artisanEnv.StaticLibrary(target = "aesalon-artisan", source = Glob("*.cpp") + Glob("*/*.cpp"))

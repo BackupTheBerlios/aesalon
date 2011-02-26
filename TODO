@@ -7,3 +7,6 @@
 - Allow access to the marshaller list for inter-module communication via "setup" function, to save function pointers etc. (?)
 
 ==== Collector ====
+
+==== Storage ====
+- Fix RTree deletion algorithm
