@@ -7,7 +7,7 @@ env = qtEnv.Clone()
 
 env.Replace(QT4_MOCHSUFFIX = ".cpp")
 env.Replace(QT4_MOCHPREFIX = "#.build/visualizer/moc_")
-env.Replace(QT4_QRCCXXPREFIX = "#.build/qrc_")
+env.Replace(QT4_QRCCXXPREFIX = ".build/qrc_")
 
 automocPath = [
 	"#src/visualizer/",

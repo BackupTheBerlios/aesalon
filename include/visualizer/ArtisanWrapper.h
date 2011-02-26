@@ -10,7 +10,7 @@
 #ifndef AesalonVisualizer_ArtisanWrapper_H
 #define AesalonVisualizer_ArtisanWrapper_H
 
-#include <QString>
+#include <string>
 
 #include "artisan/Interface.h"
 
@@ -21,10 +21,13 @@ private:
 	Artisan::Interface *m_interface;
 	void *m_handle;
 public:
-	ArtisanWrapper(const QString &name);
+	ArtisanWrapper(Artisan::Interface *interface);
+	ArtisanWrapper(const std::string &name);
 	~ArtisanWrapper();
+	
+	Artisan::Interface *interface() const { return m_interface; }
 private:
-	void load(const QString &name);
+	void load(const std::string &name);
 };
 
 } // namespace Visualizer

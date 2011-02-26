@@ -21,7 +21,7 @@ public:
 	
 	virtual Storage *storageObject() = 0;
 	
-	virtual Viewport *viewport() = 0;
+	virtual Viewport *createViewport() = 0;
 };
 
 #define InstantiateArtisan(type) \

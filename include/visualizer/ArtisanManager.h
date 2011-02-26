@@ -10,13 +10,23 @@
 #ifndef AesalonVisualizer_ArtisanManager_H
 #define AesalonVisualizer_ArtisanManager_H
 
+#include <string>
+#include <QHash>
+
+#include "ArtisanWrapper.h"
 
 namespace Visualizer {
 
 class ArtisanManager {
+protected:
+	typedef QHash<std::string, ArtisanWrapper *> ArtisanHash;
+private:
+	ArtisanHash m_artisanHash;
 public:
 	ArtisanManager();
 	~ArtisanManager();
+	
+	ArtisanWrapper *artisan(const std::string &name);
 };
 
 } // namespace Visualizer

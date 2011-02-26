@@ -7,12 +7,31 @@
 	@file src/visualizer/ArtisanManager.cpp
 */
 
+#include "visualizer/StringHacks.h"
 #include "visualizer/ArtisanManager.h"
-
 
 
 namespace Visualizer {
 
+ArtisanManager::ArtisanManager() {
 
+}
+
+ArtisanManager::~ArtisanManager() {
+
+}
+
+ArtisanWrapper *ArtisanManager::artisan(const std::string &name) {
+	ArtisanWrapper *artisan = m_artisanHash[name];
+	if(artisan != NULL) return artisan;
+	
+	artisan = new ArtisanWrapper(name);
+	if(artisan->interface() == NULL) {
+		delete artisan;
+		return NULL;
+	}
+	
+	return (m_artisanHash[name] = artisan);
+}
 
 } // namespace Visualizer

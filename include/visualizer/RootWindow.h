@@ -11,13 +11,20 @@
 #define AesalonVisualizer_RootWindow_H
 
 #include <QMainWindow>
+#include <QMdiArea>
+#include <QWidget>
 
 namespace Visualizer {
 
 class RootWindow : public QMainWindow { Q_OBJECT
+private:
+	QMdiArea *m_mdiArea;
+	QWidget *m_aboutAesalon;
 public:
 	RootWindow();
-	~RootWindow();
+	virtual ~RootWindow();
+private:
+	void createAboutBox();
 };
 
 } // namespace Visualizer

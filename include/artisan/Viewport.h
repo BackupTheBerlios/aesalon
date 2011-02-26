@@ -10,10 +10,11 @@
 #ifndef AesalonArtisan_Viewport_H
 #define AesalonArtisan_Viewport_H
 
+#include <QWidget>
 
 namespace Artisan {
 
-class Viewport {
+class Viewport : public QWidget {
 public:
 	virtual ~Viewport() {}
 };

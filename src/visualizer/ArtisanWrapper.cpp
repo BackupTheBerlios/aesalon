@@ -10,32 +10,37 @@
 #include <dlfcn.h>
 
 #include "visualizer/ArtisanWrapper.h"
+#include "config/GlobalVault.h"
 #include "util/MessageSystem.h"
 
 namespace Visualizer {
 
-ArtisanWrapper::ArtisanWrapper(const QString &name) {
+ArtisanWrapper::ArtisanWrapper(Artisan::Interface *interface) : m_interface(interface) {
 	
+}
+
+ArtisanWrapper::ArtisanWrapper(const std::string &name) {
+	load(name);
 }
 
 ArtisanWrapper::~ArtisanWrapper() {
 	
 }
 
-void ArtisanWrapper::load(const QString &name) {
-	QString modulePath = "" + name;
+void ArtisanWrapper::load(const std::string &name) {
+	std::string modulePath = Config::GlobalVault::instance()->get(name + ":root") + name;
 	
-	m_handle = dlopen(modulePath.toAscii().constData(), RTLD_NOW | RTLD_LOCAL);
+	m_handle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if(m_handle == NULL) {
-		Message(Warning, "Could not open marshal library for module \"" << name << "\":" << dlerror());
+		Message(Warning, "Could not open artisan library for module \"" << name << "\":" << dlerror());
 		return;
 	}
 	Artisan::Interface *(*instantiate)();
 	
-	*(void **) (&instantiate) = dlsym(m_handle, "AM_Instantiate");
+	*(void **) (&instantiate) = dlsym(m_handle, "AA_Instantiate");
 	
 	if(instantiate == NULL) {
-		Message(Warning, "Could not find AM_Instantiate in " << name << "'s marshal.");
+		Message(Warning, "Could not find AA_Instantiate in " << name << "'s artisan.");
 		return;
 	}
 	
