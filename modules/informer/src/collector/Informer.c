@@ -268,9 +268,10 @@ uint64_t AI_Timestamp() {
 	return (t.tv_sec * 1000000000) + t.tv_nsec;
 }
 
-void AI_ModuleLoaded(const char *name) {
+void AI_ModuleLoaded(const char *name, ModuleID moduleID) {
 	AI_StartPacket(0);
 	*(uint8_t *)AI_PacketSpace(1) = ModuleLoaded;
+	*(ModuleID *)AI_PacketSpace(sizeof(ModuleID)) = moduleID;
 	
 	int length = strlen(name)+1;
 	strcpy(AI_PacketSpace(length), name);

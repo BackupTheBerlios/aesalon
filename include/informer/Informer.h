@@ -41,7 +41,7 @@ void AC_EXPORT AI_EndPacket();
 /* Utility functions. */
 /** Calculates a unique timestamp for the current instant. */
 uint64_t AC_EXPORT AI_Timestamp();
-void AC_EXPORT AI_ModuleLoaded(const char *name);
+void AC_EXPORT AI_ModuleLoaded(const char *name, ModuleID moduleID);
 
 /* Configuration functions. */
 /** Returns a configuration item, @a name, as a string. */

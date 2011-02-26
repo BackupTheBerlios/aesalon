@@ -14,16 +14,19 @@
 #include <QList>
 
 #include "DataInput.h"
+#include "ArtisanManager.h"
 
 namespace Visualizer {
 
 class InputManager : public QObject { Q_OBJECT
 private:
+	ArtisanManager *m_artisanManager;
 	QList<DataInput *> m_inputList;
 public:
 	InputManager();
 	virtual ~InputManager();
 	
+	ArtisanManager *artisanManager() const { return m_artisanManager; }
 	QList<DataInput *> &inputList() { return m_inputList; }
 public slots:
 	void addInput(DataInput *input);

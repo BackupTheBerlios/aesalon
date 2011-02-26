@@ -13,11 +13,11 @@
 namespace Visualizer {
 
 InputManager::InputManager() {
-	
+	m_artisanManager = new ArtisanManager();
 }
 
 InputManager::~InputManager() {
-	
+	delete m_artisanManager;
 }
 
 void InputManager::addInput(DataInput *input) {

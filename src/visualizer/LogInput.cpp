@@ -14,7 +14,8 @@
 
 namespace Visualizer {
 
-LogInput::LogInput(const std::string &filename) {
+LogInput::LogInput(const std::string& filename, Visualizer::ArtisanManager *artisanManager)
+	: DataInput(artisanManager) {
 	m_file.setFileName(QString::fromStdString(filename));
 	
 	m_file.open(QIODevice::ReadOnly);

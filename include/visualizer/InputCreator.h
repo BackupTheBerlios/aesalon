@@ -15,6 +15,7 @@
 #include <QLabel>
 
 #include "DataInput.h"
+#include "InputManager.h"
 
 namespace Visualizer {
 
@@ -22,8 +23,9 @@ class InputCreator : public QDialog { Q_OBJECT
 private:
 	QPushButton *m_logCreateButton;
 	QLabel *m_fileLocation;
+	InputManager *m_inputManager;
 public:
-	InputCreator();
+	InputCreator(InputManager *inputManager);
 	virtual ~InputCreator();
 private:
 	QWidget *setupLogTab();

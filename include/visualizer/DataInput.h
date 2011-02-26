@@ -12,17 +12,29 @@
 
 #include <QThread>
 #include <QByteArray>
+#include <QHash>
+
+#include <stdint.h>
+
+#include "comm/Packet.h"
+#include "ArtisanWrapper.h"
+#include "ArtisanManager.h"
 
 namespace Visualizer {
 
 class DataInput : public QThread { Q_OBJECT
 private:
 	QByteArray m_unprocessed;
+	QHash<uint32_t, uint32_t> m_processIDMap;
+	ArtisanManager *m_artisanManager;
+	QHash<ModuleID, ArtisanWrapper *> m_artisanMap;
 public:
-	DataInput() {}
+	DataInput(ArtisanManager *artisanManager);
 	virtual ~DataInput() {}
 public slots:
 	void addData(QByteArray data);
+private:
+	void processInformerPacket(Comm::Packet *packet);
 };
 
 } // namespace Visualizer

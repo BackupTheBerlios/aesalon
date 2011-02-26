@@ -19,7 +19,7 @@ ArtisanWrapper::ArtisanWrapper(Artisan::Interface *interface) : m_interface(inte
 	
 }
 
-ArtisanWrapper::ArtisanWrapper(const std::string &name) {
+ArtisanWrapper::ArtisanWrapper(const std::string &name) : m_interface(NULL) {
 	load(name);
 }
 
@@ -28,7 +28,8 @@ ArtisanWrapper::~ArtisanWrapper() {
 }
 
 void ArtisanWrapper::load(const std::string &name) {
-	std::string modulePath = Config::GlobalVault::instance()->get(name + ":root") + name;
+	std::string modulePath = Config::GlobalVault::instance()->get(name + ":root") +
+		Config::GlobalVault::instance()->get(name + ":artisanPath");
 	
 	m_handle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if(m_handle == NULL) {

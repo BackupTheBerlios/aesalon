@@ -12,6 +12,8 @@
 #include "informer/PacketFormat.h"
 #include "monitor/MarshalList.h"
 #include "monitor/Coordinator.h"
+#include "config/GlobalVault.h"
+#include "util/StringTo.h"
 
 namespace Monitor {
 
@@ -25,6 +27,8 @@ InformerMarshal::~InformerMarshal() {
 
 Comm::Packet *InformerMarshal::marshal(Comm::Packet *packet) {
 	Informer::PacketType type = static_cast<Informer::PacketType>(packet->data()[0]);
+	
+	Message(Debug, "type: " << type);
 	
 	switch(type) {
 		case Informer::ModuleLoaded: {
@@ -58,9 +62,11 @@ Comm::Packet *InformerMarshal::marshal(Comm::Packet *packet) {
 }
 
 void InformerMarshal::moduleLoaded(Comm::Packet *packet) {
-	/* NOTE: the +1 is for the type byte. */
-	std::string name = reinterpret_cast<char *>(packet->data() + 1);
+	/* NOTE: the +3 is +1 for the type byte, +2 for the module ID#. (unused in the monitor) */
+	std::string name = reinterpret_cast<char *>(packet->data() + 3);
 	MarshalList *list = Coordinator::instance()->marshalList();
+	
+	Message(Debug, "Marshal name: \"" << name << "\"");
 	
 	list->loadMarshal(name);
 }

@@ -32,14 +32,16 @@ MarshalWrapper *MarshalList::marshal(ModuleID moduleID) {
 }
 
 void MarshalList::loadMarshal(const std::string &name) {
+	/* Check to see if the marshal has already been loaded. */
+	ModuleID moduleID = Util::StringTo<ModuleID>(Config::GlobalVault::instance()->get(name + ":moduleID"));
+	if(moduleID < m_marshalVector.size() && m_marshalVector[moduleID] != NULL) return;
+	
 	MarshalWrapper *marshal = new MarshalWrapper(name);
 	if(marshal->interface() == NULL) {
 		Message(Warning, "Could not load marshal for module " << name << ".");
 		delete marshal;
 	}
 	else {
-		ModuleID moduleID = Util::StringTo<ModuleID>(Config::GlobalVault::instance()->get(name + ":moduleID"));
-		
 		if(moduleID >= m_marshalVector.size()) m_marshalVector.resize(moduleID+1);
 		m_marshalVector[moduleID] = marshal;
 	}

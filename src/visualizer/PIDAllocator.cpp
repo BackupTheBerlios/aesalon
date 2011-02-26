@@ -4,21 +4,13 @@
 	Aesalon is distributed under the terms of the GNU GPLv3. See
 	the included file LICENSE for more information.
 	
-	@file include/visualizer/IDManager.h
+	@file src/visualizer/PIDAllocator.cpp
 */
 
-#ifndef AesalonVisualizer_IDManager_H
-#define AesalonVisualizer_IDManager_H
-
+#include "visualizer/PIDAllocator.h"
 
 namespace Visualizer {
 
-class IDManager {
-public:
-	IDManager();
-	~IDManager();
-};
+uint32_t PIDAllocator::m_nextID = 0;
 
 } // namespace Visualizer
-
-#endif

@@ -37,7 +37,7 @@ InputManagerWidget::~InputManagerWidget() {
 }
 
 void InputManagerWidget::showCreator() {
-	InputCreator ic;
+	InputCreator ic(m_inputManager);
 	connect(&ic, SIGNAL(inputCreated(DataInput *)), m_inputManager, SLOT(addInput(DataInput *)));
 	ic.show();
 	ic.exec();

@@ -24,7 +24,7 @@ private:
 	QFile m_file;
 	QTimer m_timer;
 public:
-	LogInput(const std::string &filename);
+	LogInput(const std::string &filename, ArtisanManager *artisanManager);
 	virtual ~LogInput();
 private slots:
 	void readMore();

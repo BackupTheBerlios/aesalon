@@ -6,10 +6,10 @@
 
 static pthread_t AM_threadID;
 
-static void *run(void *unused);
+static void *run(void *param);
 
-static void *run(void *unused) {
-	ModuleID moduleID = AI_ConfigurationLong("cpuTime:moduleID");
+static void *run(void *param) {
+	ModuleID moduleID = (ModuleID)(uint64_t) param;
 	int64_t interval_us = AI_ConfigurationLong("cpuTime:interval");
 	/* If the interval is not set, use the default of 1 ms. */
 	if(interval_us == -1) interval_us = 1000;
@@ -46,9 +46,11 @@ static void *run(void *unused) {
 void __attribute__((constructor)) AC_EXPORT AM_Construct() {
 	AI_Construct();
 	
-	pthread_create(&AM_threadID, NULL, run, NULL);
+	ModuleID moduleID = AI_ConfigurationLong("cpuTime:moduleID");
 	
-	AI_ModuleLoaded("cpuTime");
+	pthread_create(&AM_threadID, NULL, run, (void *)(uint64_t)moduleID);
+	
+	AI_ModuleLoaded("cpuTime", moduleID);
 }
 
 void __attribute__((destructor)) AC_EXPORT AM_Destruct() {

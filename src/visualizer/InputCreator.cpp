@@ -21,7 +21,7 @@
 
 namespace Visualizer {
 
-InputCreator::InputCreator() {
+InputCreator::InputCreator(InputManager *inputManager) : m_inputManager(inputManager) {
 	setModal(true);
 	QVBoxLayout *layout = new QVBoxLayout();
 	
@@ -74,7 +74,7 @@ void InputCreator::fileSelected() {
 
 void InputCreator::createLogInput() {
 	hide();
-	LogInput *li = new LogInput(m_fileLocation->text().toStdString());
+	LogInput *li = new LogInput(m_fileLocation->text().toStdString(), m_inputManager->artisanManager());
 	emit inputCreated(li);
 }
 
