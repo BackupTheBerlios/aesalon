@@ -15,6 +15,7 @@
 #include "Object.h"
 #include "Data.h"
 #include "RenderedImage.h"
+#include "Renderer.h"
 
 namespace Artisan {
 namespace GViewport {
@@ -23,6 +24,7 @@ class Viewport : public Artisan::Viewport { Q_OBJECT
 private:
 	Data m_data;
 	RenderedImage m_rendered;
+	Renderer m_renderer;
 public:
 	Viewport();
 	virtual ~Viewport();
@@ -31,6 +33,11 @@ public:
 	void removeObject(Object *object);
 public slots:
 	void fitAll();
+private slots:
+	void mergeWith(RenderedImage image);
+protected:
+	virtual void resizeEvent(QResizeEvent *event);
+	virtual void paintEvent(QPaintEvent *event);
 };
 
 } // namespace GViewport

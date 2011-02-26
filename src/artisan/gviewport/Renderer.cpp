@@ -8,6 +8,7 @@
 */
 
 #include "artisan/gviewport/Renderer.h"
+#include "artisan/gviewport/Object.h"
 
 namespace Artisan {
 namespace GViewport {
@@ -18,6 +19,41 @@ Renderer::Renderer(Data &data) : m_data(data) {
 
 Renderer::~Renderer() {
 	
+}
+
+void Renderer::render(RenderRequest request) {
+	m_data.lock();
+	
+	RenderedImage image(request.width(), request.height(),
+		request.bound().range(1).start(),
+		request.bound().range(2).start(),
+		request.bound().range(1).end(),
+		request.bound().range(2).end());
+	
+	class Processor : public TreeType::SearchProcessor {
+	private:
+		RenderedImage &m_image;
+	public:
+		Processor(RenderedImage &image) : m_image(image) {}
+		
+		virtual bool process(const TreeType::Bound &bound, Object *value) {
+			value->render(m_image);
+			
+			return true;
+		}
+	};
+	
+	Processor p(image);
+	
+	image.startPainting();
+	
+	m_data.tree().search(request.bound(), &p);
+	
+	image.endPainting();
+	
+	m_data.unlock();
+	
+	emit renderingFinished(image);
 }
 
 } // namespace GViewport

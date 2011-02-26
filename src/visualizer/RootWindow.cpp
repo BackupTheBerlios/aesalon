@@ -53,6 +53,8 @@ RootWindow::RootWindow() {
 	helpMenu->addAction(tr("About &Qt . . ."), qApp, SLOT(aboutQt()));
 	menuBar()->addMenu(helpMenu);
 	
+	createInputManager();
+	createArtisanManager();
 }
 
 RootWindow::~RootWindow() {

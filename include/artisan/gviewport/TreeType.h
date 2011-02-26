@@ -19,7 +19,7 @@ namespace GViewport {
 
 class Object;
 
-typedef Storage::RTree<uint64_t, Object *, 3, 64, 8, double> TreeType;
+typedef Storage::RTree<double, Object *, 3, 64, 8> TreeType;
 
 } // namespace GViewport
 } // namespace Artisan

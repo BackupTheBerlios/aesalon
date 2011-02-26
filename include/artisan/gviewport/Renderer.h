@@ -15,6 +15,7 @@
 #include "Data.h"
 #include "RenderedImage.h"
 #include "CoordinateMapper.h"
+#include "RenderRequest.h"
 
 namespace Artisan {
 namespace GViewport {
@@ -26,7 +27,7 @@ public:
 	Renderer(Data &data);
 	~Renderer();
 public slots:
-	void render(TreeType::Bound bound, CoordinateMapper mapper) {}
+	void render(RenderRequest request);
 signals:
 	void renderingFinished(RenderedImage image);
 };

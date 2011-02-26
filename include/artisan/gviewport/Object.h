@@ -14,6 +14,7 @@
 
 #include "TreeType.h"
 #include "CoordinateMapper.h"
+#include "RenderedImage.h"
 
 namespace Artisan {
 namespace GViewport {
@@ -29,7 +30,7 @@ public:
 	TreeType::Range &xRange() { return m_bound.range(1); }
 	TreeType::Range &yRange() { return m_bound.range(2); }
 	
-	virtual void render(CoordinateMapper &mapper, QPainter &painter) = 0;
+	virtual void render(RenderedImage &image) = 0;
 };
 
 } // namespace GViewport

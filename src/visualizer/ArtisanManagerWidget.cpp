@@ -29,9 +29,9 @@ ArtisanManagerWidget::ArtisanManagerWidget(ArtisanManager *artisanManager) : m_a
 	
 	setLayout(layout);
 	
+	connect(m_artisanManager, SIGNAL(newArtisan(std::string)), this, SLOT(artisanLoaded(std::string)));
 	foreach(std::string name, m_artisanManager->artisanList()) {
-		ArtisanWrapper *artisan = m_artisanManager->artisan(name);
-		if(artisan != NULL) new QListWidgetItem(QString::fromStdString(name), m_listWidget);
+		artisanLoaded(name);
 	}
 }
 
@@ -50,7 +50,8 @@ void ArtisanManagerWidget::newArtisan() {
 }
 
 void ArtisanManagerWidget::artisanLoaded(std::string name) {
-	new QListWidgetItem(QString::fromStdString(name), m_listWidget);
+	ArtisanWrapper *artisan = m_artisanManager->artisan(name);
+	if(artisan != NULL) new QListWidgetItem(QString::fromStdString(name), m_listWidget);
 }
 
 } // namespace Visualizer

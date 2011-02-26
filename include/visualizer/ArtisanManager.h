@@ -19,7 +19,7 @@
 
 namespace Visualizer {
 
-class ArtisanManager : QObject { Q_OBJECT
+class ArtisanManager : public QObject { Q_OBJECT
 protected:
 	typedef QHash<std::string, ArtisanWrapper *> ArtisanHash;
 private:
@@ -32,7 +32,7 @@ public:
 	
 	QList<std::string> artisanList();
 signals:
-	void newArtisan(ArtisanWrapper *artisan);
+	void newArtisan(std::string name);
 };
 
 } // namespace Visualizer

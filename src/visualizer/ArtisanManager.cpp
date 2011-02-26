@@ -31,7 +31,10 @@ ArtisanWrapper *ArtisanManager::artisan(const std::string &name) {
 		return NULL;
 	}
 	
-	return (m_artisanHash[name] = artisan);
+	m_artisanHash[name] = artisan;
+	emit newArtisan(name);
+	
+	return artisan;
 }
 
 QList<std::string> ArtisanManager::artisanList() {

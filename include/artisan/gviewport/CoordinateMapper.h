@@ -22,7 +22,12 @@ public:
 	CoordinateMapper(double x, double y, double w, double h);
 	~CoordinateMapper() {}
 	
-	void map(uint64_t fromx, uint64_t fromy, double *tox, double *toy);
+	double x() const { return m_x; }
+	double y() const { return m_y; }
+	double w() const { return m_w; }
+	double h() const { return m_h; }
+	
+	void map(double fromx, double fromy, double *tox, double *toy) const;
 };
 
 } // namespace GViewport

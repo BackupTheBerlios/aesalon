@@ -11,6 +11,10 @@
 #define AesalonArtisan_GViewport_RenderedImage_H
 
 #include <QImage>
+#include <QPaintDevice>
+#include <QPainter>
+
+#include "CoordinateMapper.h"
 
 namespace Artisan {
 namespace GViewport {
@@ -19,10 +23,24 @@ class RenderedImage {
 private:
 	QImage m_image;
 	double m_x, m_y, m_w, m_h;
+	CoordinateMapper m_mapper;
+	QPainter *m_painter;
 public:
 	RenderedImage(int xSize, int ySize, double x, double y, double w, double h);
 	RenderedImage(QImage &image, double x, double y, double w, double h);
 	~RenderedImage();
+	
+	const CoordinateMapper &mapper() const { return m_mapper; }
+	
+	void startPainting();
+	QPainter *painter() const { return m_painter; }
+	void endPainting();
+	
+	void merge(const RenderedImage &other);
+	
+	void resize(int width, int height);
+	
+	void drawOnto(QPaintDevice *device);
 };
 
 } // namespace GViewport

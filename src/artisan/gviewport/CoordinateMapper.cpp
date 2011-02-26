@@ -16,12 +16,9 @@ CoordinateMapper::CoordinateMapper(double x, double y, double w, double h) : m_x
 	
 }
 
-void CoordinateMapper::map(uint64_t fromx, uint64_t fromy, double *tox, double *toy) {
-	*tox = fromx - m_x;
-	*toy = fromy - m_y;
-	
-	*tox /= m_w;
-	*toy /= m_h;
+void CoordinateMapper::map(double fromx, double fromy, double *tox, double *toy) const {
+	*tox = (fromx - m_x) / m_w;
+	*toy = (fromy - m_y) / m_h;
 }
 
 } // namespace GViewport

@@ -17,10 +17,10 @@ namespace GViewport {
 
 class RectObject : public Object {
 public:
-	RectObject(uint64_t layer, uint64_t x, uint64_t y, uint64_t w, uint64_t h);
+	RectObject(double layer, double x, double y, double w, double h);
 	virtual ~RectObject();
 	
-	virtual void render(CoordinateMapper &mapper, QPainter &painter);
+	virtual void render(RenderedImage &image);
 };
 
 } // namespace GViewport
