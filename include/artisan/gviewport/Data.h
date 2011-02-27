@@ -10,7 +10,7 @@
 #ifndef AesalonArtisan_GViewport_Data_H
 #define AesalonArtisan_GViewport_Data_H
 
-#include <QMutex>
+#include <QReadWriteLock>
 
 #include "TreeType.h"
 
@@ -20,15 +20,21 @@ namespace GViewport {
 class Data {
 private:
 	TreeType m_tree;
-	QMutex m_mutex;
+	
+	QReadWriteLock m_treeLock;
 public:
 	Data() {}
 	~Data() {}
 	
 	TreeType &tree() { return m_tree; }
 	
-	void lock() { m_mutex.lock(); }
-	void unlock() { m_mutex.unlock(); }
+	void startReading();
+	void stopReading();
+	void startWriting();
+	void stopWriting();
+	
+	void addObject(Object *object);
+	void removeObject(Object *object);
 };
 
 } // namespace GViewport

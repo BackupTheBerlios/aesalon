@@ -10,28 +10,29 @@
 #ifndef AesalonArtisan_GViewport_Renderer_H
 #define AesalonArtisan_GViewport_Renderer_H
 
-#include <QThread>
+#include <QRunnable>
+#include <QObject>
 
 #include "Data.h"
 #include "RenderedImage.h"
-#include "CoordinateMapper.h"
-#include "RenderRequest.h"
+#include "TreeType.h"
 
 namespace Artisan {
 namespace GViewport {
 
-class Renderer : public QThread { Q_OBJECT
+class Renderer : public QObject, public QRunnable, public TreeType::SearchProcessor { Q_OBJECT
 private:
-	Data &m_data;
+	RenderedImage m_image;
+	Data *m_data;
 public:
-	Renderer(Data &data);
+	Renderer(const Rect &dataRange, const Rect &pixelRange, Data *data);
 	virtual ~Renderer();
-protected:
-	virtual bool shouldRender(Object *object) { object = object; return true; }
-public slots:
-	void render(RenderRequest request);
+	
+	virtual void run();
+	
+	virtual bool process(const TreeType::Bound &bound, Object *value);
 signals:
-	void renderingFinished(RenderedImage image);
+	void finishedRendering(RenderedImage image);
 };
 
 } // namespace GViewport

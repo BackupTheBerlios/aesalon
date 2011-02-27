@@ -10,8 +10,6 @@
 #ifndef AesalonArtisan_GViewport_TreeType_H
 #define AesalonArtisan_GViewport_TreeType_H
 
-#include <stdint.h>
-
 #include "storage/RTree.h"
 
 namespace Artisan {
@@ -19,7 +17,7 @@ namespace GViewport {
 
 class Object;
 
-typedef Storage::RTree<double, Object *, 3, 64, 8> TreeType;
+typedef Storage::RTree<double, Object *, 2, 64, 8> TreeType;
 
 } // namespace GViewport
 } // namespace Artisan

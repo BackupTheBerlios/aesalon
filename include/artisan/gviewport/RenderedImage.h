@@ -10,39 +10,34 @@
 #ifndef AesalonArtisan_GViewport_RenderedImage_H
 #define AesalonArtisan_GViewport_RenderedImage_H
 
-#include <QImage>
-#include <QPaintDevice>
 #include <QPainter>
+#include <QImage>
 
-#include "CoordinateMapper.h"
+#include "Rect.h"
 
 namespace Artisan {
 namespace GViewport {
 
 class RenderedImage {
 private:
+	Rect m_dataRange;
+	Rect m_pixelSize;
 	QImage m_image;
-	double m_x, m_y, m_w, m_h;
-	CoordinateMapper m_mapper;
 	QPainter *m_painter;
 public:
-	RenderedImage(int xSize, int ySize, double x, double y, double w, double h);
-	RenderedImage(QImage &image, double x, double y, double w, double h);
+	RenderedImage(const Rect &dataRange = Rect(), const Rect &pixelSize = Rect());
 	~RenderedImage();
 	
-	const CoordinateMapper &mapper() const { return m_mapper; }
+	const Rect &dataRange() const { return m_dataRange; }
+	const Rect &pixelSize() const { return m_pixelSize; }
+	
+	void merge(RenderedImage &other);
 	
 	void startPainting();
-	QPainter *painter() const { return m_painter; }
-	void endPainting();
+	QPainter &painter() { return *m_painter; }
+	void stopPainting();
 	
-	void merge(const RenderedImage &other);
-	void shift(double x, double y);
-	void shiftPixels(int x, int y);
-	
-	void resize(int width, int height);
-	
-	void drawOnto(QPaintDevice *device);
+	void paintOnto(QPaintDevice *device);
 };
 
 } // namespace GViewport

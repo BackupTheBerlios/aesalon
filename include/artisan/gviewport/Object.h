@@ -10,27 +10,22 @@
 #ifndef AesalonArtisan_GViewport_Object_H
 #define AesalonArtisan_GViewport_Object_H
 
-#include <QPainter>
-
-#include "TreeType.h"
-#include "CoordinateMapper.h"
+#include "Rect.h"
 #include "RenderedImage.h"
 
 namespace Artisan {
 namespace GViewport {
 
 class Object {
-protected:
-	TreeType::Bound m_bound;
+private:
+	Rect m_bound;
 public:
+	Object(Rect bound) : m_bound(bound) {}
 	virtual ~Object() {}
 	
-	const TreeType::Bound &bound() const { return m_bound; }
-	TreeType::Range &layerRange() { return m_bound.range(0); }
-	TreeType::Range &xRange() { return m_bound.range(1); }
-	TreeType::Range &yRange() { return m_bound.range(2); }
+	const Rect &bound() const { return m_bound; }
 	
-	virtual void render(RenderedImage &image) = 0;
+	virtual void renderOnto(RenderedImage &image) = 0;
 };
 
 } // namespace GViewport

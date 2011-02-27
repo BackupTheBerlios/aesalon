@@ -7,13 +7,41 @@
 	@file src/artisan/gviewport/Data.cpp
 */
 
+#include <QAtomicInt>
+
 #include "artisan/gviewport/Data.h"
-
-
+#include "artisan/gviewport/Object.h"
 
 namespace Artisan {
 namespace GViewport {
 
+void Data::startReading() {
+	m_treeLock.lockForRead();
+}
+
+void Data::stopReading() {
+	m_treeLock.unlock();
+}
+
+void Data::startWriting() {
+	m_treeLock.lockForWrite();
+}
+
+void Data::stopWriting() {
+	m_treeLock.unlock();
+}
+
+void Data::addObject(Object *object) {
+	startWriting();
+	m_tree.insert(object->bound().toTreeBound(), object);
+	stopWriting();
+}
+
+void Data::removeObject(Object *object) {
+	startWriting();
+	m_tree.remove(object->bound().toTreeBound(), object);
+	stopWriting();
+}
 
 } // namespace GViewport
 } // namespace Artisan

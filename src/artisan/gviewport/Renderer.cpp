@@ -8,53 +8,33 @@
 */
 
 #include "artisan/gviewport/Renderer.h"
+
 #include "artisan/gviewport/Object.h"
 
 namespace Artisan {
 namespace GViewport {
 
-Renderer::Renderer(Data &data) : m_data(data) {
-	
+Renderer::Renderer(const Rect &dataRange, const Rect &pixelRange, Data *data)
+	: m_image(RenderedImage(dataRange, pixelRange)), m_data(data) {
 }
 
 Renderer::~Renderer() {
-	
+
 }
 
-void Renderer::render(RenderRequest request) {
-	m_data.lock();
+void Renderer::run() {
+	m_data->startReading();
 	
-	RenderedImage image(request.width(), request.height(),
-		request.bound().range(1).start(),
-		request.bound().range(2).start(),
-		request.bound().range(1).end(),
-		request.bound().range(2).end());
+	m_data->tree().search(m_image.dataRange().toTreeBound(), this);
 	
-	class Processor : public TreeType::SearchProcessor {
-	private:
-		Renderer *m_renderer;
-		RenderedImage &m_image;
-	public:
-		Processor(Renderer *renderer, RenderedImage &image) : m_renderer(renderer), m_image(image) {}
-		
-		virtual bool process(const TreeType::Bound &bound, Object *value) {
-			if(m_renderer->shouldRender(value)) value->render(m_image);
-			
-			return true;
-		}
-	};
+	m_data->stopReading();
 	
-	Processor p(this, image);
-	
-	image.startPainting();
-	
-	m_data.tree().search(request.bound(), &p);
-	
-	image.endPainting();
-	
-	m_data.unlock();
-	
-	emit renderingFinished(image);
+	emit finishedRendering(m_image);
+}
+
+bool Renderer::process(const TreeType::Bound &bound, Object *value) {
+	value->renderOnto(m_image);
+	return true;
 }
 
 } // namespace GViewport

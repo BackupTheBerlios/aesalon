@@ -10,24 +10,25 @@
 #ifndef AesalonArtisan_GViewport_CoordinateMapper_H
 #define AesalonArtisan_GViewport_CoordinateMapper_H
 
-#include "TreeType.h"
+#include "RenderedImage.h"
+#include "Point.h"
+#include "Rect.h"
 
 namespace Artisan {
 namespace GViewport {
 
 class CoordinateMapper {
 private:
-	double m_x, m_y, m_w, m_h;
+	const Rect &m_dataRect;
+	const Rect &m_pixelRect;
 public:
-	CoordinateMapper(double x, double y, double w, double h);
-	~CoordinateMapper() {}
+	CoordinateMapper(const Rect &dataRect, const Rect &pixelRect);
+	CoordinateMapper(const RenderedImage &m_image);
 	
-	double x() const { return m_x; }
-	double y() const { return m_y; }
-	double w() const { return m_w; }
-	double h() const { return m_h; }
-	
-	void map(double fromx, double fromy, double *tox, double *toy) const;
+	Point dataToPixel(const Point &dataPoint);
+	Rect dataToPixel(const Rect &dataRect);
+	Point pixelToData(const Point &pixelPoint);
+	Rect pixelToData(const Rect &pixelPoint);
 };
 
 } // namespace GViewport
