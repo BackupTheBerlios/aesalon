@@ -12,14 +12,21 @@
 
 #include "visualizer/RootWindow.h"
 #include "util/MessageSystem.h"
+#include "util/StringTo.h"
 #include "config/GlobalVault.h"
 
 int main(int argc, char *argv[]) {
 	QApplication qapp(argc, argv);
 	
-	Message(Debug, "Ideal thread count is " << QThread::idealThreadCount() << ".");
+	Message(Debug, "According to Qt, the ideal thread count is " << QThread::idealThreadCount() << ".");
 	
 	Config::GlobalVault gv;
+	int threadCount = Util::StringTo<int>(gv.get("visualizer:threadCount"));
+	
+	if(threadCount != 0) {
+		Message(Debug, "Setting thread count to " << threadCount << ".");
+		QThreadPool::globalInstance()->setMaxThreadCount(threadCount);
+	}
 	
 	Visualizer::RootWindow rw;
 	rw.show();

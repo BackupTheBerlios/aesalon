@@ -36,13 +36,10 @@ public:
 	
 	Rect rangeLimit() const { return m_rangeLimit; }
 	void limitRange(const Rect &newLimit) { m_rangeLimit = newLimit; }
-	
-	void translate(const Point &upperLeft);
-	void scale(double factor);
-	
-	void setViewport(const Rect &range);
 public slots:
 	void acceptRenderedImage(RenderedImage *image);
+	void translate(const Point &upperLeft);
+	void setViewport(const Rect &range);
 	void updateRange(const Rect &range);
 protected:
 	virtual void resizeEvent(QResizeEvent *event);
@@ -51,7 +48,7 @@ protected:
 	virtual void mousePressEvent(QMouseEvent *event);
 	virtual void wheelEvent(QWheelEvent *event);
 private:
-	void enqueue(Renderer *renderer);
+	void enqueue(const Rect &range);
 };
 
 } // namespace GViewport

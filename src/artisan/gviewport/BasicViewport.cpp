@@ -27,39 +27,41 @@ BasicViewport::~BasicViewport() {
 	
 }
 
-void BasicViewport::translate(const Point &upperLeft) {
-	
-}
-
-void BasicViewport::scale(double factor) {
-	
-}
-
-void BasicViewport::setViewport(const Rect &range) {
-	RenderedImage image(range, Rect(size()));
-	image.merge(m_image);
-	m_image = image;
-}
-
 void BasicViewport::acceptRenderedImage(RenderedImage *image) {
 	m_image.merge(*image);
 	delete image;
 	update();
 }
 
-void BasicViewport::updateRange(const Rect &range) {
+void BasicViewport::translate(const Point &upperLeft) {
+	RenderedImage image(
+		Rect(upperLeft, m_image.dataRange().width(), m_image.dataRange().height()),
+		m_image.pixelSize());
+	image.merge(m_image);
+	update();
+	
+	enqueue(m_image.dataRange());
+}
+
+void BasicViewport::setViewport(const Rect &range) {
 	RenderedImage image(range, Rect(size()));
 	image.merge(m_image);
 	m_image = image;
+	update();
 	
-	enqueue(new Renderer(m_image.dataRange(), m_image.pixelSize(), m_data));
+	enqueue(m_image.dataRange());
+}
+
+void BasicViewport::updateRange(const Rect &range) {
+	enqueue(range);
 }
 
 void BasicViewport::resizeEvent(QResizeEvent *event) {
 	RenderedImage image(m_image.dataRange(), Rect(event->size()));
 	image.merge(m_image);
 	m_image = image;
-	enqueue(new Renderer(m_image.dataRange(), Rect(event->size()), m_data));
+	
+	enqueue(m_image.dataRange());
 }
 
 void BasicViewport::paintEvent(QPaintEvent *event) {
@@ -71,7 +73,7 @@ void BasicViewport::mouseMoveEvent(QMouseEvent *event) {
 		Point diff = -(event->pos() - m_lastPoint);
 		
 		CoordinateMapper mapper(m_image);
-		updateRange(m_image.dataRange() + mapper.pixelToDataOffset(diff));
+		translate(m_image.dataRange().topLeft() + mapper.pixelToDataOffset(diff));
 		
 		m_lastPoint = event->pos();
 	}
@@ -97,10 +99,13 @@ void BasicViewport::wheelEvent(QWheelEvent *event) {
 		newRange.scaleWidth(factor);
 	}
 	
-	updateRange(newRange);
+	setViewport(newRange);
 }
 
-void BasicViewport::enqueue(Renderer *renderer) {
+void BasicViewport::enqueue(const Rect &rect) {
+	CoordinateMapper mapper(m_image);
+	Renderer *renderer = new Renderer(rect, mapper.dataToPixel(rect), m_data);
+	
 	connect(renderer, SIGNAL(finishedRendering(RenderedImage *)),
 		this, SLOT(acceptRenderedImage(RenderedImage *)),
 		Qt::QueuedConnection);

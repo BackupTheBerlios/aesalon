@@ -7,7 +7,7 @@
 
 Viewport::Viewport(DataStore *dataStore) : Artisan::GViewport::BasicViewport(dataStore), m_dataStore(dataStore) {
 	Message(Debug, "Creating cpuTime Viewport instance . . .");
-	updateRange(Artisan::GViewport::Rect(1.0, 1.0));
+	setViewport(Artisan::GViewport::Rect(1.0, 1.0));
 	
 	Artisan::GViewport::Object *object = NULL;
 	
@@ -31,7 +31,7 @@ Viewport::Viewport(DataStore *dataStore) : Artisan::GViewport::BasicViewport(dat
 	
 	Artisan::GViewport::TreeType::Bound maxBound = data()->tree().bounds();
 	
-	updateRange(Artisan::GViewport::Rect(maxBound.range(0).start(), maxBound.range(0).end(), maxBound.range(1).start(),
+	setViewport(Artisan::GViewport::Rect(maxBound.range(0).start(), maxBound.range(0).end(), maxBound.range(1).start(),
 		maxBound.range(1).end()));
 }
 

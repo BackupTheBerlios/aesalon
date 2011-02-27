@@ -29,10 +29,12 @@ public:
 	Rect() : m_left(0), m_right(0), m_top(0), m_bottom(0) {}
 	Rect(double width, double height) : m_left(0), m_right(width), m_top(0), m_bottom(height) { normalize(); }
 	Rect(QSizeF size) : m_left(0), m_right(size.width()), m_top(0), m_bottom(size.height()) { normalize(); }
-	Rect(double left, double right, double top, double bottom) :
-		m_left(left), m_right(right), m_top(top), m_bottom(bottom) { normalize(); }
+	Rect(double left, double right, double top, double bottom)
+		: m_left(left), m_right(right), m_top(top), m_bottom(bottom) { normalize(); }
 	Rect(Point ul, Point lr) : 
 		m_left(ul.x()), m_right(lr.x()), m_top(ul.y()), m_bottom(lr.y()) { normalize(); }
+	Rect(Point ul, double width, double height)
+		: m_left(ul.x()), m_right(ul.x() + width), m_top(ul.y()), m_bottom(ul.y() + height) { normalize(); }
 	
 	double &left() { return m_left; }
 	double left() const { return m_left; }
