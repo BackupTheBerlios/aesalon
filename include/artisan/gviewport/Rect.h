@@ -27,12 +27,12 @@ private:
 	double m_top, m_bottom;
 public:
 	Rect() : m_left(0), m_right(0), m_top(0), m_bottom(0) {}
-	Rect(double width, double height) : m_left(0), m_right(width), m_top(0), m_bottom(height) {}
-	Rect(QSizeF size) : m_left(0), m_right(size.width()), m_top(0), m_bottom(size.height()) {}
+	Rect(double width, double height) : m_left(0), m_right(width), m_top(0), m_bottom(height) { normalize(); }
+	Rect(QSizeF size) : m_left(0), m_right(size.width()), m_top(0), m_bottom(size.height()) { normalize(); }
 	Rect(double left, double right, double top, double bottom) :
-		m_left(left), m_right(right), m_top(top), m_bottom(bottom) {}
+		m_left(left), m_right(right), m_top(top), m_bottom(bottom) { normalize(); }
 	Rect(Point ul, Point lr) : 
-		m_left(ul.x()), m_right(lr.x()), m_top(ul.y()), m_bottom(lr.y()) {}
+		m_left(ul.x()), m_right(lr.x()), m_top(ul.y()), m_bottom(lr.y()) { normalize(); }
 	
 	double &left() { return m_left; }
 	double left() const { return m_left; }
@@ -55,10 +55,19 @@ public:
 	Point bottomLeft() const { return Point(m_left, m_bottom); }
 	Point bottomRight() const { return Point(m_right, m_bottom); }
 	
+	void normalize() {
+		double x1 = m_left, x2 = m_right;
+		double y1 = m_top, y2 = m_bottom;
+		m_left = std::min(x1, x2);
+		m_right = std::max(x1, x2);
+		m_top = std::min(y1, y2);
+		m_bottom = std::max(y1, y2);
+	}
+	
 	TreeType::Bound toTreeBound() const {
 		TreeType::Bound b;
 		b.range(0) = TreeType::Range(m_left, m_right);
-		b.range(1) = TreeType::Range(m_bottom, m_top);
+		b.range(1) = TreeType::Range(m_top, m_bottom);
 		return b;
 	}
 	

@@ -22,7 +22,7 @@ namespace GViewport {
 
 class Renderer : public QObject, public QRunnable, public TreeType::SearchProcessor { Q_OBJECT
 private:
-	RenderedImage m_image;
+	RenderedImage *m_image;
 	Data *m_data;
 public:
 	Renderer(const Rect &dataRange, const Rect &pixelRange, Data *data);
@@ -34,7 +34,7 @@ public:
 	
 	virtual bool process(const TreeType::Bound &bound, Object *value);
 signals:
-	void finishedRendering(RenderedImage image);
+	void finishedRendering(RenderedImage *image);
 };
 
 } // namespace GViewport

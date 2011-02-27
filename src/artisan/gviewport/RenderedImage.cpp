@@ -37,8 +37,6 @@ void RenderedImage::merge(RenderedImage &other) {
 	Rect local = mapper.dataToPixel(other.dataRange());
 	startPainting();
 	
-	Message(Debug, "Local rect: " << local.toString());
-	
 	m_painter->drawImage(local.toQRect(), other.m_image);
 	
 	stopPainting();

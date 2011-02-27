@@ -39,8 +39,9 @@ void BasicViewport::setViewport(const Rect &range) {
 	m_image = image;
 }
 
-void BasicViewport::acceptRenderedImage(RenderedImage image) {
-	m_image.merge(image);
+void BasicViewport::acceptRenderedImage(RenderedImage *image) {
+	m_image.merge(*image);
+	delete image;
 }
 
 void BasicViewport::updateRange(const Rect &range) {
@@ -54,7 +55,7 @@ void BasicViewport::resizeEvent(QResizeEvent *event) {
 	image.merge(m_image);
 	m_image = image;
 	Renderer *renderer = new Renderer(m_image.dataRange(), Rect(event->size()), m_data);
-	connect(renderer, SIGNAL(finishedRendering(RenderedImage)), this, SLOT(acceptRenderedImage(RenderedImage)));
+	connect(renderer, SIGNAL(finishedRendering(RenderedImage *)), this, SLOT(acceptRenderedImage(RenderedImage *)));
 	renderer->enqueue();
 }
 

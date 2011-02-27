@@ -13,11 +13,13 @@
 
 #include "artisan/gviewport/Object.h"
 
+#include "util/MessageSystem.h"
+
 namespace Artisan {
 namespace GViewport {
 
-Renderer::Renderer(const Rect &dataRange, const Rect &pixelRange, Data *data)
-	: m_image(RenderedImage(dataRange, pixelRange)), m_data(data) {
+Renderer::Renderer(const Rect &dataRange, const Rect &pixelRange, Data *data) : m_data(data) {
+	m_image = new RenderedImage(dataRange, pixelRange);
 }
 
 Renderer::~Renderer() {
@@ -31,7 +33,7 @@ void Renderer::enqueue() {
 void Renderer::run() {
 	m_data->startReading();
 	
-	m_data->tree().search(m_image.dataRange().toTreeBound(), this);
+	m_data->tree().search(m_image->dataRange().toTreeBound(), this);
 	
 	m_data->stopReading();
 	
@@ -39,7 +41,7 @@ void Renderer::run() {
 }
 
 bool Renderer::process(const TreeType::Bound &bound, Object *value) {
-	value->renderOnto(m_image);
+	value->renderOnto(*m_image);
 	return true;
 }
 

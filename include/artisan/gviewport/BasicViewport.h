@@ -29,6 +29,8 @@ public:
 	BasicViewport(Data *data);
 	virtual ~BasicViewport();
 	
+	Data *data() const { return m_data; }
+	
 	Rect rangeLimit() const { return m_rangeLimit; }
 	void limitRange(const Rect &newLimit) { m_rangeLimit = newLimit; }
 	
@@ -37,7 +39,7 @@ public:
 	
 	void setViewport(const Rect &range);
 public slots:
-	void acceptRenderedImage(RenderedImage image);
+	void acceptRenderedImage(RenderedImage *image);
 	void updateRange(const Rect &range);
 protected:
 	virtual void resizeEvent(QResizeEvent *event);

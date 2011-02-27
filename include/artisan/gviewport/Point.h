@@ -10,6 +10,8 @@
 #ifndef AesalonArtisan_GViewport_Point_H
 #define AesalonArtisan_GViewport_Point_H
 
+#include <QPoint>
+
 namespace Artisan {
 namespace GViewport {
 
@@ -24,6 +26,10 @@ public:
 	double x() const { return m_x; }
 	double &y() { return m_y; }
 	double y() const { return m_y; }
+	
+	QPointF toQPoint() const {
+		return QPointF(m_x, m_y);
+	}
 };
 
 } // namespace GViewport
