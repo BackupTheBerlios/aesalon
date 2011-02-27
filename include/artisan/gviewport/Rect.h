@@ -16,6 +16,8 @@
 #include "TreeType.h"
 #include "Point.h"
 
+#include "util/StreamAsString.h"
+
 namespace Artisan {
 namespace GViewport {
 
@@ -62,6 +64,11 @@ public:
 	
 	QRectF toQRect() const { 
 		return QRectF(m_left, m_top, width(), height());
+	}
+	
+	std::string toString() const {
+		return Util::StreamAsString() << "(" << m_left << ", " 
+			<< m_top << "), (" << m_right << ", " << m_bottom << ")";
 	}
 };
 

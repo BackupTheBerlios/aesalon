@@ -7,13 +7,18 @@
 	@file src/artisan/gviewport/BasicViewport.cpp
 */
 
+#include <QResizeEvent>
+#include <QPaintEvent>
+#include <QThreadPool>
+
 #include "artisan/gviewport/BasicViewport.h"
+#include "artisan/gviewport/Renderer.h"
 
 namespace Artisan {
 namespace GViewport {
 
 BasicViewport::BasicViewport(Data *data) : m_data(data) {
-	
+	setMinimumSize(120, 120);
 }
 
 BasicViewport::~BasicViewport() {
@@ -39,7 +44,22 @@ void BasicViewport::acceptRenderedImage(RenderedImage image) {
 }
 
 void BasicViewport::updateRange(const Rect &range) {
-	
+	RenderedImage image(range, Rect(size()));
+	image.merge(m_image);
+	m_image = image;
+}
+
+void BasicViewport::resizeEvent(QResizeEvent *event) {
+	RenderedImage image(m_image.dataRange(), Rect(event->size()));
+	image.merge(m_image);
+	m_image = image;
+	Renderer *renderer = new Renderer(m_image.dataRange(), Rect(event->size()), m_data);
+	connect(renderer, SIGNAL(finishedRendering(RenderedImage)), this, SLOT(acceptRenderedImage(RenderedImage)));
+	renderer->enqueue();
+}
+
+void BasicViewport::paintEvent(QPaintEvent *event) {
+	m_image.paintOnto(this);
 }
 
 } // namespace GViewport

@@ -7,6 +7,8 @@
 	@file src/artisan/gviewport/Renderer.cpp
 */
 
+#include <QThreadPool>
+
 #include "artisan/gviewport/Renderer.h"
 
 #include "artisan/gviewport/Object.h"
@@ -19,7 +21,11 @@ Renderer::Renderer(const Rect &dataRange, const Rect &pixelRange, Data *data)
 }
 
 Renderer::~Renderer() {
+	
+}
 
+void Renderer::enqueue() {
+	QThreadPool::globalInstance()->start(this);
 }
 
 void Renderer::run() {

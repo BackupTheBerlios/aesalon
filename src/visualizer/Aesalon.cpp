@@ -8,6 +8,7 @@
 */
 
 #include <QApplication>
+#include <QThreadPool>
 
 #include "visualizer/RootWindow.h"
 #include "util/MessageSystem.h"
@@ -15,6 +16,8 @@
 
 int main(int argc, char *argv[]) {
 	QApplication qapp(argc, argv);
+	
+	Message(Debug, "Ideal thread count is " << QThread::idealThreadCount() << ".");
 	
 	Config::GlobalVault gv;
 	

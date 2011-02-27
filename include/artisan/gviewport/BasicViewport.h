@@ -39,6 +39,9 @@ public:
 public slots:
 	void acceptRenderedImage(RenderedImage image);
 	void updateRange(const Rect &range);
+protected:
+	virtual void resizeEvent(QResizeEvent *event);
+	virtual void paintEvent(QPaintEvent *event);
 };
 
 } // namespace GViewport

@@ -28,6 +28,8 @@ public:
 	Renderer(const Rect &dataRange, const Rect &pixelRange, Data *data);
 	virtual ~Renderer();
 	
+	void enqueue();
+	
 	virtual void run();
 	
 	virtual bool process(const TreeType::Bound &bound, Object *value);

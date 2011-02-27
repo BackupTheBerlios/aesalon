@@ -13,6 +13,8 @@
 #include "artisan/gviewport/RenderedImage.h"
 #include "artisan/gviewport/CoordinateMapper.h"
 
+#include "util/MessageSystem.h"
+
 namespace Artisan {
 namespace GViewport {
 
@@ -20,6 +22,9 @@ RenderedImage::RenderedImage(const Rect &dataRange, const Rect &pixelSize)
 	: m_dataRange(dataRange), m_pixelSize(pixelSize) {
 	
 	m_image = QImage(m_pixelSize.width(), m_pixelSize.height(), QImage::Format_ARGB32);
+	
+	m_image.fill(qRgb(qrand()%256, 128, 128));
+	
 	m_painter = new QPainter();
 }
 
@@ -31,6 +36,8 @@ void RenderedImage::merge(RenderedImage &other) {
 	CoordinateMapper mapper(*this);
 	Rect local = mapper.dataToPixel(other.dataRange());
 	startPainting();
+	
+	Message(Debug, "Local rect: " << local.toString());
 	
 	m_painter->drawImage(local.toQRect(), other.m_image);
 	
@@ -48,6 +55,13 @@ void RenderedImage::stopPainting() {
 void RenderedImage::paintOnto(QPaintDevice *device) {
 	QPainter painter(device);
 	painter.drawImage(QRect(0, 0, device->width(), device->height()), m_image, m_image.rect());
+}
+
+RenderedImage &RenderedImage::operator=(const RenderedImage &other) {
+	m_dataRange = other.m_dataRange;
+	m_pixelSize = other.m_pixelSize;
+	m_image = other.m_image;
+	return *this;
 }
 
 } // namespace GViewport

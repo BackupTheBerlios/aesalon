@@ -38,6 +38,8 @@ public:
 	void stopPainting();
 	
 	void paintOnto(QPaintDevice *device);
+	
+	RenderedImage &operator=(const RenderedImage &other);
 };
 
 } // namespace GViewport

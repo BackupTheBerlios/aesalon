@@ -9,6 +9,8 @@
 
 #include "artisan/gviewport/CoordinateMapper.h"
 
+#include "util/MessageSystem.h"
+
 namespace Artisan {
 namespace GViewport {
 
@@ -17,8 +19,8 @@ CoordinateMapper::CoordinateMapper(const Rect &dataRect, const Rect &pixelRect)
 	
 }
 
-CoordinateMapper::CoordinateMapper(const RenderedImage &image) : m_dataRect(Rect()), m_pixelRect(Rect()) {
-	
+CoordinateMapper::CoordinateMapper(const RenderedImage &image)
+	: m_dataRect(image.dataRange()), m_pixelRect(image.pixelSize()) {
 }
 
 Point CoordinateMapper::dataToPixel(const Point &dataPoint) {
