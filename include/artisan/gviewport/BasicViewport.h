@@ -25,6 +25,7 @@ private:
 	RenderedImage m_image;
 	
 	Rect m_rangeLimit;
+	QPoint m_lastPoint;
 public:
 	BasicViewport(Data *data);
 	virtual ~BasicViewport();
@@ -44,6 +45,8 @@ public slots:
 protected:
 	virtual void resizeEvent(QResizeEvent *event);
 	virtual void paintEvent(QPaintEvent *event);
+	virtual void mouseMoveEvent(QMouseEvent *event);
+	virtual void mousePressEvent(QMouseEvent *event);
 };
 
 } // namespace GViewport

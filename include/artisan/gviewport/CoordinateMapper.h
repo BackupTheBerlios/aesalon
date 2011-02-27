@@ -29,6 +29,8 @@ public:
 	Rect dataToPixel(const Rect &dataRect);
 	Point pixelToData(const Point &pixelPoint);
 	Rect pixelToData(const Rect &pixelPoint);
+	
+	Point pixelToDataOffset(const Point &pixelPoint);
 };
 
 } // namespace GViewport

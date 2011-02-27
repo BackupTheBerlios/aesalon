@@ -21,6 +21,7 @@ private:
 public:
 	Point();
 	Point(double x, double y) : m_x(x), m_y(y) {}
+	Point(const QPoint &point) : m_x(point.x()), m_y(point.y()) {}
 	
 	double &x() { return m_x; }
 	double x() const { return m_x; }

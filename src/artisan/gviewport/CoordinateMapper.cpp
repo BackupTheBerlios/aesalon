@@ -49,6 +49,14 @@ Rect CoordinateMapper::pixelToData(const Rect &pixelRect) {
 	return Rect(pixelToData(pixelRect.topLeft()), pixelToData(pixelRect.bottomRight()));
 }
 
+Point CoordinateMapper::pixelToDataOffset(const Point &pixelPoint) {
+	double xPercentage = (pixelPoint.x() - m_pixelRect.left()) / m_pixelRect.width();
+	double yPercentage = (pixelPoint.y() - m_pixelRect.top()) / m_pixelRect.height();
+	
+	return Point(
+		(xPercentage * m_dataRect.width()),
+		(yPercentage * m_dataRect.height()));
+}
 
 } // namespace GViewport
 } // namespace Artisan

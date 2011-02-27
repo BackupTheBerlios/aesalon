@@ -79,6 +79,10 @@ public:
 		return Util::StreamAsString() << "(" << m_left << ", " 
 			<< m_top << "), (" << m_right << ", " << m_bottom << ")";
 	}
+	
+	Rect operator+(const Point &point) const {
+		return Rect(m_left + point.x(), m_right + point.x(), m_top + point.y(), m_bottom + point.y());
+	}
 };
 
 } // namespace GViewport

@@ -23,7 +23,7 @@ RenderedImage::RenderedImage(const Rect &dataRange, const Rect &pixelSize)
 	
 	m_image = QImage(m_pixelSize.width(), m_pixelSize.height(), QImage::Format_ARGB32);
 	
-	m_image.fill(qRgb(qrand()%256, 128, 128));
+	m_image.fill(qRgb(255, 255, 255));
 	
 	m_painter = new QPainter();
 }
