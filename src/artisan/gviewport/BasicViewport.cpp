@@ -52,18 +52,14 @@ void BasicViewport::updateRange(const Rect &range) {
 	image.merge(m_image);
 	m_image = image;
 	
-	Renderer *renderer = new Renderer(m_image.dataRange(), m_image.pixelSize(), m_data);
-	connect(renderer, SIGNAL(finishedRendering(RenderedImage *)), this, SLOT(acceptRenderedImage(RenderedImage *)));
-	renderer->enqueue();
+	enqueue(new Renderer(m_image.dataRange(), m_image.pixelSize(), m_data));
 }
 
 void BasicViewport::resizeEvent(QResizeEvent *event) {
 	RenderedImage image(m_image.dataRange(), Rect(event->size()));
 	image.merge(m_image);
 	m_image = image;
-	Renderer *renderer = new Renderer(m_image.dataRange(), Rect(event->size()), m_data);
-	connect(renderer, SIGNAL(finishedRendering(RenderedImage *)), this, SLOT(acceptRenderedImage(RenderedImage *)));
-	renderer->enqueue();
+	enqueue(new Renderer(m_image.dataRange(), Rect(event->size()), m_data));
 }
 
 void BasicViewport::paintEvent(QPaintEvent *event) {
@@ -83,6 +79,32 @@ void BasicViewport::mouseMoveEvent(QMouseEvent *event) {
 
 void BasicViewport::mousePressEvent(QMouseEvent *event) {
 	m_lastPoint = event->pos();
+}
+
+void BasicViewport::wheelEvent(QWheelEvent *event) {
+	double factor = 1.0 - (event->delta() / 1200.0);
+	
+	Rect newRange = m_image.dataRange();
+	
+	if(event->modifiers() & Qt::ShiftModifier) {
+		newRange.scaleHeight(factor);
+	}
+	else if(event->modifiers() & Qt::ControlModifier) {
+		newRange.scaleWidth(factor);
+	}
+	else {
+		newRange.scaleHeight(factor);
+		newRange.scaleWidth(factor);
+	}
+	
+	updateRange(newRange);
+}
+
+void BasicViewport::enqueue(Renderer *renderer) {
+	connect(renderer, SIGNAL(finishedRendering(RenderedImage *)),
+		this, SLOT(acceptRenderedImage(RenderedImage *)),
+		Qt::QueuedConnection);
+	renderer->enqueue();
 }
 
 } // namespace GViewport

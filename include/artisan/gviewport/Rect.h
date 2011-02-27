@@ -83,6 +83,22 @@ public:
 	Rect operator+(const Point &point) const {
 		return Rect(m_left + point.x(), m_right + point.x(), m_top + point.y(), m_bottom + point.y());
 	}
+	
+	void scaleWidth(double factor) {
+		double w = width() / 2;
+		double centreX = m_left + w;
+		w *= factor;
+		m_left = centreX - w;
+		m_right = centreX + w;
+	}
+	
+	void scaleHeight(double factor) {
+		double h = height()/2;
+		double centreY = m_top + h;
+		h *= factor;
+		m_top = centreY - h;
+		m_bottom = centreY + h;
+	}
 };
 
 } // namespace GViewport
