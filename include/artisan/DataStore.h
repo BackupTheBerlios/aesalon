@@ -14,10 +14,14 @@
 
 namespace Artisan {
 
+/** Represents a store of data; the grand sum of all the data relevant to an Artisan. */
 class DataStore {
 public:
 	virtual ~DataStore() {}
 	
+	/** Process a given packet and extract any relevant data.
+		@param packet The packet to process.
+	*/
 	virtual void process(Comm::Packet *packet) = 0;
 };
 

@@ -33,11 +33,10 @@ void BasicViewport::acceptRenderedImage(RenderedImage *image) {
 	update();
 }
 
-void BasicViewport::translate(const Point &upperLeft) {
-	RenderedImage image(
-		Rect(upperLeft, m_image.dataRange().width(), m_image.dataRange().height()),
-		m_image.pixelSize());
+void BasicViewport::translate(const Point &by) {
+	RenderedImage image(Rect(m_image.dataRange() + by), m_image.pixelSize());
 	image.merge(m_image);
+	m_image = image;
 	update();
 	
 	enqueue(m_image.dataRange());
@@ -73,7 +72,7 @@ void BasicViewport::mouseMoveEvent(QMouseEvent *event) {
 		Point diff = -(event->pos() - m_lastPoint);
 		
 		CoordinateMapper mapper(m_image);
-		translate(m_image.dataRange().topLeft() + mapper.pixelToDataOffset(diff));
+		translate(mapper.pixelToDataOffset(diff));
 		
 		m_lastPoint = event->pos();
 	}

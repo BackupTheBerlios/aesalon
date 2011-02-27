@@ -38,7 +38,7 @@ public:
 	void limitRange(const Rect &newLimit) { m_rangeLimit = newLimit; }
 public slots:
 	void acceptRenderedImage(RenderedImage *image);
-	void translate(const Point &upperLeft);
+	void translate(const Point &by);
 	void setViewport(const Rect &range);
 	void updateRange(const Rect &range);
 protected:

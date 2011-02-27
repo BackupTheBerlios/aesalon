@@ -15,15 +15,19 @@
 
 namespace Artisan {
 
+/** Represents an Aritsan module's interface to the Visualizer. */
 class Interface {
 public:
 	virtual ~Interface() {}
 	
+	/** Retrieves the DataStore instance of this artisan. */
 	virtual DataStore *dataStore() = 0;
 	
+	/** Creates a new Viewport for this artisan. */
 	virtual Viewport *createViewport() = 0;
 };
 
+/** Creates the AA_Instantiate() global function in an artisan. */
 #define InstantiateArtisan(type) \
 	extern "C" { Artisan::Interface *AA_Instantiate() { return new type(); } }
 

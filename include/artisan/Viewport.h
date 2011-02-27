@@ -14,6 +14,7 @@
 
 namespace Artisan {
 
+/** Represents a viewport (graphical or not) into an artisan's data. */
 class Viewport : public QWidget {
 public:
 	virtual ~Viewport() {}
