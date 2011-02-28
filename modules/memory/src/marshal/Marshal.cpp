@@ -2,18 +2,18 @@
 #include "util/MessageSystem.h"
 #include "storage/Mempool.h"
 
-InstantiateMarshal(CpuTimeMarshal)
+InstantiateMarshal(MemoryMarshal)
 
-CpuTimeMarshal::CpuTimeMarshal() {
+MemoryMarshal::MemoryMarshal() {
 	
 }
 
-CpuTimeMarshal::~CpuTimeMarshal() {
+MemoryMarshal::~MemoryMarshal() {
 	
 }
 
-Comm::Packet *CpuTimeMarshal::marshal(Comm::Packet *packet) {
-	Message(Debug, "CpuTimeMarshal: marshalling packet . . .");
+Comm::Packet *MemoryMarshal::marshal(Comm::Packet *packet) {
+	Message(Debug, "MemoryMarshal: marshalling packet . . .");
 	
 	return packet;
 }

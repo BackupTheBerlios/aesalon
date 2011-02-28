@@ -1,12 +1,12 @@
-#ifndef AesalonModule_cpuTime_Marshal_H
-#define AesalonModule_cpuTime_Marshal_H
+#ifndef AesalonModule_memory_Marshal_H
+#define AesalonModule_memory_Marshal_H
 
 #include "marshal/Interface.h"
 
-class CpuTimeMarshal : public Marshal::Interface {
+class MemoryMarshal : public Marshal::Interface {
 public:
-	CpuTimeMarshal();
-	virtual ~CpuTimeMarshal();
+	MemoryMarshal();
+	virtual ~MemoryMarshal();
 	
 	virtual Comm::Packet *marshal(Comm::Packet *packet);
 };
