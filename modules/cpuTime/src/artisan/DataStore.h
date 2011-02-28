@@ -23,4 +23,5 @@ public:
 	QListIterator<QPair<double, double> > iterator() { return QListIterator<QPair<double, double> >(m_dataList); }
 };
 
+
 #endif
