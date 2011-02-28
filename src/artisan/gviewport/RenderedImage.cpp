@@ -9,6 +9,7 @@
 
 #include <QPaintDevice>
 #include <QRect>
+#include <QMutexLocker>
 
 #include "artisan/gviewport/RenderedImage.h"
 #include "artisan/gviewport/CoordinateMapper.h"
@@ -23,7 +24,8 @@ RenderedImage::RenderedImage(const Rect &dataRange, const Rect &pixelSize)
 	
 	m_image = QImage(m_pixelSize.width(), m_pixelSize.height(), QImage::Format_ARGB32);
 	
-	m_image.fill(qRgb(qrand()%256, qrand()%256, qrand()%256));
+	//m_image.fill(qRgb(qrand()%256, qrand()%256, qrand()%256));
+	m_image.fill(qRgb(255, 255, 255));
 	
 	m_painter = new QPainter();
 }
@@ -43,11 +45,13 @@ void RenderedImage::merge(RenderedImage &other) {
 }
 
 void RenderedImage::startPainting() {
+	m_paintLock.lock();
 	m_painter->begin(&m_image);
 }
 
 void RenderedImage::stopPainting() {
 	m_painter->end();
+	m_paintLock.unlock();
 }
 
 void RenderedImage::paintOnto(QPaintDevice *device) {

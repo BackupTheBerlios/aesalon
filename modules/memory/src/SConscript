@@ -1,0 +1,13 @@
+Import("env")
+Import("qtEnv")
+
+collectorEnv = env.Clone()
+marshalEnv = env.Clone()
+artisanEnv = qtEnv.Clone()
+
+collectorEnv.Append(LIBS = ["rt", "dl"])
+artisanEnv.EnableQt4Modules(["QtCore", "QtGui"])
+
+collectorEnv.SharedLibrary(target="collector", source=Glob("collector/*.c"))
+marshalEnv.SharedLibrary(target="marshal", source=Glob("marshal/*.cpp"))
+artisanEnv.SharedLibrary(target="artisan", source=Glob("artisan/*.cpp"))

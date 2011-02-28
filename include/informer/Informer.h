@@ -59,5 +59,4 @@ void AC_EXPORT AI_ContinueCollection(pthread_t threadID);
 /** Returns 1 if data should be collected, 0 otherwise. */
 short AC_EXPORT AI_CollectionStatus();
 
-
 #endif

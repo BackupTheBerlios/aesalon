@@ -32,9 +32,11 @@ void Renderer::enqueue() {
 
 void Renderer::run() {
 	m_data->startReading();
+	m_image->startPainting();
 	
 	m_data->tree().search(m_image->dataRange().toTreeBound(), this);
 	
+	m_image->stopPainting();
 	m_data->stopReading();
 	
 	emit finishedRendering(m_image);

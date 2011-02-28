@@ -12,6 +12,7 @@
 
 #include <QPainter>
 #include <QImage>
+#include <QMutex>
 
 #include "Rect.h"
 
@@ -24,6 +25,7 @@ private:
 	Rect m_pixelSize;
 	QImage m_image;
 	QPainter *m_painter;
+	QMutex m_paintLock;
 public:
 	RenderedImage(const Rect &dataRange = Rect(), const Rect &pixelSize = Rect());
 	~RenderedImage();

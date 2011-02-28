@@ -24,16 +24,12 @@ LineObject::~LineObject() {
 }
 
 void LineObject::renderOnto(RenderedImage &image) {
-	image.startPainting();
-	
 	CoordinateMapper mapper(image);
 	
 	image.painter().drawLine(
 		mapper.dataToPixel(m_from).toQPoint(),
 		mapper.dataToPixel(m_to).toQPoint()
 		);
-	
-	image.stopPainting();
 }
 
 } // namespace GViewport
