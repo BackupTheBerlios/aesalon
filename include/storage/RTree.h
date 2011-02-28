@@ -499,7 +499,7 @@ typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
 		}
 		else if((nn->branchCount() + listSize) == Minimum) {
 			for(int i = 0; i < listSize; i ++) {
-				nn->branch(node->branchCount()) = list[i];
+				nn->branch(nn->branchCount()) = list[i];
 				nn->setBranchCount(nn->branchCount()+1);
 			}
 			break;
