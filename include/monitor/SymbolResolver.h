@@ -29,8 +29,6 @@ public:
 	~SymbolResolver();
 	
 	void parse(const std::string &filename, uint64_t offset);
-	
-	
 };
 
 } // namespace Monitor

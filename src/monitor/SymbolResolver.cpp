@@ -29,20 +29,16 @@ void SymbolResolver::parse(const std::string &filename, uint64_t offset) {
 	private:
 		RTree *m_rtree;
 		uint64_t m_offset;
-		Storage::Mempool *m_mempool;
 	public:
-		Processor(RTree *rtree, uint64_t offset) : m_rtree(rtree), m_offset(offset),
-			m_mempool(Coordinator::instance()->mempool()) {}
+		Processor(RTree *rtree, uint64_t offset) : m_rtree(rtree), m_offset(offset) {}
 		virtual ~Processor() {}
 		
 		virtual void process(const char *symbolName, uint64_t symbolAddress, uint64_t symbolSize) {
 			symbolAddress += m_offset;
-			RTree::Bound b;
-			b.setRange(RTree::Range(symbolAddress, symbolAddress + symbolSize), 0);
 			
-			char *name = static_cast<char *>(m_mempool->request(std::strlen(symbolName)));
+			char *name = new char[std::strlen(symbolName)];
 			strcpy(name, symbolName);
-			m_rtree->insert(b, name);
+			m_rtree->insert(RTree::Bound(symbolAddress, symbolAddress + symbolSize), name);
 		}
 	};
 	

@@ -14,7 +14,7 @@
 
 #include "storage/RTree.h"
 
-#if 1
+#if 0
 int main(int argc, char *argv[]) {
 	Config::GlobalVault gv;
 	Monitor::Coordinator coordinator(argv);
@@ -28,49 +28,31 @@ int main(int argc, char *argv[]) {
 	
 	RTree rt;
 	
-	RTree::Bound b;
+	/*rt.insert(RTree::Bound(77.7, 79.2), 1);
+	rt.insert(RTree::Bound(64.9, 67), 2);
+	rt.insert(RTree::Bound(76.3, 78.9), 3);
+	rt.insert(RTree::Bound(21.1, 27.9), 4);
+	rt.insert(RTree::Bound(86.2, 88.5), 5);*/
+	/*rt.insert(RTree::Bound(2.2, 8), 6);
+	rt.insert(RTree::Bound(1.1, 5.3), 7);
+	rt.insert(RTree::Bound(78.4, 82.1), 8);
+	rt.insert(RTree::Bound(41.3, 43.9), 9);
+	rt.insert(RTree::Bound(86.2, 93.2), 10);*/
 	
-	b.setRange(RTree::Range(77.7, 79.2), 0);
-	rt.insert(b, 1);
-	b.setRange(RTree::Range(64.9, 67), 0);
-	rt.insert(b, 2);
-	b.setRange(RTree::Range(76.3, 78.9), 0);
-	rt.insert(b, 3);
-	b.setRange(RTree::Range(21.1, 27.9), 0);
-	rt.insert(b, 4);
-	b.setRange(RTree::Range(86.2, 88.5), 0);
-	rt.insert(b, 5);
-	b.setRange(RTree::Range(2.2, 8), 0);
-	rt.insert(b, 6);
-	b.setRange(RTree::Range(1.1, 5.3), 0);
-	rt.insert(b, 7);
-	b.setRange(RTree::Range(78.4, 82.1), 0);
-	rt.insert(b, 8);
-	b.setRange(RTree::Range(41.3, 43.9), 0);
-	rt.insert(b, 9);
-	b.setRange(RTree::Range(86.2, 93.2), 0);
-	rt.insert(b, 10);
+	rt.insert(RTree::Bound(2.2, 8), 6);
+	rt.insert(RTree::Bound(1.1, 5.3), 7);
 	
-	b.setRange(RTree::Range(21.1, 27.9), 0);
-	rt.remove(b, 4);
-	b.setRange(RTree::Range(2.2, 8), 0);
-	rt.remove(b, 6);
-	b.setRange(RTree::Range(1.1, 5.3), 0);
-	rt.remove(b, 7);
-	
-	class Processor : public RTree::SearchProcessor {
+	class Processor : public RTree::Visitor {
 	public:
-		virtual bool process(const RTree::Bound &bound, int value) {
+		virtual void visit(const RTree::Bound &/*bound*/, int &value) {
 			Message(Debug, "****\t\tFound value " << value);
-			return true;
 		}
 	};
 	
 	Processor p;
 	
-	b.setRange(RTree::Range(0.0, 8.0), 0);
-	
-	rt.search(b, &p);
+	rt.search(RTree::Bound(0.0, 8.0), &p);
+	rt.search(RTree::Bound(0.0, 16.0), &p);
 	
 	return 0;
 }

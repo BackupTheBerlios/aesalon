@@ -53,8 +53,9 @@ env = Environment(
 		'HOME' : os.environ['HOME']})
 
 env.Append(CPPPATH = ["#include/"])
-env.Append(CCFLAGS = ["-W", "-Wall", "-g"])
+env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-pthread"])
 env.Append(LIBPATH = ["#.build"])
+env.Append(LINKFLAGS = ["-pthread"])
 
 Export('env')
 
@@ -66,5 +67,5 @@ Export("qtEnv")
 
 SConscript("build/SConscript")
 SConscript("src/SConscript", variant_dir=".build", duplicate=0)
-SConscript("modules/SConscript")
+#SConscript("modules/SConscript")
 SConscript("tests/SConscript")

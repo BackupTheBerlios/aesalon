@@ -27,6 +27,7 @@ env.Append(CPPPATH = ["#include/"])
 env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-DAesalonVisualizer"])
 env.Append(LINKFLAGS = ["-rdynamic"])
 env.Append(LINKFLAGS = ["-Xlinker", "--whole-archive", "-laesalon-config", "-laesalon-util", "-laesalon-storage", "-laesalon-artisan", "-Xlinker", "--no-whole-archive"])
+env.Append(LIBS = ["rt", "dl"])
 
 sourceFiles = Glob("*.cpp", strings=True) + Glob("*/*.cpp", strings=True) + Glob("*.qrc", strings=True)
 

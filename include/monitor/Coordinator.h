@@ -29,7 +29,6 @@ private:
 	DataOutputController *m_dataOutputController;
 	MarshalList *m_marshalList;
 	SymbolResolver *m_resolver;
-	Storage::Mempool *m_mempool;
 public:
 	static Coordinator *instance() { return m_instance; }
 	Coordinator(char **argv);
@@ -42,7 +41,6 @@ public:
 	DataOutputController *dataOutputController() const { return m_dataOutputController; }
 	MarshalList *marshalList() const { return m_marshalList; }
 	SymbolResolver *resolver() const { return m_resolver; }
-	Storage::Mempool *mempool() const { return m_mempool; }
 	
 	void run();
 private:

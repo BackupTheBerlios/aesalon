@@ -27,4 +27,6 @@
 
 #define AesalonConnectionQueueLength %(connectionQueueLength)s
 
+#define AesalonPoolAllocator %(usePoolAllocator)s
+
 #endif

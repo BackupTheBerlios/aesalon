@@ -13,26 +13,26 @@
 #include <stdint.h>
 #include <vector>
 
-namespace Storage {
+#include <ext/pool_allocator.h>
 
-class Mempool {
-protected:
-	typedef std::vector<uint8_t *> MapVector;
-	typedef std::vector<uint32_t> UseVector;
-private:
-	MapVector m_mapVector;
-	UseVector m_useVector;
-	/** Mempool size: 16MB. */
-	static const uint32_t m_mempoolSize = 16777216;
-public:
-	Mempool();
-	~Mempool();
-	
-	void *request(uint32_t size);
-private:
-	void createNew();
-};
+#define AesalonPoolAlloc(type, pointer, object) \
+	do { \
+		__gnu_cxx::__pool_alloc<type> allocator; \
+		pointer = allocator.allocate(1); \
+		allocator.construct(pointer, object); \
+	} while(0)
 
-} // namespace Storage
+#define AesalonPoolDestroy(type, pointer) \
+	do { \
+		__gnu_cxx::__pool_alloc<type> allocator; \
+		allocator.destroy(pointer); \
+	} while(0)
+
+#define AesalonPoolArray(type, pointer, size) \
+	do { \
+		__gnu_cxx::__pool_alloc<type> allocator; \
+		pointer = allocator.allocate(size); \
+	} while(0)
+
 
 #endif

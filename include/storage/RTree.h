@@ -10,11 +10,11 @@
 #ifndef AesalonStorage_RTree_H
 #define AesalonStorage_RTree_H
 
-#include <vector>
-#include <list>
-#include <queue>
+#include <stdarg.h>
+#include "Config.h"
 
 #include "util/MessageSystem.h"
+#include "Mempool.h"
 
 namespace Storage {
 
@@ -34,137 +34,123 @@ namespace Storage {
 	
 	@todo Improve condenseTree's handling of non-leaf nodes.
 */
-template<typename Key, typename Value, int Dimensions, int Maximum = 8, int Minimum = Maximum/2,
-	typename FloatKey = Key>
+
+#define RTreeTemplate \
+	template< RTreeTemplateItems >
+#define RTreeTemplateItems \
+	typename Key, typename Value, int Dimensions, int Maximum, int Minimum, typename FloatKey
+#define RTreeScope \
+	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>
+
+template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum, typename FloatKey=Key>
 class RTree {
 public:
-	class Range {
-	private:
-		bool m_valid;
-		Key m_start, m_end;
-	public:
-		Range() : m_valid(false) {}
-		Range(Key start, Key end) : m_valid(true), m_start(start), m_end(end) {}
-		
-		bool valid() const { return m_valid; }
-		Key start() const { return m_start; }
-		Key end() const { return m_end; }
-		Key size() const { return m_end - m_start; }
-		
-		bool overlaps(const Range &other) const {
-			if(m_start > other.m_end || other.m_start > m_end) {
-				return false;
-			}
-			return true;
-		}
-		
-		Key enlargementToCover(const Range &other) const {
-			Key sum = 0;
-			if(m_start > other.m_start) sum += (m_start - other.m_start);
-			if(m_end < other.m_end) sum += (other.m_end - m_end);
-			return sum;
-		}
-	};
-	
 	class Bound {
 	private:
-		Range m_ranges[Dimensions];
+		Key m_bounds[Dimensions][2];
 	public:
 		Bound() {}
-		Bound(Range ranges[Dimensions]) {
-			for(int i = 0; i < Dimensions; i ++) m_ranges[i] = ranges[i];
+		Bound(Key d1_start, Key d1_end, ...) {
+			va_list ap;
+			va_start(ap, d1_end);
+			
+			m_bounds[0][0] = d1_start, m_bounds[0][1] = d1_end;
+			
+			for(int i = 1; i < Dimensions; i ++) {
+				m_bounds[i][0] = va_arg(ap, Key);
+				m_bounds[i][1] = va_arg(ap, Key);
+			}
+			
+			va_end(ap);
 		}
 		
-		void setRange(const Range &range, int dimension) { m_ranges[dimension] = range; }
-		Range &range(int dimension) { return m_ranges[dimension]; }
-		const Range &range(int dimension) const { return m_ranges[dimension]; }
+		Key start(int dimension) const { return m_bounds[dimension][0]; }
+		Key end(int dimension) const { return m_bounds[dimension][1]; }
 		
 		bool overlaps(const Bound &other) const {
 			for(int i = 0; i < Dimensions; i ++) {
-				if(!m_ranges[i].overlaps(other.m_ranges[i])) return false;
+				if(m_bounds[i][0] > other.m_bounds[i][1] ||
+					m_bounds[i][1] < other.m_bounds[i][0]) return false;
 			}
 			return true;
 		}
 		
-		Key enlargementToCover(const Bound &other) const {
+		Key toCover(const Bound &other) {
 			Key volume = 0;
+			Key bounds[Dimensions][2];
+			Key sizes[Dimensions];
 			
-			for(int j = 0; j < Dimensions; j ++) {
-				Key difference = other.m_ranges[j].enlargementToCover(m_ranges[j]);
-				if(difference == 0) continue;
-				
-				for(int k = 0; k < Dimensions; k ++) {
-					if(k == j) continue;
-					difference *= other.m_ranges[j].size();
-				}
-				volume += difference;
+			for(int i = 0; i < Dimensions; i ++) {
+				bounds[i][0] = m_bounds[i][0];
+				bounds[i][1] = m_bounds[i][1];
+				sizes[i] = m_bounds[i][1] - m_bounds[i][0];
 			}
 			
-			return volume;
+			for(int i = 0; i < Dimensions; i ++) {
+				Key delta = 0;
+				if(other.m_bounds[i][0] < bounds[i][0]) delta += bounds[i][0] - other.m_bounds[i][0];
+				if(other.m_bounds[i][1] > bounds[i][1]) delta += other.m_bounds[i][1] - bounds[i][1];
+				sizes[i] += delta;
+				
+				for(int i = 0; i < Dimensions; i ++) {
+					volume += delta*sizes[i];
+				}
+			}
 		}
 		
-		void enclose(const Bound &other) {
+		void cover(const Bound &other) {
 			for(int i = 0; i < Dimensions; i ++) {
-				if(m_ranges[i].valid() && other.m_ranges[i].valid()) {
-					m_ranges[i] = Range(
-						std::min(m_ranges[i].start(), other.m_ranges[i].start()),
-						std::max(m_ranges[i].end(), other.m_ranges[i].end()));
-				}
-				else if(other.m_ranges[i].valid()) {
-					m_ranges[i] = other.m_ranges[i];
-				}
-				/* If other.m_ranges[i] is not valid, nothing needs to be done. */
+				m_bounds[i][0] = std::min(m_bounds[i][0], other.m_bounds[i][0]);
+				m_bounds[i][1] = std::max(m_bounds[i][1], other.m_bounds[i][1]);
 			}
 		}
 	};
 	
-	class SearchProcessor {
+	class Visitor {
 	public:
-		virtual bool process(const Bound &bound, Value value) = 0;
+		virtual ~Visitor() {}
+		
+		virtual void visit(const Bound &bound, Value &value) = 0;
 	};
 protected:
-	class Node;
-	struct Branch {
-		Bound bound;
-		union {
-			Node *node;
-			Value value;
-		};
-	};
 	class Node {
 	private:
-		bool m_isLeaf;
-		Branch m_branches[Maximum];
-		int m_branchCount;
-		Node *m_parent;
+		Bound m_bound;
+		int m_depth;
+		int m_childCount;
+		Node *m_parent, *m_next;
+		union {
+			Value m_value;
+			Node *m_child;
+		};
 	public:
-		Node(bool isLeaf) : m_isLeaf(isLeaf), m_branchCount(0), m_parent(NULL) {}
-		bool isLeaf() const { return m_isLeaf; }
-		void setLeaf(bool leaf) { m_isLeaf = leaf; }
+		Node(const Bound &bound, Value value, Node *parent)
+			: m_bound(bound), m_depth(0), m_childCount(0), m_parent(parent), m_next(NULL), m_value(value) { }
+		Node(int depth, Node *parent)
+			: m_depth(depth), m_childCount(0), m_parent(parent), m_next(NULL) {}
 		
-		Branch &branch(int which) { return m_branches[which]; }
-		int branchCount() const { return m_branchCount; }
-		void setBranchCount(int count) { m_branchCount = count; }
+		Bound &bound() { return m_bound; }
+		const Bound &bound() const { return m_bound; }
+		
+		int depth() const { return m_depth; }
+		bool isLeaf() const { return m_depth == 0; }
+		
+		bool isFull() const { return m_childCount == Maximum; }
+		int childCount() const { return m_childCount; }
+		void incChildren() { m_childCount ++; }
+		void setChildCount(int childcount) { m_childCount = childcount; }
+		
 		Node *parent() const { return m_parent; }
-		void setParent(Node *node) { m_parent = node; }
+		void setParent(Node *parent) { m_parent = parent; }
 		
-		Bound bound() const {
-			Bound result;
-			for(int i = 0; i < Dimensions; i ++) {
-				Key minimum = 0, maximum = 0;
-				for(int j = 0; j < branchCount(); j ++) {
-					if(j == 0) {
-						minimum = m_branches[j].bound.range(i).start();
-						maximum = m_branches[j].bound.range(i).end();
-						continue;
-					}
-					minimum = std::min(minimum, m_branches[j].bound.range(i).start());
-					maximum = std::max(maximum, m_branches[j].bound.range(i).end());
-				}
-				result.range(i) = Range(minimum, maximum);
-			}
-			return result;
-		}
+		Node *next() const { return m_next; }
+		void setNext(Node *next) { m_next = next; }
+		
+		Value &value() { return m_value; }
+		const Value &value() const { return m_value; }
+		void setValue(Value value) { m_value = value; }
+		Node *child() const { return m_child; }
+		void setChild(Node *child) { m_child = child; }
 	};
 private:
 	Node *m_root;
@@ -172,454 +158,115 @@ public:
 	RTree();
 	~RTree();
 	
-	/** Searches the tree for anything overlapping bound.
-		@param bound The bound to search for.
-		@param processor A search processor.
-	*/
-	void search(const Bound &bound, SearchProcessor *processor);
-	/** Inserts a value into the tree with a bound.
-		@param bound The bound to use.
-		@param value The value to insert.
-	*/
-	void insert(const Bound &bound, Value value);
-	/** Removes a value from the tree.
-		@param bound The bound to search.
-		@param value The value to remove.
-	*/
-	void remove(const Bound &bound, Value value);
-	
-	/** Returns the overall bounds of the tree.
-		@return The overall bounds of the tree.
-	*/
-	Bound bounds();
+	void search(const Bound &bound, Visitor *visitor);
+	void insert(const Bound &bound, const Value &value);
 private:
-	void search(const Bound &bound, Node *node, SearchProcessor *processor);
-	
-	Node *chooseLeaf(const Bound &bound);
-	Node *adjustTree(Node *n, Node *nn);
-	Node *splitNode(Node *node, Branch &branch);
-	
-	Node *findLeaf(Node *node, const Bound &bound, Value value);
-	void condenseTree(Node *leaf);
+	void search(Node *node, const Bound &bound, Visitor *visitor);
+	Node *split(Node *node, Node *toInsert);
 };
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::RTree() {
-	m_root = new Node(true);
+RTreeTemplate
+RTreeScope::RTree() {
+	m_root = NULL;
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::~RTree() {
+RTreeTemplate
+RTreeScope::~RTree() {
 	
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::search(
-	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
-	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::SearchProcessor *processor) {
-	
-	search(bound, m_root, processor);
+RTreeTemplate
+void RTreeScope::search(const RTreeScope::Bound &bound, RTreeScope::Visitor *visitor) {
+	search(m_root, bound, visitor);
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::insert(
-	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
-	Value value) {
+RTreeTemplate
+void RTreeScope::insert(const RTreeScope::Bound &bound, const Value &value) {
+	Node *toInsert;
+	AesalonPoolAlloc(Node, toInsert, Node(bound, value, NULL));
 	
-	Node *leaf = chooseLeaf(bound), *ll = NULL;
-	int count = leaf->branchCount();
-	if(count < Maximum) {
-		leaf->branch(count).bound = bound;
-		leaf->branch(count).value = value;
-		leaf->setBranchCount(count+1);
+	if(m_root == NULL) {
+		AesalonPoolAlloc(Node, m_root, Node(0, NULL));
+	}
+	
+	/* Choose leaf node . . . */
+	Node *c = m_root;
+	while(c->child() && !c->child()->isLeaf()) {
+		c = c->child();
+	}
+	
+	Node *cc = NULL;
+	if(!c->isFull()) {
+		Message(Debug, "First insertion case: c->child() is " << c->child());
+		toInsert->setNext(c->child());
+		toInsert->setParent(c);
+		c->setChild(toInsert);
+		c->incChildren();
 	}
 	else {
-		Branch b;
-		b.bound = bound;
-		b.value = value;
-		ll = splitNode(leaf, b);
+		cc = split(c, toInsert);
 	}
 	
-	Node *result = adjustTree(leaf, ll);
-	if(result != NULL) {
-		Node *newRoot = new Node(false);
-		newRoot->setBranchCount(2);
-		newRoot->branch(0).bound = m_root->bound();
-		newRoot->branch(0).node = m_root;
-		newRoot->branch(1).bound = result->bound();
-		newRoot->branch(1).node = result;
-		m_root->setParent(newRoot);
-		result->setParent(newRoot);
-		m_root = newRoot;
+	while(cc != NULL && c != m_root) {
+		Node *parent = c->parent();
+		
+		if(!parent->isFull()) {
+			cc->setNext(parent->child());
+			cc->setParent(parent);
+			parent->setChild(cc);
+			parent->incChildren();
+		}
+		else {
+			cc = split(parent, cc);
+		}
+		
+		c = parent;
 	}
 	
-}
-
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::remove(
-	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
-	Value value) {
-	
-	Node *leaf = findLeaf(m_root, bound, value);
-	
-	condenseTree(leaf);
-	
-	if(!m_root->isLeaf() && m_root->branchCount() == 1) {
-		Node *newRoot = m_root->branch(0).node;
-		newRoot->setParent(NULL);
-		delete m_root;
-		m_root = newRoot;
+	if(cc != NULL) {
+		Node *newRoot;
+		AesalonPoolAlloc(Node, newRoot, Node(m_root->depth()+1, NULL));
+		c->setParent(newRoot);
+		cc->setParent(newRoot);
+		c->setNext(cc);
+		newRoot->setChildCount(2);
+		newRoot->setChild(c);
 	}
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound
-	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::bounds() {
-	
-	return m_root->bound();
-}
-
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::search(
-	const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
-	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *node,
-	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::SearchProcessor *processor) {
-	
+RTreeTemplate
+void RTreeScope::search(RTreeScope::Node *node, const RTreeScope::Bound &bound, RTreeScope::Visitor *visitor) {
 	if(node == NULL) return;
 	
-	if(node->isLeaf()) {
-		for(int i = 0; i < node->branchCount(); i ++) {
-			Branch &branch = node->branch(i);
-			
-			if(branch.bound.overlaps(bound)) {
-				processor->process(branch.bound, branch.value);
-			}
-		}
-	}
-	else {
-		for(int i = 0; i < node->branchCount(); i ++) {
-			Branch &branch = node->branch(i);
-			if(branch.bound.overlaps(bound)) {
-				search(bound, branch.node, processor);
-			}
-		}
-	}
-}
-
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
-	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::chooseLeaf(
-		const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound) {
+	Message(Debug, "**** Beginning search.");
 	
-	Node *node = m_root;
-	
-	while(!node->isLeaf()) {
-		Node *smallestNode = NULL;
-		Key smallestVolume = 0;
-		for(int i = 0; i < node->branchCount(); i ++) {
-			Key volume = bound.enlargementToCover(node->branch(i).bound);
-			
-			if(volume < smallestVolume || smallestNode == NULL) {
-				smallestNode = node->branch(i).node;
-				smallestVolume = volume;
-			}
-			else if(volume == smallestVolume) {
-				/* TODO: implement tiebreaker. */
-				//Message(Debug, "RTree: smallestVolume tie-breaker not implemented!");
-			}
-		}
-		
-		node = smallestNode;
-	}
-	
-	return node;
-}
-
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
-	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::adjustTree(
-		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *n,
-		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *nn) {
-	
-	while(n != m_root) {
-		Node *p = n->parent();
-		
-		int i = 0;
-		for(; i < p->branchCount(); i ++) {
-			if(p->branch(i).node == n) {
-				break;
-			}
-		}
-		
-		p->branch(i).bound = n->bound();
-		
-		if(nn != NULL) {
-			/* Add nn to p. */
-			int count = p->branchCount();
-			if(count < Maximum) {
-				p->branch(count).bound = nn->bound();
-				p->branch(count).node = nn;
-				nn = NULL;
-				p->setBranchCount(p->branchCount()+1);
+	Node *n = node;
+	while(n != NULL) {
+		Message(Debug, "Searching node . . .");
+		if(bound.overlaps(n->bound())) {
+			Message(Debug, "\tBound overlaps!");
+			if(node->isLeaf()) {
+				visitor->visit(n->bound(), n->value());
 			}
 			else {
-				/* Invoke splitNode to create pp. */
-				
-				Branch b;
-				b.bound = nn->bound();
-				b.node = nn;
-				
-				nn = splitNode(p, b);
+				search(n, bound, visitor);
 			}
 		}
-		
-		n = p;
+		n = n->next();
 	}
-	
-	return nn;
 }
 
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
-	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::splitNode(
-		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *node,
-		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Branch &branch) {
-	
-	/* This uses the linear-time algorithm specified in the publication. */
-	Node *nn = new Node(node->isLeaf());
-	nn->setParent(node->parent());
-	
-	Branch list[Maximum+1];
-	int listSize = Maximum+1;
-	
-	for(int i = 0; i < Maximum; i ++) {
-		list[i] = node->branch(i);
-	}
-	list[Maximum] = branch;
-	
-	node->setBranchCount(0);
-	nn->setBranchCount(0);
-	
-	int highestStart[Dimensions] = {0};
-	int lowestEnd[Dimensions] = {0};
-	Key lowest[Dimensions] = {0};
-	Key highest[Dimensions] = {0};
-	
-	for(int j = 0; j < Maximum+1; j ++) {
-		for(int i = 0; i < Dimensions; i ++) {
-			const Range &iRange = list[j].bound.range(i);
-			if(j == 0) {
-				lowest[i] = iRange.start();
-				highest[i] = iRange.end();
-				highestStart[i] = 0;
-				lowestEnd[i] = 0;
-				continue;
-			}
-			lowest[i] = std::min(lowest[i], iRange.start());
-			highest[i] = std::max(highest[i], iRange.end());
-			
-			Range &itemRange = list[j].bound.range(i);
-			if(list[highestStart[i]].bound.range(i).start() > itemRange.start()) {
-				highestStart[i] = j;
-			}
-			if(list[lowestEnd[i]].bound.range(i).end() < itemRange.end()) {
-				lowestEnd[i] = j;
-			}
-		}
-	}
-	
-	Key maxSeparation = 0;
-	int maxIndex = -1;
-	
-	/* Create normalized separations. */
-	for(int i = 0; i < Dimensions; i ++) {
-		Key separation;
-		if(highest[i]-lowest[i] == 0) separation = 0;
-		else separation = 
-			(list[lowestEnd[i]].bound.range(i).end() - list[highestStart[i]].bound.range(i).start())
-			/ (highest[i]-lowest[i]);
-		
-		if(maxIndex == -1 || separation > maxSeparation) maxIndex = i, maxSeparation = separation;
-	}
-	
-	Bound nodeBound;
-	Bound nnBound;
-	
-	if(highestStart[maxIndex] != lowestEnd[maxIndex]) {
-		node->branch(0) = list[highestStart[maxIndex]];
-		node->setBranchCount(1);
-		nn->branch(0) = list[lowestEnd[maxIndex]];
-		nn->setBranchCount(1);
-	
-		nodeBound = list[highestStart[maxIndex]].bound;
-		nnBound = list[lowestEnd[maxIndex]].bound;
-		
-		/* Do the removal in the correct order . . . */
-		if(highestStart[maxIndex] > lowestEnd[maxIndex]) {
-			list[highestStart[maxIndex]] = list[listSize-1];
-			list[lowestEnd[maxIndex]] = list[listSize-2];
-		}
-		else if(lowestEnd[maxIndex] > highestStart[maxIndex]) {
-			list[lowestEnd[maxIndex]] = list[listSize-1];
-			list[highestStart[maxIndex]] = list[listSize-2];
-		}
-	}
-	/* They are one and the same . . . this only happens if all ranges are identical in this node.
-		Thus, any elements will do perfectly well.
-	*/
-	else {
-		node->branch(0) = list[listSize-1];
-		node->setBranchCount(1);
-		nn->branch(0) = list[listSize-2];
-		nn->setBranchCount(1);
-		
-		nodeBound = list[listSize-1].bound;
-		nnBound = list[listSize-2].bound;
-	}
-	listSize -= 2;
-	
-	while(true) {
-		if(listSize == 0) break;
-		else if((node->branchCount() + listSize) == Minimum) {
-			for(int i = 0; i < listSize; i ++) {
-				node->branch(node->branchCount()) = list[i];
-				node->setBranchCount(node->branchCount()+1);
-			}
-			break;
-		}
-		else if((nn->branchCount() + listSize) == Minimum) {
-			for(int i = 0; i < listSize; i ++) {
-				nn->branch(nn->branchCount()) = list[i];
-				nn->setBranchCount(nn->branchCount()+1);
-			}
-			break;
-		}
-		/* PickNext algorithm for linear-time is to simply pick any item. Choose the last. */
-		Key volume1 = nodeBound.enlargementToCover(list[listSize-1].bound);
-		Key volume2 = nnBound.enlargementToCover(list[listSize-1].bound);
-		
-		if(volume1 < volume2) {
-			node->branch(node->branchCount()) = list[listSize-1];
-			node->setBranchCount(node->branchCount()+1);
-			nodeBound.enclose(list[listSize-1].bound);
-		}
-		else if(volume2 < volume1) {
-			nn->branch(nn->branchCount()) = list[listSize-1];
-			nn->setBranchCount(nn->branchCount()+1);
-			nnBound.enclose(list[listSize-1].bound);
-		}
-		else {
-			//Message(Warning, "RTree: splitNode tie-breaker NYI. Defaulting to node.");
-			node->branch(node->branchCount()) = list[listSize-1];
-			node->setBranchCount(node->branchCount()+1);
-			nodeBound.enclose(list[listSize-1].bound);
-		}
-		listSize --;
-	}
-	
-	return nn;
-}
-
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-typename RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *
-	RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::findLeaf(
-		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *node,
-		const RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Bound &bound,
-		Value value) {
-	
-	if(node->isLeaf()) {
-		for(int i = 0; i < node->branchCount(); i ++) {
-			if(node->branch(i).value == value) {
-				node->branch(i) = node->branch(node->branchCount()-1);
-				node->setBranchCount(node->branchCount()-1);
-				return node;
-			}
-		}
-		return NULL;
-	}
-	else {
-		for(int i = 0; i < node->branchCount(); i ++) {
-			if(bound.overlaps(node->branch(i).bound)) {
-				Node *result = findLeaf(node->branch(i).node, bound, value);
-				if(result != NULL) return result;
-			}
-		}
-	}
-	return NULL;
-}
-
-template<typename Key, typename Value, int Dimensions, int Maximum, int Minimum,
-	typename FloatKey>
-void RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::condenseTree(
-		RTree<Key, Value, Dimensions, Maximum, Minimum, FloatKey>::Node *leaf) {
-	
-	Node *n = leaf;
-	std::list<Node *> removedNodes;
-	
-	while(m_root != n) {
-		Node *p = n->parent();
-		
-		int i;
-		for(i = 0; i < p->branchCount(); i ++) {
-			if(p->branch(i).node == n) break;
-		}
-		
-		if(n->branchCount() < Minimum) {
-			p->branch(i) = p->branch(p->branchCount()-1);
-			p->setBranchCount(p->branchCount()-1);
-			removedNodes.push_back(n);
-		}
-		else {
-			p->branch(i).bound = n->bound();
-		}
-		n = p;
-	}
-	
-	Message(Debug, "Reinserting " << removedNodes.size() << " node(s) into tree.");
-	
-	for(typename std::list<Node *>::iterator i = removedNodes.begin(); i != removedNodes.end(); ++i) {
-		Node *node = *i;
-		
-		if(node->isLeaf()) {
-			for(int i = 0; i < node->branchCount(); i ++) {
-				Branch &b = node->branch(i);
-				insert(b.bound, b.value);
-			}
-		}
-		/* TODO: implement better support for removal. This is horribly slow. */
-		else {
-			std::queue<Node *> q;
-			q.push(node);
-			while(q.size()) {
-				node = q.front();
-				q.pop();
-				if(node->isLeaf()) {
-					for(int i = 0; i < node->branchCount(); i ++) {
-						Branch &b = node->branch(i);
-						insert(b.bound, b.value);
-					}
-				}
-				else {
-					for(int i = 0; i < node->branchCount(); i ++) {
-						q.push(node->branch(i).node);
-					}
-				}
-			}
-		}
-	}
+RTreeTemplate
+typename RTreeScope::Node *RTreeScope::split(RTreeScope::Node *node, RTreeScope::Node *toInsert) {
+	Node *s;
+	AesalonPoolAlloc(Node, s, Node(node->depth(), NULL));
 	
 	
+	Message(Fatal, "Splitting NYI.");
+	
+	toInsert = toInsert;
+	
+	return s;
 }
 
 } // namespace Storage
