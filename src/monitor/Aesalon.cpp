@@ -42,10 +42,11 @@ int main(int argc, char *argv[]) {
 	rt.insert(RTree::Bound(2.2, 8), 6);
 	rt.insert(RTree::Bound(1.1, 5.3), 7);
 	
-	class Processor : public RTree::Visitor {
+	class Processor : public RTree::Callback {
 	public:
-		virtual void visit(const RTree::Bound &/*bound*/, int &value) {
+		virtual bool handle(const RTree::Bound &/*bound*/, int &value) {
 			Message(Debug, "****\t\tFound value " << value);
+			return true;
 		}
 	};
 	

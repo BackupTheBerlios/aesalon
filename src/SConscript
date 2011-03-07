@@ -12,7 +12,8 @@ for path in dirglob:
 for path in dirglob:
 	SConscript(path)"""
 
-dirs = "util config storage artisan monitor visualizer".split()
+#dirs = "util config storage artisan monitor visualizer".split()
+dirs = "util config storage monitor".split()
 
 for dir in dirs:
 	env.Append(LIBPATH="#.build/" + dir)

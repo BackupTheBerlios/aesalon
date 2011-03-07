@@ -49,7 +49,11 @@ public:
 	private:
 		Key m_bounds[Dimensions][2];
 	public:
-		Bound() {}
+		Bound() {
+			for(int i = 1; i < Dimensions; i ++) {
+				m_bounds[i][0] = m_bounds[i][1] = 0.0;
+			}
+		}
 		Bound(Key d1_start, Key d1_end, ...) {
 			va_list ap;
 			va_start(ap, d1_end);
@@ -106,28 +110,30 @@ public:
 		}
 	};
 	
-	class Visitor {
+	class Callback {
 	public:
-		virtual ~Visitor() {}
+		virtual ~Callback() {}
 		
-		virtual void visit(const Bound &bound, Value &value) = 0;
+		/** Handle a search result.
+			@return True if the search should continue.
+		*/
+		virtual bool handle(const Bound &bound, Value &value) = 0;
 	};
 protected:
 	class Node {
 	private:
 		Bound m_bound;
 		int m_depth;
-		int m_childCount;
-		Node *m_parent, *m_next;
-		union {
-			Value m_value;
-			Node *m_child;
+		int m_branches;
+		Node *m_parent;
+		
+		union Branch {
+			Value value;
+			Node *child;
 		};
+		Branch m_branch[Maximum];
 	public:
-		Node(const Bound &bound, Value value, Node *parent)
-			: m_bound(bound), m_depth(0), m_childCount(0), m_parent(parent), m_next(NULL), m_value(value) { }
-		Node(int depth, Node *parent)
-			: m_depth(depth), m_childCount(0), m_parent(parent), m_next(NULL) {}
+		Node(int depth) : m_depth(depth) {}
 		
 		Bound &bound() { return m_bound; }
 		const Bound &bound() const { return m_bound; }
@@ -135,22 +141,19 @@ protected:
 		int depth() const { return m_depth; }
 		bool isLeaf() const { return m_depth == 0; }
 		
-		bool isFull() const { return m_childCount == Maximum; }
-		int childCount() const { return m_childCount; }
-		void incChildren() { m_childCount ++; }
-		void setChildCount(int childcount) { m_childCount = childcount; }
+		bool isFull() const { return m_branches == Maximum; }
+		int branches() const { return m_branches; }
+		
+		void addBranch(const Bound &bound, Value value) {
+			m_branch[m_branches].item.bound = bound;
+			m_branch[m_branches++].item.value= value;
+		}
+		void addBranch(Node *child) {
+		
+		}
 		
 		Node *parent() const { return m_parent; }
 		void setParent(Node *parent) { m_parent = parent; }
-		
-		Node *next() const { return m_next; }
-		void setNext(Node *next) { m_next = next; }
-		
-		Value &value() { return m_value; }
-		const Value &value() const { return m_value; }
-		void setValue(Value value) { m_value = value; }
-		Node *child() const { return m_child; }
-		void setChild(Node *child) { m_child = child; }
 	};
 private:
 	Node *m_root;
@@ -158,10 +161,10 @@ public:
 	RTree();
 	~RTree();
 	
-	void search(const Bound &bound, Visitor *visitor);
+	void search(const Bound &bound, Callback *callback);
 	void insert(const Bound &bound, const Value &value);
 private:
-	void search(Node *node, const Bound &bound, Visitor *visitor);
+	bool search(Node *node, const Bound &bound, Callback *callback);
 	Node *split(Node *node, Node *toInsert);
 };
 
@@ -176,8 +179,8 @@ RTreeScope::~RTree() {
 }
 
 RTreeTemplate
-void RTreeScope::search(const RTreeScope::Bound &bound, RTreeScope::Visitor *visitor) {
-	search(m_root, bound, visitor);
+void RTreeScope::search(const RTreeScope::Bound &bound, RTreeScope::Callback *callback) {
+	search(m_root, bound, callback);
 }
 
 RTreeTemplate
@@ -185,57 +188,11 @@ void RTreeScope::insert(const RTreeScope::Bound &bound, const Value &value) {
 	Node *toInsert;
 	AesalonPoolAlloc(Node, toInsert, Node(bound, value, NULL));
 	
-	if(m_root == NULL) {
-		AesalonPoolAlloc(Node, m_root, Node(0, NULL));
-	}
 	
-	/* Choose leaf node . . . */
-	Node *c = m_root;
-	while(c->child() && !c->child()->isLeaf()) {
-		c = c->child();
-	}
-	
-	Node *cc = NULL;
-	if(!c->isFull()) {
-		Message(Debug, "First insertion case: c->child() is " << c->child());
-		toInsert->setNext(c->child());
-		toInsert->setParent(c);
-		c->setChild(toInsert);
-		c->incChildren();
-	}
-	else {
-		cc = split(c, toInsert);
-	}
-	
-	while(cc != NULL && c != m_root) {
-		Node *parent = c->parent();
-		
-		if(!parent->isFull()) {
-			cc->setNext(parent->child());
-			cc->setParent(parent);
-			parent->setChild(cc);
-			parent->incChildren();
-		}
-		else {
-			cc = split(parent, cc);
-		}
-		
-		c = parent;
-	}
-	
-	if(cc != NULL) {
-		Node *newRoot;
-		AesalonPoolAlloc(Node, newRoot, Node(m_root->depth()+1, NULL));
-		c->setParent(newRoot);
-		cc->setParent(newRoot);
-		c->setNext(cc);
-		newRoot->setChildCount(2);
-		newRoot->setChild(c);
-	}
 }
 
 RTreeTemplate
-void RTreeScope::search(RTreeScope::Node *node, const RTreeScope::Bound &bound, RTreeScope::Visitor *visitor) {
+bool RTreeScope::search(RTreeScope::Node *node, const RTreeScope::Bound &bound, RTreeScope::Callback *callback) {
 	if(node == NULL) return;
 	
 	Message(Debug, "**** Beginning search.");
@@ -246,14 +203,15 @@ void RTreeScope::search(RTreeScope::Node *node, const RTreeScope::Bound &bound, 
 		if(bound.overlaps(n->bound())) {
 			Message(Debug, "\tBound overlaps!");
 			if(node->isLeaf()) {
-				visitor->visit(n->bound(), n->value());
+				if(!callback->handle(n->bound(), n->value())) return false;
 			}
 			else {
-				search(n, bound, visitor);
+				if(!search(n, bound, callback)) return false;
 			}
 		}
 		n = n->next();
 	}
+	return true;
 }
 
 RTreeTemplate
