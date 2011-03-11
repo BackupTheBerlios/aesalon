@@ -204,7 +204,9 @@ public:
 	void insert(const Bound &bound, const Value &value);
 private:
 	bool search(Node *node, const Bound &bound, Callback *callback);
-	Node *split(Node *node);
+	
+	Node *splitLeaf(Node *node);
+	Node *splitInternal(Node *node);
 };
 
 RTreeTemplate
@@ -244,7 +246,7 @@ void RTreeScope::insert(const RTreeScope::Bound &bound, const Value &value) {
 	Node *nn = NULL;
 	if(node->branches() == Maximum) {
 		/* */
-		nn = split(node);
+		nn = splitLeaf(node);
 		if(nn->bound().toCover(bound) < node->bound().toCover(bound)) {
 			nn->asLeaf()->addBranch(bound, value);
 		}
@@ -282,8 +284,105 @@ bool RTreeScope::search(RTreeScope::Node *node, const RTreeScope::Bound &bound, 
 }
 
 RTreeTemplate
-typename RTreeScope::Node *RTreeScope::split(RTreeScope::Node *node) {
+typename RTreeScope::Node *RTreeScope::splitLeaf(RTreeScope::Node *node) {
+	LeafNode split1, *split2;
+	AesalonPoolAlloc(LeafNode, split2, LeafNode());
+	
+	/* Find maximum separation. */
+	int highestStart[Dimensions];
+	int lowestEnd[Dimensions];
+	Key lowest[Dimensions];
+	Key highest[Dimensions];
+	
+	for(int i = 0; i < Dimensions; i ++) {
+		highestStart[i] = 0;
+		lowestEnd[i] = 0;
+		lowest[i] = node->asLeaf()->bound(0).start(i);
+		highest[i] = node->asLeaf()->bound(0).end(i);
+		
+		for(int j = 1; j < Maximum; j ++) {
+			const Key &start = node->asLeaf()->bound(j).start(i);
+			const Key &end = node->asLeaf()->bound(j).end(i);
+			if(start > node->asLeaf()->bound(j).start(highestStart[i])) highestStart[i] = j;
+			if(end < node->asLeaf()->bound(j).end(lowestEnd[i])) lowestEnd[i] = j;
+			if(start < lowest[i]) lowest[i] = start;
+			if(end > highest[i]) highest[i] = end;
+		}
+	}
+	
+	FloatKey normalized[Dimensions];
+	int largest = 0;
+	for(int i = 0; i < Dimensions; i ++) {
+		if(lowest[i] == highest[i]) {
+			normalized[i] = 0;
+		}
+		else {
+			normalized[i] = FloatKey(lowestEnd[i] - highestStart[i]) / FloatKey(highest[i]-lowest[i]);
+		}
+		
+		if(normalized[i] > normalized[largest]) largest = i;
+	}
+	
+	if(highestStart[largest] == lowestEnd[largest]) {
+		split1.addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
+		split1.bound() = node->asLeaf()->bound(0);
+		split2->addBranch(node->asLeaf()->bound(1), node->asLeaf()->value(1));
+		split2.bound() = node->asLeaf()->bound(1);
+		node->asLeaf()->removeBranch(0);
+		node->asLeaf()->removeBranch(0);
+	}
+	else {
+		split1.addBranch(node->asLeaf()->bound(highestStart[largest]), node->asLeaf()->value(highestStart[largest]));
+		split2->addBranch(node->asLeaf()->bound(lowestEnd[largest]), node->asLeaf()->value(lowestEnd[largest]));
+		
+		split1.bound() = node->asLeaf()->bound(highestStart[largest]);
+		split2->bound() = node->asLeaf()->bound(lowestEnd[largest]);
+		
+		if(highestStart[largest] > lowestEnd[largest]) {
+			node->asLeaf()->removeBranch(highestStart[largest]);
+			node->asLeaf()->removeBranch(lowestEnd[largest]);
+		}
+		else {
+			node->asLeaf()->removeBranch(lowestEnd[largest]);
+			node->asLeaf()->removeBranch(highestStart[largest]);
+		}
+	}
+	
+	while(node->branches() > 0) {
+		if(split1.branches() + node->branches() == Minimum) {
+			break;
+		}
+		else if(split2->branches() + node->branches() == Minimum) {
+			break;
+		}
+		
+		Key cover1 = split1.bound().toCover(node->asLeaf()->bound(0));
+		Key cover2 = split2->bound().toCover(node->asLeaf()->bound(0));
+		if(cover1 < cover2) {
+			split1.toLeaf()->addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
+			split1.bound().cover(node->asLeaf()->bound(0));
+		}
+		else if(cover1 > cover2) {
+			split2->toLeaf()->addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
+			split2->bound().cover(node->asLeaf()->bound(0));
+		}
+		else {
+			
+		}
+		
+		node->branches();
+	}
+	
+	*node = split1;
+	
+	return split2;
+}
+
+RTreeTemplate
+typename RTreeScope::Node *RTreeScope::splitInternal(RTreeScope::Node *node) {
 	//AesalonPoolAlloc(Node, s, Node(node->depth(), NULL));
+	
+	
 	
 	Message(Fatal, "Splitting NYI.");
 	
