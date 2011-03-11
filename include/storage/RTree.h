@@ -100,6 +100,7 @@ public:
 					volume += delta*sizes[i];
 				}
 			}
+			return volume;
 		}
 		
 		void cover(const Bound &other) {
@@ -120,20 +121,18 @@ public:
 		virtual bool handle(const Bound &bound, Value &value) = 0;
 	};
 protected:
+	class LeafNode;
+	class InternalNode;
+	
 	class Node {
-	private:
+	protected:
 		Bound m_bound;
 		int m_depth;
 		int m_branches;
 		Node *m_parent;
-		
-		union Branch {
-			Value value;
-			Node *child;
-		};
-		Branch m_branch[Maximum];
 	public:
-		Node(int depth) : m_depth(depth) {}
+		Node(int depth) : m_depth(depth), m_branches(0) {}
+		virtual ~Node() {}
 		
 		Bound &bound() { return m_bound; }
 		const Bound &bound() const { return m_bound; }
@@ -144,16 +143,56 @@ protected:
 		bool isFull() const { return m_branches == Maximum; }
 		int branches() const { return m_branches; }
 		
-		void addBranch(const Bound &bound, Value value) {
-			m_branch[m_branches].item.bound = bound;
-			m_branch[m_branches++].item.value= value;
-		}
-		void addBranch(Node *child) {
-		
-		}
-		
 		Node *parent() const { return m_parent; }
 		void setParent(Node *parent) { m_parent = parent; }
+		
+		LeafNode *asLeaf() { return dynamic_cast<LeafNode *>(this); }
+		InternalNode *asInternal() { return dynamic_cast<InternalNode *>(this); }
+	};
+	
+	class LeafNode : public Node {
+	private:
+		struct Branch {
+			Bound bound;
+			Value value;
+		};
+		
+		Branch m_branch[Maximum];
+	public:
+		LeafNode() : Node(0) {}
+		
+		void addBranch(const Bound &bound, Value value) {
+			m_branch[this->m_branches].bound = bound;
+			m_branch[this->m_branches++].value = value;
+		}
+		void removeBranch(int which) {
+			if(this->m_branches == 0) return;
+			m_branch[which] = m_branch[--this->m_branches];
+		}
+		const Bound &bound(int which) {
+			return m_branch[which].bound;
+		}
+		Value &value(int which) {
+			return m_branch[which].value;
+		}
+	};
+	
+	class InternalNode : public Node {
+	private:
+		Node *m_branch[Maximum];
+	public:
+		InternalNode(int depth) : Node(depth) {}
+		
+		void addBranch(Node *node) {
+			m_branch[this->m_branches++] = node;
+		}
+		void removeBranch(int which) {
+			if(this->m_branches == 0) return;
+			m_branch[which] = m_branch[--this->m_branches];
+		}
+		Node *node(int which) {
+			return m_branch[which];
+		}
 	};
 private:
 	Node *m_root;
@@ -165,7 +204,7 @@ public:
 	void insert(const Bound &bound, const Value &value);
 private:
 	bool search(Node *node, const Bound &bound, Callback *callback);
-	Node *split(Node *node, Node *toInsert);
+	Node *split(Node *node);
 };
 
 RTreeTemplate
@@ -180,51 +219,75 @@ RTreeScope::~RTree() {
 
 RTreeTemplate
 void RTreeScope::search(const RTreeScope::Bound &bound, RTreeScope::Callback *callback) {
+	Message(Debug, "RTreeScope::search() called . . .");
 	search(m_root, bound, callback);
 }
 
 RTreeTemplate
 void RTreeScope::insert(const RTreeScope::Bound &bound, const Value &value) {
-	Node *toInsert;
-	AesalonPoolAlloc(Node, toInsert, Node(bound, value, NULL));
+	/* Simple case . . . */
+	if(m_root == NULL) {
+		LeafNode *leaf;
+		AesalonPoolAlloc(LeafNode, leaf, LeafNode());
+		leaf->addBranch(bound, value);
+		m_root = leaf;
+		return;
+	}
+	//Node *toInsert;
+	//AesalonPoolAlloc(Node, toInsert, Node(bound, value, NULL));
 	
+	Node *node = m_root;
+	while(!node->isLeaf()) {
+		node = node->asInternal()->node(0);
+	}
 	
+	Node *nn = NULL;
+	if(node->branches() == Maximum) {
+		/* */
+		nn = split(node);
+		if(nn->bound().toCover(bound) < node->bound().toCover(bound)) {
+			nn->asLeaf()->addBranch(bound, value);
+		}
+		else {
+			node->asLeaf()->addBranch(bound, value);
+		}
+	}
+	else {
+		node->asLeaf()->addBranch(bound, value);
+	}
 }
 
 RTreeTemplate
 bool RTreeScope::search(RTreeScope::Node *node, const RTreeScope::Bound &bound, RTreeScope::Callback *callback) {
-	if(node == NULL) return;
-	
 	Message(Debug, "**** Beginning search.");
+	if(node == NULL) {
+		Message(Debug, "NULL node . . .");
+		return true;
+	}
 	
-	Node *n = node;
-	while(n != NULL) {
+	for(int i = 0; i < node->branches(); i ++) {
 		Message(Debug, "Searching node . . .");
-		if(bound.overlaps(n->bound())) {
+		const Bound &nbound = node->asLeaf()->bound(i);
+		if(bound.overlaps(nbound)) {
 			Message(Debug, "\tBound overlaps!");
 			if(node->isLeaf()) {
-				if(!callback->handle(n->bound(), n->value())) return false;
+				if(!callback->handle(nbound, node->asLeaf()->value(i))) return false;
 			}
 			else {
-				if(!search(n, bound, callback)) return false;
+				if(!search(node->asInternal()->node(i), bound, callback)) return false;
 			}
 		}
-		n = n->next();
 	}
 	return true;
 }
 
 RTreeTemplate
-typename RTreeScope::Node *RTreeScope::split(RTreeScope::Node *node, RTreeScope::Node *toInsert) {
-	Node *s;
-	AesalonPoolAlloc(Node, s, Node(node->depth(), NULL));
-	
+typename RTreeScope::Node *RTreeScope::split(RTreeScope::Node *node) {
+	//AesalonPoolAlloc(Node, s, Node(node->depth(), NULL));
 	
 	Message(Fatal, "Splitting NYI.");
 	
-	toInsert = toInsert;
-	
-	return s;
+	return node;
 }
 
 } // namespace Storage
