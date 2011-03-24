@@ -109,6 +109,14 @@ public:
 				m_bounds[i][1] = std::max(m_bounds[i][1], other.m_bounds[i][1]);
 			}
 		}
+
+		Key volume() const {
+			Key value = m_bounds[0][1] - m_bounds[0][0];
+			for(int i = 1; i < Dimensions && value != 0; i ++) {
+				value *= (m_bounds[i][1] - m_bounds[i][0]);
+			}
+			return value;
+		}
 	};
 	
 	class Callback {
@@ -136,6 +144,7 @@ protected:
 		
 		Bound &bound() { return m_bound; }
 		const Bound &bound() const { return m_bound; }
+		virtual const Bound &bound(int which) = 0;
 		
 		int depth() const { return m_depth; }
 		bool isLeaf() const { return m_depth == 0; }
@@ -160,6 +169,7 @@ protected:
 		Branch m_branch[Maximum];
 	public:
 		LeafNode() : Node(0) {}
+		virtual ~LeafNode() {}
 		
 		void addBranch(const Bound &bound, Value value) {
 			m_branch[this->m_branches].bound = bound;
@@ -169,7 +179,10 @@ protected:
 			if(this->m_branches == 0) return;
 			m_branch[which] = m_branch[--this->m_branches];
 		}
-		const Bound &bound(int which) {
+		Bound &bound() {
+			return this->Node::bound();
+		}
+		virtual const Bound &bound(int which) {
 			return m_branch[which].bound;
 		}
 		Value &value(int which) {
@@ -185,11 +198,21 @@ protected:
 		
 		void addBranch(Node *node) {
 			m_branch[this->m_branches++] = node;
+			node->setParent(this);
 		}
 		void removeBranch(int which) {
 			if(this->m_branches == 0) return;
 			m_branch[which] = m_branch[--this->m_branches];
 		}
+
+		Bound &bound() {
+			return this->Node::bound();
+		}
+		
+		virtual const Bound &bound(int which) {
+			return m_branch[which]->bound();
+		}
+		
 		Node *node(int which) {
 			return m_branch[which];
 		}
@@ -245,7 +268,6 @@ void RTreeScope::insert(const RTreeScope::Bound &bound, const Value &value) {
 	
 	Node *nn = NULL;
 	if(node->branches() == Maximum) {
-		/* */
 		nn = splitLeaf(node);
 		if(nn->bound().toCover(bound) < node->bound().toCover(bound)) {
 			nn->asLeaf()->addBranch(bound, value);
@@ -256,6 +278,38 @@ void RTreeScope::insert(const RTreeScope::Bound &bound, const Value &value) {
 	}
 	else {
 		node->asLeaf()->addBranch(bound, value);
+	}
+
+	Message(Debug, "nn: " << nn);
+
+	/* Adjust the tree, going upwards. */
+	while(nn != NULL && node != m_root) {
+		Node *parent = node->parent();
+
+		Message(Debug, "parent: " << parent);
+		Message(Debug, "m_root: " << m_root);
+		Message(Debug, "node: " << node);
+		
+		if(parent->branches() == Maximum) {
+			Message(Fatal, "Case NYI.");
+		}
+		else {
+			parent->asInternal()->addBranch(nn);
+			parent->bound().cover(nn->bound());
+			nn = NULL;
+		}
+		node = parent;
+	}
+
+	if(nn != NULL) {
+		InternalNode *newRoot;
+		AesalonPoolAlloc(InternalNode, newRoot, InternalNode(m_root->depth()+1));
+
+		newRoot->addBranch(m_root);
+		newRoot->addBranch(nn);
+		newRoot->bound().cover(m_root->bound());
+		newRoot->bound().cover(m_root->bound());
+		m_root = newRoot;
 	}
 }
 
@@ -269,7 +323,7 @@ bool RTreeScope::search(RTreeScope::Node *node, const RTreeScope::Bound &bound, 
 	
 	for(int i = 0; i < node->branches(); i ++) {
 		Message(Debug, "Searching node . . .");
-		const Bound &nbound = node->asLeaf()->bound(i);
+		const Bound &nbound = node->bound(i);
 		if(bound.overlaps(nbound)) {
 			Message(Debug, "\tBound overlaps!");
 			if(node->isLeaf()) {
@@ -327,7 +381,7 @@ typename RTreeScope::Node *RTreeScope::splitLeaf(RTreeScope::Node *node) {
 		split1.addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
 		split1.bound() = node->asLeaf()->bound(0);
 		split2->addBranch(node->asLeaf()->bound(1), node->asLeaf()->value(1));
-		split2.bound() = node->asLeaf()->bound(1);
+		split2->bound() = node->asLeaf()->bound(1);
 		node->asLeaf()->removeBranch(0);
 		node->asLeaf()->removeBranch(0);
 	}
@@ -350,29 +404,51 @@ typename RTreeScope::Node *RTreeScope::splitLeaf(RTreeScope::Node *node) {
 	
 	while(node->branches() > 0) {
 		if(split1.branches() + node->branches() == Minimum) {
+			for(int i = 0; i < node->branches(); i ++) {
+				split1.addBranch(node->asLeaf()->bound(i), node->asLeaf()->value(i));
+				split1.bound().cover(node->asLeaf()->bound(i));
+			}
+
 			break;
 		}
 		else if(split2->branches() + node->branches() == Minimum) {
+			for(int i = 0; i < node->branches(); i ++) {
+				split2->addBranch(node->asLeaf()->bound(i), node->asLeaf()->value(i));
+				split2->bound().cover(node->asLeaf()->bound(i));
+			}
+
 			break;
 		}
 		
 		Key cover1 = split1.bound().toCover(node->asLeaf()->bound(0));
 		Key cover2 = split2->bound().toCover(node->asLeaf()->bound(0));
+		Message(Debug, "Adding value " << node->asLeaf()->value(0));
+
 		if(cover1 < cover2) {
-			split1.toLeaf()->addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
+			split1.addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
 			split1.bound().cover(node->asLeaf()->bound(0));
 		}
 		else if(cover1 > cover2) {
-			split2->toLeaf()->addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
+			split2->addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
 			split2->bound().cover(node->asLeaf()->bound(0));
 		}
 		else {
-			
+			if(split1.bound().volume() < split2->bound().volume()) {
+				split1.addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
+				split1.bound().cover(node->asLeaf()->bound(0));
+			}
+			else {
+				split2->addBranch(node->asLeaf()->bound(0), node->asLeaf()->value(0));
+				split2->bound().cover(node->asLeaf()->bound(0));
+			}
 		}
+		node->asLeaf()->removeBranch(0);
 		
 		node->branches();
 	}
-	
+
+	split1.setParent(node->parent());
+	split2->setParent(node->parent());
 	*node = split1;
 	
 	return split2;
