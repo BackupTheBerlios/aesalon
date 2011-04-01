@@ -9,5 +9,4 @@
 ==== Collector ====
 
 ==== Storage ====
-- Fix RTree deletion algorithm
-- Implement smallest-volume tiebreaker in chooseLeaf and splitNode.
+- Finish re-implementation of RTree.

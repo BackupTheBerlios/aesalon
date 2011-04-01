@@ -147,7 +147,7 @@ protected:
 		virtual const Bound &bound(int which) = 0;
 		
 		int depth() const { return m_depth; }
-		bool isLeaf() const { return m_depth == 0; }
+		virtual bool isLeaf() const = 0;
 		
 		bool isFull() const { return m_branches == Maximum; }
 		int branches() const { return m_branches; }
@@ -188,6 +188,8 @@ protected:
 		Value &value(int which) {
 			return m_branch[which].value;
 		}
+		
+		virtual bool isLeaf() const { return true; }
 	};
 	
 	class InternalNode : public Node {
@@ -216,6 +218,8 @@ protected:
 		Node *node(int which) {
 			return m_branch[which];
 		}
+		
+		virtual bool isLeaf() const { return false; }
 	};
 private:
 	Node *m_root;
@@ -258,12 +262,26 @@ void RTreeScope::insert(const RTreeScope::Bound &bound, const Value &value) {
 		m_root = leaf;
 		return;
 	}
-	//Node *toInsert;
-	//AesalonPoolAlloc(Node, toInsert, Node(bound, value, NULL));
 	
 	Node *node = m_root;
 	while(!node->isLeaf()) {
-		node = node->asInternal()->node(0);
+		Node *smallest = node->asInternal()->node(0);
+		Key smallestCost = node->asInternal()->node(0)->bound().toCover(bound);
+		for(int i = 1; i < node->branches(); i ++) {
+			Node *p = node->asInternal()->node(i);
+			Key cost = p->bound().toCover(bound);
+			if(cost < smallestCost) {
+				smallestCost = cost;
+				smallest = p;
+			}
+			else if(cost == smallestCost) {
+				if(smallest->bound().volume() > p->bound().volume()) {
+					smallestCost = cost;
+					smallest = p;
+				}
+			}
+		}
+		node = smallest;
 	}
 	
 	Node *nn = NULL;
@@ -309,6 +327,7 @@ void RTreeScope::insert(const RTreeScope::Bound &bound, const Value &value) {
 		newRoot->addBranch(nn);
 		newRoot->bound().cover(m_root->bound());
 		newRoot->bound().cover(m_root->bound());
+		
 		m_root = newRoot;
 	}
 }
