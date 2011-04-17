@@ -35,6 +35,18 @@ int main(int argc, char *argv[]) {
 	rt.insert(RTree::BoundType(86.2, 88.5), 5);
 	rt.insert(RTree::BoundType(2.2, 8), 6);
 	
+	class Visitor : public RTree::SearchVisitorType {
+	public:
+		virtual ~Visitor() {}
+		
+		virtual void visit(const RTree::BoundType &bound, const int &data) {
+			Message(Debug, "Found item with data " << data);
+		}
+	};
+	
+	Visitor visitor;
+	rt.search(RTree::BoundType(0.0, 100.0), visitor);
+	
 	return 0;
 }
 #endif

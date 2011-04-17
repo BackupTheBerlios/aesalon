@@ -40,6 +40,7 @@ template<typename KeyType, typename DataType, int Dimensions, int MinimumFactor 
 class RTree {
 public:
 	typedef Bound<KeyType, Dimensions> BoundType;
+	typedef RTreePrivate::SearchVisitor<DataType, BoundType> SearchVisitorType;
 private:
 	typedef RTreePrivate::Node<DataType, BoundType, MaximumFactor> NodeType;
 	typedef RTreePrivate::InternalNode<DataType, BoundType, MaximumFactor> InternalNodeType;
@@ -55,7 +56,10 @@ public:
 		
 	}
 	
-	void insert(BoundType bound, DataType data) {
+	void search(const BoundType &bound, SearchVisitorType &visitor)
+		{ searchHelper(bound, m_root, visitor); }
+	
+	void insert(const BoundType &bound, const DataType &data) {
 		if(m_root == NULL) {
 			LeafNodeType *leafRoot;
 			AesalonPoolAlloc(LeafNodeType, leafRoot, LeafNodeType());
@@ -64,6 +68,101 @@ public:
 			return;
 		}
 		
+		NodeType *node = insertChooseLeaf(bound);
+		
+		bool succeeded = node->asLeafNode()->addBranch(bound, data);
+		if(!succeeded) {
+			LeafNodeType *newLeaf = splitNode(node->asLeafNode());
+			
+			Message(Fatal, "Splitting support in insert NYI.");
+		}
+	}
+private:
+	void searchHelper(const BoundType &bound, NodeType *node, SearchVisitorType &visitor) {
+		if(node == NULL) return;
+		
+		for(int branch = 0; branch < node->branchCount(); branch ++) {
+			if(!bound.overlaps(node->branchBound(branch))) continue;
+			
+			if(node->isLeaf()) {
+				visitor.visit(node->branchBound(branch), node->asLeafNode()->branch(branch));
+			}
+			else {
+				searchHelper(bound, node->asInternalNode()->branch(branch), visitor);
+			}
+		}
+	}
+	
+	NodeType *insertChooseLeaf(const BoundType &bound) {
+		NodeType *node = m_root;
+		while(!node->isLeaf()) {
+			Message(Fatal, "Insertion into non-root nodes NYI.");
+		}
+		return node;
+	}
+	
+	void linearSplitSeeds(NodeType *node, int *seeds) {
+		KeyType highestStartValue[Dimensions] = {0};
+		int highestStart[Dimensions] = {-1};
+		KeyType lowestEndValue[Dimensions] = {0};
+		int lowestEnd[Dimensions] = {-1};
+		
+		KeyType lowest[Dimensions];
+		KeyType highest[Dimensions];
+		
+		for(int d = 0; d < Dimensions; d ++) {
+			for(int i = 0; i <= MaximumFactor; i ++) {
+				const BoundType &bound = node->branchBound(i);
+				
+				if(i == 0 || bound.start(d) > highestStartValue[d]) {
+					highestStart[d] = i;
+					highestStartValue[d] = bound.start(d);
+				}
+				if(i == 0 || bound.end(d) < lowestEndValue[d]) {
+					lowestEnd[d] = i;
+					lowestEndValue[d] = bound.end(d);
+				}
+				
+				if(i == 0 || bound.start(d) < lowest[d]) lowest[d] = bound.start(d);
+				if(i == 0 || bound.end(d) < highest[d]) highest[d] = bound.end(d);
+			}
+		}
+		
+		FloatKeyType greatestSeparation;
+		int greatestSeparationDimension = -1;
+		for(int d = 0; d < Dimensions; d ++) {
+			KeyType size = highest[d] - lowest[d];
+			if(size == 0) continue;
+			
+			KeyType sep = highestStart[d] - lowestEnd[d];
+			FloatKeyType sepNormalized = FloatKeyType(sep) / size;
+			
+			if(d == 0 || sepNormalized > greatestSeparation) {
+				greatestSeparation = sepNormalized;
+				greatestSeparationDimension = d;
+			}
+		}
+		
+		if(greatestSeparationDimension == -1) {
+			Message(Fatal, "R-tree degeneracy case: all nodes have the same range. Cannot decide which to use as seeds.");
+		}
+		
+		seeds[0] = highestStart[greatestSeparationDimension];
+		seeds[1] = lowestEnd[greatestSeparationDimension];
+	}
+	
+	InternalNodeType *splitNode(InternalNodeType *toSplit) {
+		int seeds[2];
+		linearSplitSeeds(toSplit, seeds);
+		
+		return NULL;
+	}
+	
+	LeafNodeType *splitNode(LeafNodeType *toSplit) {
+		int seeds[2];
+		linearSplitSeeds(toSplit, seeds);
+		
+		return NULL;
 	}
 };
 

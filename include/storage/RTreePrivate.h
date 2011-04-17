@@ -20,7 +20,7 @@ template<typename DataType, typename BoundType, int MaximumFactor>
 class Node {
 private:
 	Node *m_parent;
-	BoundType m_bounds[MaximumFactor];
+	BoundType m_bounds[MaximumFactor+1];
 	int m_branchCount;
 public:
 	Node() : m_branchCount(0) {}
@@ -49,7 +49,7 @@ public:
 template<typename DataType, typename BoundType, int MaximumFactor>
 class InternalNode : public Node<DataType, BoundType, MaximumFactor> {
 private:
-	Node<DataType, BoundType, MaximumFactor> *m_branches[MaximumFactor];
+	Node<DataType, BoundType, MaximumFactor> *m_branches[MaximumFactor+1];
 	int m_depth;
 public:
 	InternalNode() {}
@@ -65,7 +65,7 @@ public:
 template<typename DataType, typename BoundType, int MaximumFactor>
 class LeafNode : public Node<DataType, BoundType, MaximumFactor> {
 private:
-	DataType m_branches[MaximumFactor];
+	DataType m_branches[MaximumFactor+1];
 public:
 	LeafNode() {}
 	virtual ~LeafNode() {}
@@ -87,14 +87,13 @@ public:
 			nodes has already been reached.
 	*/
 	bool addBranch(const BoundType &bound, const DataType &data) {
-		int branch;
-		if((branch = branchCount()) == MaximumFactor) return false;
+		int branch = branchCount();
 		
 		setBranchBound(branch, bound);
 		setBranch(branch, data);
 		
 		setBranchCount(branch+1);
-		return true;
+		return branch != MaximumFactor;
 	}
 	
 	void removeBranch(int which) {
@@ -105,6 +104,14 @@ public:
 		}
 		setBranchCount(lastBranch-1);
 	}
+};
+
+template<typename DataType, typename BoundType>
+class SearchVisitor {
+public:
+	virtual ~SearchVisitor() {}
+	
+	virtual void visit(const BoundType &bound, const DataType &data) = 0;
 };
 
 } // namespace RTreePrivate
