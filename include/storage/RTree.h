@@ -22,14 +22,13 @@ namespace Storage {
 
 /** An arbitrary-dimensional R-tree.
 	Notes:
-	- Key must support a basic assignment specifier and also the element zero, plus all the usual arithmetic operators.
-		Using an elementary type is a very good idea.
-	- Value must be either a basic type or a pointer.
-	- Minimum <= Maximum/2. (Logic in code assumes this.)
-	- Maximum <= some reasonable number. Many linear searches through lists of this size take place.
-		A reasonable size is 16 to 100.
+	- KeyType must support a basic assignment specifier and also the element zero, plus all the usual arithmetic operators.
+		Using an elementary type (int, double, etc.) is a very good idea.
+	- DataType can be any type, but pointers are probably the best idea.
+	- 2 <= MinimumFactor <= MaximumFactor/2.
+	- MaximumFactor should be a reasonably small number. Many linear searches through arrays of this size take place.
+		
 	- Dimensions should be as small as possible; many linear operations take place on this number.
-		Six is a reasonable upper bound.
 	- FloatKey should be a version of Key that supports floating-point arithmetic (or at least non-integer division).
 		If Key is already a floating-point type, then this can be omitted.
 	Unless otherwise noted, all algorithms are from
@@ -50,7 +49,9 @@ private:
 public:
 	RTree() {
 		m_root = NULL;
+		/* Some basic sanity checks. */
 		if(MinimumFactor*2 > MaximumFactor) Message(Fatal, "RTree: MinimumFactor must be at most half of MaximumFactor.");
+		if(MaximumFactor < 2) Message(Fatal, "RTree: MaximumFactor must be at least 2!");
 	}
 	
 	~RTree() {
@@ -100,8 +101,6 @@ public:
 			newRoot->addBranch(newNode->overallBound(), newNode);
 			m_root = newRoot;
 		}
-		
-		//Message(Fatal, "Splitting support in insert NYI.");
 	}
 private:
 	void searchHelper(const BoundType &bound, NodeType *node, SearchVisitorType &visitor) {
@@ -130,7 +129,6 @@ private:
 			}
 			
 			node = node->asInternalNode()->branch(minElement);
-			//Message(Fatal, "Insertion into non-root nodes NYI.");
 		}
 		return node;
 	}
@@ -168,21 +166,26 @@ private:
 			KeyType size = highest[d] - lowest[d];
 			if(size == 0) continue;
 			
-			KeyType sep = highestStart[d] - lowestEnd[d];
+			if(highestStart[d] == lowestEnd[d]) continue;
+			
+			KeyType sep = highestStartValue[d] - lowestEndValue[d];
 			FloatKeyType sepNormalized = FloatKeyType(sep) / size;
 			
-			if(d == 0 || sepNormalized > greatestSeparation) {
+			if(greatestSeparationDimension == -1 || sepNormalized > greatestSeparation) {
 				greatestSeparation = sepNormalized;
 				greatestSeparationDimension = d;
 			}
 		}
 		
+		/* Check for degeneracy case . . . */
 		if(greatestSeparationDimension == -1) {
-			Message(Fatal, "R-tree degeneracy case: all nodes have the same range. Cannot decide which to use as seeds for node splitting.");
+			seeds[0] = 0;
+			seeds[1] = 1;
 		}
-		
-		seeds[0] = highestStart[greatestSeparationDimension];
-		seeds[1] = lowestEnd[greatestSeparationDimension];
+		else {
+			seeds[0] = highestStart[greatestSeparationDimension];
+			seeds[1] = lowestEnd[greatestSeparationDimension];
+		}
 	}
 	
 	template<typename SplitNodeType>
@@ -195,8 +198,9 @@ private:
 		
 		int tsSeed = 0;
 		
-		SplitNodeType *newNode;
+		SplitNodeType *newNode = NULL;
 		AesalonPoolAlloc(SplitNodeType, newNode, SplitNodeType());
+		
 		newNode->setParent(toSplit->parent());
 		if(seeds[0] > seeds[1]) {
 			newNode->addBranch(toSplit->branchBound(seeds[0]), toSplit->branch(seeds[0]));
@@ -215,6 +219,7 @@ private:
 			tsSeed = seeds[0];
 		}
 		else {
+			abort();
 			Message(Fatal, "Both seeds for node-splitting are identical. Fix linearSplitSeeds.");
 		}
 		
@@ -230,12 +235,9 @@ private:
 			
 			/* Handle the minumum branching factor cases . . . */
 			if(toSplit->branchCount() == MinimumFactor) {
-				Message(Debug, "toSplit minimum factor . . .");
 				break;
 			}
 			else if(newNode->branchCount() + adjI == MinimumFactor) {
-				Message(Debug, "newNode minimum factor . . .");
-				Message(Warning, "TODO: Handle newNode minimum factor!");
 				for(; i >= 0; i --) {
 					if(i == tsSeed) continue;
 					
@@ -252,7 +254,7 @@ private:
 			/* The other case is a fall-through. */
 		}
 		
-		Message(Debug, "After splitting (toSplit/newNode) is " << toSplit->branchCount() << "/" << newNode->branchCount());
+		newNode->setDepth(toSplit->depth());
 		
 		return newNode;
 	}

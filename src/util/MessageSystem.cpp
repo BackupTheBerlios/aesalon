@@ -26,7 +26,7 @@ void MessageSystem::writeMessage(MessageSystem::MessageLevel level, const std::s
 	std::printf("[%02i:%02i:%02i %5s] ", lt->tm_hour, lt->tm_min, lt->tm_sec, LevelString(level));
 	std::puts(message.c_str());
 	
-	if(level == Fatal) exit(1);
+	if(level == Fatal) abort();
 }
 
 } // namespace Util

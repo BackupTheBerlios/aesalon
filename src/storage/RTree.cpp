@@ -11,7 +11,4 @@
 
 namespace Storage {
 
-//RTreeTemplate
-//__gnu_cxx::__pool_alloc< RTreeScope::Node > RTreeScope::m_allocator;
-
 } // namespace Storage

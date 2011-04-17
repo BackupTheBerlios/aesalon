@@ -14,7 +14,7 @@
 
 #include "storage/RTree.h"
 
-#if 0
+#if 1
 int main(int argc, char *argv[]) {
 	Config::GlobalVault gv;
 	Monitor::Coordinator coordinator(argv);
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 	};
 	
 	Visitor visitor;
-	rt.search(RTree::BoundType(0.0, 100.0), visitor);
+	rt.search(RTree::BoundType(0.0, 22.0), visitor);
 	
 	return 0;
 }
