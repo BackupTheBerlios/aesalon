@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
 #else
 int main(int argc, char *argv[]) {
-	typedef Storage::RTree<double, int, 2, 2, 16> RTree;
+	typedef Storage::RTree<double, int, 1, 2, 4> RTree;
 	
 	RTree rt;
 	

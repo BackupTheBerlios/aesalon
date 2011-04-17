@@ -28,6 +28,14 @@ public:
 	
 	virtual int depth() const = 0;
 	
+	BoundType overallBound() const {
+		BoundType bound;
+		for(int i = 0; i < m_branchCount; i ++) {
+			bound.cover(m_bounds[i]);
+		}
+		return bound;
+	}
+	
 	bool isLeaf() const { return depth() == 0; }
 	
 	int branchCount() const { return m_branchCount; }
@@ -60,6 +68,48 @@ public:
 	
 	Node<DataType, BoundType, MaximumFactor> *branch(int which) const { return m_branches[which]; }
 	void setBranch(int which, Node<DataType, BoundType, MaximumFactor> *node) { m_branches[which] = node; }
+	
+	int branch(Node<DataType, BoundType, MaximumFactor> *which) const {
+		for(int i = 0; i < branchCount(); i ++) {
+			if(m_branches[i] == which) return i;
+		}
+		return -1;
+	}
+	
+	using Node<DataType, BoundType, MaximumFactor>::branchCount;
+	using Node<DataType, BoundType, MaximumFactor>::branchBound;
+	using Node<DataType, BoundType, MaximumFactor>::setBranchCount;
+	using Node<DataType, BoundType, MaximumFactor>::setBranchBound;
+	
+	/**
+		Adds a branch to the internal node.
+		
+		@return True if the node could be added; false if the maximum number of
+			nodes has already been reached.
+	*/
+	bool addBranch(const BoundType &bound, Node<DataType, BoundType, MaximumFactor> *node) {
+		int branch = branchCount();
+		
+		setBranchBound(branch, bound);
+		setBranch(branch, node);
+		
+		node->setParent(this);
+		
+		setBranchCount(branch+1);
+		return branch != MaximumFactor;
+	}
+	
+	/**
+		Removes a branch from the internal node.
+	*/
+	void removeBranch(int which) {
+		int lastBranch;
+		if((lastBranch = branchCount()) != 1 && which != lastBranch-1) {
+			m_branches[which] = m_branches[lastBranch-1];
+			setBranchBound(which, branchBound(lastBranch-1));
+		}
+		setBranchCount(lastBranch-1);
+	}
 };
 
 template<typename DataType, typename BoundType, int MaximumFactor>
@@ -71,6 +121,8 @@ public:
 	virtual ~LeafNode() {}
 	
 	virtual int depth() const { return 0; }
+	/** Dummy function, does nothing. */
+	void setDepth(int depth) { }
 	
 	const DataType &branch(int which) const { return m_branches[which]; }
 	void setBranch(int which, const DataType &data) { m_branches[which] = data; }
@@ -96,9 +148,12 @@ public:
 		return branch != MaximumFactor;
 	}
 	
+	/**
+		Removes a branch from the leaf node.
+	*/
 	void removeBranch(int which) {
 		int lastBranch;
-		if((lastBranch = branchCount()) != 1) {
+		if((lastBranch = branchCount()) != 1 && which != lastBranch-1) {
 			m_branches[which] = m_branches[lastBranch-1];
 			setBranchBound(which, branchBound(lastBranch-1));
 		}
