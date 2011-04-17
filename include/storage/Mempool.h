@@ -10,9 +10,6 @@
 #ifndef AesalonStorage_Mempool_H
 #define AesalonStorage_Mempool_H
 
-#include <stdint.h>
-#include <vector>
-
 #include <ext/pool_allocator.h>
 
 #define AesalonPoolAlloc(type, pointer, object) \

@@ -38,7 +38,7 @@ void SymbolResolver::parse(const std::string &filename, uint64_t offset) {
 			
 			char *name = new char[std::strlen(symbolName)];
 			strcpy(name, symbolName);
-			m_rtree->insert(RTree::Bound(symbolAddress, symbolAddress + symbolSize), name);
+			m_rtree->insert(RTree::BoundType(symbolAddress, symbolAddress + symbolSize), name);
 		}
 	};
 	

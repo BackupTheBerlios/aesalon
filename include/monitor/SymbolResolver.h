@@ -13,15 +13,13 @@
 #include <stdint.h>
 #include <string>
 
-namespace Storage {
-template<typename Key, typename Value, int dimensions, int Maximum, int Minimum, typename FloatKey> class RTree;
-} // namespace Storage
+#include "storage/RTree.h"
 
 namespace Monitor {
 
 class SymbolResolver {
 protected:
-	typedef Storage::RTree<uint64_t, const char *, 1, 64, 32, double> RTree;
+	typedef Storage::RTree<uint64_t, const char *, 1, 2, 16, double> RTree;
 private:
 	RTree *m_rtree;
 public:
