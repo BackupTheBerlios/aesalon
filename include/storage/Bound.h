@@ -19,7 +19,7 @@ private:
 	Key m_bounds[Dimensions][2];
 public:
 	Bound() {
-		for(int i = 1; i < Dimensions; i ++) {
+		for(int i = 0; i < Dimensions; i ++) {
 			m_bounds[i][0] = m_bounds[i][1] = 0.0;
 		}
 	}

@@ -122,7 +122,7 @@ public:
 	
 	virtual int depth() const { return 0; }
 	/** Dummy function, does nothing. */
-	void setDepth(int depth) { }
+	void setDepth(int) { }
 	
 	const DataType &branch(int which) const { return m_branches[which]; }
 	void setBranch(int which, const DataType &data) { m_branches[which] = data; }
