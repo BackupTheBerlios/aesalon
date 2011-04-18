@@ -14,7 +14,7 @@
 
 #include "storage/RTree.h"
 
-#if 0
+#if 1
 int main(int argc, char *argv[]) {
 	Config::GlobalVault gv;
 	Monitor::Coordinator coordinator(argv);

@@ -95,9 +95,9 @@ public:
 		
 		condenseTree(leaf);
 		
-		if(!m_root->isLeaf() && m_root->branchCount() < MinimumFactor) {
+		if(!m_root->isLeaf() && m_root->branchCount() == 1) {
 			NodeType *newRoot = m_root->asInternalNode()->branch(0);
-			/* LEAK m_root . . . */
+			AesalonPoolDestroy(InternalNodeType, m_root->asInternalNode());
 			m_root = newRoot;
 		}
 	}

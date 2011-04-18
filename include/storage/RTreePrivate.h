@@ -166,7 +166,7 @@ class SearchVisitor {
 public:
 	virtual ~SearchVisitor() {}
 	
-	virtual void visit(const BoundType &bound, const DataType &data) = 0;
+	virtual void visit(const BoundType &bound, DataType data) = 0;
 };
 
 } // namespace RTreePrivate

@@ -34,7 +34,7 @@ void Renderer::run() {
 	m_data->startReading();
 	m_image->startPainting();
 	
-	m_data->tree().search(m_image->dataRange().toTreeBound(), this);
+	m_data->tree().search(m_image->dataRange().toTreeBound(), *this);
 	
 	m_image->stopPainting();
 	m_data->stopReading();
@@ -42,9 +42,8 @@ void Renderer::run() {
 	emit finishedRendering(m_image);
 }
 
-bool Renderer::process(const TreeType::Bound &bound, Object *value) {
-	value->renderOnto(*m_image);
-	return true;
+void Renderer::visit(const TreeType::BoundType &bound, Object *data) {
+	data->renderOnto(*m_image);
 }
 
 } // namespace GViewport

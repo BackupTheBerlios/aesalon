@@ -20,7 +20,7 @@
 namespace Artisan {
 namespace GViewport {
 
-class Renderer : public QObject, public QRunnable, public TreeType::SearchProcessor { Q_OBJECT
+class Renderer : public QObject, public QRunnable, public TreeType::SearchVisitorType { Q_OBJECT
 private:
 	RenderedImage *m_image;
 	Data *m_data;
@@ -32,7 +32,8 @@ public:
 	
 	virtual void run();
 	
-	virtual bool process(const TreeType::Bound &bound, Object *value);
+	
+	virtual void visit(const TreeType::BoundType &bound, Object *data);
 signals:
 	void finishedRendering(RenderedImage *image);
 };

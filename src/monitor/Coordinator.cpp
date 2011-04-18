@@ -37,7 +37,7 @@ void Coordinator::run() {
 	
 	if(vault->get("::list-attributes") == "true") {
 		Message(Log, "Listing all configuration keys and values.");
-		Message(Log, "Some auto-generated values may have non-canonical values.");
+		Message(Log, "Some auto-generated keys may have non-canonical values.");
 		std::vector<Config::Vault::KeyPair> list;
 		vault->match("*", list);
 		for(std::vector<Config::Vault::KeyPair>::iterator i = list.begin(); i != list.end(); ++i) {

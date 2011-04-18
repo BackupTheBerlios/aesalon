@@ -241,7 +241,12 @@ void __attribute__((constructor)) AI_Construct() {
 }
 
 void __attribute__((destructor)) AI_Destruct() {
-	
+	printf("Destructing . . .\n");
+	AI_StartPacket(0);
+	*(uint8_t *)AI_PacketSpace(1) = ProcessExiting;
+	/* TODO: implement support for finding the process ID. */
+	*(uint32_t *)AI_PacketSpace(8) = 0;
+	AI_EndPacket();
 }
 
 void  AI_StartPacket(ModuleID moduleID) {

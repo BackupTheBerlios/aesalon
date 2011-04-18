@@ -81,11 +81,8 @@ public:
 	}
 	
 	/** Returns this rectangle as a 2-dimensional RTree bound. */
-	TreeType::Bound toTreeBound() const {
-		TreeType::Bound b;
-		b.range(0) = TreeType::Range(m_left, m_right);
-		b.range(1) = TreeType::Range(m_top, m_bottom);
-		return b;
+	TreeType::BoundType toTreeBound() const {
+		return TreeType::BoundType(m_left, m_right, m_top, m_bottom);
 	}
 	
 	/** Converts this rectangle into a QRectF for Qt integration. */
