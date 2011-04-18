@@ -14,7 +14,7 @@
 
 #include "storage/RTree.h"
 
-#if 1
+#if 0
 int main(int argc, char *argv[]) {
 	Config::GlobalVault gv;
 	Monitor::Coordinator coordinator(argv);
@@ -28,12 +28,12 @@ int main(int argc, char *argv[]) {
 	
 	RTree rt;
 	
-	rt.insert(RTree::BoundType(77.7, 79.2), 1);
-	rt.insert(RTree::BoundType(64.9, 67), 2);
-	rt.insert(RTree::BoundType(76.3, 78.9), 3);
-	rt.insert(RTree::BoundType(21.1, 27.9), 4);
-	rt.insert(RTree::BoundType(86.2, 88.5), 5);
-	rt.insert(RTree::BoundType(2.2, 8), 6);
+	srand(1);
+	
+	for(int i = 0; i < 100; i ++) {
+		double d = (rand()%1000)/10.0;
+		rt.insert(RTree::BoundType(d, d + (rand()%500)/10.0), i);
+	}
 	
 	class Visitor : public RTree::SearchVisitorType {
 	public:

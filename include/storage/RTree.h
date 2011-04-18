@@ -11,6 +11,7 @@
 #define AesalonStorage_RTree_H
 
 #include <stdarg.h>
+#include <list>
 #include "Config.h"
 
 #include "util/MessageSystem.h"
@@ -27,7 +28,6 @@ namespace Storage {
 	- DataType can be any type, but pointers are probably the best idea.
 	- 2 <= MinimumFactor <= MaximumFactor/2.
 	- MaximumFactor should be a reasonably small number. Many linear searches through arrays of this size take place.
-		
 	- Dimensions should be as small as possible; many linear operations take place on this number.
 	- FloatKey should be a version of Key that supports floating-point arithmetic (or at least non-integer division).
 		If Key is already a floating-point type, then this can be omitted.
@@ -76,31 +76,24 @@ public:
 		if(succeeded) return;
 		LeafNodeType *newLeaf = splitNode(node->asLeafNode());
 		
-		NodeType *newNode = newLeaf;
-		while(node != m_root) {
-			InternalNodeType *parent = node->parent()->asInternalNode();
-			
-			int branch = parent->branch(node);
-			parent->setBranchBound(branch, node->overallBound());
-			
-			if(newNode != NULL) {
-				succeeded = parent->addBranch(newNode->overallBound(), newNode);
-				if(!succeeded) {
-					newNode = splitNode(parent);
-				}
-			}
-			
-			node = parent;
-		}
+		adjustTree(node, newLeaf);
+	}
+	
+	void remove(const BoundType &bound, const DataType &data) {
+		LeafNodeType *leaf = removeFromLeaf(bound, data, m_root);
 		
-		if(newNode != NULL) {
-			InternalNodeType *newRoot;
-			AesalonPoolAlloc(InternalNodeType, newRoot, InternalNodeType());
-			newRoot->setDepth(newNode->depth()+1);
-			newRoot->addBranch(node->overallBound(), node);
-			newRoot->addBranch(newNode->overallBound(), newNode);
+		condenseTree(leaf);
+		
+		if(!m_root->isLeaf() && m_root->branchCount() < MinimumFactor) {
+			NodeType *newRoot = m_root->asInternalNode()->branch(0);
+			/* LEAK m_root . . . */
 			m_root = newRoot;
 		}
+	}
+	
+	void updateBound(const BoundType &oldBound, const DataType &data, const BoundType &newBound) {
+		remove(oldBound, data);
+		insert(newBound, data);
 	}
 private:
 	void searchHelper(const BoundType &bound, NodeType *node, SearchVisitorType &visitor) {
@@ -113,6 +106,7 @@ private:
 				visitor.visit(node->branchBound(branch), node->asLeafNode()->branch(branch));
 			}
 			else {
+				Message(Debug, "Transitioning from " << node << " to " << node->asInternalNode()->branch(branch));
 				searchHelper(bound, node->asInternalNode()->branch(branch), visitor);
 			}
 		}
@@ -131,6 +125,33 @@ private:
 			node = node->asInternalNode()->branch(minElement);
 		}
 		return node;
+	}
+	
+	void adjustTree(NodeType *node, NodeType *newNode) {
+		while(node != m_root) {
+			InternalNodeType *parent = node->parent()->asInternalNode();
+			
+			int branch = parent->branch(node);
+			parent->setBranchBound(branch, node->overallBound());
+			
+			if(newNode != NULL) {
+				bool succeeded = parent->addBranch(newNode->overallBound(), newNode);
+				if(!succeeded) {
+					newNode = splitNode(parent);
+				}
+			}
+			
+			node = parent;
+		}
+		
+		if(newNode != NULL) {
+			InternalNodeType *newRoot;
+			AesalonPoolAlloc(InternalNodeType, newRoot, InternalNodeType());
+			newRoot->setDepth(newNode->depth()+1);
+			newRoot->addBranch(node->overallBound(), node);
+			newRoot->addBranch(newNode->overallBound(), newNode);
+			m_root = newRoot;
+		}
 	}
 	
 	void linearSplitSeeds(NodeType *node, int *seeds) {
@@ -224,6 +245,7 @@ private:
 		}
 		
 		/* Iterate through branches. */
+		/* NOTE: use reverse order for a slight speed increase (see implementation of removeNode). */
 		for(int i = toSplit->branchCount()-1; i >= 0; i --) {
 			/* Skip the seed. */
 			if(i == tsSeed) continue;
@@ -251,7 +273,7 @@ private:
 				newNode->addBranch(bound, toSplit->branch(i));
 				toSplit->removeBranch(i);
 			}
-			/* The other case is a fall-through. */
+			/* The other case is a fall-through, e.g. the branch is already in the correct node. */
 		}
 		
 		newNode->setDepth(toSplit->depth());
@@ -259,12 +281,69 @@ private:
 		return newNode;
 	}
 	
-	InternalNodeType *splitNode(InternalNodeType *toSplit) {
-		return splitNode<InternalNodeType>(toSplit);
+	LeafNodeType *removeFromLeaf(const BoundType &bound, const DataType &data, NodeType *node) {
+		if(node == NULL) return NULL;
+		else if(node->isLeaf()) {
+			for(int i = 0; i < node->branchCount(); i ++) {
+				if(node->branchBound(i).overlaps(bound) && node->asLeafNode()->branch(i) == data) {
+					node->asLeafNode()->removeBranch(i);
+					return node->asLeafNode();
+				}
+			}
+		}
+		else {
+			for(int i = 0; i < node->branchCount(); i ++) {
+				if(node->branchBound(i).overlaps(bound)) {
+					LeafNodeType *n = removeFromLeaf(bound, data, node->asInternalNode()->branch(i));
+					if(n != NULL) return n;
+				}
+			}
+		}
+		return NULL;
 	}
 	
-	LeafNodeType *splitNode(LeafNodeType *toSplit) {
-		return splitNode<LeafNodeType>(toSplit);
+	void condenseTreeInsert(NodeType *toInsert) {
+		const BoundType &bound = toInsert->overallBound();
+		NodeType *node = m_root;
+		while(node->depth() > (toInsert->depth()+1)) {
+			KeyType minCost;
+			int minElement;
+			for(int i = 0; i < node->branchCount(); i ++) {
+				KeyType coverCost = node->branchBound(i).toCover(bound);
+				if(i == 0 || coverCost < minCost) minElement = i, minCost = coverCost;
+			}
+			
+			node = node->asInternalNode()->branch(minElement);
+		}
+		
+		if(!node->asInternalNode()->addBranch(bound, toInsert)) {
+			InternalNodeType *newNode = splitNode(node->asInternalNode());
+			adjustTree(node, newNode);
+		}
+	}
+	
+	void condenseTree(NodeType *node) {
+		typename std::list<NodeType *> removedBranches;
+		while(node != m_root) {
+			/* The parent will always be an internal node, even if node itself is a leaf. */
+			InternalNodeType *parent = node->parent()->asInternalNode();
+			
+			int branch = parent->branch(node);
+			if(node->branchCount() < MinimumFactor) {
+				parent->removeBranch(branch);
+				removedBranches.push_back(node);
+			}
+			else {
+				parent->setBranchBound(branch, node->overallBound());
+			}
+			
+			node = parent;
+		}
+		
+		/* Re-insert the removed branches into the tree. */
+		for(typename std::list<NodeType *>::reverse_iterator i = removedBranches.rbegin(); i != removedBranches.rend(); --i) {
+			condenseTreeInsert(*i);
+		}
 	}
 };
 
