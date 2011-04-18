@@ -153,6 +153,7 @@ private:
 				if(!succeeded) {
 					newNode = splitNode(parent);
 				}
+				else newNode = NULL;
 			}
 			
 			node = parent;

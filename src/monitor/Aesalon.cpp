@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < 15; i ++) {
 		double d = (rand()%1000)/10.0;
 		rt.insert(RTree::BoundType(d, d + 0.1 + (rand()%500)/10.0), i);
+		rt.search(RTree::BoundType(0.0, 150.0), visitor);
 	}
 	
-	rt.search(RTree::BoundType(0.0, 150.0), visitor);
 	
 	return 0;
 }

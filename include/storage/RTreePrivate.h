@@ -95,7 +95,7 @@ public:
 		
 		node->setParent(this);
 		
-		setBranchCount(++branch);
+		setBranchCount(branch+1);
 		return branch != MaximumFactor;
 	}
 	
@@ -144,7 +144,7 @@ public:
 		setBranchBound(branch, bound);
 		setBranch(branch, data);
 		
-		setBranchCount(++branch);
+		setBranchCount(branch+1);
 		return branch != MaximumFactor;
 	}
 	
