@@ -12,7 +12,7 @@
 
 #include <ext/pool_allocator.h>
 
-/*#define AesalonPoolAlloc(type, pointer, object) \
+#define AesalonPoolAlloc(type, pointer, object) \
 	do { \
 		__gnu_cxx::__pool_alloc<type> allocator; \
 		pointer = allocator.allocate(1); \
@@ -29,12 +29,12 @@
 	do { \
 		__gnu_cxx::__pool_alloc<type> allocator; \
 		pointer = allocator.allocate(size); \
-	} while(0)*/
+	} while(0)
 
-#undef AesalonPoolAlloc
+/*#undef AesalonPoolAlloc
 #define AesalonPoolAlloc(type, pointer, object) \
 	do { \
 		pointer = new object ; \
-	} while(0)
+	} while(0)*/
 
 #endif
