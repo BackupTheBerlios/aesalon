@@ -47,9 +47,6 @@ struct SHMHeader {
 	uint32_t lastProcessID;
 	/** The last allocated thread ID; used to assign 4-byte thread IDs dynamically. */
 	uint32_t lastThreadID;
-	
-	/** The number of running, monitored processes. Used to exit the monitor when required. */
-	uint16_t runningProcesses;
 };
 
 #ifdef __cplusplus

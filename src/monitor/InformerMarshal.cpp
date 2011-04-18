@@ -53,7 +53,8 @@ Comm::Packet *InformerMarshal::marshal(Comm::Packet *packet) {
 			break;
 		}
 		case Informer::ProcessExiting: {
-			Message(Log, "Process exited.");
+			processExited(packet);
+			packet = NULL;
 			break;
 		}
 	}
@@ -77,6 +78,12 @@ void InformerMarshal::fileLoaded(Comm::Packet *packet) {
 	std::string name = reinterpret_cast<char *>(packet->data() + 17);
 	
 	Coordinator::instance()->resolver()->parse(name, baseAddress);
+}
+
+void InformerMarshal::processExited(Comm::Packet *packet) {
+	Message(Log, "Process exited.");
+	uint32_t processID = *(uint32_t *)(packet->data() + 1);
+	Coordinator::instance()->launcher()->shmReader()->closeZones(processID);
 }
 
 } // namespace Monitor

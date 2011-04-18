@@ -60,6 +60,7 @@ void Coordinator::run() {
 		m_marshalList = &marshalList;
 		m_dataOutputController = &doc;
 		Launcher launcher(m_argv + m_argcOffset);
+		m_launcher = &launcher;
 		
 		launcher.launch();
 		

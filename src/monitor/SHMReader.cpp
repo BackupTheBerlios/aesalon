@@ -32,10 +32,6 @@ SHMReader::ReadBroker::~ReadBroker() {
 	if(m_temporaryBuffer) delete[] m_temporaryBuffer;
 }
 
-int SHMReader::runningProcesses() {
-	return m_header->runningProcesses;
-}
-
 void SHMReader::ReadBroker::resizeBuffer(uint32_t newSize) {
 	if(m_temporaryBufferSize >= newSize) return;
 	delete[] m_temporaryBuffer;
@@ -75,6 +71,11 @@ int32_t SHMReader::zoneWithData() {
 			
 			if(sem_trywait(&zheader->packetSemaphore) == -1 && errno == EAGAIN) continue;
 			
+			if(zheader->head == zheader->tail) {
+				closeZone(i);
+				continue;
+			}
+			
 			return i;
 		}
 	}
@@ -89,6 +90,32 @@ uint32_t SHMReader::zoneProcessID(uint32_t zoneID) {
 uint32_t SHMReader::zoneThreadID(uint32_t zoneID) {
 	SHM::ZoneHeader *header = reinterpret_cast<SHM::ZoneHeader *>(getZone(zoneID));
 	return header->threadID;
+}
+
+void SHMReader::closeZones(uint32_t processID) {
+	Message(Debug, "Closing zones for process ID#" << processID);
+	for(uint32_t i = 0; i < m_header->zonesAllocated; i ++) {
+		Message(Debug, "Considering zone #" << i);
+		if(m_zoneUseData[i/8] & (0x01 << (i%8))) {
+			Message(Debug, "Zone #" << i << " marked as in use! Checking process ID# . . .");
+			uint8_t *zone = getZone(i);
+			
+			if(zone == NULL) {
+				Message(Warning, "Could not open zone #" << i);
+				continue;
+			}
+			
+			SHM::ZoneHeader *zheader = reinterpret_cast<SHM::ZoneHeader *>(zone);
+			
+			if(zheader->processID == processID) {
+				Message(Debug, "Process IDs match. Posting to semaphores.");
+				sem_post(&zheader->packetSemaphore);
+				sem_post(&m_header->packetSemaphore);
+			}
+			else Message(Debug, "Process IDs differ. Ignoring.");
+		}
+		else Message(Debug, "Zone not in use.");
+	}
 }
 
 void SHMReader::waitForPacket() {
@@ -143,6 +170,14 @@ void SHMReader::processRequest(ReadBroker &request) {
 	}
 }
 
+void SHMReader::closeZone(uint32_t id) {
+	/* Clear the corresponding use bit . . . */
+	m_zoneUseData[id/8] &= ~(0x01 << (id%8));
+	/* Unmap the data. */
+	unmapRegion(m_zoneList[id], m_header->zoneSize);
+	m_zoneList[id] = NULL;
+}
+
 uint8_t *SHMReader::getZone(uint32_t id) {
 	if(id < m_zoneList.size() && m_zoneList[id] != NULL) {
 		return m_zoneList[id];
@@ -185,8 +220,6 @@ void SHMReader::setupHeader() {
 	
 	sem_init(&m_header->packetSemaphore, 1, 0);
 	sem_init(&m_header->resizeSemaphore, 1, 1);
-	
-	m_header->runningProcesses = 1;
 }
 
 void SHMReader::setupConfiguration() {

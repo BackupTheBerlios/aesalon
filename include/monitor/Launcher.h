@@ -23,6 +23,8 @@ public:
 	Launcher(char **argv);
 	~Launcher();
 	
+	SHMReader *shmReader() const { return m_shmReader; }
+	
 	void launch();
 	
 private:

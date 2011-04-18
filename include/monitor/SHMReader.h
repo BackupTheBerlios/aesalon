@@ -62,18 +62,19 @@ public:
 	SHMReader();
 	~SHMReader();
 	
-	int runningProcesses();
-	
 	uint32_t zoneCount();
 	int32_t zoneWithData();
 	
 	uint32_t zoneProcessID(uint32_t zoneID);
 	uint32_t zoneThreadID(uint32_t zoneID);
 	
+	void closeZones(uint32_t processID);
+	
 	void waitForPacket();
 	
 	void processRequest(ReadBroker &request);
 private:
+	void closeZone(uint32_t id);
 	uint8_t *getZone(uint32_t id);
 	void *mapRegion(uint32_t start, uint32_t size);
 	void unmapRegion(void *data, uint32_t size);

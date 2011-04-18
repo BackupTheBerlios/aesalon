@@ -17,6 +17,7 @@
 #include "MarshalList.h"
 #include "SymbolResolver.h"
 #include "storage/Mempool.h"
+#include "Launcher.h"
 
 namespace Monitor {
 
@@ -29,6 +30,7 @@ private:
 	DataOutputController *m_dataOutputController;
 	MarshalList *m_marshalList;
 	SymbolResolver *m_resolver;
+	Launcher *m_launcher;
 public:
 	static Coordinator *instance() { return m_instance; }
 	Coordinator(char **argv);
@@ -41,6 +43,7 @@ public:
 	DataOutputController *dataOutputController() const { return m_dataOutputController; }
 	MarshalList *marshalList() const { return m_marshalList; }
 	SymbolResolver *resolver() const { return m_resolver; }
+	Launcher *launcher() const { return m_launcher; }
 	
 	void run();
 private:

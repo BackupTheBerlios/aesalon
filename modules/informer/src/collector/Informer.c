@@ -238,22 +238,19 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_SendInitialFiles();
 	
 	AI_StartPacket(0);
-	
 	*(uint8_t *)AI_PacketSpace(1) = NewProcess;
 	/* TODO: implement support for finding the process ID. */
-	/* TODO: increment header's runningProcesses value when not the first process. */
-	*(uint32_t *)AI_PacketSpace(8) = 0;
+	*(uint32_t *)AI_PacketSpace(4) = 0;
 	AI_EndPacket();
 	
 	AI_ContinueCollection(self);
 }
 
 void __attribute__((destructor)) AI_Destruct() {
-	AI_InformerData.shmHeader->runningProcesses --;
 	AI_StartPacket(0);
 	*(uint8_t *)AI_PacketSpace(1) = ProcessExiting;
 	/* TODO: implement support for finding the process ID. */
-	*(uint32_t *)AI_PacketSpace(8) = 0;
+	*(uint32_t *)AI_PacketSpace(4) = 0;
 	AI_EndPacket();
 }
 

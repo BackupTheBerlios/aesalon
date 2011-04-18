@@ -23,6 +23,7 @@ public:
 private:
 	void moduleLoaded(Comm::Packet *packet);
 	void fileLoaded(Comm::Packet *packet);
+	void processExited(Comm::Packet *packet);
 };
 
 } // namespace Monitor
