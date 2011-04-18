@@ -58,6 +58,11 @@ public:
 		
 	}
 	
+	int height() const {
+		if(m_root == NULL) return -1;
+		return m_root->depth();
+	}
+	
 	void search(const BoundType &bound, SearchVisitorType &visitor)
 		{ searchHelper(bound, m_root, visitor); }
 	
@@ -82,6 +87,11 @@ public:
 	
 	void remove(const BoundType &bound, const DataType &data) {
 		LeafNodeType *leaf = removeFromLeaf(bound, data, m_root);
+		
+		if(leaf == NULL) {
+			Message(Warning, "Tried to find " << data << ", but failed.");
+			return;
+		}
 		
 		condenseTree(leaf);
 		
@@ -321,6 +331,9 @@ private:
 			InternalNodeType *newNode = splitNode(node->asInternalNode());
 			adjustTree(node, newNode);
 		}
+		else {
+			adjustTree(node, NULL);
+		}
 	}
 	
 	void condenseTree(NodeType *node) {
@@ -342,8 +355,18 @@ private:
 		}
 		
 		/* Re-insert the removed branches into the tree. */
-		for(typename std::list<NodeType *>::reverse_iterator i = removedBranches.rbegin(); i != removedBranches.rend(); --i) {
-			condenseTreeInsert(*i);
+		for(typename std::list<NodeType *>::reverse_iterator i = removedBranches.rbegin(); i != removedBranches.rend(); ++i) {
+			NodeType *node = *i;
+			if(node->isLeaf()) {
+				for(int b = 0; b < node->branchCount(); b ++) {
+					insert(node->branchBound(b), node->asLeafNode()->branch(b));
+				}
+			}
+			else {
+				for(int b = 0; b < node->branchCount(); b ++) {
+					condenseTreeInsert(node->asInternalNode()->branch(b));
+				}
+			}
 		}
 	}
 };
