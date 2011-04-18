@@ -32,6 +32,10 @@ SHMReader::ReadBroker::~ReadBroker() {
 	if(m_temporaryBuffer) delete[] m_temporaryBuffer;
 }
 
+int SHMReader::runningProcesses() {
+	return m_header->runningProcesses;
+}
+
 void SHMReader::ReadBroker::resizeBuffer(uint32_t newSize) {
 	if(m_temporaryBufferSize >= newSize) return;
 	delete[] m_temporaryBuffer;
@@ -181,6 +185,8 @@ void SHMReader::setupHeader() {
 	
 	sem_init(&m_header->packetSemaphore, 1, 0);
 	sem_init(&m_header->resizeSemaphore, 1, 1);
+	
+	m_header->runningProcesses = 1;
 }
 
 void SHMReader::setupConfiguration() {

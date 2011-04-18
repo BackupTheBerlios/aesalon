@@ -32,7 +32,6 @@ public:
 	
 	virtual void run();
 	
-	
 	virtual void visit(const TreeType::BoundType &bound, Object *data);
 signals:
 	void finishedRendering(RenderedImage *image);

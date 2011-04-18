@@ -41,7 +41,7 @@ Comm::Packet *InformerMarshal::marshal(Comm::Packet *packet) {
 			break;
 		}
 		case Informer::NewProcess: {
-			Message(Fatal, "Informer::NewProcess handling NYI.");
+			Message(Log, "Monitoring new process.");
 			break;
 		}
 		case Informer::NewThread: {
@@ -53,7 +53,7 @@ Comm::Packet *InformerMarshal::marshal(Comm::Packet *packet) {
 			break;
 		}
 		case Informer::ProcessExiting: {
-			Message(Fatal, "Informer::ProcessExiting handling NYI.");
+			Message(Log, "Process exited.");
 			break;
 		}
 	}

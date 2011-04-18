@@ -62,6 +62,8 @@ public:
 	SHMReader();
 	~SHMReader();
 	
+	int runningProcesses();
+	
 	uint32_t zoneCount();
 	int32_t zoneWithData();
 	

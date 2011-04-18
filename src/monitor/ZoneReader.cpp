@@ -45,6 +45,7 @@ void *ZoneReader::run(void *voidInstance) {
 	MarshalList *marshalList = Coordinator::instance()->marshalList();
 	DataOutputController *doc = Coordinator::instance()->dataOutputController();
 	
+	int32_t zone;
 	while(true) {
 		reader->waitForPacket();
 		int32_t zone = reader->zoneWithData();
@@ -75,6 +76,8 @@ void *ZoneReader::run(void *voidInstance) {
 	}
 	
 	Message(Debug, "Ending ZoneReader loop . . .");
+	
+	delete instance;
 	
 	return NULL;
 }

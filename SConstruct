@@ -67,5 +67,5 @@ Export("qtEnv")
 
 SConscript("build/SConscript")
 SConscript("src/SConscript", variant_dir=".build", duplicate=0)
-#SConscript("modules/SConscript")
+SConscript("modules/SConscript")
 SConscript("tests/SConscript")

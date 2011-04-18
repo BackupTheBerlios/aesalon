@@ -29,10 +29,9 @@ Viewport::Viewport(DataStore *dataStore) : Artisan::GViewport::BasicViewport(dat
 		lastData = pair.second;
 	}
 	
-	Artisan::GViewport::TreeType::Bound maxBound = data()->tree().bounds();
+	Artisan::GViewport::TreeType::BoundType maxBound = data()->tree().bounds();
 	
-	setViewport(Artisan::GViewport::Rect(maxBound.range(0).start(), maxBound.range(0).end(), maxBound.range(1).start(),
-		maxBound.range(1).end()));
+	setViewport(Artisan::GViewport::Rect(maxBound.start(0), maxBound.end(0), maxBound.start(1), maxBound.end(1)));
 }
 
 Viewport::~Viewport() {

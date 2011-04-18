@@ -24,7 +24,7 @@ Launcher::Launcher(char **argv) : m_argv(argv) {
 }
 
 Launcher::~Launcher() {
-
+	if(m_shmReader) delete m_shmReader;
 }
 
 void Launcher::launch() {

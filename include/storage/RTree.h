@@ -63,6 +63,10 @@ public:
 		return m_root->depth();
 	}
 	
+	BoundType bounds() const {
+		return m_root->overallBound();
+	}
+	
 	void search(const BoundType &bound, SearchVisitorType &visitor)
 		{ searchHelper(bound, m_root, visitor); }
 	

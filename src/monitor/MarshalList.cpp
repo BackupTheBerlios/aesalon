@@ -21,7 +21,9 @@ MarshalList::MarshalList() {
 }
 
 MarshalList::~MarshalList() {
-	
+	for(MarshalVector::iterator i = m_marshalVector.begin(); i != m_marshalVector.end(); ++i) {
+		delete *i;
+	}
 }
 
 MarshalWrapper *MarshalList::marshal(ModuleID moduleID) {
