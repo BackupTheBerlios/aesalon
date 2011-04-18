@@ -62,7 +62,11 @@ public:
 		{ searchHelper(bound, m_root, visitor); }
 	
 	void insert(const BoundType &bound, const DataType &data) {
+		Message(Debug, "");
+		Message(Debug, "");
+		Message(Debug, "************ Inserting " << data);
 		if(m_root == NULL) {
+			Message(Debug, "Creating new root node.");
 			LeafNodeType *leafRoot;
 			AesalonPoolAlloc(LeafNodeType, leafRoot, LeafNodeType());
 			leafRoot->addBranch(bound, data);
@@ -70,12 +74,19 @@ public:
 			return;
 		}
 		
+		Message(Debug, "Looking for leaf node to insert into . . .");
 		NodeType *node = insertChooseLeaf(bound);
+		Message(Debug, "Chose " << node);
 		
+		Message(Debug, "Attempting to add data to leaf.");
 		bool succeeded = node->asLeafNode()->addBranch(bound, data);
-		if(succeeded) return;
+		if(succeeded) {
+			Message(Debug, "Succeeded! Branch count is now " << node->branchCount());
+			return;
+		}
+		Message(Debug, "Failed. Splitting node . . .");
 		LeafNodeType *newLeaf = splitNode(node->asLeafNode());
-		
+		Message(Debug, "New node: " << newLeaf);
 		adjustTree(node, newLeaf);
 	}
 	
@@ -106,7 +117,7 @@ private:
 				visitor.visit(node->branchBound(branch), node->asLeafNode()->branch(branch));
 			}
 			else {
-				Message(Debug, "Transitioning from " << node << " to " << node->asInternalNode()->branch(branch));
+				Message(Debug, "Transitioning from " << (void *)((unsigned long)node & 0xfff) << " to " << (void *)((unsigned long)node->asInternalNode()->branch(branch) & 0xfff));
 				searchHelper(bound, node->asInternalNode()->branch(branch), visitor);
 			}
 		}
@@ -119,8 +130,11 @@ private:
 			int minElement;
 			for(int i = 0; i < node->branchCount(); i ++) {
 				KeyType coverCost = node->branchBound(i).toCover(bound);
+				Message(Debug, "Cover cost for branch #" << i << ": " << coverCost);
 				if(i == 0 || coverCost < minCost) minElement = i, minCost = coverCost;
 			}
+			
+			Message(Debug, "Choosing branch #" << minElement << " of " << node->branchCount());
 			
 			node = node->asInternalNode()->branch(minElement);
 		}
@@ -145,6 +159,7 @@ private:
 		}
 		
 		if(newNode != NULL) {
+			Message(Debug, "Growing tree height . . .");
 			InternalNodeType *newRoot;
 			AesalonPoolAlloc(InternalNodeType, newRoot, InternalNodeType());
 			newRoot->setDepth(newNode->depth()+1);

@@ -24,16 +24,11 @@ int main(int argc, char *argv[]) {
 
 #else
 int main(int argc, char *argv[]) {
-	typedef Storage::RTree<double, int, 1, 2, 4> RTree;
+	typedef Storage::RTree<double, int, 1, 2, 6> RTree;
 	
 	RTree rt;
 	
 	srand(1);
-	
-	for(int i = 0; i < 100; i ++) {
-		double d = (rand()%1000)/10.0;
-		rt.insert(RTree::BoundType(d, d + (rand()%500)/10.0), i);
-	}
 	
 	class Visitor : public RTree::SearchVisitorType {
 	public:
@@ -45,7 +40,12 @@ int main(int argc, char *argv[]) {
 	};
 	
 	Visitor visitor;
-	rt.search(RTree::BoundType(0.0, 22.0), visitor);
+	
+	for(int i = 0; i < 10; i ++) {
+		double d = (rand()%1000)/10.0;
+		rt.insert(RTree::BoundType(d, d + 0.1 + (rand()%500)/10.0), i);
+		rt.search(RTree::BoundType(0.0, 150.0), visitor);
+	}
 	
 	return 0;
 }
