@@ -95,9 +95,7 @@ uint32_t SHMReader::zoneThreadID(uint32_t zoneID) {
 void SHMReader::closeZones(uint32_t processID) {
 	Message(Debug, "Closing zones for process ID#" << processID);
 	for(uint32_t i = 0; i < m_header->zonesAllocated; i ++) {
-		Message(Debug, "Considering zone #" << i);
 		if(m_zoneUseData[i/8] & (0x01 << (i%8))) {
-			Message(Debug, "Zone #" << i << " marked as in use! Checking process ID# . . .");
 			uint8_t *zone = getZone(i);
 			
 			if(zone == NULL) {
@@ -108,13 +106,10 @@ void SHMReader::closeZones(uint32_t processID) {
 			SHM::ZoneHeader *zheader = reinterpret_cast<SHM::ZoneHeader *>(zone);
 			
 			if(zheader->processID == processID) {
-				Message(Debug, "Process IDs match. Posting to semaphores.");
 				sem_post(&zheader->packetSemaphore);
 				sem_post(&m_header->packetSemaphore);
 			}
-			else Message(Debug, "Process IDs differ. Ignoring.");
 		}
-		else Message(Debug, "Zone not in use.");
 	}
 }
 

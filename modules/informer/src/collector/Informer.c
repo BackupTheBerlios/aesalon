@@ -28,7 +28,7 @@
 typedef struct InformerData InformerData;
 struct InformerData {
 	int initialized;
-	uint64_t processID;
+	uint32_t processID;
 	
 	pthread_t monitorThreadList[AesalonInformerMonitorThreadListSize];
 	int monitorThreadListSize;
@@ -130,8 +130,7 @@ static void *AI_SetupZone() {
 	
 	((ZoneHeader *)AI_Zone)->head = ((ZoneHeader *)AI_Zone)->tail = ZoneDataOffset;
 	((ZoneHeader *)AI_Zone)->overflow = 0;
-	/* TODO: implement support for finding the process ID. */
-	((ZoneHeader *)AI_Zone)->processID = 0;
+	((ZoneHeader *)AI_Zone)->processID = AI_InformerData.processID;
 	((ZoneHeader *)AI_Zone)->threadID = ++AI_InformerData.shmHeader->lastThreadID;
 	
 	return AI_Zone;
@@ -235,12 +234,13 @@ void __attribute__((constructor)) AI_Construct() {
 	AI_InformerData.threadCount = 1;
 	AI_InformerData.threadList[0] = self;
 	
+	AI_InformerData.processID = ++AI_InformerData.shmHeader->lastProcessID;
+	
 	AI_SendInitialFiles();
 	
 	AI_StartPacket(0);
 	*(uint8_t *)AI_PacketSpace(1) = NewProcess;
-	/* TODO: implement support for finding the process ID. */
-	*(uint32_t *)AI_PacketSpace(4) = 0;
+	*(uint32_t *)AI_PacketSpace(4) = AI_InformerData.processID;
 	AI_EndPacket();
 	
 	AI_ContinueCollection(self);
@@ -250,7 +250,7 @@ void __attribute__((destructor)) AI_Destruct() {
 	AI_StartPacket(0);
 	*(uint8_t *)AI_PacketSpace(1) = ProcessExiting;
 	/* TODO: implement support for finding the process ID. */
-	*(uint32_t *)AI_PacketSpace(4) = 0;
+	*(uint32_t *)AI_PacketSpace(4) = AI_InformerData.processID;
 	AI_EndPacket();
 }
 

@@ -5,7 +5,7 @@
 .gdb_history
 core
 vgcore.*
-*.sr.orig 
+*.sr.orig
 .*.swp
 *.sr.orig
 *.pyc
@@ -32,3 +32,4 @@ profile.*
 
 # Local ignores
 musings/
+output*
