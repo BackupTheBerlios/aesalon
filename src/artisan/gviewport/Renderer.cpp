@@ -10,7 +10,6 @@
 #include <QThreadPool>
 
 #include "artisan/gviewport/Renderer.h"
-
 #include "artisan/gviewport/Object.h"
 
 #include "util/MessageSystem.h"
@@ -34,7 +33,7 @@ void Renderer::run() {
 	m_data->startReading();
 	m_image->startPainting();
 	
-	m_data->tree().search(m_image->dataRange().toTreeBound(), *this);
+	m_data->tree().search(m_image->dataRange(), *this);
 	
 	m_image->stopPainting();
 	m_data->stopReading();
@@ -43,6 +42,10 @@ void Renderer::run() {
 }
 
 void Renderer::visit(const TreeType::BoundType &bound, Object *data) {
+	data->renderOnto(*m_image);
+}
+
+void Renderer::visit(const TreeType::PointType &point, Object *data) {
 	data->renderOnto(*m_image);
 }
 

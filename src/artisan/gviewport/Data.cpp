@@ -33,13 +33,13 @@ void Data::stopWriting() {
 
 void Data::addObject(Object *object) {
 	startWriting();
-	m_tree.insert(object->bound().toTreeBound(), object);
+	m_tree.insert(object->bound(), object);
 	stopWriting();
 }
 
 void Data::removeObject(Object *object) {
 	startWriting();
-	m_tree.remove(object->bound().toTreeBound(), object);
+	m_tree.remove(object->bound(), object);
 	stopWriting();
 }
 

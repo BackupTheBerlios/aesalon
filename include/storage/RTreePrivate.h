@@ -161,12 +161,13 @@ public:
 	}
 };
 
-template<typename DataType, typename BoundType>
+template<typename DataType, typename BoundType, typename PointType>
 class SearchVisitor {
 public:
 	virtual ~SearchVisitor() {}
 	
 	virtual void visit(const BoundType &bound, DataType data) = 0;
+	virtual void visit(const PointType &point, DataType data) = 0;
 };
 
 } // namespace RTreePrivate

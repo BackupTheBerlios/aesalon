@@ -37,6 +37,9 @@ int main(int argc, char *argv[]) {
 		virtual void visit(const RTree::BoundType &bound, const int &data) {
 			Message(Debug, "Found item with data " << data);
 		}
+		virtual void visit(const RTree::PointType &point, const int &data) {
+			Message(Fatal, "Point visitor called. No such data should have been inserted.");
+		}
 	};
 	
 	Visitor visitor;

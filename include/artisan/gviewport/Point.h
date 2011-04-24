@@ -12,11 +12,13 @@
 
 #include <QPoint>
 
+#include "TreeType.h"
+
 namespace Artisan {
 namespace GViewport {
 
 /** A single point of data in two-dimensional space. */
-class Point {
+class Point : public TreeType::PointType {
 private:
 	/** The x-coordinate of this point. */
 	double m_x;

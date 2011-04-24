@@ -22,98 +22,76 @@ namespace Artisan {
 namespace GViewport {
 
 /** Rectangle class ; represents a range of two-dimensional points. */
-class Rect {
-private:
-	/** Lower x-coordinate. */
-	double m_left;
-	/** Upper x-coordinate. */
-	double m_right;
-	/** Lower y-coordinate. */
-	double m_top;
-	/** Upper y-coordinate. */
-	double m_bottom;
+class Rect : public TreeType::BoundType {
 public:
 	/** Default constructor; sets all coordinates to zero. */
-	Rect() : m_left(0), m_right(0), m_top(0), m_bottom(0) {}
+	Rect() : TreeType::BoundType() {}
 	/** Size-constructor; sets the left/top coordinates to zero and the right/bottom coordinates as given. */
-	Rect(double width, double height) : m_left(0), m_right(width), m_top(0), m_bottom(height) { normalize(); }
+	Rect(double width, double height) : TreeType::BoundType(0.0, width, 0.0, height) { normalize(); }
 	/** QSizeF "copy"-constructor; does the same as the above except with a QSizeF instance. */
-	Rect(const QSizeF &size) : m_left(0), m_right(size.width()), m_top(0), m_bottom(size.height()) { normalize(); }
+	Rect(const QSizeF &size) : TreeType::BoundType(0, size.width(), 0.0, size.height()) { normalize(); }
 	/** Simple constructor; sets all coordinates as given. */
 	Rect(double left, double right, double top, double bottom)
-		: m_left(left), m_right(right), m_top(top), m_bottom(bottom) { normalize(); }
+		: TreeType::BoundType(left, right, top, bottom) { normalize(); }
 	/** Point-constructor; constructs a Rect from two points. */
 	Rect(Point ul, Point lr) : 
-		m_left(ul.x()), m_right(lr.x()), m_top(ul.y()), m_bottom(lr.y()) { normalize(); }
+		TreeType::BoundType(ul.x(), lr.x(), ul.y(), lr.y()) { normalize(); }
 	/** Point-size constructor; constructs a Rect from a point and a size. */
 	Rect(Point ul, double width, double height)
-		: m_left(ul.x()), m_right(ul.x() + width), m_top(ul.y()), m_bottom(ul.y() + height) { normalize(); }
+		: TreeType::BoundType(ul.x(), ul.x() + width, ul.y(), ul.y() + height) { normalize(); }
 	
-	double &left() { return m_left; }
-	double left() const { return m_left; }
+	double left() const { return start(0); }
+	double right() const { return start(0); }
+	double width() const { return end(0) - start(0); }
 	
-	double &right() { return m_right; }
-	double right() const { return m_right; }
+	double top() const { return start(1); }
+	double bottom() const { return end(1); }
+	double height() const { return end(1) - start(1); }
 	
-	double width() const { return m_right - m_left; }
-	
-	double &top() { return m_top; }
-	double top() const { return m_top; }
-	
-	double &bottom() { return m_bottom; }
-	double bottom() const { return m_bottom; }
-	
-	double height() const { return m_bottom - m_top; }
-	
-	Point topLeft() const { return Point(m_left, m_top); }
-	Point topRight() const { return Point(m_right, m_top); }
-	Point bottomLeft() const { return Point(m_left, m_bottom); }
-	Point bottomRight() const { return Point(m_right, m_bottom); }
+	Point topLeft() const { return Point(start(0), start(1)); }
+	Point topRight() const { return Point(end(1), start(1)); }
+	Point bottomLeft() const { return Point(start(0), end(1)); }
+	Point bottomRight() const { return Point(end(1), end(1)); }
 	
 	/** "Normalizes" a rectangle such that left <= right and top <= bottom. */
 	void normalize() {
-		double x1 = m_left, x2 = m_right;
-		double y1 = m_top, y2 = m_bottom;
-		m_left = std::min(x1, x2);
-		m_right = std::max(x1, x2);
-		m_top = std::min(y1, y2);
-		m_bottom = std::max(y1, y2);
-	}
-	
-	/** Returns this rectangle as a 2-dimensional RTree bound. */
-	TreeType::BoundType toTreeBound() const {
-		return TreeType::BoundType(m_left, m_right, m_top, m_bottom);
+		double x1 = start(0), x2 = end(0);
+		double y1 = end(0), y2 = end(1);
+		start(0) = std::min(x1, x2);
+		end(0) = std::max(x1, x2);
+		start(1) = std::min(y1, y2);
+		end(1) = std::max(y1, y2);
 	}
 	
 	/** Converts this rectangle into a QRectF for Qt integration. */
 	QRectF toQRect() const { 
-		return QRectF(m_left, m_top, width(), height());
+		return QRectF(start(0), start(1), width(), height());
 	}
 	
 	/** Converts this rectangle into a std::string printable form. */
 	std::string toString() const {
-		return Util::StreamAsString() << "(" << m_left << ", " 
-			<< m_top << "), (" << m_right << ", " << m_bottom << ")";
+		return Util::StreamAsString() << "(" << start(0) << ", " 
+			<< start(1) << "), (" << end(0) << ", " << end(1) << ")";
 	}
 	
 	Rect operator+(const Point &point) const {
-		return Rect(m_left + point.x(), m_right + point.x(), m_top + point.y(), m_bottom + point.y());
+		return Rect(start(0) + point.x(), end(0) + point.x(), start(1) + point.y(), end(1) + point.y());
 	}
 	
 	void scaleWidth(double factor) {
 		double w = width() / 2;
-		double centreX = m_left + w;
+		double centreX = start(0) + w;
 		w *= factor;
-		m_left = centreX - w;
-		m_right = centreX + w;
+		start(0) = centreX - w;
+		end(0) = centreX + w;
 	}
 	
 	void scaleHeight(double factor) {
 		double h = height()/2;
-		double centreY = m_top + h;
+		double centreY = start(1) + h;
 		h *= factor;
-		m_top = centreY - h;
-		m_bottom = centreY + h;
+		start(1) = centreY - h;
+		end(1) = centreY + h;
 	}
 };
 

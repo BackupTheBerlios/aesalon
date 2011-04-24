@@ -37,7 +37,9 @@ public:
 		va_end(ap);
 	}
 	
+	Key &start(int dimension) { return m_bounds[dimension][0]; }
 	Key start(int dimension) const { return m_bounds[dimension][0]; }
+	Key &end(int dimension) { return m_bounds[dimension][1]; }
 	Key end(int dimension) const { return m_bounds[dimension][1]; }
 	
 	bool overlaps(const Bound &other) const {

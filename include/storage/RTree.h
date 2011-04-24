@@ -17,6 +17,7 @@
 #include "util/MessageSystem.h"
 #include "Mempool.h"
 #include "Bound.h"
+#include "Point.h"
 #include "RTreePrivate.h"
 
 namespace Storage {
@@ -39,7 +40,8 @@ template<typename KeyType, typename DataType, int Dimensions, int MinimumFactor 
 class RTree {
 public:
 	typedef Bound<KeyType, Dimensions> BoundType;
-	typedef RTreePrivate::SearchVisitor<DataType, BoundType> SearchVisitorType;
+	typedef Point<KeyType, Dimensions> PointType;
+	typedef RTreePrivate::SearchVisitor<DataType, BoundType, PointType> SearchVisitorType;
 private:
 	typedef RTreePrivate::Node<DataType, BoundType, MaximumFactor> NodeType;
 	typedef RTreePrivate::InternalNode<DataType, BoundType, MaximumFactor> InternalNodeType;
