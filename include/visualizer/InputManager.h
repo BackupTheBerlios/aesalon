@@ -12,13 +12,14 @@
 
 #include <QObject>
 #include <QList>
+#include <QAbstractTableModel>
 
 #include "DataInput.h"
 #include "ArtisanManager.h"
 
 namespace Visualizer {
 
-class InputManager : public QObject { Q_OBJECT
+class InputManager : public QAbstractTableModel { Q_OBJECT
 private:
 	ArtisanManager *m_artisanManager;
 	QList<DataInput *> m_inputList;
@@ -28,6 +29,13 @@ public:
 	
 	ArtisanManager *artisanManager() const { return m_artisanManager; }
 	QList<DataInput *> &inputList() { return m_inputList; }
+	
+	virtual int columnCount(const QModelIndex &parent) const;
+	virtual QVariant data(const QModelIndex &index, int role) const;
+	virtual int rowCount(const QModelIndex &parent) const;
+	virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+	virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+	virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
 public slots:
 	void addInput(DataInput *input);
 signals:

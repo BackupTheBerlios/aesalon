@@ -15,7 +15,7 @@
 
 namespace Visualizer {
 
-DataInput::DataInput(ArtisanManager *artisanManager) : m_artisanManager(artisanManager) {
+DataInput::DataInput(ArtisanManager *artisanManager) : m_artisanManager(artisanManager), m_enabled(false) {
 	
 }
 
@@ -63,6 +63,12 @@ void DataInput::processInformerPacket(Comm::Packet *packet) {
 		case Informer::NewProcess: {
 			uint32_t informerID = *reinterpret_cast<uint32_t *>(packet->data() + 1);
 			m_processIDMap[informerID] = PIDAllocator::nextID();
+			Message(Debug, "New process! Informer ID: " << informerID << " Artisan ID: " << m_processIDMap[informerID]);
+			break;
+		}
+		case Informer::NewThread: {
+			uint32_t informerID = *reinterpret_cast<uint32_t *>(packet->data() + 1);
+			Message(Debug, "New thread! Informer ID: " << informerID);
 			break;
 		}
 		default: break;

@@ -26,6 +26,8 @@ private:
 public:
 	LogInput(const std::string &filename, ArtisanManager *artisanManager);
 	virtual ~LogInput();
+	
+	virtual QString title() const;
 private slots:
 	void readMore();
 signals:

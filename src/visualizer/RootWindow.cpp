@@ -18,9 +18,9 @@
 #include <QMdiSubWindow>
 
 #include "visualizer/RootWindow.h"
-#include "visualizer/InputManagerWidget.h"
-#include "visualizer/ArtisanManagerWidget.h"
 #include "util/MessageSystem.h"
+#include "visualizer/InputManagerWidget.h"
+#include <visualizer/LogInput.h>
 
 namespace Visualizer {
 
@@ -34,6 +34,14 @@ RootWindow::RootWindow() {
 	
 	m_inputManager = new InputManager();
 	
+	m_inputManager->addInput(new LogInput("/home/ethereal/projects/aesalon/output-3.alog", m_inputManager->artisanManager()));
+	
+	InputManagerWidget *imw = new InputManagerWidget(m_inputManager);
+	
+	imw->setParent(this);
+	imw->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	addDockWidget(Qt::LeftDockWidgetArea, imw);
+	
 	createAboutBox();
 	
 	QMenu *aesalonMenu = new QMenu(tr("&Aesalon"));
@@ -41,41 +49,14 @@ RootWindow::RootWindow() {
 	aesalonMenu->addAction(tr("&Quit"), qApp, SLOT(closeAllWindows()));
 	menuBar()->addMenu(aesalonMenu);
 	
-	QMenu *windowMenu = new QMenu(tr("&Window"));
-	windowMenu->addAction(tr("Create &input manager"), this, SLOT(createInputManager()));
-	menuBar()->addMenu(windowMenu);
-	
-	windowMenu->addAction(tr("Create &artisan manager"), this, SLOT(createArtisanManager()));
-	menuBar()->addMenu(windowMenu);
-	
 	QMenu *helpMenu = new QMenu(tr("&Help"));
 	helpMenu->addAction(tr("&About . . ."), m_aboutAesalon, SLOT(show()));
 	helpMenu->addAction(tr("About &Qt . . ."), qApp, SLOT(aboutQt()));
 	menuBar()->addMenu(helpMenu);
-	
-	createInputManager();
-	createArtisanManager();
 }
 
 RootWindow::~RootWindow() {
 	
-}
-
-void RootWindow::createInputManager() {
-	InputManagerWidget *imw = new InputManagerWidget(m_inputManager);
-	QMdiSubWindow *msw = m_mdiArea->addSubWindow(imw);
-	msw->setAttribute(Qt::WA_DeleteOnClose);
-	msw->setWindowTitle(tr("Input manager"));
-	msw->show();
-}
-
-void RootWindow::createArtisanManager() {
-	ArtisanManagerWidget *amw = new ArtisanManagerWidget(m_inputManager->artisanManager());
-	connect(amw, SIGNAL(newViewport(Artisan::Viewport *)), this, SLOT(addSubwindow(Artisan::Viewport *)));
-	QMdiSubWindow *msw = m_mdiArea->addSubWindow(amw);
-	msw->setAttribute(Qt::WA_DeleteOnClose);
-	msw->setWindowTitle(tr("Artisan manager"));
-	msw->show();
 }
 
 void RootWindow::addSubwindow(Artisan::Viewport *viewport) {
@@ -86,7 +67,8 @@ void RootWindow::addSubwindow(Artisan::Viewport *viewport) {
 }
 
 void RootWindow::createAboutBox() {
-	m_aboutAesalon = new QWidget();
+	m_aboutAesalon = new QDialog();
+	m_aboutAesalon->setModal(true);
 	
 	QBoxLayout *layout = new QHBoxLayout();
 	m_aboutAesalon->setLayout(layout);

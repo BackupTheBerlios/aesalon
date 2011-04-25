@@ -10,24 +10,20 @@
 #ifndef AesalonVisualizer_InputManagerWidget_H
 #define AesalonVisualizer_InputManagerWidget_H
 
-#include <QWidget>
-#include <QListWidget>
+#include <QDockWidget>
+#include <QListView>
 
 #include "InputManager.h"
 
 namespace Visualizer {
 
-class InputManagerWidget : public QWidget { Q_OBJECT
+class InputManagerWidget : public QDockWidget {
 private:
 	InputManager *m_inputManager;
-	QListWidget *m_listWidget;
+	QListView *m_listView;
 public:
 	InputManagerWidget(InputManager *inputManager);
 	virtual ~InputManagerWidget();
-	
-private slots:
-	void showCreator();
-	void inputAdded(DataInput *input);
 };
 
 } // namespace Visualizer

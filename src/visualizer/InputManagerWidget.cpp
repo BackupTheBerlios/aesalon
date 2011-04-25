@@ -7,44 +7,35 @@
 	@file src/visualizer/InputManagerWidget.cpp
 */
 
+#include <QLabel>
 #include <QVBoxLayout>
-#include <QPushButton>
 
 #include "visualizer/InputManagerWidget.h"
-#include "visualizer/InputCreator.h"
 
 namespace Visualizer {
 
 InputManagerWidget::InputManagerWidget(InputManager *inputManager) : m_inputManager(inputManager) {
-	QVBoxLayout *layout = new QVBoxLayout();
+	setFeatures(QDockWidget::DockWidgetMovable);
 	
-	m_listWidget = new QListWidget();
-	layout->addWidget(m_listWidget);
+	setTitleBarWidget(new QLabel(tr("Input Manager")));
 	
-	QPushButton *creatorButton = new QPushButton(tr("Add &input"));
-	connect(creatorButton, SIGNAL(clicked()), this, SLOT(showCreator()));
-	layout->addWidget(creatorButton);
+	QWidget *stackWidget = new QWidget();
+	QVBoxLayout *stackLayout = new QVBoxLayout();
 	
-	setLayout(layout);
+	m_listView = new QListView();
 	
-	connect(m_inputManager, SIGNAL(inputAdded(DataInput *)), this, SLOT(inputAdded(DataInput *)));
+	m_listView->setModel(inputManager);
 	
-	foreach(DataInput *input, inputManager->inputList()) inputAdded(input);
+	stackLayout->addWidget(m_listView);
+	
+	stackWidget->setLayout(stackLayout);
+	
+	setWidget(stackWidget);
+	setVisible(true);
 }
 
 InputManagerWidget::~InputManagerWidget() {
 	
-}
-
-void InputManagerWidget::showCreator() {
-	InputCreator ic(m_inputManager);
-	connect(&ic, SIGNAL(inputCreated(DataInput *)), m_inputManager, SLOT(addInput(DataInput *)));
-	ic.show();
-	ic.exec();
-}
-
-void InputManagerWidget::inputAdded(DataInput *input) {
-	new QListWidgetItem("Testing", m_listWidget);
 }
 
 } // namespace Visualizer

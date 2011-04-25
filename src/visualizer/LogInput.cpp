@@ -14,7 +14,7 @@
 
 namespace Visualizer {
 
-LogInput::LogInput(const std::string& filename, Visualizer::ArtisanManager *artisanManager)
+LogInput::LogInput(const std::string &filename, Visualizer::ArtisanManager *artisanManager)
 	: DataInput(artisanManager) {
 	m_file.setFileName(QString::fromStdString(filename));
 	
@@ -28,6 +28,10 @@ LogInput::LogInput(const std::string& filename, Visualizer::ArtisanManager *arti
 
 LogInput::~LogInput() {
 	
+}
+
+QString LogInput::title() const {
+	return m_file.fileName();
 }
 
 void LogInput::readMore() {

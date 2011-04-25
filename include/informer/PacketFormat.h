@@ -31,7 +31,13 @@ enum PacketType {
 			- filename: 8-bit NULL-terminated ASCII string.
 	*/
 	FileLoaded,
+	/**
+		A new thread was just created; an ID for it is provided.
+	*/
 	NewThread,
+	/**
+		A new process was just created; an ID for it is provided.
+	*/
 	NewProcess,
 	ThreadExiting,
 	ProcessExiting,

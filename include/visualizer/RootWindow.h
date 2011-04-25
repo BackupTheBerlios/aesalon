@@ -10,6 +10,7 @@
 #ifndef AesalonVisualizer_RootWindow_H
 #define AesalonVisualizer_RootWindow_H
 
+#include <QDialog>
 #include <QMainWindow>
 #include <QMdiArea>
 #include <QWidget>
@@ -21,14 +22,12 @@ namespace Visualizer {
 class RootWindow : public QMainWindow { Q_OBJECT
 private:
 	QMdiArea *m_mdiArea;
-	QWidget *m_aboutAesalon;
+	QDialog *m_aboutAesalon;
 	InputManager *m_inputManager;
 public:
 	RootWindow();
 	virtual ~RootWindow();
 private slots:
-	void createInputManager();
-	void createArtisanManager();
 	void addSubwindow(Artisan::Viewport *viewport);
 private:
 	void createAboutBox();

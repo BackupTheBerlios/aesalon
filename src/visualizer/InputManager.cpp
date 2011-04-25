@@ -26,4 +26,60 @@ void InputManager::addInput(DataInput *input) {
 	emit inputAdded(input);
 }
 
+int InputManager::columnCount(const QModelIndex &parent) const {
+	return 1;
+}
+
+QVariant InputManager::data(const QModelIndex &index, int role) const {
+	int row = index.row();
+	int col = index.column();
+	if(role == Qt::DisplayRole) {
+		if(col == 0 && row < m_inputList.length()) {
+			return m_inputList[row]->title();
+		}
+	}
+	else if(role == Qt::CheckStateRole) {
+		if(col == 0 && row < m_inputList.length()) {
+			if(m_inputList[row]->isEnabled()) return Qt::Checked;
+			else return Qt::Unchecked;
+		}
+	}
+	return QVariant();
+}
+
+int InputManager::rowCount(const QModelIndex &parent) const {
+	return m_inputList.length();
+}
+
+QVariant InputManager::headerData(int section, Qt::Orientation orientation, int role) const {
+	if(role == Qt::DisplayRole) {
+		switch(section) {
+			case 0: return "";
+			case 1: return "Name";
+			default: return QVariant();
+		}
+	}
+	return QVariant();
+}
+
+Qt::ItemFlags InputManager::flags(const QModelIndex &index) const {
+	if(index.column() == 0) return Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+bool InputManager::setData(const QModelIndex &index, const QVariant &value, int role) {
+	if(role == Qt::CheckStateRole) {
+		int row = index.row();
+		if(row < 0 || row > m_inputList.length()) return false;
+		if(value.toBool()) {
+			m_inputList[row]->enable();
+		}
+		else {
+			m_inputList[row]->disable();
+		}
+		return true;
+	}
+	return false;
+}
+
 } // namespace Visualizer

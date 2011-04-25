@@ -28,9 +28,16 @@ private:
 	QHash<uint32_t, uint32_t> m_processIDMap;
 	ArtisanManager *m_artisanManager;
 	QHash<ModuleID, ArtisanWrapper *> m_artisanMap;
+	bool m_enabled;
 public:
 	DataInput(ArtisanManager *artisanManager);
 	virtual ~DataInput() {}
+	
+	virtual QString title() const { return "<default>"; }
+	
+	bool isEnabled() const { return m_enabled; }
+	void disable() { m_enabled = false; }
+	void enable() { m_enabled = true; }
 public slots:
 	void addData(QByteArray data);
 private:
