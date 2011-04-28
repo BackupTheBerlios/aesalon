@@ -29,6 +29,7 @@ public:
 	virtual ~RootWindow();
 private slots:
 	void addSubwindow(Artisan::Viewport *viewport);
+	void showSettingsDialog();
 private:
 	void createAboutBox();
 };

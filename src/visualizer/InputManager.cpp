@@ -52,13 +52,6 @@ int InputManager::rowCount(const QModelIndex &parent) const {
 }
 
 QVariant InputManager::headerData(int section, Qt::Orientation orientation, int role) const {
-	if(role == Qt::DisplayRole) {
-		switch(section) {
-			case 0: return "";
-			case 1: return "Name";
-			default: return QVariant();
-		}
-	}
 	return QVariant();
 }
 

@@ -20,7 +20,8 @@
 #include "visualizer/RootWindow.h"
 #include "util/MessageSystem.h"
 #include "visualizer/InputManagerWidget.h"
-#include <visualizer/LogInput.h>
+#include "visualizer/LogInput.h"
+#include "visualizer/SettingsDialog.h"
 
 namespace Visualizer {
 
@@ -45,6 +46,7 @@ RootWindow::RootWindow() {
 	createAboutBox();
 	
 	QMenu *aesalonMenu = new QMenu(tr("&Aesalon"));
+	aesalonMenu->addAction(tr("&Settings"), this, SLOT(showSettingsDialog()));
 	aesalonMenu->addAction(tr("&Close"), this, SLOT(close()));
 	aesalonMenu->addAction(tr("&Quit"), qApp, SLOT(closeAllWindows()));
 	menuBar()->addMenu(aesalonMenu);
@@ -64,6 +66,12 @@ void RootWindow::addSubwindow(Artisan::Viewport *viewport) {
 	msw->setAttribute(Qt::WA_DeleteOnClose);
 	msw->setWindowTitle(viewport->windowTitle());
 	msw->show();
+}
+
+void RootWindow::showSettingsDialog() {
+	SettingsDialog *dialog = new SettingsDialog();
+	dialog->setModal(true);
+	dialog->show();
 }
 
 void RootWindow::createAboutBox() {
