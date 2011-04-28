@@ -14,16 +14,19 @@
 #include <QListView>
 
 #include "InputManager.h"
+#include "InputCreator.h"
 
 namespace Visualizer {
 
-class InputManagerWidget : public QDockWidget {
+class InputManagerWidget : public QDockWidget { Q_OBJECT
 private:
 	InputManager *m_inputManager;
 	QListView *m_listView;
 public:
 	InputManagerWidget(InputManager *inputManager);
 	virtual ~InputManagerWidget();
+private slots:
+	void showCreator();
 };
 
 } // namespace Visualizer

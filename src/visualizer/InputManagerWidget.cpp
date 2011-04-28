@@ -9,6 +9,7 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QPushButton>
 
 #include "visualizer/InputManagerWidget.h"
 
@@ -27,6 +28,13 @@ InputManagerWidget::InputManagerWidget(InputManager *inputManager) : m_inputMana
 	m_listView->setModel(inputManager);
 	
 	stackLayout->addWidget(m_listView);
+
+	QPushButton *addButton = new QPushButton(tr("&Add input"));
+	connect(addButton, SIGNAL(clicked()), this, SLOT(showCreator()));
+	stackLayout->addWidget(addButton);
+
+	QPushButton *removeButton = new QPushButton(tr("&Remove input"));
+	stackLayout->addWidget(removeButton);
 	
 	stackWidget->setLayout(stackLayout);
 	
@@ -36,6 +44,11 @@ InputManagerWidget::InputManagerWidget(InputManager *inputManager) : m_inputMana
 
 InputManagerWidget::~InputManagerWidget() {
 	
+}
+
+void InputManagerWidget::showCreator() {
+	InputCreator creator(m_inputManager);
+	creator.exec();
 }
 
 } // namespace Visualizer

@@ -75,7 +75,7 @@ void InputCreator::fileSelected() {
 void InputCreator::createLogInput() {
 	hide();
 	LogInput *li = new LogInput(m_fileLocation->text().toStdString(), m_inputManager->artisanManager());
-	emit inputCreated(li);
+	m_inputManager->addInput(li);
 }
 
 } // namespace Visualizer

@@ -38,8 +38,6 @@ public:
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
 public slots:
 	void addInput(DataInput *input);
-signals:
-	void inputAdded(DataInput *input);
 };
 
 } // namespace Visualizer

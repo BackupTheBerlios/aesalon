@@ -22,8 +22,10 @@ InputManager::~InputManager() {
 
 void InputManager::addInput(DataInput *input) {
 	Message(Debug, "Adding input . . .");
+	
+	beginInsertRows(QModelIndex(), m_inputList.length(), m_inputList.length());
 	m_inputList.push_back(input);
-	emit inputAdded(input);
+	endInsertRows();
 }
 
 int InputManager::columnCount(const QModelIndex &parent) const {

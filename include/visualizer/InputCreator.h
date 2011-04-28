@@ -32,8 +32,6 @@ private:
 private slots:
 	void fileSelected();
 	void createLogInput();
-signals:
-	void inputCreated(DataInput *input);
 };
 
 } // namespace Visualizer
