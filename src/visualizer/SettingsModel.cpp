@@ -25,7 +25,6 @@ int SettingsModel::columnCount(const QModelIndex &parent) const {
 }
 
 int SettingsModel::rowCount(const QModelIndex &parent) const {
-	Message(Debug, "rowCount called. Return value: " << m_settingsVector.size() + 1);
 	return m_settingsVector.size() + 1;
 }
 

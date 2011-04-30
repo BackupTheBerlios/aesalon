@@ -35,8 +35,6 @@ RootWindow::RootWindow() {
 	
 	m_inputManager = new InputManager();
 	
-	m_inputManager->addInput(new LogInput("/home/ethereal/projects/aesalon/output-3.alog", m_inputManager->artisanManager()));
-	
 	InputManagerWidget *imw = new InputManagerWidget(m_inputManager);
 	
 	imw->setParent(this);
