@@ -9,3 +9,4 @@
 ==== Collector ====
 
 ==== Storage ====
+- Fix memory leaks in RTree implementation.
