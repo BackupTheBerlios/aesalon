@@ -18,7 +18,7 @@ namespace Storage {
 namespace RTreePrivate {
 
 void benchmarkTimings() {
-	typedef Storage::RTree<double, int, 1, 2, 6> RTree;
+	typedef Storage::RTree<double, int, 3, 2, 6> RTree;
 	
 	RTree rt;
 	
@@ -29,14 +29,21 @@ void benchmarkTimings() {
 	clock_gettime(CLOCK_REALTIME, &start);
 	
 	for(int i = 0; i < 1000000; i ++) {
-		double d = rand();
-		rt.insert(RTree::BoundType(d, d + 0.1 + (double)rand()), i);
+		double x = rand();
+		double y = rand();
+		double z = rand();
+		rt.insert(RTree::BoundType(
+			x, x + 0.1 + (double)rand(),
+			y, y + 0.1 + (double)rand(),
+			z, z + 0.1 + (double)rand()
+			), i);
 	}
 	
 	clock_gettime(CLOCK_REALTIME, &end);
 	
 	uint64_t elapsed = (end.tv_sec*1000000000+end.tv_nsec)-(start.tv_sec*1000000000+start.tv_nsec);
 	Message2(Log, Storage, "Elapsed time for 1,000,000 random insertions: " << elapsed << "ns");
+	Message2(Log, Storage, "Resulting RTree height: " << rt.height());
 }
 
 } // namespace RTreePrivate
