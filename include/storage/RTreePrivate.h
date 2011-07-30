@@ -170,6 +170,8 @@ public:
 	virtual void visit(const PointType &point, DataType data) = 0;
 };
 
+void benchmarkTimings();
+
 } // namespace RTreePrivate
 } // namespace Storage
 

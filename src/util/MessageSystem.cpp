@@ -14,16 +14,24 @@
 
 #include "util/MessageSystem.h"
 
+namespace MessageSubSystems {
+	const char *General = "GEN";
+	const char *Config = "CFG";
+	const char *Storage = "STR";
+} // namespace MessageSubSystems
+
 namespace Util {
 
-void MessageSystem::writeMessage(MessageSystem::MessageLevel level, const std::string &message) {
+void MessageSystem::writeMessage(MessageSystem::MessageLevel level,
+	const std::string &subsystem, const std::string &message) {
+	
 	std::time_t t = std::time(NULL);
 	
 	struct tm *lt = std::localtime(&t);
 	
 	std::string time = Util::StreamAsString() << lt->tm_hour << ":" << lt->tm_min << ":" << lt->tm_sec;
 	
-	std::printf("[%02i:%02i:%02i %5s] ", lt->tm_hour, lt->tm_min, lt->tm_sec, LevelString(level));
+	std::printf("[%02i:%02i:%02i %3s %5s] ", lt->tm_hour, lt->tm_min, lt->tm_sec, subsystem.c_str(), LevelString(level));
 	std::puts(message.c_str());
 	
 	if(level == Fatal) abort();

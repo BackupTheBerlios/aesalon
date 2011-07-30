@@ -52,8 +52,10 @@ public:
 	RTree() {
 		m_root = NULL;
 		/* Some basic sanity checks. */
-		if(MinimumFactor*2 > MaximumFactor) Message(Fatal, "RTree: MinimumFactor must be at most half of MaximumFactor.");
-		if(MaximumFactor < 2) Message(Fatal, "RTree: MaximumFactor must be at least 2!");
+		if(MinimumFactor*2 > MaximumFactor)
+			Message2(Fatal, Storage, "RTree: MinimumFactor must be at most half of MaximumFactor.");
+		if(MaximumFactor < 2)
+			Message2(Fatal, Storage, "RTree: MaximumFactor must be at least 2!");
 	}
 	
 	~RTree() {
@@ -95,7 +97,7 @@ public:
 		LeafNodeType *leaf = removeFromLeaf(bound, data, m_root);
 		
 		if(leaf == NULL) {
-			Message(Warning, "Tried to find " << data << ", but failed.");
+			Message2(Warning, Storage, "Tried to find " << data << ", but failed.");
 			return;
 		}
 		
@@ -258,7 +260,7 @@ private:
 		}
 		else {
 			abort();
-			Message(Fatal, "Both seeds for node-splitting are identical. Fix linearSplitSeeds.");
+			Message2(Fatal, Storage, "Both seeds for node-splitting are identical. Fix linearSplitSeeds.");
 		}
 		
 		/* Iterate through branches. */

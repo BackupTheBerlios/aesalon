@@ -46,6 +46,9 @@ void Coordinator::run() {
 			Message(Log, "    * \"" << i->first << "\" ==> \"" << i->second << "\"");
 		}
 	}
+	else if(vault->get("::rtree-benchmark") != "") {
+		Storage::RTreePrivate::benchmarkTimings();
+	}
 	else if(vault->get("::version") == "true") {
 		usage(false);
 	}

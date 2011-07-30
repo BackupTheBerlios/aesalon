@@ -25,22 +25,27 @@ public:
 		Fatal
 	};
 public:
-	static void writeMessage(MessageLevel level, const std::string &message);
+	static void writeMessage(MessageLevel level, const std::string &subsystem, const std::string &message);
 };
 
 } // namespace Util
 
+namespace MessageSubSystems {
+	extern const char *General;
+	extern const char *Config;
+	extern const char *Storage;
+} // namespace MessageSubSystems
+
+
 /* Usage something like:
 	Message(Debug, "The foo has passed bar #" << fooBar << " at baz #" << baz);
+	Message2(Debug, Config, "The foo has passed bar #" << fooBar << " at baz #" << baz);
 */
 
 #define Message(level, message) \
-	Util::MessageSystem::writeMessage(level, Util::StreamAsString() << message)
-
-#define Debug Util::MessageSystem::Debug
-#define Log Util::MessageSystem::Log
-#define Warning Util::MessageSystem::Warning
-#define Fatal Util::MessageSystem::Fatal
+	Util::MessageSystem::writeMessage(Util::MessageSystem::level, MessageSubSystems::General, Util::StreamAsString() << message)
+#define Message2(level, system, message) \
+	Util::MessageSystem::writeMessage(Util::MessageSystem::level, MessageSubSystems::system, Util::StreamAsString() << message)
 
 #define LevelString(level) \
 	(level == Debug?("DEBUG"):( \

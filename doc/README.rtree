@@ -1,0 +1,2 @@
+R-tree can be benchmarked by setting ::rtree-benchmark to non-empty.
+
