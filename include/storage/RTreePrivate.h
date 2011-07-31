@@ -23,8 +23,8 @@ private:
 	BoundType m_bounds[MaximumFactor+1];
 	int m_branchCount;
 public:
-	Node() : m_branchCount(0) {}
-	virtual ~Node() {}
+	Node() : m_branchCount(0) { Message2(Debug, Storage, "Node constructing . . ."); }
+	virtual ~Node() { Message2(Debug, Storage, "Node destructing . . ."); }
 	
 	virtual int depth() const = 0;
 	
@@ -60,7 +60,7 @@ private:
 	Node<DataType, BoundType, MaximumFactor> *m_branches[MaximumFactor+1];
 	int m_depth;
 public:
-	InternalNode() {}
+	InternalNode() : Node<DataType, BoundType, MaximumFactor>() {}
 	virtual ~InternalNode() {}
 	
 	virtual int depth() const { return m_depth; }
@@ -117,7 +117,7 @@ class LeafNode : public Node<DataType, BoundType, MaximumFactor> {
 private:
 	DataType m_branches[MaximumFactor+1];
 public:
-	LeafNode() {}
+	LeafNode() : Node<DataType, BoundType, MaximumFactor>() {}
 	virtual ~LeafNode() {}
 	
 	virtual int depth() const { return 0; }

@@ -59,7 +59,7 @@ public:
 	}
 	
 	~RTree() {
-		
+		clearTree();
 	}
 	
 	int height() const {
@@ -113,6 +113,10 @@ public:
 	void updateBound(const BoundType &oldBound, const DataType &data, const BoundType &newBound) {
 		remove(oldBound, data);
 		insert(newBound, data);
+	}
+	
+	void clearTree() {
+		clearTreeHelper(m_root);
 	}
 private:
 	void searchHelper(const BoundType &bound, NodeType *node, SearchVisitorType &visitor) {
@@ -375,6 +379,19 @@ private:
 					condenseTreeInsert(node->asInternalNode()->branch(b));
 				}
 			}
+		}
+	}
+	
+	void clearTreeHelper(NodeType *node) {
+		if(node->isLeaf()) {
+			Message2(Debug, Storage, "Destroying leaf node . . .");
+			AesalonPoolDestroy(LeafNodeType, node->asLeafNode());
+		}
+		else {
+			for(int b = 0; b < node->branchCount(); b ++) {
+				clearTreeHelper(node->asInternalNode()->branch(b));
+			}
+			AesalonPoolDestroy(InternalNodeType, node->asInternalNode());
 		}
 	}
 };
