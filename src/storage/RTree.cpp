@@ -29,7 +29,7 @@ static void benchmarkTimingsFor() {
 	
 	clock_gettime(CLOCK_REALTIME, &start);
 	
-	for(int i = 0; i < 1000; i ++) {
+	for(int i = 0; i < 1000000000; i ++) {
 		double x = rand();
 		double y = rand();
 		double z = rand();

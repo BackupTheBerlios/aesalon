@@ -42,31 +42,41 @@ void Mempool::destroy() {
 void *Mempool::allocate(uint64_t size) {
 	size = normalize(size);
 	
-	int8_t index = logBase2(size);
-	
-	if(m_elementSizes[index].start == NULL) allocatePool(size);
-	
-	Message2(Debug, Storage, "Allocating entry, size is " << size);
-	Message2(Debug, Storage, "\tstart: " << m_elementSizes[index].start);
-	
-	uint64_t address = (uint64_t)m_elementSizes[index].start;
-	m_elementSizes[index].start = (uint64_t *)*((uint64_t *)address);
-	
-	return (void *)address;
+	if(size >= AesalonPoolSizeThreshold) {
+		return new uint8_t[size];
+	}
+	else {
+		int8_t index = logBase2(size);
+		
+		if(m_elementSizes[index].start == NULL) allocatePool(size);
+		
+		Message2(Debug, Storage, "Allocating entry, size is " << size);
+		Message2(Debug, Storage, "\tstart: " << m_elementSizes[index].start);
+		
+		uint64_t address = (uint64_t)m_elementSizes[index].start;
+		m_elementSizes[index].start = (uint64_t *)*((uint64_t *)address);
+		
+		return (void *)address;
+	}
 }
 
 void Mempool::release(void *data, uint64_t size) {
 	size = normalize(size);
 	
-	uint64_t *ptr = (uint64_t *)data;
-	*ptr = 0;
-	
-	int8_t index = logBase2(size);
-	
-	if(m_elementSizes[index].end != NULL) {
-		*m_elementSizes[index].end = (uint64_t)ptr;
+	if(size >= AesalonPoolSizeThreshold) {
+		delete[] (uint8_t *)data;
 	}
-	m_elementSizes[index].end = ptr;
+	else {
+		uint64_t *ptr = (uint64_t *)data;
+		*ptr = 0;
+	
+		int8_t index = logBase2(size);
+	
+		if(m_elementSizes[index].end != NULL) {
+			*m_elementSizes[index].end = (uint64_t)ptr;
+		}
+		m_elementSizes[index].end = ptr;
+	}
 }
 
 uint64_t Mempool::normalize(uint64_t size) {
