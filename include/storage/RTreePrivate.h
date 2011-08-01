@@ -23,8 +23,8 @@ private:
 	BoundType m_bounds[MaximumFactor+1];
 	int m_branchCount;
 public:
-	Node() : m_branchCount(0) { Message2(Debug, Storage, "Node constructing . . ."); }
-	virtual ~Node() { Message2(Debug, Storage, "Node destructing . . ."); }
+	Node() : m_branchCount(0) { }
+	virtual ~Node() { }
 	
 	virtual int depth() const = 0;
 	

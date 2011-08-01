@@ -31,12 +31,15 @@ int ArgumentParser::parse(Config::Vault *vault, char **argv) {
 			/*std::cout << argv[arg+1] << std::endl;*/
 			std::string line = argv[arg];
 			std::string::size_type divider = line.find('=');
-			std::string key = line.substr(0, divider);
-			std::string data = line.substr(divider+1);
-			if(key[key.length()-1] != '+') vault->clear(key);
-			else key.erase(key.length()-1);
-			
-			vault->set(key, data);
+			if(divider != std::string::npos) {
+				std::string key = line.substr(0, divider);
+				std::string data = line.substr(divider+1);
+				if(key[key.length()-1] != '+') vault->clear(key);
+				else key.erase(key.length()-1);
+				
+				vault->set(key, data);
+			}
+			else vault->set(line, "true");
 		}
 		else if(std::strcmp(argv[arg], "--use-module") == 0) {
 			if(argv[++arg] == NULL) {

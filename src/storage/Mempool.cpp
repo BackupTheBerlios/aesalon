@@ -46,7 +46,10 @@ void *Mempool::allocate(uint64_t size) {
 	
 	if(m_elementSizes[index].start == NULL) allocatePool(size);
 	
-	uint64_t address = *m_elementSizes[index].start;
+	Message2(Debug, Storage, "Allocating entry, size is " << size);
+	Message2(Debug, Storage, "\tstart: " << m_elementSizes[index].start);
+	
+	uint64_t address = (uint64_t)m_elementSizes[index].start;
 	m_elementSizes[index].start = (uint64_t *)*((uint64_t *)address);
 	
 	return (void *)address;
@@ -90,70 +93,14 @@ int8_t Mempool::logBase2(uint64_t value) {
 #define MapLog2(n) \
 	else if(value == (1ul << n)) return n
 	
-	MapLog2(0);
-	MapLog2(1);
-	MapLog2(2);
-	MapLog2(3);
-	MapLog2(4);
-	MapLog2(5);
-	MapLog2(6);
-	MapLog2(7);
-	MapLog2(8);
-	MapLog2(9);
-	MapLog2(10);
-	MapLog2(11);
-	MapLog2(12);
-	MapLog2(13);
-	MapLog2(14);
-	MapLog2(15);
-	MapLog2(16);
-	MapLog2(17);
-	MapLog2(18);
-	MapLog2(19);
-	MapLog2(20);
-	MapLog2(21);
-	MapLog2(22);
-	MapLog2(23);
-	MapLog2(24);
-	MapLog2(25);
-	MapLog2(26);
-	MapLog2(27);
-	MapLog2(28);
-	MapLog2(29);
-	MapLog2(30);
-	MapLog2(31);
-	MapLog2(32);
-	MapLog2(33);
-	MapLog2(34);
-	MapLog2(35);
-	MapLog2(36);
-	MapLog2(37);
-	MapLog2(38);
-	MapLog2(39);
-	MapLog2(40);
-	MapLog2(41);
-	MapLog2(42);
-	MapLog2(43);
-	MapLog2(44);
-	MapLog2(45);
-	MapLog2(46);
-	MapLog2(47);
-	MapLog2(48);
-	MapLog2(49);
-	MapLog2(50);
-	MapLog2(51);
-	MapLog2(52);
-	MapLog2(53);
-	MapLog2(54);
-	MapLog2(55);
-	MapLog2(56);
-	MapLog2(57);
-	MapLog2(58);
-	MapLog2(59);
-	MapLog2(60);
-	MapLog2(61);
-	MapLog2(62);
-	MapLog2(63);
+	MapLog2(0);  MapLog2(1);  MapLog2(2);  MapLog2(3);  MapLog2(4);  MapLog2(5);  MapLog2(6);  MapLog2(7);
+	MapLog2(8);  MapLog2(9);  MapLog2(10); MapLog2(11); MapLog2(12); MapLog2(13); MapLog2(14); MapLog2(15);
+	MapLog2(16); MapLog2(17); MapLog2(18); MapLog2(19); MapLog2(20); MapLog2(21); MapLog2(22); MapLog2(23);
+	MapLog2(24); MapLog2(25); MapLog2(26); MapLog2(27); MapLog2(28); MapLog2(29); MapLog2(30); MapLog2(31);
+	MapLog2(32); MapLog2(33); MapLog2(34); MapLog2(35); MapLog2(36); MapLog2(37); MapLog2(38); MapLog2(39);
+	MapLog2(40); MapLog2(41); MapLog2(42); MapLog2(43); MapLog2(44); MapLog2(45); MapLog2(46); MapLog2(47);
+	MapLog2(48); MapLog2(49); MapLog2(50); MapLog2(51); MapLog2(52); MapLog2(53); MapLog2(54); MapLog2(55);
+	MapLog2(56); MapLog2(57); MapLog2(58); MapLog2(59); MapLog2(60); MapLog2(61); MapLog2(62); MapLog2(63);
 	
 #undef MapLog2
 	
@@ -162,7 +109,10 @@ int8_t Mempool::logBase2(uint64_t value) {
 }
 
 void Mempool::allocatePool(uint64_t size) {
-	uint64_t *data = new uint64_t[size * AesalonPoolSize];
+	Message2(Log, Storage, "Allocating pool for entry size " << size);
+	Message2(Log, Storage, "AesalonPoolSize: " << AesalonPoolSize);
+	
+	uint64_t *data = new uint64_t[(size >> 3) * AesalonPoolSize];
 	data[0] = 0;
 	data[1] = size;
 	
@@ -175,7 +125,11 @@ void Mempool::allocatePool(uint64_t size) {
 	int8_t index = logBase2(size);
 	
 	/* Chain together elements inside this pool. */
-	for(int i = 1; i < (AesalonPoolSize-1); i ++) {
+	int i;
+	if(size == 8) i = 2;
+	else i = 1;
+	
+	for(; i < (AesalonPoolSize-1); i ++) {
 		data[i*(size >> 3)] = (uint64_t)&data[(i+1)*(size >> 3)];
 	}
 	/* The last element doesn't point to anything. */

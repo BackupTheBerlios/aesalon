@@ -15,21 +15,16 @@
 
 #include "Config.h"
 
-#define AesalonPoolAlloc(type, pointer, object) \
+#define AesalonPoolAlloc(type, pointer, constructor) \
 	do { \
-		pointer = new(Storage::Mempool::allocate(sizeof(type))) object; \
+		(pointer) = new(Storage::Mempool::allocate(sizeof(type))) constructor; \
 	} while(0)
 
 #define AesalonPoolDestroy(type, pointer) \
 	do { \
-		__gnu_cxx::__pool_alloc<type> allocator; \
-		allocator.destroy(pointer); \
-	} while(0)
-
-#define AesalonPoolArray(type, pointer, size) \
-	do { \
-		__gnu_cxx::__pool_alloc<type> allocator; \
-		pointer = allocator.allocate(size); \
+		type *poolPointer = pointer; \
+		(poolPointer) ->~type(); \
+		Storage::Mempool::release(poolPointer, sizeof(type)); \
 	} while(0)
 
 namespace Storage {

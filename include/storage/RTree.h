@@ -384,7 +384,6 @@ private:
 	
 	void clearTreeHelper(NodeType *node) {
 		if(node->isLeaf()) {
-			Message2(Debug, Storage, "Destroying leaf node . . .");
 			AesalonPoolDestroy(LeafNodeType, node->asLeafNode());
 		}
 		else {
