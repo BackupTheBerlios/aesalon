@@ -20,6 +20,11 @@
 	# The length of the listen() queue in the monitor.
 	"connectionQueueLength": 4,
 
-	# Whether or not to use the g++ pool allocator.
+	# Whether or not to use the pool allocator, which wastes memory but is usually faster.
 	"usePoolAllocator": 1,
+	# Size of each memory pool, in numbers of elements.
+	"poolSize": 4096,
+	# Threshold (as a power of two) for the pool allocator: elements greater than
+	# this size will be allocated using new. Making this value large leads to Bad Things (TM).
+	"poolSizeThreshold": 10,
 }

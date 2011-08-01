@@ -29,7 +29,7 @@ static void benchmarkTimingsFor() {
 	
 	clock_gettime(CLOCK_REALTIME, &start);
 	
-	for(int i = 0; i < 1000000; i ++) {
+	for(int i = 0; i < 1000; i ++) {
 		double x = rand();
 		double y = rand();
 		double z = rand();
@@ -51,6 +51,8 @@ static void benchmarkTimingsFor() {
 void benchmarkTimings() {
 	Message2(Log, Storage, "Running R-tree benchmark . . .");
 
+	benchmarkTimingsFor<2, 4>();
+
 #define benchmark(n) do { \
 	benchmarkTimingsFor<n, n*2>(); \
 	benchmarkTimingsFor<n, n*3>(); \
@@ -61,12 +63,12 @@ void benchmarkTimings() {
 	benchmarkTimingsFor<n, n*8>(); \
 	} while(0)
 	
-	benchmark(2);
+	/*benchmark(2);
 	benchmark(4);
 	benchmark(8);
 	benchmark(16);
 	benchmark(32);
-	benchmark(64);
+	benchmark(64);*/
 }
 
 } // namespace RTreePrivate

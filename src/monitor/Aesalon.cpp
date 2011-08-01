@@ -11,10 +11,14 @@
 
 #include "monitor/Coordinator.h"
 #include "config/GlobalVault.h"
+#include "storage/Mempool.h"
 
 int main(int argc, char *argv[]) {
+	Storage::Mempool::create();
 	Config::GlobalVault gv;
 	Monitor::Coordinator coordinator(argv);
 	coordinator.run();
+	
+	Storage::Mempool::destroy();
 	return coordinator.returnValue();
 }
