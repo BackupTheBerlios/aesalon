@@ -137,8 +137,8 @@ private:
 	NodeType *insertChooseLeaf(const BoundType &bound) {
 		NodeType *node = m_root;
 		while(!node->isLeaf()) {
-			KeyType minCost;
-			int minElement;
+			KeyType minCost = 0;
+			int minElement = 0;
 			for(int i = 0; i < node->branchCount(); i ++) {
 				KeyType coverCost = node->branchBound(i).toCover(bound);
 				if(i == 0 || coverCost < minCost) minElement = i, minCost = coverCost;
@@ -183,8 +183,9 @@ private:
 		KeyType lowestEndValue[Dimensions] = {0};
 		int lowestEnd[Dimensions] = {-1};
 		
-		KeyType lowest[Dimensions];
-		KeyType highest[Dimensions];
+		/* Set these to zero to keep GCC happy. */
+		KeyType lowest[Dimensions] = {0};
+		KeyType highest[Dimensions] = {0};
 		
 		for(int d = 0; d < Dimensions; d ++) {
 			for(int i = 0; i <= MaximumFactor; i ++) {
@@ -330,7 +331,7 @@ private:
 		NodeType *node = m_root;
 		while(node->depth() > (toInsert->depth()+1)) {
 			KeyType minCost;
-			int minElement;
+			int minElement = 0;
 			for(int i = 0; i < node->branchCount(); i ++) {
 				KeyType coverCost = node->branchBound(i).toCover(bound);
 				if(i == 0 || coverCost < minCost) minElement = i, minCost = coverCost;

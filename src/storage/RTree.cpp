@@ -27,9 +27,11 @@ static void benchmarkTimingsFor() {
 	
 	struct timespec start, end;
 	
+	Message2(Log, Storage, "Benchmark results for (min,max) = (" << min << "," << max << ")");
+	
 	clock_gettime(CLOCK_REALTIME, &start);
 	
-	for(int i = 0; i < 1000000000; i ++) {
+	for(int i = 0; i < 1000000; i ++) {
 		double x = rand();
 		double y = rand();
 		double z = rand();
@@ -43,14 +45,36 @@ static void benchmarkTimingsFor() {
 	clock_gettime(CLOCK_REALTIME, &end);
 	
 	uint64_t elapsed = (end.tv_sec*1000000000+end.tv_nsec)-(start.tv_sec*1000000000+start.tv_nsec);
-	Message2(Log, Storage, "Benchmark results for (min,max) = (" << min << "," << max << ")");
 	Message2(Log, Storage, "\tElapsed time for 1,000,000 random insertions: " << elapsed << "ns");
 	Message2(Log, Storage, "\tResulting RTree height: " << rt.height());
+	
+	typename RTree::BoundType bound = rt.bounds();
+	
+	class Visitor : public RTree::SearchVisitorType {
+	public:
+		int i;
+		virtual ~Visitor() {}
+		virtual void visit(const typename RTree::BoundType &bound, int data) { i ++; }
+		virtual void visit(const typename RTree::PointType &point, int data) { }
+	};
+	
+	clock_gettime(CLOCK_REALTIME, &start);
+	
+	for(int i = 0; i < 50; i ++) {
+		Visitor v;
+		v.i = 0;
+		rt.search(bound, v);
+		if(v.i != 1000000) Message2(Warning, Storage, "Complete search did not encounter all items!");
+	}
+	clock_gettime(CLOCK_REALTIME, &end);
+	
+	elapsed = (end.tv_sec*1000000000+end.tv_nsec)-(start.tv_sec*1000000000+start.tv_nsec);
+	Message2(Log, Storage, "\tElapsed time for 50 complete searches: " << elapsed << "ns");
 }
 
 void benchmarkTimings() {
 	Message2(Log, Storage, "Running R-tree benchmark . . .");
-
+	
 #define benchmark(n) do { \
 	benchmarkTimingsFor<n, n*2>(); \
 	benchmarkTimingsFor<n, n*3>(); \

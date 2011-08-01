@@ -53,7 +53,7 @@ env = Environment(
 		'HOME' : os.environ['HOME']})
 
 env.Append(CPPPATH = ["#include/"])
-env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-pthread"])
+env.Append(CCFLAGS = ["-W", "-Wall", "-g", "-pthread", "-O2"])
 env.Append(LIBPATH = ["#.build"])
 env.Append(LINKFLAGS = ["-pthread"])
 

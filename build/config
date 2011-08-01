@@ -21,7 +21,8 @@
 	"connectionQueueLength": 4,
 
 	# Whether or not to use the pool allocator, which wastes memory but is usually faster.
-	# The amount of wasted memory can potentially be as high as (poolSize-1)*(2**poolSizeThreshold).
+	# The amount of wasted memory can potentially be as high as
+	# (poolSize-1)*(2**poolSizeThreshold) per allocated element.
 	"usePoolAllocator": 1,
 	# Size of each memory pool, in numbers of elements.
 	"poolSize": 4096,
