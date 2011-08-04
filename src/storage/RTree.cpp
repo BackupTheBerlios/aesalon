@@ -7,6 +7,7 @@
 	@file src/storage/RTree.cpp
 */
 
+#include <stdlib.h>
 #include <time.h>
 #include <stdint.h>
 
@@ -54,8 +55,11 @@ static void benchmarkTimingsFor() {
 	public:
 		int i;
 		virtual ~Visitor() {}
-		virtual void visit(const typename RTree::BoundType &bound, int data) { i ++; }
-		virtual void visit(const typename RTree::PointType &point, int data) { }
+		virtual void visit(const typename RTree::BoundType &, int) {
+			i ++;
+		}
+		
+		virtual void visit(const typename RTree::PointType &, int) { }
 	};
 	
 	clock_gettime(CLOCK_REALTIME, &start);

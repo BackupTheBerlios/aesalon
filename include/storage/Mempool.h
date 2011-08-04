@@ -10,6 +10,7 @@
 #ifndef AesalonStorage_Mempool_H
 #define AesalonStorage_Mempool_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "Config.h"

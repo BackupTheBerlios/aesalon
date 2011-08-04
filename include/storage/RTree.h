@@ -264,7 +264,6 @@ private:
 			tsSeed = seeds[0];
 		}
 		else {
-			abort();
 			Message2(Fatal, Storage, "Both seeds for node-splitting are identical. Fix linearSplitSeeds.");
 		}
 		
