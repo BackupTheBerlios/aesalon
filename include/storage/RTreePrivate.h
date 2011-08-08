@@ -49,9 +49,9 @@ public:
 	void setParent(Node *newParent) { m_parent = newParent; }
 	
 	InternalNode<DataType, BoundType, MaximumFactor> *asInternalNode()
-		{ return dynamic_cast<InternalNode<DataType, BoundType, MaximumFactor> *>(this); }
+		{ return static_cast<InternalNode<DataType, BoundType, MaximumFactor> *>(this); }
 	LeafNode<DataType, BoundType, MaximumFactor> *asLeafNode()
-		{ return dynamic_cast<LeafNode<DataType, BoundType, MaximumFactor> *>(this); }
+		{ return static_cast<LeafNode<DataType, BoundType, MaximumFactor> *>(this); }
 };
 
 template<typename DataType, typename BoundType, int MaximumFactor>
